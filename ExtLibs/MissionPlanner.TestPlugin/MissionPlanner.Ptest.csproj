@@ -1,0 +1,155 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{C371589D-A8D6-4883-95CF-56B2D78193C6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>MissionPlanner.TestPlugin</RootNamespace>
+    <AssemblyName>MissionPlanner.TestPlugin</AssemblyName>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\..\bin\Debug\net461\plugins\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\..\bin\Release\net461\plugins\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="OpenTK, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\OpenTK.3.0.1\lib\net20\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK.GLControl, Version=3.0.1.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\OpenTK.GLControl.3.0.1\lib\net20\OpenTK.GLControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="PtestPlugin.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PtestPlugin.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>PtestPlugin.resx</DependentUpon>
+    </Compile>
+    <Compile Include="PtestUI.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PtestUI.Designer.cs">
+      <DependentUpon>PtestUI.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+    </Compile>
+    <EmbeddedResource Include="PtestPlugin.resx">
+      <DependentUpon>PtestPlugin.cs</DependentUpon>
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>PtestPlugin.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PtestUI.resx">
+      <DependentUpon>PtestUI.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="OpenTK.dll.config" />
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\MissionPlanner.csproj">
+      <Project>{a2e22272-95fe-47b6-b050-9ae7e2055bf5}</Project>
+      <Name>MissionPlanner</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ArduPilot\MissionPlanner.ArduPilot.csproj">
+      <Project>{ca6345d3-7a6d-478b-a0ed-a58e50dcaa83}</Project>
+      <Name>MissionPlanner.ArduPilot</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Comms\MissionPlanner.Comms.csproj">
+      <Project>{825e7a10-390c-4a2b-b3a8-491d14966912}</Project>
+      <Name>MissionPlanner.Comms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Controls\MissionPlanner.Controls.csproj">
+      <Project>{c8b88795-6d01-494d-83ad-6944bd4c5023}</Project>
+      <Name>MissionPlanner.Controls</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GeoUtility\GeoUtility.csproj">
+      <Project>{7f7994ce-823f-4a04-bbea-d0a3808ff56d}</Project>
+      <Name>GeoUtility</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GMap.NET.Core\GMap.NET.Core.csproj">
+      <Project>{d0c39d9d-bed0-418b-9a5e-713176caf40c}</Project>
+      <Name>GMap.NET.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GMap.NET.WindowsForms\GMap.NET.WindowsForms.csproj">
+      <Project>{e06def77-f933-42fb-afd7-db2d0d8d6a98}</Project>
+      <Name>GMap.NET.WindowsForms</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StreamPlayerControl\StreamPlayerControl.csproj">
+      <Project>{933cf601-d940-4934-8fdb-b3d58ce43568}</Project>
+      <Name>StreamPlayerControl</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj">
+      <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
+      <Name>MissionPlanner.Utilities</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\rac_flightdata_icon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\Image1.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\logo2.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
