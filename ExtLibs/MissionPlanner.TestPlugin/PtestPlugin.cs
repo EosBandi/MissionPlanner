@@ -22,6 +22,9 @@ using OpenTK.Graphics.OpenGL;
 
 namespace MissionPlanner.Ptest
 {
+
+
+
     public class PtestPlugin : MissionPlanner.Plugin.Plugin
     {
 
@@ -29,6 +32,7 @@ namespace MissionPlanner.Ptest
         Panel videoPanel;
         TableLayoutPanel tblMap;
         Label lab;
+        Button b;
 
         Player.ucPlayerControl ucPlayerControl1;
 
@@ -63,16 +67,15 @@ namespace MissionPlanner.Ptest
                     Program.Splash.FormBorderStyle = FormBorderStyle.None;
                 
 
-
                     sc = Host.MainForm.FlightData.Controls.Find("splitContainer1", true).FirstOrDefault() as SplitContainer;
                     TrackBar tb = Host.MainForm.FlightData.Controls.Find("TRK_zoom", true).FirstOrDefault() as TrackBar;
                     Panel pn1 = Host.MainForm.FlightData.Controls.Find("panel1", true).FirstOrDefault() as Panel;
                     tblMap = Host.MainForm.FlightData.Controls.Find("tableMap", true).FirstOrDefault() as TableLayoutPanel;
                     SplitContainer SubMainLeft = Host.MainForm.FlightData.Controls.Find("SubMainLeft", true).FirstOrDefault() as SplitContainer;
                     HUD hud = SubMainLeft.Panel1.Controls["hud1"] as HUD;
-
-
                     hud.skyColor1 = Color.Red;
+
+                    System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PtestPlugin));
 
                     SubMainLeft.Panel2.Controls["tabControlActions"].Visible = false;
 
@@ -84,6 +87,21 @@ namespace MissionPlanner.Ptest
                     sc.Panel2.Controls.Add(lab);
                     sc.Panel2.Controls.SetChildIndex(lab, 1);
 
+                    b = new Button();
+                    b.Location = new Point(200, 30);
+                    //b.Text = "Button";
+                    sc.Panel2.Controls.Add(b);
+                    sc.Panel2.Controls.SetChildIndex(b, 1);
+                    Image i = (Image)(resources.GetObject("logo2"));
+                    b.Image = i;
+                    b.BackColor = Color.Transparent;
+                    b.ForeColor = Color.Transparent;
+                    b.Width = 300;
+                    b.Height = 60;
+                    
+            
+
+
                     MenuStrip mainmenu = Host.MainForm.MainMenu;
                     //Remove menu items from Simulation (Sim, Terminal, Help, Donate and ArduPilot)
                     mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuHelp"));
@@ -92,10 +110,9 @@ namespace MissionPlanner.Ptest
                     mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuSimulation"));
                     mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuArduPilot"));
 
-                    System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PtestPlugin));
 
                     Host.MainForm.MainMenu.SuspendLayout();
-                    Image lg = (Image)(resources.GetObject("logo2"));
+                    Bitmap lg = (Bitmap)(resources.GetObject("logo2"));
                     ToolStripButton mi = new ToolStripButton();
 
                     mi.Size = lg.Size;
@@ -201,9 +218,10 @@ namespace MissionPlanner.Ptest
         }
         public override bool Loop()
         {
+            b.BackColor = Color.Transparent;
+            b.ForeColor = Color.Transparent;
 
-
-           MainV2.instance.Invoke((Action)
+            MainV2.instance.Invoke((Action)
            delegate
            {
 
