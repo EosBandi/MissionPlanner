@@ -110,7 +110,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Transitions", "ExtLibs\Tran
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "wasm", "ExtLibs\wasm\wasm.csproj", "{E2CE55F4-53FB-48C3-A8BE-34161961FD2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MissionPlanner.Ptest", "ExtLibs\MissionPlanner.TestPlugin\MissionPlanner.Ptest.csproj", "{C371589D-A8D6-4883-95CF-56B2D78193C6}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MissionPlanner.EliPlugin", "ExtLibs\MissionPlanner.TestPlugin\MissionPlanner.EliPlugin.csproj", "{C371589D-A8D6-4883-95CF-56B2D78193C6}"
 	ProjectSection(ProjectDependencies) = postProject
 		{933CF601-D940-4934-8FDB-B3D58CE43568} = {933CF601-D940-4934-8FDB-B3D58CE43568}
 	EndProjectSection

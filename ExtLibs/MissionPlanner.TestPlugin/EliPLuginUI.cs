@@ -10,9 +10,9 @@ using System.Windows.Forms;
 
 namespace MissionPlanner.TestPlugin
 {
-    public partial class PtestUI : Form
+    public partial class EliPLuginUI : Form
     {
-        public PtestUI()
+        public EliPLuginUI()
         {
             InitializeComponent();
         }

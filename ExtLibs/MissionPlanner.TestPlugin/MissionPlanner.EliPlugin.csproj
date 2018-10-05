@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{C371589D-A8D6-4883-95CF-56B2D78193C6}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>MissionPlanner.TestPlugin</RootNamespace>
-    <AssemblyName>MissionPlanner.TestPlugin</AssemblyName>
+    <RootNamespace>MissionPlanner.EliPlugin</RootNamespace>
+    <AssemblyName>MissionPlanner.EliPlugin</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -55,18 +55,19 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PtestPlugin.cs" />
+    <Compile Include="EliPlugin.cs" />
+    <Compile Include="ElistairClass.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PtestPlugin.Designer.cs">
+    <Compile Include="EliPlugin.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>PtestPlugin.resx</DependentUpon>
+      <DependentUpon>EliPlugin.resx</DependentUpon>
     </Compile>
-    <Compile Include="PtestUI.cs">
+    <Compile Include="EliPLuginUI.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="PtestUI.Designer.cs">
-      <DependentUpon>PtestUI.cs</DependentUpon>
+    <Compile Include="EliPLuginUI.Designer.cs">
+      <DependentUpon>EliPLuginUI.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
@@ -78,13 +79,13 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="PtestPlugin.resx">
-      <DependentUpon>PtestPlugin.cs</DependentUpon>
+    <EmbeddedResource Include="EliPlugin.resx">
+      <DependentUpon>EliPlugin.cs</DependentUpon>
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>PtestPlugin.Designer.cs</LastGenOutput>
+      <LastGenOutput>EliPlugin.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="PtestUI.resx">
-      <DependentUpon>PtestUI.cs</DependentUpon>
+    <EmbeddedResource Include="EliPLuginUI.resx">
+      <DependentUpon>EliPLuginUI.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="OpenTK.dll.config" />
     <None Include="packages.config" />
@@ -150,6 +151,15 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\logo2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\EasyPlanner_splash.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\landing-512.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\start-512.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

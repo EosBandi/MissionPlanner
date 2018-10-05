@@ -1,6 +1,6 @@
 ﻿namespace MissionPlanner.TestPlugin
 {
-    partial class PtestUI
+    partial class EliPLuginUI
     {
         /// <summary>
         /// Required designer variable.

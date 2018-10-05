@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace MissionPlanner.TestPlugin {
+namespace MissionPlanner.EliPlugin {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace MissionPlanner.TestPlugin {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class PtestPlugin {
+    internal class EliPlugin {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal PtestPlugin() {
+        internal EliPlugin() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace MissionPlanner.TestPlugin {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MissionPlanner.TestPlugin.PtestPlugin", typeof(PtestPlugin).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("MissionPlanner.EliPlugin.EliPlugin", typeof(EliPlugin).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -63,6 +63,26 @@ namespace MissionPlanner.TestPlugin {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap EasyPlanner_splash {
+            get {
+                object obj = ResourceManager.GetObject("EasyPlanner_splash", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap landing_512 {
+            get {
+                object obj = ResourceManager.GetObject("landing_512", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap logo2 {
             get {
                 object obj = ResourceManager.GetObject("logo2", resourceCulture);
@@ -76,6 +96,16 @@ namespace MissionPlanner.TestPlugin {
         internal static System.Drawing.Bitmap rac_flightdata_icon {
             get {
                 object obj = ResourceManager.GetObject("rac_flightdata_icon", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap start_512 {
+            get {
+                object obj = ResourceManager.GetObject("start_512", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
