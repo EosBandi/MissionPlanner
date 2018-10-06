@@ -131,9 +131,17 @@
       <Project>{e06def77-f933-42fb-afd7-db2d0d8d6a98}</Project>
       <Name>GMap.NET.WindowsForms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\StreamPlayerControl\StreamPlayerControl.csproj">
-      <Project>{933cf601-d940-4934-8fdb-b3d58ce43568}</Project>
-      <Name>StreamPlayerControl</Name>
+    <ProjectReference Include="..\Mavlink\MAVLink.csproj">
+      <Project>{13d2ec90-c41f-48a1-aada-859b6dc24edc}</Project>
+      <Name>MAVLink</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MissionPlanner.Stats\MissionPlanner.Stats.csproj">
+      <Project>{6a6f4345-0a45-413e-b6d6-fd73660dad4c}</Project>
+      <Name>MissionPlanner.Stats</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\racPlayerControl\racPlayerControl.csproj">
+      <Project>{d85d7828-a8bb-4879-86c1-1084577a66b2}</Project>
+      <Name>racPlayerControl</Name>
     </ProjectReference>
     <ProjectReference Include="..\Utilities\MissionPlanner.Utilities.csproj">
       <Project>{1378a66c-38e4-46f5-a05f-dc04ef7d4d16}</Project>
@@ -160,6 +168,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\start-512.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\minus.png" />
+    <Content Include="Resources\plus.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

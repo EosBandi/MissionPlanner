@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.ucPlayerControl1 = new Player.ucPlayerControl();
+            this.ucPlayerControl1 = new racPlayerControl.racPlayerControl();
             this.SuspendLayout();
             // 
             // ucPlayerControl1
@@ -45,7 +45,7 @@
             this.ucPlayerControl1.RecordPath = "";
             this.ucPlayerControl1.Size = new System.Drawing.Size(545, 340);
             this.ucPlayerControl1.TabIndex = 0;
-            this.ucPlayerControl1.VideoRate = Player.ucPlayerControl.ratelist.OriginalRate;
+            this.ucPlayerControl1.VideoRate = racPlayerControl.racPlayerControl.ratelist.OriginalRate;
             this.ucPlayerControl1.VisiblePlayerMenu = true;
             this.ucPlayerControl1.VisibleStatus = true;
             // 
@@ -63,6 +63,6 @@
 
         #endregion
 
-        private Player.ucPlayerControl ucPlayerControl1;
+        private racPlayerControl.racPlayerControl ucPlayerControl1;
     }
 }

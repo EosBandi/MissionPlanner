@@ -19,7 +19,7 @@ using MissionPlanner.Controls;
 using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
-
+using racPlayerControl;
 
 
 namespace MissionPlanner.Elistair
@@ -32,7 +32,10 @@ namespace MissionPlanner.Elistair
         private WebClient browser = new WebClient();
         private Uri _url = new Uri("http://127.0.0.1/");
         private ElistairClass eli = new ElistairClass();
+        private bool _eli_connected = false;
         private int _eli_wait_cycles = 0;
+
+        private int _target_altitude = 15;
 
 
         SplitContainer sc;
@@ -42,14 +45,16 @@ namespace MissionPlanner.Elistair
         SplitContainer SubMainLeft;
         SplitContainer MainH;
         TableLayoutPanel tblMap;
+        HUD hud;
 
-        Player.ucPlayerControl ucPlayerControl1;
+        racPlayerControl.racPlayerControl ucPlayerControl1;
 
         int a = 0;
 
 
         private System.Windows.Forms.Panel EliStatPanel;
         private System.Windows.Forms.GroupBox groupBoxWinch;
+        private System.Windows.Forms.GroupBox groupBoxButton;
         private System.Windows.Forms.Label lTorque;
         private System.Windows.Forms.Label lCOut;
         private System.Windows.Forms.Label lCSpeed;
@@ -60,8 +65,16 @@ namespace MissionPlanner.Elistair
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button button1;
-
+        private System.Windows.Forms.PictureBox btnDoLand;
+        private System.Windows.Forms.PictureBox btnDoTakeoff;
+        private System.Windows.Forms.PictureBox btnAltPlus;
+        private System.Windows.Forms.PictureBox btnAltMinus;
+        private System.Windows.Forms.Label lSafetyBatt;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label lTargetAlt;
+        private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Button bDoChangeAlt;
+        private System.Windows.Forms.Label lMessage;
 
         public override string Name
         {
@@ -135,7 +148,7 @@ namespace MissionPlanner.Elistair
             tblMap.Visible = false;
 
             // Customize HUD
-            HUD hud = SubMainLeft.Panel1.Controls["hud1"] as HUD;
+            hud = SubMainLeft.Panel1.Controls["hud1"] as HUD;
             hud.displayAOASSA = false;
             hud.displayxtrack = false;
             hud.displayspeed = false;
@@ -143,25 +156,40 @@ namespace MissionPlanner.Elistair
 
             hud.ContextMenuStrip.Items["swapWithMapToolStripMenuItem"].Enabled = false;
             hud.ContextMenuStrip.Items["videoToolStripMenuItem"].Enabled = false;
-            
-            
 
+
+            this.lMessage = new System.Windows.Forms.Label();
+            this.lMessage.Anchor =  ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top)
+                                       | System.Windows.Forms.AnchorStyles.Left)
+                                       | System.Windows.Forms.AnchorStyles.Right)));
+
+            this.lMessage.AutoSize = false;
+            this.lMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lMessage.Location = new System.Drawing.Point(0, 0);
+            this.lMessage.Name = "lMessage";
+            this.lMessage.Size = new System.Drawing.Size(MainH.Panel2.Size.Width, 40);
+            this.lMessage.Text = "";
+            this.lMessage.TextAlign = ContentAlignment.MiddleCenter;
+            this.lMessage.ForeColor = Color.DarkOrange;
+            MainH.Panel2.Controls.Add(lMessage);
+
+            
 
             //Create and Add StreamPlayerControl to the place of tblMap
-            ucPlayerControl1 = new Player.ucPlayerControl();
+            ucPlayerControl1 = new racPlayerControl.racPlayerControl();
             ucPlayerControl1.AutoRecconect = true;
             ucPlayerControl1.ffmegParams = "";
             ucPlayerControl1.ffmegPath = "";
-            ucPlayerControl1.Location = new System.Drawing.Point(0, 0);
-            ucPlayerControl1.MediaUrl = "rtsp://192.168.0.33:554/user=admin&password=titok&channel=1&stream=1.sdp?real_stream--rtp-caching=1";// rtsp://localhost:8554/";
+            ucPlayerControl1.Location = new System.Drawing.Point(0, 40);
+            ucPlayerControl1.MediaUrl = "rtsp://192.168.0.33:554/user=admin&password=titok&channel=&stream=.sdp";// rtsp://localhost:8554/";
             ucPlayerControl1.Name = "ucPlayerControl1";
             ucPlayerControl1.RecordPath = "";
-            ucPlayerControl1.Size = MainH.Panel2.Size;
+            ucPlayerControl1.Size = new System.Drawing.Size(MainH.Panel2.Size.Width, MainH.Panel2.Size.Height - 40);
             ucPlayerControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                                        | System.Windows.Forms.AnchorStyles.Left)
                                        | System.Windows.Forms.AnchorStyles.Right)));
             ucPlayerControl1.TabIndex = 0;
-            ucPlayerControl1.VideoRate = Player.ucPlayerControl.ratelist.WideScreen;
+            ucPlayerControl1.VideoRate = racPlayerControl.racPlayerControl.ratelist.WideScreen;
             ucPlayerControl1.VisiblePlayerMenu = true;
             ucPlayerControl1.VisibleStatus = true;
             MainH.Panel2.Controls.Add(ucPlayerControl1);
@@ -172,9 +200,21 @@ namespace MissionPlanner.Elistair
             EliStatPanel.Width = SubMainLeft.Panel2.Width;
 
             Image imageLand = (Image)(resources.GetObject("landing_512"));
-            this.button1.BackgroundImage = imageLand;
-            this.button1.BackgroundImageLayout = ImageLayout.Stretch;
-                        
+            this.btnDoLand.BackgroundImage = imageLand;
+            this.btnDoLand.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageTakeoff = (Image)(resources.GetObject("start_512"));
+            this.btnDoTakeoff.BackgroundImage = imageTakeoff;
+            this.btnDoTakeoff.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageAltPlus = (Image)(resources.GetObject("plus"));
+            this.btnAltPlus.BackgroundImage = imageAltPlus;
+            this.btnAltPlus.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageAltMinus = (Image)(resources.GetObject("minus"));
+            this.btnAltMinus.BackgroundImage = imageAltMinus;
+            this.btnAltMinus.BackgroundImageLayout = ImageLayout.Stretch;
+            // this.btnDoTakeoff.Location = new Point(229, EliStatPanel.Height - 100);
 
 
             MainV2.instance.Invoke((Action)
@@ -237,8 +277,8 @@ namespace MissionPlanner.Elistair
         public override bool Loop()
         {
 
-            this.button1.ForeColor = Color.Transparent;
-            this.button1.BackColor = Color.Transparent;
+
+ 
             //Check if browser is busy
             if (!browser.IsBusy)
             {
@@ -253,12 +293,20 @@ namespace MissionPlanner.Elistair
                 else
                 {
                     browser.CancelAsync();
+                    _eli_connected = false;
+
                 }
             }
+   
+
 
             MainV2.instance.Invoke((Action)
               delegate
               {
+
+                  this.btnAltPlus.Location = new System.Drawing.Point(btnDoLand.Location.X, EliStatPanel.Height / 2 - 100);
+                  this.btnAltMinus.Location = new System.Drawing.Point(btnDoLand.Location.X, EliStatPanel.Height / 2 + 20);
+                  //Host.MainForm.Menu
                   // Update winch data
                   lTemp.Text = eli.Temperature.ToString();
                   lPower.Text = eli.Power.ToString();
@@ -278,6 +326,37 @@ namespace MissionPlanner.Elistair
                   else if (eli.Power >= 1400 && eli.Power <= 1800) lPower.ForeColor = Color.Orange;
                   else lPower.ForeColor = Color.OrangeRed;
 
+                  lSafetyBatt.Text = Math.Round(Host.cs.battery_voltage,2).ToString("F2") + " V";
+                  if (!_eli_connected)
+                  {
+                      groupBoxWinch.Text = "Winch - disconnected";
+                      groupBoxWinch.ForeColor = Color.OrangeRed;
+                  }
+                  else
+                  {
+                      groupBoxWinch.Text = "Winch - connected";
+                      groupBoxWinch.ForeColor = Color.LightGreen;
+                  }
+
+
+                  if ( ((Host.cs.mode.ToUpper() == "GUIDED") || (Host.cs.mode.ToUpper() == "LOITER") && (Host.cs.armed) && (Host.cs.alt > 14)) )
+                  {
+                      btnAltMinus.Enabled = true;
+                      btnAltPlus.Enabled = true;
+                      lTargetAlt.Text = _target_altitude.ToString() + " m";
+                      
+                  }
+                  else
+                  {
+                      btnAltMinus.Enabled = false;
+                      btnAltPlus.Enabled = false;
+                      lTargetAlt.Text = "---";
+                      _target_altitude = 15;
+
+                  }
+
+
+                  lMessage.Text = hud.message;
 
 
               });
@@ -298,17 +377,80 @@ namespace MissionPlanner.Elistair
         {
             if (e.Error != null)
             { eli.Message = "";
+                _eli_connected = false;
                 return;
             }
             eli.Message = e.Result;
+            _eli_connected = true;
         }
 
+        private void btnAltPlus_Click(object sender, EventArgs e)
+        {
+            if (_target_altitude < 80)
+            {
+                _target_altitude += 5;
+                lTargetAlt.Text = _target_altitude.ToString() + " m";
+                bDoChangeAlt.Enabled = true;
+            }
+        }
+
+        private void btnAltMinus_Click(object sender, EventArgs e)
+        {
+            if (_target_altitude > 20)
+            {
+                _target_altitude -= 5;
+                lTargetAlt.Text = _target_altitude.ToString() + " m";
+                bDoChangeAlt.Enabled = true;
+            }
+        }
+
+        private void btnDoChangeAlt_Click(object sender, EventArgs e)
+        {
+            Locationwp loc = new Locationwp();
+            loc.lat = Host.cs.HomeLocation.Lat;
+            loc.lng = Host.cs.HomeLocation.Lng;
+            loc.alt = _target_altitude;
+            Host.comPort.setGuidedModeWP(loc,true);
+            bDoChangeAlt.Enabled = false;
+
+        }
+        private void btnDoLand_Click(object sender, EventArgs e)
+        {
+            DoLand();
+        }
+        private void btnDoTakeoff_Click(object sender, EventArgs e)
+        {
+            DoTakeOff();
+        }
+
+        private void DoTakeOff()
+        {
+            Host.comPort.setMode("Loiter");
+
+            if (Host.comPort.doARM(true))
+            {
+                Host.comPort.setMode("GUIDED");
+                Host.comPort.doCommand(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 15);
+            }
+
+            lMessage.Text = "Takeoff is in progress";
+        }
+
+        private void DoLand()
+        {
+            if (Host.cs.armed && (Host.cs.alt > 0))
+            {
+                Host.comPort.setMode("LAND");
+            }
+            lMessage.Text = "Landing is in progress";
+        }
 
         private bool AddControls()
         {
 
             this.EliStatPanel = new System.Windows.Forms.Panel();
             this.groupBoxWinch = new System.Windows.Forms.GroupBox();
+            this.groupBoxButton = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -319,22 +461,41 @@ namespace MissionPlanner.Elistair
             this.lCSpeed = new System.Windows.Forms.Label();
             this.lCOut = new System.Windows.Forms.Label();
             this.lTorque = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
+            this.btnDoLand = new System.Windows.Forms.PictureBox();
+            this.btnDoTakeoff = new System.Windows.Forms.PictureBox();
+            this.btnAltPlus = new System.Windows.Forms.PictureBox();
+            this.btnAltMinus = new System.Windows.Forms.PictureBox();
+            this.label6 = new System.Windows.Forms.Label();
+            this.lSafetyBatt = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.lTargetAlt = new System.Windows.Forms.Label();
+            this.bDoChangeAlt = new System.Windows.Forms.Button();
             // 
             // EliStatPanel
             // 
+            this.EliStatPanel.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.EliStatPanel.Controls.Add(this.groupBoxWinch);
-            this.EliStatPanel.Controls.Add(this.button1);
+            this.EliStatPanel.Controls.Add(this.btnDoLand);
+            this.EliStatPanel.Controls.Add(this.btnDoTakeoff);
+            this.EliStatPanel.Controls.Add(this.btnAltMinus);
+            this.EliStatPanel.Controls.Add(this.btnAltPlus);
+            this.EliStatPanel.Controls.Add(this.lSafetyBatt);
+            this.EliStatPanel.Controls.Add(this.label6);
+            this.EliStatPanel.Controls.Add(this.lTargetAlt);
+            this.EliStatPanel.Controls.Add(this.label7);
+            this.EliStatPanel.Controls.Add(this.groupBoxButton);
+            this.EliStatPanel.Controls.Add(this.bDoChangeAlt);
             this.EliStatPanel.Location = new System.Drawing.Point(0, 0);
             this.EliStatPanel.Name = "EliStatPanel";
-            this.EliStatPanel.Size = new System.Drawing.Size(340, 271);
+            this.EliStatPanel.Size = new System.Drawing.Size(340, SubMainLeft.Panel2.Height-2);
             this.EliStatPanel.TabIndex = 0;
             // 
             // groupBoxWinch
             // 
             this.groupBoxWinch.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top)
-            | System.Windows.Forms.AnchorStyles.Left)
-            | System.Windows.Forms.AnchorStyles.Right)));
+            | System.Windows.Forms.AnchorStyles.Left))));
             this.groupBoxWinch.Controls.Add(this.lTorque);
             this.groupBoxWinch.Controls.Add(this.lCOut);
             this.groupBoxWinch.Controls.Add(this.lCSpeed);
@@ -347,13 +508,24 @@ namespace MissionPlanner.Elistair
             this.groupBoxWinch.Controls.Add(this.label1);
 
             this.groupBoxWinch.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBoxWinch.Location = new System.Drawing.Point(0, 0);
+            this.groupBoxWinch.Location = new System.Drawing.Point(2, 0);
             this.groupBoxWinch.Name = "groupBoxWinch";
             this.groupBoxWinch.Size = new System.Drawing.Size(220, 163);
             this.groupBoxWinch.AutoSize = true;
             this.groupBoxWinch.TabIndex = 0;
             this.groupBoxWinch.TabStop = false;
             this.groupBoxWinch.Text = "Winch";
+
+            this.groupBoxButton.Anchor = (System.Windows.Forms.AnchorStyles)(System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right);
+            this.groupBoxButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.groupBoxButton.Location = new System.Drawing.Point(EliStatPanel.Width - 122, 1);
+            this.groupBoxButton.Name = "groupBoxButton";
+            this.groupBoxButton.Size = new System.Drawing.Size(110, EliStatPanel.Height-2);
+            this.groupBoxButton.AutoSize = true;
+            this.groupBoxButton.TabIndex = 0;
+            this.groupBoxButton.TabStop = false;
+            this.groupBoxButton.Text = "";
+
             // 
             // label1
             // 
@@ -474,16 +646,103 @@ namespace MissionPlanner.Elistair
             this.lTorque.Size = new System.Drawing.Size(19, 20);
             this.lTorque.TabIndex = 9;
             this.lTorque.Text = "0";
+
+            int h = EliStatPanel.Height;
             // 
-            // button1
+            // btnDoLand
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(229, 8);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(90,90 );
-            this.button1.TabIndex = 1;
-            this.button1.Text = "button1";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnDoLand.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDoLand.Location = new System.Drawing.Point(229, 10);
+            this.btnDoLand.Name = "btnDoLand";
+            this.btnDoLand.Size = new System.Drawing.Size(90,90 );
+            this.btnDoLand.TabIndex = 1;
+            this.btnDoLand.Text = "";
+            this.btnDoLand.DoubleClick += new System.EventHandler(this.btnDoLand_Click);
+
+            // 
+            // btnDoTakeoff
+            // 
+            this.btnDoTakeoff.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnDoTakeoff.Location = new System.Drawing.Point(229, (int)(h - 100));
+            this.btnDoTakeoff.Name = "btnDoTakeoff";
+            this.btnDoTakeoff.Size = new System.Drawing.Size(90, 90);
+            this.btnDoTakeoff.TabIndex = 1;
+            this.btnDoTakeoff.Text = "aaaa";
+            this.btnDoTakeoff.DoubleClick += new System.EventHandler(this.btnDoTakeoff_Click);
+
+            // 
+            // btnAltPlus
+            // 
+            this.btnAltPlus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top| System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAltPlus.Location = new System.Drawing.Point(229, EliStatPanel.Height/2 - 40);
+            this.btnAltPlus.Name = "btnAltPlus";
+            this.btnAltPlus.Size = new System.Drawing.Size(80, 80);
+            this.btnAltPlus.TabIndex = 1;
+            this.btnAltPlus.Text = "";
+            this.btnAltPlus.Click += new System.EventHandler(this.btnAltPlus_Click);
+
+            // 
+            // btnAltMinus
+            // 
+            this.btnAltMinus.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAltMinus.Location = new System.Drawing.Point(229, EliStatPanel.Height / 2 + 40);
+            this.btnAltMinus.Name = "btnAltMinus";
+            this.btnAltMinus.Size = new System.Drawing.Size(80, 80);
+            this.btnAltMinus.TabIndex = 1;
+            this.btnAltMinus.Text = "aaaa";
+            this.btnAltMinus.Click += new System.EventHandler(this.btnAltMinus_Click);
+
+
+            // 
+            // label6
+            // 
+            this.label6.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.label6.AutoSize = true;
+            this.label6.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label6.Location = new System.Drawing.Point(18, 180);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(110, 20);
+            this.label6.TabIndex = 10;
+            this.label6.Text = "Safety BATT";
+            // 
+            // lSafetyBatt
+            // 
+            this.lSafetyBatt.AutoSize = true;
+            this.lSafetyBatt.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lSafetyBatt.Location = new System.Drawing.Point(152, 180);
+            this.lSafetyBatt.Name = "lSafetyBatt";
+            this.lSafetyBatt.Size = new System.Drawing.Size(19, 20);
+            this.lSafetyBatt.TabIndex = 10;
+            this.lSafetyBatt.Text = "0 V";
+
+
+            this.label7.AutoSize = true;
+            this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label7.Location = new System.Drawing.Point(20, 223);
+            this.label7.Name = "label7";
+            this.label7.Size = new System.Drawing.Size(110, 20);
+            this.label7.TabIndex = 12;
+            this.label7.Text = "Target ALT";
+            // 
+            // lTargetAlt
+            // 
+            this.lTargetAlt.AutoSize = true;
+            this.lTargetAlt.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lTargetAlt.Location = new System.Drawing.Point(58, 253);
+            this.lTargetAlt.Name = "lTargetAlt";
+            this.lTargetAlt.Size = new System.Drawing.Size(38, 20);
+            this.lTargetAlt.TabIndex = 13;
+            this.lTargetAlt.Text = "0 m";
+
+            this.bDoChangeAlt.Location = new System.Drawing.Point(24, 278);
+            this.bDoChangeAlt.Name = "bDoChangeAlt";
+            this.bDoChangeAlt.Size = new System.Drawing.Size(104, 23);
+            this.bDoChangeAlt.TabIndex = 14;
+            this.bDoChangeAlt.Text = "Execute";
+            this.bDoChangeAlt.UseVisualStyleBackColor = true;
+            this.bDoChangeAlt.Click += new System.EventHandler(this.btnDoChangeAlt_Click);
 
             return true;
         }
