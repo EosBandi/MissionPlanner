@@ -317,25 +317,25 @@ namespace MissionPlanner.Elistair
                   // 
                   //Temp 
                   // 
-                  if (eli.Temperature < 40) lTemp.ForeColor = Color.White;
-                  else if (eli.Temperature >= 40 && eli.Temperature < 45) lTemp.ForeColor = Color.Orange;
-                  else lTemp.ForeColor = Color.OrangeRed;
+                  if (eli.Temperature < 40) lTemp.BackColor = Color.Transparent;
+                  else if (eli.Temperature >= 40 && eli.Temperature < 45) lTemp.BackColor = Color.Orange;
+                  else lTemp.BackColor = Color.OrangeRed;
                   //Power
                   // 
-                  if (eli.Power < 1400) lPower.ForeColor = Color.White;
-                  else if (eli.Power >= 1400 && eli.Power <= 1800) lPower.ForeColor = Color.Orange;
-                  else lPower.ForeColor = Color.OrangeRed;
+                  if (eli.Power < 1400) lPower.BackColor = Color.Transparent;
+                  else if (eli.Power >= 1400 && eli.Power <= 1800) lPower.BackColor = Color.Orange;
+                  else lPower.BackColor = Color.OrangeRed;
 
                   lSafetyBatt.Text = Math.Round(Host.cs.battery_voltage,2).ToString("F2") + " V";
                   if (!_eli_connected)
                   {
                       groupBoxWinch.Text = "Winch - disconnected";
-                      groupBoxWinch.ForeColor = Color.OrangeRed;
+                      groupBoxWinch.ForeColor = Color.Red;
                   }
                   else
                   {
                       groupBoxWinch.Text = "Winch - connected";
-                      groupBoxWinch.ForeColor = Color.LightGreen;
+                      groupBoxWinch.ForeColor = Color.Green;
                   }
 
 
