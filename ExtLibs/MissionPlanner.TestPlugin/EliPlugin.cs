@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using System.Data;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -51,6 +52,7 @@ namespace MissionPlanner.Elistair
 
         int a = 0;
 
+        private Queue<String> messageQueue;
 
         private System.Windows.Forms.Panel EliStatPanel;
         private System.Windows.Forms.GroupBox groupBoxWinch;
@@ -95,7 +97,11 @@ namespace MissionPlanner.Elistair
         public override bool Init()
         {
             loopratehz = 1;
-            
+
+            //Init message queue
+            messageQueue = new Queue<string>();
+
+
             //Use resources
             ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EliPlugin));
             
@@ -182,6 +188,7 @@ namespace MissionPlanner.Elistair
             ucPlayerControl1.ffmegPath = "";
             ucPlayerControl1.Location = new System.Drawing.Point(0, 40);
             ucPlayerControl1.MediaUrl = "rtsp://192.168.0.33:554/user=admin&password=titok&channel=&stream=.sdp";// rtsp://localhost:8554/";
+            ucPlayerControl1.MediaUrl = 
             ucPlayerControl1.Name = "ucPlayerControl1";
             ucPlayerControl1.RecordPath = "";
             ucPlayerControl1.Size = new System.Drawing.Size(MainH.Panel2.Size.Width, MainH.Panel2.Size.Height - 40);
@@ -193,7 +200,7 @@ namespace MissionPlanner.Elistair
             ucPlayerControl1.VisiblePlayerMenu = true;
             ucPlayerControl1.VisibleStatus = true;
             MainH.Panel2.Controls.Add(ucPlayerControl1);
-            ucPlayerControl1.Play();
+            //ucPlayerControl1.Play();
 
             this.AddControls();
             SubMainLeft.Panel2.Controls.Add(EliStatPanel);
@@ -257,9 +264,6 @@ namespace MissionPlanner.Elistair
                     //men.Click += men_Click;
                     //Host.FDMenuMap.Items.Add(men);
 
-
-
-
                 });
 
 
@@ -319,14 +323,40 @@ namespace MissionPlanner.Elistair
                   // 
                   if (eli.Temperature < 40) lTemp.BackColor = Color.Transparent;
                   else if (eli.Temperature >= 40 && eli.Temperature < 45) lTemp.BackColor = Color.Orange;
-                  else lTemp.BackColor = Color.OrangeRed;
+                  else
+                  { 
+                      lTemp.BackColor = Color.OrangeRed;
+                      messageQueue.Enqueue("Winch overtemp! Please land ASAP!");
+                  }
                   //Power
                   // 
                   if (eli.Power < 1400) lPower.BackColor = Color.Transparent;
                   else if (eli.Power >= 1400 && eli.Power <= 1800) lPower.BackColor = Color.Orange;
-                  else lPower.BackColor = Color.OrangeRed;
+                  else
+                  {
+                      lPower.BackColor = Color.OrangeRed;
+                      messageQueue.Enqueue("Tether power overload! Please land ASAP!");
+                  }
 
-                  lSafetyBatt.Text = Math.Round(Host.cs.battery_voltage,2).ToString("F2") + " V";
+
+
+
+
+                  lSafetyBatt.Text = Math.Round(Host.cs.battery_voltage2,2).ToString("F2") + " V";
+
+                  if (Host.cs.mode.ToUpper() != "LAND")
+                  {
+                      if (Host.cs.battery_voltage2 < 46)
+                      {
+                          //messageQueue.Enqueue("Safety Battery lov voltage! Please Land ASAP.");
+                      }
+
+                      if ((Math.Abs(Host.cs.roll) > 15) || (Math.Abs(Host.cs.pitch) > 15))
+                      {
+                          messageQueue.Enqueue("Strong wind detected, please consider landing!");
+                      }
+                  }
+
                   if (!_eli_connected)
                   {
                       groupBoxWinch.Text = "Winch - disconnected";
@@ -344,7 +374,6 @@ namespace MissionPlanner.Elistair
                       btnAltMinus.Enabled = true;
                       btnAltPlus.Enabled = true;
                       lTargetAlt.Text = _target_altitude.ToString() + " m";
-                      
                   }
                   else
                   {
@@ -356,8 +385,12 @@ namespace MissionPlanner.Elistair
                   }
 
 
-                  lMessage.Text = hud.message;
-
+                  if (messageQueue.Count >= 1)
+                  {
+                      lMessage.ForeColor = Color.Red;
+                      lMessage.Text = messageQueue.Dequeue();
+                  }
+                  
 
               });
 
@@ -433,7 +466,7 @@ namespace MissionPlanner.Elistair
                 Host.comPort.doCommand(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 15);
             }
 
-            lMessage.Text = "Takeoff is in progress";
+            messageQueue.Enqueue("Takeoff is in progress!");
         }
 
         private void DoLand()
@@ -442,7 +475,7 @@ namespace MissionPlanner.Elistair
             {
                 Host.comPort.setMode("LAND");
             }
-            lMessage.Text = "Landing is in progress";
+            messageQueue.Enqueue("Landing is in progress! You can abort via manual control only.");
         }
 
         private bool AddControls()

@@ -41,7 +41,7 @@
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="WebEye.Controls.WinForms.StreamPlayerControl, Version=1.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\WebEye.Controls.WinForms.StreamPlayerControl.1.0.5\lib\net20\WebEye.Controls.WinForms.StreamPlayerControl.dll</HintPath>
+      <HintPath>..\..\packages\WebEye.Controls.WinForms.StreamPlayerControl.1.0.5\lib\net20\WebEye.Controls.WinForms.StreamPlayerControl.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -61,8 +61,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Resources\fit-to-width-512.png" />
   </ItemGroup>
   <ItemGroup>
