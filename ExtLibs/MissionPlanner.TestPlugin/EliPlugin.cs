@@ -31,7 +31,8 @@ namespace MissionPlanner.Elistair
 
 
         private WebClient browser = new WebClient();
-        private Uri _url = new Uri("http://127.0.0.1/");
+        private Uri _elistairUrl = new Uri("http://192.168.4.1/");
+        //private String _videoUrl = new string("udp://224.10.10.10.:15004");
         private ElistairClass eli = new ElistairClass();
         private bool _eli_connected = false;
         private int _eli_wait_cycles = 0;
@@ -187,8 +188,8 @@ namespace MissionPlanner.Elistair
             ucPlayerControl1.ffmegParams = "";
             ucPlayerControl1.ffmegPath = "";
             ucPlayerControl1.Location = new System.Drawing.Point(0, 40);
-            ucPlayerControl1.MediaUrl = "rtsp://192.168.0.33:554/user=admin&password=titok&channel=&stream=.sdp";// rtsp://localhost:8554/";
-            ucPlayerControl1.MediaUrl = 
+            //ucPlayerControl1.MediaUrl = "rtsp://192.168.0.33:554/user=admin&password=titok&channel=&stream=.sdp";// rtsp://localhost:8554/";
+            ucPlayerControl1.MediaUrl = "udp://224.10.10.10.:15004";
             ucPlayerControl1.Name = "ucPlayerControl1";
             ucPlayerControl1.RecordPath = "";
             ucPlayerControl1.Size = new System.Drawing.Size(MainH.Panel2.Size.Width, MainH.Panel2.Size.Height - 40);
@@ -200,7 +201,7 @@ namespace MissionPlanner.Elistair
             ucPlayerControl1.VisiblePlayerMenu = true;
             ucPlayerControl1.VisibleStatus = true;
             MainH.Panel2.Controls.Add(ucPlayerControl1);
-            //ucPlayerControl1.Play();
+            ucPlayerControl1.Play();
 
             this.AddControls();
             SubMainLeft.Panel2.Controls.Add(EliStatPanel);
@@ -287,7 +288,7 @@ namespace MissionPlanner.Elistair
             if (!browser.IsBusy)
             {
                 // not busy, lets start a download
-                browser.DownloadStringAsync(_url);
+                browser.DownloadStringAsync(_elistairUrl);
                 // and clear wait cycles
                 _eli_wait_cycles = 0;
             } else
@@ -307,6 +308,8 @@ namespace MissionPlanner.Elistair
             MainV2.instance.Invoke((Action)
               delegate
               {
+
+                  
 
                   this.btnAltPlus.Location = new System.Drawing.Point(btnDoLand.Location.X, EliStatPanel.Height / 2 - 100);
                   this.btnAltMinus.Location = new System.Drawing.Point(btnDoLand.Location.X, EliStatPanel.Height / 2 + 20);
@@ -339,6 +342,9 @@ namespace MissionPlanner.Elistair
                   }
 
 
+                  if (Host.cs.battery_voltage2 > 47.2) lSafetyBatt.BackColor = Color.Transparent;
+                  else if (Host.cs.battery_voltage2 > 46.8) lSafetyBatt.BackColor = Color.Orange;
+                  else lSafetyBatt.BackColor = Color.Red;
 
 
 
@@ -346,9 +352,10 @@ namespace MissionPlanner.Elistair
 
                   if (Host.cs.mode.ToUpper() != "LAND")
                   {
-                      if (Host.cs.battery_voltage2 < 46)
+                      if (Host.cs.battery_voltage2 <= 46.8 )
                       {
-                          //messageQueue.Enqueue("Safety Battery lov voltage! Please Land ASAP.");
+                          messageQueue.Enqueue("Safety Battery lov voltage! Please Land ASAP.");
+
                       }
 
                       if ((Math.Abs(Host.cs.roll) > 15) || (Math.Abs(Host.cs.pitch) > 15))
@@ -458,15 +465,25 @@ namespace MissionPlanner.Elistair
 
         private void DoTakeOff()
         {
-            Host.comPort.setMode("Loiter");
-
-            if (Host.comPort.doARM(true))
+            //Do takeoff only if 
+            if (   !Host.cs.armed 
+                && (Host.cs.battery_voltage2 > 46.8)
+                && (Host.cs.battery_voltage > Host.cs.battery_voltage2) )
             {
-                Host.comPort.setMode("GUIDED");
-                Host.comPort.doCommand(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 15);
-            }
+                Host.comPort.setMode("Loiter");
 
-            messageQueue.Enqueue("Takeoff is in progress!");
+                if (Host.comPort.doARM(true))
+                {
+                    Host.comPort.setMode("GUIDED");
+                    Host.comPort.doCommand(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, 15);
+                }
+
+                messageQueue.Enqueue("Takeoff is in progress!");
+            }
+            else
+            {
+                //Takeoff failed add neccessary message
+            }
         }
 
         private void DoLand()
