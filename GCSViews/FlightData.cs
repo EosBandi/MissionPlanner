@@ -30,6 +30,7 @@ using WebCamService;
 using ZedGraph;
 using LogAnalyzer = MissionPlanner.Utilities.LogAnalyzer;
 using MissionPlanner.Maps;
+using racPlayerControl;
 
 // written by michael oborne
 

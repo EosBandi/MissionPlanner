@@ -23,6 +23,8 @@ namespace racPlayerControl
         string record_path = "";
         ratelist videorate = new ratelist();
 
+        TimeSpan videoTimeout = new TimeSpan(0, 0, 10);
+
         public Process proc = new Process();
 
         public racPlayerControl()
@@ -37,6 +39,32 @@ namespace racPlayerControl
             {
                 process.Kill();
             }
+        }
+/*
+        protected override void OnControlAdded(ControlEventArgs e)
+        {
+            e.Control.DoubleClick += Control_DoubleClick;
+            e.Control.ControlAdded += OnControlAdded; // add this line
+            base.OnControlAdded(e);
+        }
+
+        // add this method
+        private void OnControlAdded(object sender, ControlEventArgs e)
+        {
+            e.Control.DoubleClick += Control_DoubleClick;
+            e.Control.ControlAdded += OnControlAdded;
+        }
+
+        void Control_DoubleClick(object sender, EventArgs e)
+        {
+            MessageBox.Show("User control clicked");
+            OnDoubleClick(e);
+        }
+        */
+
+        public Size VideoSize
+        {
+            get { return streamPlayerControl1.VideoSize; }
         }
 
         /// <summary>
@@ -124,7 +152,7 @@ namespace racPlayerControl
         {
             if (Uri.IsWellFormedUriString(url_string, UriKind.RelativeOrAbsolute))
             {
-                streamPlayerControl1.StartPlay(new Uri(url_string));
+                streamPlayerControl1.StartPlay(new Uri(url_string),videoTimeout,WebEye.Controls.WinForms.StreamPlayerControl.RtspTransport.UdpMulticast,WebEye.Controls.WinForms.StreamPlayerControl.RtspFlags.None);
                 statuslabel.Text = "Connect";
                 streamPlayerControl1.StreamStarted += StreamPlayerControl1_StreamStarted;
                 timer1.Enabled = true;
@@ -150,8 +178,11 @@ namespace racPlayerControl
         /// </summary>
         public void Stop()
         {
-            streamPlayerControl1.Stop();
-            timer1.Enabled = false;
+            if (streamPlayerControl1.IsPlaying)
+            {
+                streamPlayerControl1.Stop();
+                timer1.Enabled = false;
+            }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -380,6 +411,12 @@ namespace racPlayerControl
             this.status.ForeColor = e;
             this.statuslabel.BackColor = g;
             this.statuslabel.ForeColor = e;
+        }
+
+        private void streamPlayerControl1_DoubleClick(object sender, EventArgs e)
+        {
+            MessageBox.Show("User control clicked");
+
         }
     }
 }

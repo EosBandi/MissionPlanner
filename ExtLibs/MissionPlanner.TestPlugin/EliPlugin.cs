@@ -21,6 +21,7 @@ using OpenTK;
 using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using racPlayerControl;
+using System.Threading;
 
 
 namespace MissionPlanner.Elistair
@@ -38,7 +39,11 @@ namespace MissionPlanner.Elistair
         private int _eli_wait_cycles = 0;
 
         private int _target_altitude = 15;
+        private int _epsilonTrackMode = 0;
+        private int _epsilonCameraMode = 0;
 
+        private Color ButBGDeselect = Color.FromArgb(0xFF, 0xFF, 0x99);                       // This changes the colour of button backgrounds (Top)
+        private Color ButBGSelect = Color.OrangeRed;
 
         SplitContainer sc;
         Label lab;
@@ -76,8 +81,15 @@ namespace MissionPlanner.Elistair
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label lTargetAlt;
         private System.Windows.Forms.Label label7;
-        private System.Windows.Forms.Button bDoChangeAlt;
+        private System.Windows.Forms.PictureBox bDoChangeAlt;
         private System.Windows.Forms.Label lMessage;
+
+        private System.Windows.Forms.Button btnSwitchToIR;
+        private System.Windows.Forms.Button btnSwitchToDaylight;
+
+        private System.Windows.Forms.Button btnRateMode;
+        private System.Windows.Forms.Button btnSceneMode;
+        private System.Windows.Forms.Button btnVehicleMode;
 
         public override string Name
         {
@@ -181,18 +193,17 @@ namespace MissionPlanner.Elistair
             MainH.Panel2.Controls.Add(lMessage);
 
             
-
             //Create and Add StreamPlayerControl to the place of tblMap
             ucPlayerControl1 = new racPlayerControl.racPlayerControl();
-            ucPlayerControl1.AutoRecconect = true;
+            ucPlayerControl1.AutoRecconect = false;
             ucPlayerControl1.ffmegParams = "";
             ucPlayerControl1.ffmegPath = "";
             ucPlayerControl1.Location = new System.Drawing.Point(0, 40);
-            //ucPlayerControl1.MediaUrl = "rtsp://192.168.0.33:554/user=admin&password=titok&channel=&stream=.sdp";// rtsp://localhost:8554/";
-            ucPlayerControl1.MediaUrl = "udp://224.10.10.10.:15004";
+            ucPlayerControl1.MediaUrl = "udp://224.10.10.10:15004";
             ucPlayerControl1.Name = "ucPlayerControl1";
-            ucPlayerControl1.RecordPath = "";
-            ucPlayerControl1.Size = new System.Drawing.Size(MainH.Panel2.Size.Width, MainH.Panel2.Size.Height - 40);
+            ucPlayerControl1.RecordPath = "d:\\epvideodir\\";
+            ucPlayerControl1.ffmegPath = ".\\ffmpeg.exe";
+            ucPlayerControl1.Size = new System.Drawing.Size(MainH.Panel2.Size.Width-100, MainH.Panel2.Size.Height - 40);
             ucPlayerControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                                        | System.Windows.Forms.AnchorStyles.Left)
                                        | System.Windows.Forms.AnchorStyles.Right)));
@@ -200,10 +211,62 @@ namespace MissionPlanner.Elistair
             ucPlayerControl1.VideoRate = racPlayerControl.racPlayerControl.ratelist.WideScreen;
             ucPlayerControl1.VisiblePlayerMenu = true;
             ucPlayerControl1.VisibleStatus = true;
+            //ucPlayerControl1.DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
+            ucPlayerControl1.Controls["panel1"].Controls["streamPlayerControl1"].DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
+
             MainH.Panel2.Controls.Add(ucPlayerControl1);
             ucPlayerControl1.Play();
 
+            btnSwitchToIR = new Button();
+            btnSwitchToIR.Location = new Point(MainH.Panel2.Size.Width - 90, 40);
+            btnSwitchToIR.Size = new Size(80, 80);
+            btnSwitchToIR.Anchor = (AnchorStyles)(AnchorStyles.Top | AnchorStyles.Right);
+            btnSwitchToIR.Text = "";
+            btnSwitchToIR.Name = "btnSwitchToIR";
+            btnSwitchToIR.Click += new System.EventHandler(btnSwitchToIR_Click);
+            MainH.Panel2.Controls.Add(btnSwitchToIR);
+
+            btnSwitchToDaylight = new Button();
+            btnSwitchToDaylight.Location = new Point(MainH.Panel2.Size.Width - 90, 140);
+            btnSwitchToDaylight.Size = new Size(80, 80);
+            btnSwitchToDaylight.Anchor = (AnchorStyles)(AnchorStyles.Top | AnchorStyles.Right);
+            btnSwitchToDaylight.Text = "";
+            btnSwitchToDaylight.Name = "btnSwitchToDayLight";
+            btnSwitchToDaylight.Click += new System.EventHandler(btnSwitchToDayLight_Click);
+            MainH.Panel2.Controls.Add(btnSwitchToDaylight);
+
+            btnRateMode = new Button();
+            btnRateMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 100);
+            btnRateMode.Size = new Size(80, 80);
+            btnRateMode.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
+            btnRateMode.Text = "";
+            btnRateMode.Name = "btnRateMode";
+            btnRateMode.Click += new System.EventHandler(btnRateMode_Click);
+            MainH.Panel2.Controls.Add(btnRateMode);
+
+            btnSceneMode = new Button();
+            btnSceneMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 200);
+            btnSceneMode.Size = new Size(80, 80);
+            btnSceneMode.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
+            btnSceneMode.Text = "";
+            btnSceneMode.Name = "btnSceneMode";
+            btnSceneMode.Click += new System.EventHandler(btnSceneMode_Click);
+            MainH.Panel2.Controls.Add(btnSceneMode);
+
+            btnVehicleMode = new Button();
+            btnVehicleMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 300);
+            btnVehicleMode.Size = new Size(80, 80);
+            btnVehicleMode.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
+            btnVehicleMode.Text = "";
+            btnVehicleMode.Name = "btnVehicleMode";
+            btnVehicleMode.Click += new System.EventHandler(btnVehicleMode_Click);
+            MainH.Panel2.Controls.Add(btnVehicleMode);
+
+
+
             this.AddControls();
+
+
             SubMainLeft.Panel2.Controls.Add(EliStatPanel);
             EliStatPanel.Width = SubMainLeft.Panel2.Width;
 
@@ -222,7 +285,31 @@ namespace MissionPlanner.Elistair
             Image imageAltMinus = (Image)(resources.GetObject("minus"));
             this.btnAltMinus.BackgroundImage = imageAltMinus;
             this.btnAltMinus.BackgroundImageLayout = ImageLayout.Stretch;
-            // this.btnDoTakeoff.Location = new Point(229, EliStatPanel.Height - 100);
+
+            Image imageIR = (Image)(resources.GetObject("ir"));
+            this.btnSwitchToIR.BackgroundImage = imageIR;
+            this.btnSwitchToIR.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageDay = (Image)(resources.GetObject("daylight"));
+            this.btnSwitchToDaylight.BackgroundImage = imageDay;
+            this.btnSwitchToDaylight.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageRate = (Image)(resources.GetObject("rate"));
+            this.btnRateMode.BackgroundImage = imageRate;
+            this.btnRateMode.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageScene = (Image)(resources.GetObject("scene"));
+            this.btnSceneMode.BackgroundImage = imageScene;
+            this.btnSceneMode.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageVehicle = (Image)(resources.GetObject("vehicle"));
+            this.btnVehicleMode.BackgroundImage = imageVehicle;
+            this.btnVehicleMode.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageExecute = (Image)(resources.GetObject("execute"));
+            this.bDoChangeAlt.BackgroundImage = imageExecute;
+            this.bDoChangeAlt.BackgroundImageLayout = ImageLayout.Stretch;
+
 
 
             MainV2.instance.Invoke((Action)
@@ -232,38 +319,6 @@ namespace MissionPlanner.Elistair
                     sc = Host.MainForm.FlightData.Controls.Find("splitContainer1", true).FirstOrDefault() as SplitContainer;
                     TrackBar tb = Host.MainForm.FlightData.Controls.Find("TRK_zoom", true).FirstOrDefault() as TrackBar;
                     Panel pn1 = Host.MainForm.FlightData.Controls.Find("panel1", true).FirstOrDefault() as Panel;
-
-                    //System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PtestPlugin));
-
-
-
-                    lab = new System.Windows.Forms.Label();
-                    lab.Location = new System.Drawing.Point(66, 15);
-                    lab.Text = "Ez itt ?";
-                    sc.Panel2.Controls.Add(lab);
-                    sc.Panel2.Controls.SetChildIndex(lab, 1);
-
-                    Image fd = (Image)(resources.GetObject("rac_flightdata_icon"));
-                    mainmenu.Items["menuFlightData"].Image = fd;
-
-                    /*
-                    videoPanel = new System.Windows.Forms.Panel() { Name = "videoPanel" };
-
-                    int x = Host.MainForm.FlightData.Width;
-                    int y = Host.MainForm.FlightData.Height;
-
-                    videoPanel.Location = new System.Drawing.Point(x-300-tb.Width-5 ,y-200-33-5);
-                    videoPanel.Height = 200;
-                    videoPanel.Width = 300;
-                    videoPanel.Anchor = (AnchorStyles.Bottom | AnchorStyles.Right);
-
-                    Host.MainForm.FlightData.Controls.Add(videoPanel);
-                    Host.MainForm.FlightData.Controls.SetChildIndex(videoPanel, 1);
-                    */
-                    
-                    //System.Windows.Forms.ToolStripMenuItem men = new System.Windows.Forms.ToolStripMenuItem() { Text = "VideoSwitch" };
-                    //men.Click += men_Click;
-                    //Host.FDMenuMap.Items.Add(men);
 
                 });
 
@@ -277,6 +332,10 @@ namespace MissionPlanner.Elistair
         public override bool Loaded()
         {
             browser.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadStringCompleted);
+            btnSceneMode.BackColor = ButBGDeselect;
+            btnRateMode.BackColor = ButBGSelect;
+            btnVehicleMode.BackColor = ButBGDeselect;
+
             return true;
         }
         public override bool Loop()
@@ -318,7 +377,7 @@ namespace MissionPlanner.Elistair
                   lTemp.Text = eli.Temperature.ToString();
                   lPower.Text = eli.Power.ToString();
                   lCSpeed.Text = eli.CableSpeed.ToString();
-                  lCOut.Text = eli.CableLength.ToString();
+                  lCOut.Text = ((double)(eli.CableLength)/10).ToString("F1");
                   lTorque.Text = eli.Torque.ToString();
                   // check safety boundaries and color winch data accordingly
                   // 
@@ -350,20 +409,29 @@ namespace MissionPlanner.Elistair
 
                   lSafetyBatt.Text = Math.Round(Host.cs.battery_voltage2,2).ToString("F2") + " V";
 
-                  if (Host.cs.mode.ToUpper() != "LAND")
+                  if ((Host.cs.mode.ToUpper() != "LAND") && Host.cs.armed)
                   {
-                      if (Host.cs.battery_voltage2 <= 46.8 )
+                      if (Host.cs.battery_voltage2 <= 46.8)
                       {
-                          messageQueue.Enqueue("Safety Battery lov voltage! Please Land ASAP.");
-
+                          messageQueue.Enqueue("Safety Battery low voltage! Please Land ASAP.");
                       }
 
                       if ((Math.Abs(Host.cs.roll) > 15) || (Math.Abs(Host.cs.pitch) > 15))
                       {
                           messageQueue.Enqueue("Strong wind detected, please consider landing!");
                       }
-                  }
 
+                      if (eli.CableLength > 700)
+                      {
+                          messageQueue.Enqueue("Cable length at 90% check winch and wind!");
+                      }
+
+                      if (Math.Abs((eli.CableLength/10) - Host.cs.alt) > 10)
+                      {
+                          messageQueue.Enqueue("Cable length and altitude missmatch, check cable!");
+                      }
+
+                  }
                   if (!_eli_connected)
                   {
                       groupBoxWinch.Text = "Winch - disconnected";
@@ -397,7 +465,39 @@ namespace MissionPlanner.Elistair
                       lMessage.ForeColor = Color.Red;
                       lMessage.Text = messageQueue.Dequeue();
                   }
-                  
+
+
+
+                  switch(_epsilonTrackMode)
+                  {
+                      case 0:
+                      case 1:
+                          btnSceneMode.BackColor = ButBGDeselect;
+                          btnRateMode.BackColor = ButBGSelect;
+                          btnVehicleMode.BackColor = ButBGDeselect;
+                          break;
+                      case 4:
+                          btnSceneMode.BackColor = ButBGDeselect;
+                          btnRateMode.BackColor = ButBGDeselect;
+                          btnVehicleMode.BackColor = ButBGSelect;
+                          break;
+                      case 5:
+                          btnSceneMode.BackColor = ButBGSelect;
+                          btnRateMode.BackColor = ButBGDeselect;
+                          btnVehicleMode.BackColor = ButBGDeselect;
+                          break;
+                  }
+
+                  if (_epsilonCameraMode == 2)
+                  {
+                      btnSwitchToDaylight.BackColor = ButBGDeselect; ;
+                      btnSwitchToIR.BackColor = ButBGSelect;
+
+                  }else{
+                      btnSwitchToDaylight.BackColor = ButBGSelect;
+                      btnSwitchToIR.BackColor = ButBGDeselect;
+
+                  }
 
               });
 
@@ -424,9 +524,170 @@ namespace MissionPlanner.Elistair
             _eli_connected = true;
         }
 
+        private void ucPlayer_MouseDblClick(object sender, EventArgs e)
+        {
+          
+            var coordinates = ucPlayerControl1.PointToClient(Cursor.Position);
+            Size displaySize = ucPlayerControl1.Controls["panel1"].Controls["streamPlayerControl1"].Size;
+            Point loc = ucPlayerControl1.Controls["panel1"].Controls["streamPlayerControl1"].Location;
+
+            long clickX = (long) ( (double)(coordinates.X - loc.X) / ((double)displaySize.Width / (double)ucPlayerControl1.VideoSize.Width)) ;
+            long clickY = (long) ((double)(coordinates.Y - loc.Y) / ((double)displaySize.Height / (double)ucPlayerControl1.VideoSize.Height)) ;
+
+            //MessageBox.Show("Clicked! at "+coordinates.X.ToString()+ " : "+coordinates.Y.ToString() + " Video :"+ucPlayerControl1.VideoSize.Width + " : " + ucPlayerControl1.VideoSize.Height + "Control:" + displaySize.Width + ":" + displaySize.Height + "\n" +
+            //                 "Caluclated: " + clickX + " : " + clickY + "  Location: "+ loc.X + " : " + loc.Y);
+
+            if (_epsilonTrackMode <= 1 ) _epsilonTrackMode = 5;  //If 0 or rate, then switch to Scene
+            //Otherwise use actual (Scene or Vehicle mode)
+
+            try
+            {
+                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
+                using (StreamWriter sw = new StreamWriter(pipeClient))
+                {
+                    if (!pipeClient.IsConnected) pipeClient.Connect();
+                    sw.WriteLine("TRACK:"+_epsilonTrackMode.ToString()+":"+clickX.ToString()+":"+clickY.ToString());
+                    sw.Flush();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+            if (_epsilonTrackMode == 5) btnSceneMode.BackColor = ButBGSelect; else btnSceneMode.BackColor = ButBGDeselect;
+            btnRateMode.BackColor = ButBGDeselect;
+            if (_epsilonTrackMode == 4) btnVehicleMode.BackColor = ButBGSelect; else btnVehicleMode.BackColor = ButBGDeselect;
+
+        }
+
+        private void btnRateMode_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
+                using (StreamWriter sw = new StreamWriter(pipeClient))
+                {
+                    if (!pipeClient.IsConnected) pipeClient.Connect();
+                    sw.WriteLine("TRACK:1:0:0");
+                    sw.Flush();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            _epsilonTrackMode = 1;
+
+            btnSceneMode.BackColor = ButBGDeselect;
+            btnRateMode.BackColor = ButBGSelect;
+            btnVehicleMode.BackColor = ButBGDeselect;
+
+        }
+
+        private void btnSceneMode_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
+                using (StreamWriter sw = new StreamWriter(pipeClient))
+                {
+                    if (!pipeClient.IsConnected) pipeClient.Connect();
+                    sw.WriteLine("TRACK:5:0:0");
+                    sw.Flush();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            _epsilonTrackMode = 5;
+            btnSceneMode.BackColor = ButBGSelect;
+            btnRateMode.BackColor = ButBGDeselect;
+            btnVehicleMode.BackColor = ButBGDeselect;
+
+        }
+
+        private void btnVehicleMode_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
+                using (StreamWriter sw = new StreamWriter(pipeClient))
+                {
+                    if (!pipeClient.IsConnected) pipeClient.Connect();
+                    sw.WriteLine("TRACK:4:0:0");
+                    sw.Flush();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            _epsilonTrackMode = 4;
+            btnSceneMode.BackColor = ButBGDeselect;
+            btnRateMode.BackColor = ButBGDeselect;
+            btnVehicleMode.BackColor = ButBGSelect;
+
+        }
+
+
+        private void btnSwitchToIR_Click(object sender, EventArgs e)
+        {
+            btnSwitchToDaylight.BackColor = ButBGDeselect;
+            btnSwitchToIR.BackColor = ButBGSelect;
+
+            ucPlayerControl1.Stop();
+            //Thread.Sleep(500);
+            try
+            {
+                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
+                using (StreamWriter sw = new StreamWriter(pipeClient))
+                {
+                    if (!pipeClient.IsConnected) pipeClient.Connect();
+                    sw.WriteLine("INFRA");
+                    sw.Flush();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            Thread.Sleep(500);
+            ucPlayerControl1.Play();
+            _epsilonCameraMode = 2;
+        }
+        private void btnSwitchToDayLight_Click(object sender, EventArgs e)
+        {
+            btnSwitchToDaylight.BackColor = ButBGSelect;
+            btnSwitchToIR.BackColor = ButBGDeselect;
+
+
+            ucPlayerControl1.Stop();
+            Thread.Sleep(500);
+            try
+            {
+                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
+                using (StreamWriter sw = new StreamWriter(pipeClient))
+                {
+                    if (!pipeClient.IsConnected) pipeClient.Connect();
+                    sw.WriteLine("DAYLIGHT");
+                    sw.Flush();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+            Thread.Sleep(500);
+            ucPlayerControl1.Play();
+            _epsilonCameraMode = 1;
+        }
+
+
         private void btnAltPlus_Click(object sender, EventArgs e)
         {
-            if (_target_altitude < 80)
+            if (_target_altitude < 70)
             {
                 _target_altitude += 5;
                 lTargetAlt.Text = _target_altitude.ToString() + " m";
@@ -482,7 +743,7 @@ namespace MissionPlanner.Elistair
             }
             else
             {
-                //Takeoff failed add neccessary message
+                messageQueue.Enqueue("Automatic takeoff is not allowed, check power!");
             }
         }
 
@@ -519,7 +780,7 @@ namespace MissionPlanner.Elistair
             this.lSafetyBatt = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.lTargetAlt = new System.Windows.Forms.Label();
-            this.bDoChangeAlt = new System.Windows.Forms.Button();
+            this.bDoChangeAlt = new System.Windows.Forms.PictureBox();
             // 
             // EliStatPanel
             // 
@@ -788,10 +1049,10 @@ namespace MissionPlanner.Elistair
 
             this.bDoChangeAlt.Location = new System.Drawing.Point(24, 278);
             this.bDoChangeAlt.Name = "bDoChangeAlt";
-            this.bDoChangeAlt.Size = new System.Drawing.Size(104, 23);
+            this.bDoChangeAlt.Size = new System.Drawing.Size(90, 90);
             this.bDoChangeAlt.TabIndex = 14;
-            this.bDoChangeAlt.Text = "Execute";
-            this.bDoChangeAlt.UseVisualStyleBackColor = true;
+            this.bDoChangeAlt.Text = "";
+            //this.bDoChangeAlt.UseVisualStyleBackColor = true;
             this.bDoChangeAlt.Click += new System.EventHandler(this.btnDoChangeAlt_Click);
 
             return true;

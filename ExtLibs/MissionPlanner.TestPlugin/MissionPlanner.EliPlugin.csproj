@@ -173,6 +173,12 @@
     <None Include="Resources\start-512.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\vehicle.png" />
+    <None Include="Resources\scene.png" />
+    <None Include="Resources\rate.png" />
+    <None Include="Resources\daylight.png" />
+    <None Include="Resources\execute.png" />
+    <None Include="Resources\ir.png" />
     <Content Include="Resources\minus.png" />
     <Content Include="Resources\plus.png" />
   </ItemGroup>

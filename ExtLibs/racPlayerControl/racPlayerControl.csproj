@@ -85,6 +85,9 @@
     <None Include="Resources\stop-512.png" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="racPlayerControl.resx">
+      <DependentUpon>racPlayerControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>

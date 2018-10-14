@@ -126,7 +126,7 @@ namespace racPlayerControl
             // tsbReconnect
             // 
             this.tsbReconnect.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbReconnect.Image = Resources.refresh_512;
+            this.tsbReconnect.Image = global::racPlayerControl.Resources.refresh_512;
             this.tsbReconnect.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbReconnect.Name = "tsbReconnect";
             this.tsbReconnect.Size = new System.Drawing.Size(23, 22);
@@ -137,7 +137,7 @@ namespace racPlayerControl
             // tsbPlay
             // 
             this.tsbPlay.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbPlay.Image = Resources.play_512;
+            this.tsbPlay.Image = global::racPlayerControl.Resources.play_512;
             this.tsbPlay.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbPlay.Name = "tsbPlay";
             this.tsbPlay.Size = new System.Drawing.Size(23, 22);
@@ -148,7 +148,7 @@ namespace racPlayerControl
             // tsbStop
             // 
             this.tsbStop.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbStop.Image = Resources.stop_512;
+            this.tsbStop.Image = global::racPlayerControl.Resources.stop_512;
             this.tsbStop.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbStop.Name = "tsbStop";
             this.tsbStop.Size = new System.Drawing.Size(23, 22);
@@ -160,7 +160,7 @@ namespace racPlayerControl
             // 
             this.tsbRecording.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
             this.tsbRecording.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsbRecording.Image = Resources.record_512;
+            this.tsbRecording.Image = global::racPlayerControl.Resources.record_512;
             this.tsbRecording.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbRecording.Name = "tsbRecording";
             this.tsbRecording.Size = new System.Drawing.Size(23, 22);
@@ -191,28 +191,29 @@ namespace racPlayerControl
             // 
             // streamPlayerControl1
             // 
-            this.streamPlayerControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-            | System.Windows.Forms.AnchorStyles.Left)
+            this.streamPlayerControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.streamPlayerControl1.ContextMenuStrip = this.popupmenu;
             this.streamPlayerControl1.Location = new System.Drawing.Point(0, 1);
             this.streamPlayerControl1.Name = "streamPlayerControl1";
             this.streamPlayerControl1.Size = new System.Drawing.Size(483, 250);
             this.streamPlayerControl1.TabIndex = 6;
+            //this.streamPlayerControl1.DoubleClick += new System.EventHandler(this.streamPlayerControl1_DoubleClick);
             // 
             // blink_timer
             // 
             this.blink_timer.Interval = 1000;
             this.blink_timer.Tick += new System.EventHandler(this.blink_timer_Tick);
             // 
-            // ucPlayerControl
+            // racPlayerControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.playmenu);
             this.Controls.Add(this.status);
-            this.Name = "ucPlayerControl";
+            this.Name = "racPlayerControl";
             this.Size = new System.Drawing.Size(483, 300);
             this.popupmenu.ResumeLayout(false);
             this.status.ResumeLayout(false);
