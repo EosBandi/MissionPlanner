@@ -201,7 +201,7 @@ namespace MissionPlanner.Elistair
             ucPlayerControl1.Location = new System.Drawing.Point(0, 40);
             ucPlayerControl1.MediaUrl = "udp://224.10.10.10:15004";
             ucPlayerControl1.Name = "ucPlayerControl1";
-            ucPlayerControl1.RecordPath = "d:\\epvideodir\\";
+            ucPlayerControl1.RecordPath = "e:\\epvideodir\\";
             ucPlayerControl1.ffmegPath = ".\\ffmpeg.exe";
             ucPlayerControl1.Size = new System.Drawing.Size(MainH.Panel2.Size.Width-100, MainH.Panel2.Size.Height - 40);
             ucPlayerControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
