@@ -930,6 +930,13 @@ namespace MissionPlanner
             get { return messages.LastOrDefault().message; }
         }
 
+        public event System.EventHandler NewMessageHigh;
+
+        protected virtual void OnNewMessageHigh()
+        {
+            if (NewMessageHigh != null) NewMessageHigh(this, EventArgs.Empty);
+        }
+
         /// <summary>
         /// a message that originates from within the gcs
         /// </summary>
@@ -940,6 +947,7 @@ namespace MissionPlanner
             {
                 messageHighTime = DateTime.Now;
                 _messagehigh = value;
+                OnNewMessageHigh();
             }
         }
 
