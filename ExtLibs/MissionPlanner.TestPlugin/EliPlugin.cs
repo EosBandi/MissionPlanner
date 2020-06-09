@@ -22,18 +22,7 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using racPlayerControl;
 using System.Threading;
-using MissionPlanner.ArduPilot;
-using MissionPlanner.Utilities;
-using MissionPlanner.Controls;
 using MissionPlanner;
-
-
-//Add variables in config file
-//  CameraStreamURL
-//  ElistairURL
-//  RecordLocation
-
-
 
 namespace MissionPlanner.Elistair
 {
@@ -105,9 +94,13 @@ namespace MissionPlanner.Elistair
         private System.Windows.Forms.Button btnSceneMode;
         private System.Windows.Forms.Button btnVehicleMode;
 
+        //Use resources
+        private ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EliPlugin));
+
+
         public override string Name
         {
-            get { return "Elistair Control Panel"; }
+            get { return "EasyPlanner Tethered Control Panel"; }
         }
 
         public override string Version
@@ -162,201 +155,11 @@ namespace MissionPlanner.Elistair
             //Init message queue
             messageQueue = new Queue<string>();
 
+            //Customize UI
+            CustomiseLook();
 
-            //Use resources
-            ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EliPlugin));
-            
-            // Change splash screen at plugin load
-
-            Bitmap splash_logo = (Bitmap)(resources.GetObject("EasyPlanner_splash"));
-            Program.Splash.BackgroundImage = splash_logo;
-            Application.DoEvents();
-            Program.Splash.MinimizeBox = false;
-            Program.Splash.MaximizeBox = false;
-            Program.Splash.ShowIcon = false;
-            Program.Splash.FormBorderStyle = FormBorderStyle.None;
-            Program.Splash.Controls["TXT_version"].Visible = false;
-            Program.Splash.Controls["label1"].Visible = false;
-            Program.Splash.Controls["pictureBox1"].Visible = false;
-
-            //Remove unneccessary menu items from the bar 
-            mainmenu = Host.MainForm.MainMenu;
-            mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuHelp"));
-            mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuTerminal"));
-            mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuDonate"));
-            mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuSimulation"));
-            mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuArduPilot"));
-            ToolStripMenuItem a = mainmenu.ContextMenuStrip.Items["autoHideToolStripMenuItem"] as ToolStripMenuItem;
-            a.PerformClick();
-            //a.Checked = true;
-            
-
-            //Add Rotors logo to the menubar
-            Bitmap lg = (Bitmap)(resources.GetObject("logo2"));
-            ToolStripButton mi = new ToolStripButton();
-            mi.Size = lg.Size;
-            mi.Alignment = ToolStripItemAlignment.Right;
-            mi.BackColor = Color.Transparent;
-            mi.DisplayStyle = ToolStripItemDisplayStyle.Image;
-            mi.Image = lg;
-            mi.Text = "MenuLOGO";
-            mi.Margin = new Padding(0);
-            mi.Name = "MenuLOGO";
-            mi.Overflow = ToolStripItemOverflow.Never;
-            mi.ImageScaling = ToolStripItemImageScaling.None;
-            Host.MainForm.MainMenu.Items.Add(mi);
-
-            // hide map and tabControlActions
-            SubMainLeft = Host.MainForm.FlightData.Controls.Find("SubMainLeft", true).FirstOrDefault() as SplitContainer;
-            MainH = Host.MainForm.FlightData.Controls.Find("MAINH", true).FirstOrDefault() as SplitContainer;
-            tblMap = Host.MainForm.FlightData.Controls.Find("tableMap", true).FirstOrDefault() as TableLayoutPanel;
-
-            SubMainLeft.Panel2.Controls["tabControlActions"].Visible = false;
-            tblMap.Visible = false;
-
-            // Customize HUD
-            hud = SubMainLeft.Panel1.Controls["hud1"] as HUD;
-            hud.displayAOASSA = false;
-            hud.displayxtrack = false;
-            hud.displayspeed = false;
-            hud.displayconninfo = false;
-
-            hud.ContextMenuStrip.Items["swapWithMapToolStripMenuItem"].Enabled = false;
-            hud.ContextMenuStrip.Items["videoToolStripMenuItem"].Enabled = false;
-
-
-            this.lMessage = new System.Windows.Forms.Label();
-            this.lMessage.Anchor =  ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top)
-                                       | System.Windows.Forms.AnchorStyles.Left)
-                                       | System.Windows.Forms.AnchorStyles.Right)));
-
-            this.lMessage.AutoSize = false;
-            this.lMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lMessage.Location = new System.Drawing.Point(0, 0);
-            this.lMessage.Name = "lMessage";
-            this.lMessage.Size = new System.Drawing.Size(MainH.Panel2.Size.Width, 40);
-            this.lMessage.Text = "";
-            this.lMessage.TextAlign = ContentAlignment.MiddleCenter;
-            this.lMessage.ForeColor = Color.DarkOrange;
-            MainH.Panel2.Controls.Add(lMessage);
-
-            
-            //Create and Add StreamPlayerControl to the place of tblMap
-            ucVideoStreamPlayer = new racPlayerControl.racPlayerControl();
-            ucVideoStreamPlayer.AutoRecconect = false;
-            ucVideoStreamPlayer.ffmegParams = "";
-            ucVideoStreamPlayer.ffmegPath = "";
-            ucVideoStreamPlayer.Location = new System.Drawing.Point(0, 40);
-            ucVideoStreamPlayer.MediaUrl = configStreamURL;
-            ucVideoStreamPlayer.Name = "ucPlayerControl1";
-            ucVideoStreamPlayer.RecordPath = configRecordLocation;
-            ucVideoStreamPlayer.ffmegPath = ".\\ffmpeg.exe";
-            ucVideoStreamPlayer.Size = new System.Drawing.Size(MainH.Panel2.Size.Width-100, MainH.Panel2.Size.Height - 40);
-            ucVideoStreamPlayer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                                       | System.Windows.Forms.AnchorStyles.Left)
-                                       | System.Windows.Forms.AnchorStyles.Right)));
-            ucVideoStreamPlayer.TabIndex = 0;
-            ucVideoStreamPlayer.VideoRate = racPlayerControl.racPlayerControl.ratelist.WideScreen;
-            ucVideoStreamPlayer.VisiblePlayerMenu = true;
-            ucVideoStreamPlayer.VisibleStatus = true;
-            //ucPlayerControl1.DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
-            ucVideoStreamPlayer.Controls["panel1"].Controls["streamPlayerControl1"].DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
-
-            MainH.Panel2.Controls.Add(ucVideoStreamPlayer);
-            ucVideoStreamPlayer.Play();
-
-            btnSwitchToIR = new Button();
-            btnSwitchToIR.Location = new Point(MainH.Panel2.Size.Width - 90, 40);
-            btnSwitchToIR.Size = new Size(80, 80);
-            btnSwitchToIR.Anchor = (AnchorStyles)(AnchorStyles.Top | AnchorStyles.Right);
-            btnSwitchToIR.Text = "";
-            btnSwitchToIR.Name = "btnSwitchToIR";
-            btnSwitchToIR.Click += new System.EventHandler(btnSwitchToIR_Click);
-            MainH.Panel2.Controls.Add(btnSwitchToIR);
-
-            btnSwitchToDaylight = new Button();
-            btnSwitchToDaylight.Location = new Point(MainH.Panel2.Size.Width - 90, 140);
-            btnSwitchToDaylight.Size = new Size(80, 80);
-            btnSwitchToDaylight.Anchor = (AnchorStyles)(AnchorStyles.Top | AnchorStyles.Right);
-            btnSwitchToDaylight.Text = "";
-            btnSwitchToDaylight.Name = "btnSwitchToDayLight";
-            btnSwitchToDaylight.Click += new System.EventHandler(btnSwitchToDayLight_Click);
-            MainH.Panel2.Controls.Add(btnSwitchToDaylight);
-
-            btnRateMode = new Button();
-            btnRateMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 100);
-            btnRateMode.Size = new Size(80, 80);
-            btnRateMode.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
-            btnRateMode.Text = "";
-            btnRateMode.Name = "btnRateMode";
-            btnRateMode.Click += new System.EventHandler(btnRateMode_Click);
-            MainH.Panel2.Controls.Add(btnRateMode);
-
-            btnSceneMode = new Button();
-            btnSceneMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 200);
-            btnSceneMode.Size = new Size(80, 80);
-            btnSceneMode.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
-            btnSceneMode.Text = "";
-            btnSceneMode.Name = "btnSceneMode";
-            btnSceneMode.Click += new System.EventHandler(btnSceneMode_Click);
-            MainH.Panel2.Controls.Add(btnSceneMode);
-
-            btnVehicleMode = new Button();
-            btnVehicleMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 300);
-            btnVehicleMode.Size = new Size(80, 80);
-            btnVehicleMode.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
-            btnVehicleMode.Text = "";
-            btnVehicleMode.Name = "btnVehicleMode";
-            btnVehicleMode.Click += new System.EventHandler(btnVehicleMode_Click);
-            MainH.Panel2.Controls.Add(btnVehicleMode);
-
-
-
+            //Add new controls
             this.AddNewControls();
-
-
-            SubMainLeft.Panel2.Controls.Add(EliStatPanel);
-            EliStatPanel.Width = SubMainLeft.Panel2.Width;
-
-            Image imageLand = (Image)(resources.GetObject("landing_512"));
-            this.btnDoLand.BackgroundImage = imageLand;
-            this.btnDoLand.BackgroundImageLayout = ImageLayout.Stretch;
-
-            Image imageTakeoff = (Image)(resources.GetObject("start_512"));
-            this.btnDoTakeoff.BackgroundImage = imageTakeoff;
-            this.btnDoTakeoff.BackgroundImageLayout = ImageLayout.Stretch;
-
-            Image imageAltPlus = (Image)(resources.GetObject("plus"));
-            this.btnAltPlus.BackgroundImage = imageAltPlus;
-            this.btnAltPlus.BackgroundImageLayout = ImageLayout.Stretch;
-
-            Image imageAltMinus = (Image)(resources.GetObject("minus"));
-            this.btnAltMinus.BackgroundImage = imageAltMinus;
-            this.btnAltMinus.BackgroundImageLayout = ImageLayout.Stretch;
-
-            Image imageIR = (Image)(resources.GetObject("ir"));
-            this.btnSwitchToIR.BackgroundImage = imageIR;
-            this.btnSwitchToIR.BackgroundImageLayout = ImageLayout.Stretch;
-
-            Image imageDay = (Image)(resources.GetObject("daylight"));
-            this.btnSwitchToDaylight.BackgroundImage = imageDay;
-            this.btnSwitchToDaylight.BackgroundImageLayout = ImageLayout.Stretch;
-
-            Image imageRate = (Image)(resources.GetObject("rate"));
-            this.btnRateMode.BackgroundImage = imageRate;
-            this.btnRateMode.BackgroundImageLayout = ImageLayout.Stretch;
-
-            Image imageScene = (Image)(resources.GetObject("scene"));
-            this.btnSceneMode.BackgroundImage = imageScene;
-            this.btnSceneMode.BackgroundImageLayout = ImageLayout.Stretch;
-
-            Image imageVehicle = (Image)(resources.GetObject("vehicle"));
-            this.btnVehicleMode.BackgroundImage = imageVehicle;
-            this.btnVehicleMode.BackgroundImageLayout = ImageLayout.Stretch;
-
-            Image imageExecute = (Image)(resources.GetObject("execute"));
-            this.bDoChangeAlt.BackgroundImage = imageExecute;
-            this.bDoChangeAlt.BackgroundImageLayout = ImageLayout.Stretch;
 
             return true;
         }
@@ -370,11 +173,9 @@ namespace MissionPlanner.Elistair
 
             return true;
         }
+
         public override bool Loop()
         {
-
-
- 
             //Check if browser is busy
             if (!browser.IsBusy)
             {
@@ -785,12 +586,155 @@ namespace MissionPlanner.Elistair
 
         private void CustomiseLook()
         {
+            // Change splash screen at plugin load
 
+            Bitmap splash_logo = (Bitmap)(resources.GetObject("EasyPlanner_splash"));
+            Program.Splash.BackgroundImage = splash_logo;
+            Application.DoEvents();
+            Program.Splash.MinimizeBox = false;
+            Program.Splash.MaximizeBox = false;
+            Program.Splash.ShowIcon = false;
+            Program.Splash.FormBorderStyle = FormBorderStyle.None;
+            Program.Splash.Controls["TXT_version"].Visible = false;
+            Program.Splash.Controls["label1"].Visible = false;
+            Program.Splash.Controls["pictureBox1"].Visible = false;
+
+            //Remove unneccessary menu items from the bar 
+            mainmenu = Host.MainForm.MainMenu;
+            mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuHelp"));
+            mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuTerminal"));
+            mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuDonate"));
+            mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuSimulation"));
+            mainmenu.Items.RemoveAt(mainmenu.Items.IndexOfKey("MenuArduPilot"));
+
+            ToolStripMenuItem a = mainmenu.ContextMenuStrip.Items["autoHideToolStripMenuItem"] as ToolStripMenuItem;
+            a.PerformClick(); //Hide menu
+
+
+            //Add Rotors logo to the menubar
+            Bitmap lg = (Bitmap)(resources.GetObject("logo2"));
+            ToolStripButton mi = new ToolStripButton();
+            mi.Size = lg.Size;
+            mi.Alignment = ToolStripItemAlignment.Right;
+            mi.BackColor = Color.Transparent;
+            mi.DisplayStyle = ToolStripItemDisplayStyle.Image;
+            mi.Image = lg;
+            mi.Text = "MenuLOGO";
+            mi.Margin = new Padding(0);
+            mi.Name = "MenuLOGO";
+            mi.Overflow = ToolStripItemOverflow.Never;
+            mi.ImageScaling = ToolStripItemImageScaling.None;
+            Host.MainForm.MainMenu.Items.Add(mi);
+
+            // hide map and tabControlActions
+            SubMainLeft = Host.MainForm.FlightData.Controls.Find("SubMainLeft", true).FirstOrDefault() as SplitContainer;
+            MainH = Host.MainForm.FlightData.Controls.Find("MAINH", true).FirstOrDefault() as SplitContainer;
+            tblMap = Host.MainForm.FlightData.Controls.Find("tableMap", true).FirstOrDefault() as TableLayoutPanel;
+
+            SubMainLeft.Panel2.Controls["tabControlActions"].Visible = false;
+            tblMap.Visible = false;
+
+            // Customize HUD
+            hud = SubMainLeft.Panel1.Controls["hud1"] as HUD;
+            hud.displayAOASSA = false;
+            hud.displayxtrack = false;
+            hud.displayspeed = false;
+            hud.displayconninfo = false;
+
+            hud.ContextMenuStrip.Items["swapWithMapToolStripMenuItem"].Enabled = false;
+            hud.ContextMenuStrip.Items["videoToolStripMenuItem"].Enabled = false;
         }
 
 
         private bool AddNewControls()
         {
+
+            this.lMessage = new System.Windows.Forms.Label();
+            this.lMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top)
+                                       | System.Windows.Forms.AnchorStyles.Left)
+                                       | System.Windows.Forms.AnchorStyles.Right)));
+
+            this.lMessage.AutoSize = false;
+            this.lMessage.Font = new System.Drawing.Font("Microsoft Sans Serif", 24F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lMessage.Location = new System.Drawing.Point(0, 0);
+            this.lMessage.Name = "lMessage";
+            this.lMessage.Size = new System.Drawing.Size(MainH.Panel2.Size.Width, 40);
+            this.lMessage.Text = "";
+            this.lMessage.TextAlign = ContentAlignment.MiddleCenter;
+            this.lMessage.ForeColor = Color.DarkOrange;
+            MainH.Panel2.Controls.Add(lMessage);
+
+
+            //Create and Add StreamPlayerControl to the place of tblMap
+            ucVideoStreamPlayer = new racPlayerControl.racPlayerControl();
+            ucVideoStreamPlayer.AutoRecconect = false;
+            ucVideoStreamPlayer.ffmegParams = "";
+            ucVideoStreamPlayer.ffmegPath = "";
+            ucVideoStreamPlayer.Location = new System.Drawing.Point(0, 40);
+            ucVideoStreamPlayer.MediaUrl = configStreamURL;
+            ucVideoStreamPlayer.Name = "ucPlayerControl1";
+            ucVideoStreamPlayer.RecordPath = configRecordLocation;
+            ucVideoStreamPlayer.ffmegPath = ".\\ffmpeg.exe";
+            ucVideoStreamPlayer.Size = new System.Drawing.Size(MainH.Panel2.Size.Width - 100, MainH.Panel2.Size.Height - 40);
+            ucVideoStreamPlayer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                                       | System.Windows.Forms.AnchorStyles.Left)
+                                       | System.Windows.Forms.AnchorStyles.Right)));
+            ucVideoStreamPlayer.TabIndex = 0;
+            ucVideoStreamPlayer.VideoRate = racPlayerControl.racPlayerControl.ratelist.WideScreen;
+            ucVideoStreamPlayer.VisiblePlayerMenu = true;
+            ucVideoStreamPlayer.VisibleStatus = true;
+            //ucPlayerControl1.DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
+            ucVideoStreamPlayer.Controls["panel1"].Controls["streamPlayerControl1"].DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
+
+            MainH.Panel2.Controls.Add(ucVideoStreamPlayer);
+            ucVideoStreamPlayer.Play();
+
+            btnSwitchToIR = new Button();
+            btnSwitchToIR.Location = new Point(MainH.Panel2.Size.Width - 90, 40);
+            btnSwitchToIR.Size = new Size(80, 80);
+            btnSwitchToIR.Anchor = (AnchorStyles)(AnchorStyles.Top | AnchorStyles.Right);
+            btnSwitchToIR.Text = "";
+            btnSwitchToIR.Name = "btnSwitchToIR";
+            btnSwitchToIR.Click += new System.EventHandler(btnSwitchToIR_Click);
+            MainH.Panel2.Controls.Add(btnSwitchToIR);
+
+            btnSwitchToDaylight = new Button();
+            btnSwitchToDaylight.Location = new Point(MainH.Panel2.Size.Width - 90, 140);
+            btnSwitchToDaylight.Size = new Size(80, 80);
+            btnSwitchToDaylight.Anchor = (AnchorStyles)(AnchorStyles.Top | AnchorStyles.Right);
+            btnSwitchToDaylight.Text = "";
+            btnSwitchToDaylight.Name = "btnSwitchToDayLight";
+            btnSwitchToDaylight.Click += new System.EventHandler(btnSwitchToDayLight_Click);
+            MainH.Panel2.Controls.Add(btnSwitchToDaylight);
+
+            btnRateMode = new Button();
+            btnRateMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 100);
+            btnRateMode.Size = new Size(80, 80);
+            btnRateMode.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
+            btnRateMode.Text = "";
+            btnRateMode.Name = "btnRateMode";
+            btnRateMode.Click += new System.EventHandler(btnRateMode_Click);
+            MainH.Panel2.Controls.Add(btnRateMode);
+
+            btnSceneMode = new Button();
+            btnSceneMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 200);
+            btnSceneMode.Size = new Size(80, 80);
+            btnSceneMode.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
+            btnSceneMode.Text = "";
+            btnSceneMode.Name = "btnSceneMode";
+            btnSceneMode.Click += new System.EventHandler(btnSceneMode_Click);
+            MainH.Panel2.Controls.Add(btnSceneMode);
+
+            btnVehicleMode = new Button();
+            btnVehicleMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 300);
+            btnVehicleMode.Size = new Size(80, 80);
+            btnVehicleMode.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
+            btnVehicleMode.Text = "";
+            btnVehicleMode.Name = "btnVehicleMode";
+            btnVehicleMode.Click += new System.EventHandler(btnVehicleMode_Click);
+            MainH.Panel2.Controls.Add(btnVehicleMode);
+
+
 
             this.EliStatPanel = new System.Windows.Forms.Panel();
             this.groupBoxWinch = new System.Windows.Forms.GroupBox();
@@ -1087,6 +1031,50 @@ namespace MissionPlanner.Elistair
             this.bDoChangeAlt.Text = "";
             //this.bDoChangeAlt.UseVisualStyleBackColor = true;
             this.bDoChangeAlt.Click += new System.EventHandler(this.btnDoChangeAlt_Click);
+
+
+            SubMainLeft.Panel2.Controls.Add(EliStatPanel);
+            EliStatPanel.Width = SubMainLeft.Panel2.Width;
+
+            Image imageLand = (Image)(resources.GetObject("landing_512"));
+            this.btnDoLand.BackgroundImage = imageLand;
+            this.btnDoLand.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageTakeoff = (Image)(resources.GetObject("start_512"));
+            this.btnDoTakeoff.BackgroundImage = imageTakeoff;
+            this.btnDoTakeoff.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageAltPlus = (Image)(resources.GetObject("plus"));
+            this.btnAltPlus.BackgroundImage = imageAltPlus;
+            this.btnAltPlus.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageAltMinus = (Image)(resources.GetObject("minus"));
+            this.btnAltMinus.BackgroundImage = imageAltMinus;
+            this.btnAltMinus.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageIR = (Image)(resources.GetObject("ir"));
+            this.btnSwitchToIR.BackgroundImage = imageIR;
+            this.btnSwitchToIR.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageDay = (Image)(resources.GetObject("daylight"));
+            this.btnSwitchToDaylight.BackgroundImage = imageDay;
+            this.btnSwitchToDaylight.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageRate = (Image)(resources.GetObject("rate"));
+            this.btnRateMode.BackgroundImage = imageRate;
+            this.btnRateMode.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageScene = (Image)(resources.GetObject("scene"));
+            this.btnSceneMode.BackgroundImage = imageScene;
+            this.btnSceneMode.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageVehicle = (Image)(resources.GetObject("vehicle"));
+            this.btnVehicleMode.BackgroundImage = imageVehicle;
+            this.btnVehicleMode.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageExecute = (Image)(resources.GetObject("execute"));
+            this.bDoChangeAlt.BackgroundImage = imageExecute;
+            this.bDoChangeAlt.BackgroundImageLayout = ImageLayout.Stretch;
 
             return true;
         }
