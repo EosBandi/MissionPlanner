@@ -312,15 +312,14 @@ namespace MissionPlanner.Elistair
 
 
 
-            MainV2.instance.Invoke((Action)
-                delegate
-                {
+            MainV2.instance.BeginInvoke((MethodInvoker)(() =>
+            {
 
-                    sc = Host.MainForm.FlightData.Controls.Find("splitContainer1", true).FirstOrDefault() as SplitContainer;
+                sc = Host.MainForm.FlightData.Controls.Find("splitContainer1", true).FirstOrDefault() as SplitContainer;
                     TrackBar tb = Host.MainForm.FlightData.Controls.Find("TRK_zoom", true).FirstOrDefault() as TrackBar;
                     Panel pn1 = Host.MainForm.FlightData.Controls.Find("panel1", true).FirstOrDefault() as Panel;
 
-                });
+                }));
 
 
 
@@ -361,16 +360,15 @@ namespace MissionPlanner.Elistair
 
                 }
             }
-   
 
 
-            MainV2.instance.Invoke((Action)
-              delegate
-              {
 
-                  
+            MainV2.instance.BeginInvoke((MethodInvoker)(() =>
+            {
 
-                  this.btnAltPlus.Location = new System.Drawing.Point(btnDoLand.Location.X, EliStatPanel.Height / 2 - 100);
+
+
+                this.btnAltPlus.Location = new System.Drawing.Point(btnDoLand.Location.X, EliStatPanel.Height / 2 - 100);
                   this.btnAltMinus.Location = new System.Drawing.Point(btnDoLand.Location.X, EliStatPanel.Height / 2 + 20);
                   //Host.MainForm.Menu
                   // Update winch data
@@ -499,7 +497,7 @@ namespace MissionPlanner.Elistair
 
                   }
 
-              });
+              }));
 
 
             return true;
