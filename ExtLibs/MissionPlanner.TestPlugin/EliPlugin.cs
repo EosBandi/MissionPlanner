@@ -63,6 +63,7 @@ namespace MissionPlanner.Elistair
         //Queue for messes to diaplay
         private Queue<String> messageQueue;
 
+        //Create controls for new UI elements
         private System.Windows.Forms.Panel EliStatPanel;
         private System.Windows.Forms.GroupBox groupBoxWinch;
         private System.Windows.Forms.GroupBox groupBoxButton;
@@ -105,7 +106,7 @@ namespace MissionPlanner.Elistair
 
         public override string Version
         {
-            get { return "1.0"; }
+            get { return "1.1"; }
         }
 
         public override string Author
