@@ -22,6 +22,17 @@ using OpenTK.Graphics;
 using OpenTK.Graphics.OpenGL;
 using racPlayerControl;
 using System.Threading;
+using MissionPlanner.ArduPilot;
+using MissionPlanner.Utilities;
+using MissionPlanner.Controls;
+using MissionPlanner;
+
+
+//Add variables in config file
+//  CameraStreamURL
+//  ElistairURL
+//  RecordLocation
+
 
 
 namespace MissionPlanner.Elistair
@@ -31,10 +42,16 @@ namespace MissionPlanner.Elistair
     {
 
 
+        //Config variables
+        private string configEliURL { get; set; }
+        private string configStreamURL { get; set; }
+        private string configRecordLocation { get; set; }
+
+        
         private WebClient browser = new WebClient();
-        private Uri _elistairUrl = new Uri("http://192.168.4.1/");
-        //private String _videoUrl = new string("udp://224.10.10.10.:15004");
+        private Uri _elistairUrl;
         private ElistairClass eli = new ElistairClass();
+
         private bool _eli_connected = false;
         private int _eli_wait_cycles = 0;
 
@@ -45,19 +62,16 @@ namespace MissionPlanner.Elistair
         private Color ButBGDeselect = Color.FromArgb(0xFF, 0xFF, 0x99);                       // This changes the colour of button backgrounds (Top)
         private Color ButBGSelect = Color.OrangeRed;
 
-        SplitContainer sc;
-        Label lab;
-     
-        MenuStrip mainmenu;
-        SplitContainer SubMainLeft;
-        SplitContainer MainH;
-        TableLayoutPanel tblMap;
-        HUD hud;
+        //MainV2 elements
+        MenuStrip           mainmenu;
+        SplitContainer      SubMainLeft;
+        SplitContainer      MainH;
+        TableLayoutPanel    tblMap;
+        HUD                 hud;
 
-        racPlayerControl.racPlayerControl ucPlayerControl1;
+        racPlayerControl.racPlayerControl ucVideoStreamPlayer;
 
-        int a = 0;
-
+        //Queue for messes to diaplay
         private Queue<String> messageQueue;
 
         private System.Windows.Forms.Panel EliStatPanel;
@@ -106,10 +120,44 @@ namespace MissionPlanner.Elistair
             get { return "Rotors and Cams"; }
         }
 
-        //[DebuggerHidden]
         public override bool Init()
         {
             loopratehz = 1;
+
+
+            //Get config variables
+            if (Host.config["ElistairURL"] != null)
+            {
+                configEliURL = Host.config["ElistairURL"];
+            }
+            else
+            {
+                configEliURL = "http://192.168.4.1/";
+                Host.config["ElistairURL"] = configEliURL;
+            }
+            _elistairUrl = new Uri(configEliURL);
+
+
+            if (Host.config["StreamURL"] != null)
+            {
+                configStreamURL = Host.config["StreamURL"];
+            }
+            else
+            {
+                configStreamURL = "udp://224.10.10.10:15004";
+                Host.config["StreamURL"] = configStreamURL;
+            }
+
+            if (Host.config["RecordPath"] != null)
+            {
+                configRecordLocation = Host.config["RecordPath"];
+            }
+            else
+            {
+                configRecordLocation = "e:\\epvideodir\\";
+                Host.config["RecordPath"] = configRecordLocation;
+            }
+            
 
             //Init message queue
             messageQueue = new Queue<string>();
@@ -194,28 +242,28 @@ namespace MissionPlanner.Elistair
 
             
             //Create and Add StreamPlayerControl to the place of tblMap
-            ucPlayerControl1 = new racPlayerControl.racPlayerControl();
-            ucPlayerControl1.AutoRecconect = false;
-            ucPlayerControl1.ffmegParams = "";
-            ucPlayerControl1.ffmegPath = "";
-            ucPlayerControl1.Location = new System.Drawing.Point(0, 40);
-            ucPlayerControl1.MediaUrl = "udp://224.10.10.10:15004";
-            ucPlayerControl1.Name = "ucPlayerControl1";
-            ucPlayerControl1.RecordPath = "e:\\epvideodir\\";
-            ucPlayerControl1.ffmegPath = ".\\ffmpeg.exe";
-            ucPlayerControl1.Size = new System.Drawing.Size(MainH.Panel2.Size.Width-100, MainH.Panel2.Size.Height - 40);
-            ucPlayerControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            ucVideoStreamPlayer = new racPlayerControl.racPlayerControl();
+            ucVideoStreamPlayer.AutoRecconect = false;
+            ucVideoStreamPlayer.ffmegParams = "";
+            ucVideoStreamPlayer.ffmegPath = "";
+            ucVideoStreamPlayer.Location = new System.Drawing.Point(0, 40);
+            ucVideoStreamPlayer.MediaUrl = configStreamURL;
+            ucVideoStreamPlayer.Name = "ucPlayerControl1";
+            ucVideoStreamPlayer.RecordPath = configRecordLocation;
+            ucVideoStreamPlayer.ffmegPath = ".\\ffmpeg.exe";
+            ucVideoStreamPlayer.Size = new System.Drawing.Size(MainH.Panel2.Size.Width-100, MainH.Panel2.Size.Height - 40);
+            ucVideoStreamPlayer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                                        | System.Windows.Forms.AnchorStyles.Left)
                                        | System.Windows.Forms.AnchorStyles.Right)));
-            ucPlayerControl1.TabIndex = 0;
-            ucPlayerControl1.VideoRate = racPlayerControl.racPlayerControl.ratelist.WideScreen;
-            ucPlayerControl1.VisiblePlayerMenu = true;
-            ucPlayerControl1.VisibleStatus = true;
+            ucVideoStreamPlayer.TabIndex = 0;
+            ucVideoStreamPlayer.VideoRate = racPlayerControl.racPlayerControl.ratelist.WideScreen;
+            ucVideoStreamPlayer.VisiblePlayerMenu = true;
+            ucVideoStreamPlayer.VisibleStatus = true;
             //ucPlayerControl1.DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
-            ucPlayerControl1.Controls["panel1"].Controls["streamPlayerControl1"].DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
+            ucVideoStreamPlayer.Controls["panel1"].Controls["streamPlayerControl1"].DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
 
-            MainH.Panel2.Controls.Add(ucPlayerControl1);
-            ucPlayerControl1.Play();
+            MainH.Panel2.Controls.Add(ucVideoStreamPlayer);
+            ucVideoStreamPlayer.Play();
 
             btnSwitchToIR = new Button();
             btnSwitchToIR.Location = new Point(MainH.Panel2.Size.Width - 90, 40);
@@ -264,7 +312,7 @@ namespace MissionPlanner.Elistair
 
 
 
-            this.AddControls();
+            this.AddNewControls();
 
 
             SubMainLeft.Panel2.Controls.Add(EliStatPanel);
@@ -310,21 +358,6 @@ namespace MissionPlanner.Elistair
             this.bDoChangeAlt.BackgroundImage = imageExecute;
             this.bDoChangeAlt.BackgroundImageLayout = ImageLayout.Stretch;
 
-
-
-            MainV2.instance.BeginInvoke((MethodInvoker)(() =>
-            {
-
-                sc = Host.MainForm.FlightData.Controls.Find("splitContainer1", true).FirstOrDefault() as SplitContainer;
-                    TrackBar tb = Host.MainForm.FlightData.Controls.Find("TRK_zoom", true).FirstOrDefault() as TrackBar;
-                    Panel pn1 = Host.MainForm.FlightData.Controls.Find("panel1", true).FirstOrDefault() as Panel;
-
-                }));
-
-
-
-     
-
             return true;
         }
 
@@ -361,13 +394,8 @@ namespace MissionPlanner.Elistair
                 }
             }
 
-
-
             MainV2.instance.BeginInvoke((MethodInvoker)(() =>
             {
-
-
-
                 this.btnAltPlus.Location = new System.Drawing.Point(btnDoLand.Location.X, EliStatPanel.Height / 2 - 100);
                   this.btnAltMinus.Location = new System.Drawing.Point(btnDoLand.Location.X, EliStatPanel.Height / 2 + 20);
                   //Host.MainForm.Menu
@@ -499,7 +527,6 @@ namespace MissionPlanner.Elistair
 
               }));
 
-
             return true;
 
         }
@@ -525,12 +552,12 @@ namespace MissionPlanner.Elistair
         private void ucPlayer_MouseDblClick(object sender, EventArgs e)
         {
           
-            var coordinates = ucPlayerControl1.PointToClient(Cursor.Position);
-            Size displaySize = ucPlayerControl1.Controls["panel1"].Controls["streamPlayerControl1"].Size;
-            Point loc = ucPlayerControl1.Controls["panel1"].Controls["streamPlayerControl1"].Location;
+            var coordinates = ucVideoStreamPlayer.PointToClient(Cursor.Position);
+            Size displaySize = ucVideoStreamPlayer.Controls["panel1"].Controls["streamPlayerControl1"].Size;
+            Point loc = ucVideoStreamPlayer.Controls["panel1"].Controls["streamPlayerControl1"].Location;
 
-            long clickX = (long) ( (double)(coordinates.X - loc.X) / ((double)displaySize.Width / (double)ucPlayerControl1.VideoSize.Width)) ;
-            long clickY = (long) ((double)(coordinates.Y - loc.Y) / ((double)displaySize.Height / (double)ucPlayerControl1.VideoSize.Height)) ;
+            long clickX = (long) ( (double)(coordinates.X - loc.X) / ((double)displaySize.Width / (double)ucVideoStreamPlayer.VideoSize.Width)) ;
+            long clickY = (long) ((double)(coordinates.Y - loc.Y) / ((double)displaySize.Height / (double)ucVideoStreamPlayer.VideoSize.Height)) ;
 
             //MessageBox.Show("Clicked! at "+coordinates.X.ToString()+ " : "+coordinates.Y.ToString() + " Video :"+ucPlayerControl1.VideoSize.Width + " : " + ucPlayerControl1.VideoSize.Height + "Control:" + displaySize.Width + ":" + displaySize.Height + "\n" +
             //                 "Caluclated: " + clickX + " : " + clickY + "  Location: "+ loc.X + " : " + loc.Y);
@@ -629,13 +656,12 @@ namespace MissionPlanner.Elistair
 
         }
 
-
         private void btnSwitchToIR_Click(object sender, EventArgs e)
         {
             btnSwitchToDaylight.BackColor = ButBGDeselect;
             btnSwitchToIR.BackColor = ButBGSelect;
 
-            ucPlayerControl1.Stop();
+            ucVideoStreamPlayer.Stop();
             //Thread.Sleep(500);
             try
             {
@@ -652,16 +678,17 @@ namespace MissionPlanner.Elistair
                 throw ex;
             }
             Thread.Sleep(500);
-            ucPlayerControl1.Play();
+            ucVideoStreamPlayer.Play();
             _epsilonCameraMode = 2;
         }
+
         private void btnSwitchToDayLight_Click(object sender, EventArgs e)
         {
             btnSwitchToDaylight.BackColor = ButBGSelect;
             btnSwitchToIR.BackColor = ButBGDeselect;
 
 
-            ucPlayerControl1.Stop();
+            ucVideoStreamPlayer.Stop();
             Thread.Sleep(500);
             try
             {
@@ -678,10 +705,9 @@ namespace MissionPlanner.Elistair
                 throw ex;
             }
             Thread.Sleep(500);
-            ucPlayerControl1.Play();
+            ucVideoStreamPlayer.Play();
             _epsilonCameraMode = 1;
         }
-
 
         private void btnAltPlus_Click(object sender, EventArgs e)
         {
@@ -713,10 +739,12 @@ namespace MissionPlanner.Elistair
             bDoChangeAlt.Enabled = false;
 
         }
+        
         private void btnDoLand_Click(object sender, EventArgs e)
         {
             DoLand();
         }
+        
         private void btnDoTakeoff_Click(object sender, EventArgs e)
         {
             DoTakeOff();
@@ -754,7 +782,14 @@ namespace MissionPlanner.Elistair
             messageQueue.Enqueue("Landing is in progress! You can abort via manual control only.");
         }
 
-        private bool AddControls()
+
+        private void CustomiseLook()
+        {
+
+        }
+
+
+        private bool AddNewControls()
         {
 
             this.EliStatPanel = new System.Windows.Forms.Panel();
