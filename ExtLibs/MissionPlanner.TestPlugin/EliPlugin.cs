@@ -37,7 +37,7 @@ namespace MissionPlanner.Elistair
         private string configRecordLocation { get; set; }
 
         
-        private WebClient browser = new WebClient();
+        private WebClient eliStatDownloader = new WebClient();
         private Uri _elistairUrl;
         private ElistairClass eli = new ElistairClass();
 
@@ -118,7 +118,6 @@ namespace MissionPlanner.Elistair
         {
             loopratehz = 1;
 
-
             //Get config variables
             if (Host.config["ElistairURL"] != null)
             {
@@ -167,7 +166,8 @@ namespace MissionPlanner.Elistair
 
         public override bool Loaded()
         {
-            browser.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadStringCompleted);
+            eliStatDownloader.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadStringCompleted);
+
             btnSceneMode.BackColor = ButBGDeselect;
             btnRateMode.BackColor = ButBGSelect;
             btnVehicleMode.BackColor = ButBGDeselect;
@@ -178,10 +178,10 @@ namespace MissionPlanner.Elistair
         public override bool Loop()
         {
             //Check if browser is busy
-            if (!browser.IsBusy)
+            if (!eliStatDownloader.IsBusy)
             {
                 // not busy, lets start a download
-                browser.DownloadStringAsync(_elistairUrl);
+                eliStatDownloader.DownloadStringAsync(_elistairUrl);
                 // and clear wait cycles
                 _eli_wait_cycles = 0;
             } else
@@ -190,7 +190,7 @@ namespace MissionPlanner.Elistair
                 if (_eli_wait_cycles<2) { _eli_wait_cycles++; }
                 else
                 {
-                    browser.CancelAsync();
+                    eliStatDownloader.CancelAsync();
                     _eli_connected = false;
 
                 }
@@ -334,9 +334,9 @@ namespace MissionPlanner.Elistair
         }
         public override bool Exit()
         {
-            if (browser.IsBusy)
+            if (eliStatDownloader.IsBusy)
             {
-                browser.CancelAsync();
+                eliStatDownloader.CancelAsync();
             }
             return true;
         }
