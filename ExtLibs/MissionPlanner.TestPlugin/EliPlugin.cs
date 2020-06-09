@@ -63,6 +63,24 @@ namespace MissionPlanner.Elistair
         //Queue for messes to diaplay
         private Queue<String> messageQueue;
 
+        enum epilonCommands : byte
+        {
+            daylight = 0,                           //Switch to EO camera
+            thermal = 1,                            //Switch to FLIR
+            track = 2,                              //Set Tracking mode
+            do_ffc_short = 3,                       //Do Short FFC calibration
+            do_ffc_long = 4,                        //Do Long FFC calibration
+            set_compression = 5,                    //Set H264 compression parameters
+            set_false_color = 6,                    //Set false color for IR
+            set_pip = 7,                            //Enable/Disable PIP mode ????
+            stab_on_track = 8,                      //Stab box on center vhen stab is on
+            stow_camera = 9,                        //Stow camera for landing
+            set_box_size = 10,                      //Set tracking box size 60-255
+
+        }
+
+
+
         //Create controls for new UI elements
         private System.Windows.Forms.Panel EliStatPanel;
         private System.Windows.Forms.GroupBox groupBoxWinch;
@@ -168,6 +186,7 @@ namespace MissionPlanner.Elistair
         {
             eliStatDownloader.DownloadStringCompleted += new DownloadStringCompletedEventHandler(DownloadStringCompleted);
 
+            //Init Button color states
             btnSceneMode.BackColor = ButBGDeselect;
             btnRateMode.BackColor = ButBGSelect;
             btnVehicleMode.BackColor = ButBGDeselect;
@@ -177,17 +196,19 @@ namespace MissionPlanner.Elistair
 
         public override bool Loop()
         {
-            //Check if browser is busy
+
+            //Check if eliStatDownloader is busy
             if (!eliStatDownloader.IsBusy)
             {
                 // not busy, lets start a download
                 eliStatDownloader.DownloadStringAsync(_elistairUrl);
                 // and clear wait cycles
                 _eli_wait_cycles = 0;
-            } else
+            }
+            else
             {
                 // browser is busy, if it was busy for more than 2 cycles then cancel current download
-                if (_eli_wait_cycles<2) { _eli_wait_cycles++; }
+                if (_eli_wait_cycles < 2) { _eli_wait_cycles++; }
                 else
                 {
                     eliStatDownloader.CancelAsync();
@@ -195,6 +216,7 @@ namespace MissionPlanner.Elistair
 
                 }
             }
+
 
             MainV2.instance.BeginInvoke((MethodInvoker)(() =>
             {
@@ -340,6 +362,8 @@ namespace MissionPlanner.Elistair
             }
             return true;
         }
+
+
         private void DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
             if (e.Error != null)
@@ -351,6 +375,14 @@ namespace MissionPlanner.Elistair
             _eli_connected = true;
         }
 
+
+        private void SendEpsilonCommand()
+        {
+
+        }
+
+
+        //Double click on the video, translate it to set tracking point
         private void ucPlayer_MouseDblClick(object sender, EventArgs e)
         {
           
@@ -361,10 +393,8 @@ namespace MissionPlanner.Elistair
             long clickX = (long) ( (double)(coordinates.X - loc.X) / ((double)displaySize.Width / (double)ucVideoStreamPlayer.VideoSize.Width)) ;
             long clickY = (long) ((double)(coordinates.Y - loc.Y) / ((double)displaySize.Height / (double)ucVideoStreamPlayer.VideoSize.Height)) ;
 
-            //MessageBox.Show("Clicked! at "+coordinates.X.ToString()+ " : "+coordinates.Y.ToString() + " Video :"+ucPlayerControl1.VideoSize.Width + " : " + ucPlayerControl1.VideoSize.Height + "Control:" + displaySize.Width + ":" + displaySize.Height + "\n" +
-            //                 "Caluclated: " + clickX + " : " + clickY + "  Location: "+ loc.X + " : " + loc.Y);
-
             if (_epsilonTrackMode <= 1 ) _epsilonTrackMode = 5;  //If 0 or rate, then switch to Scene
+
             //Otherwise use actual (Scene or Vehicle mode)
 
             try
@@ -375,6 +405,7 @@ namespace MissionPlanner.Elistair
                     if (!pipeClient.IsConnected) pipeClient.Connect();
                     sw.WriteLine("TRACK:"+_epsilonTrackMode.ToString()+":"+clickX.ToString()+":"+clickY.ToString());
                     sw.Flush();
+                    //sw.Close();
                 }
             }
             catch (Exception ex)
