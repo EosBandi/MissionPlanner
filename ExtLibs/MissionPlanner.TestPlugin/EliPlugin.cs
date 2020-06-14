@@ -47,6 +47,11 @@ namespace MissionPlanner.Elistair
         private int _target_altitude = 15;
         private int _epsilonTrackMode = 0;
         private int _epsilonCameraMode = 0;
+        private byte _boxsize;
+
+        private ushort _bitrate;
+        private byte _iframes;
+
 
         private Color ButBGDeselect = Color.FromArgb(0xFF, 0xFF, 0x99);                       // This changes the colour of button backgrounds (Top)
         private Color ButBGSelect = Color.OrangeRed;
@@ -63,23 +68,43 @@ namespace MissionPlanner.Elistair
         //Queue for messes to diaplay
         private Queue<String> messageQueue;
 
-        enum epilonCommands : byte
+        enum epsilonCommands : byte
         {
-            daylight = 0,                           //Switch to EO camera
-            thermal = 1,                            //Switch to FLIR
-            track = 2,                              //Set Tracking mode
-            do_ffc_short = 3,                       //Do Short FFC calibration
-            do_ffc_long = 4,                        //Do Long FFC calibration
-            set_compression = 5,                    //Set H264 compression parameters
-            set_false_color = 6,                    //Set false color for IR
-            set_pip = 7,                            //Enable/Disable PIP mode ????
-            stab_on_track = 8,                      //Stab box on center vhen stab is on
-            stow_camera = 9,                        //Stow camera for landing
-            set_box_size = 10,                      //Set tracking box size 60-255
-
+            none = 0,
+            daylight = 1,                           //Switch to EO camera
+            thermal = 2,                            //Switch to FLIR
+            set_track_point = 3,                    //Set Tracking mode and point
+            do_ffc_short = 4,                       //Do Short FFC calibration
+            do_ffc_long = 5,                        //Do Long FFC calibration
+            set_compression = 6,                    //Set H264 compression parameters
+            set_false_color = 7,                    //Set false color for IR
+            set_pip = 8,                            //Enable/Disable PIP mode ????
+            stab_on_track = 9,                      //Stab box on center vhen stab is on
+            stow_camera = 10,                        //Stow camera for landing
+            set_box_size = 11,                      //Set tracking box size 60-255
+            save_and_reset_vp = 12                  //Save and reset video processor
         }
 
 
+
+        enum FalseColor : byte
+        {
+            None = 0,
+            White_hot = 2,
+            Black_hot = 3,
+            Rainbow = 4,
+            Rainbow_inverted = 5,
+            Iron = 6,
+            Iron_inverted = 7,
+            HotCold = 8,
+            Jet = 10,
+            HSV = 14,
+            CLR470_S = 16,
+            IDDEF = 28,
+            IceFire = 26,
+            Iron256 = 30,
+            XVolcano = 34
+        }
 
         //Create controls for new UI elements
         private System.Windows.Forms.Panel EliStatPanel;
@@ -113,6 +138,26 @@ namespace MissionPlanner.Elistair
         private System.Windows.Forms.Button btnSceneMode;
         private System.Windows.Forms.Button btnVehicleMode;
 
+        private System.Windows.Forms.ContextMenuStrip cmMenu;
+        private System.Windows.Forms.ToolStripMenuItem setH264MenuItem;
+        private System.Windows.Forms.ToolStripMenuItem saveAndResetVideoProcMenuItem;
+        private System.ComponentModel.IContainer components = null;
+
+
+        private System.Windows.Forms.ContextMenuStrip cmBox;
+        private System.Windows.Forms.ToolStripMenuItem menuBox50;
+        private System.Windows.Forms.ToolStripMenuItem menuBox100;
+        private System.Windows.Forms.ToolStripMenuItem menuBox150;
+        private System.Windows.Forms.ToolStripMenuItem menuBox200;
+        private System.Windows.Forms.ToolStripMenuItem menuBox250;
+
+        private System.Windows.Forms.ContextMenuStrip cmIR;
+        private System.Windows.Forms.ToolStripMenuItem menuFFCShort;
+        private System.Windows.Forms.ToolStripMenuItem menuFFCLong;
+
+
+
+
         //Use resources
         private ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EliPlugin));
 
@@ -136,39 +181,16 @@ namespace MissionPlanner.Elistair
         {
             loopratehz = 1;
 
-            //Get config variables
-            if (Host.config["ElistairURL"] != null)
-            {
-                configEliURL = Host.config["ElistairURL"];
-            }
-            else
-            {
-                configEliURL = "http://192.168.4.1/";
-                Host.config["ElistairURL"] = configEliURL;
-            }
+            configEliURL = addconfig("ElistairURL", "http://192.168.4.1/");
             _elistairUrl = new Uri(configEliURL);
 
+            configStreamURL = addconfig("StreamURL", "udp://224.10.10.10:15004");
+            configRecordLocation = addconfig("RecordPath", "e:\\epvideodir\\");
+            _bitrate = Convert.ToUInt16(addconfig("H264Bitrate", "6000"));
+            _iframes = Convert.ToByte(addconfig("H264Iframes", "10"));
 
-            if (Host.config["StreamURL"] != null)
-            {
-                configStreamURL = Host.config["StreamURL"];
-            }
-            else
-            {
-                configStreamURL = "udp://224.10.10.10:15004";
-                Host.config["StreamURL"] = configStreamURL;
-            }
+            _boxsize = Convert.ToByte(addconfig("BoxSize", "100"));
 
-            if (Host.config["RecordPath"] != null)
-            {
-                configRecordLocation = Host.config["RecordPath"];
-            }
-            else
-            {
-                configRecordLocation = "e:\\epvideodir\\";
-                Host.config["RecordPath"] = configRecordLocation;
-            }
-            
 
             //Init message queue
             messageQueue = new Queue<string>();
@@ -338,18 +360,20 @@ namespace MissionPlanner.Elistair
                           break;
                   }
 
-                  if (_epsilonCameraMode == 2)
-                  {
-                      btnSwitchToDaylight.BackColor = ButBGDeselect; ;
-                      btnSwitchToIR.BackColor = ButBGSelect;
+                if (_epsilonCameraMode == 2)
+                {
+                    btnSwitchToDaylight.BackColor = ButBGDeselect; ;
+                    btnSwitchToIR.BackColor = ButBGSelect;
 
-                  }else{
-                      btnSwitchToDaylight.BackColor = ButBGSelect;
-                      btnSwitchToIR.BackColor = ButBGDeselect;
+                }
+                else
+                {
+                    btnSwitchToDaylight.BackColor = ButBGSelect;
+                    btnSwitchToIR.BackColor = ButBGDeselect;
 
-                  }
+                }
 
-              }));
+            }));
 
             return true;
 
@@ -375,12 +399,53 @@ namespace MissionPlanner.Elistair
             _eli_connected = true;
         }
 
-
-        private void SendEpsilonCommand()
+        public string addconfig(string key, string defaultvalue)
         {
 
+            if (Host.config[key] != null)
+            {
+                return Host.config[key];
+            }
+            else
+            {
+                Host.config[key] = defaultvalue;
+                return defaultvalue;
+            }
         }
 
+        private void SendEpsilonCommand(epsilonCommands c)
+        {
+            SendEpsilonString(Convert.ToByte(c).ToString());
+        }
+
+
+        private void SendEpsilonCommand(epsilonCommands c, string commandstring)
+        {
+            SendEpsilonString(Convert.ToByte(c).ToString() + ":" + commandstring);
+        }
+
+
+        private void SendEpsilonString(string commandstring)
+        {
+            try
+            {
+                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
+                using (StreamWriter sw = new StreamWriter(pipeClient))
+                {
+                    if (!pipeClient.IsConnected) pipeClient.Connect();
+
+                    sw.WriteLine(commandstring);
+
+                    sw.Flush();
+                    sw.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
 
         //Double click on the video, translate it to set tracking point
         private void ucPlayer_MouseDblClick(object sender, EventArgs e)
@@ -397,21 +462,7 @@ namespace MissionPlanner.Elistair
 
             //Otherwise use actual (Scene or Vehicle mode)
 
-            try
-            {
-                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
-                using (StreamWriter sw = new StreamWriter(pipeClient))
-                {
-                    if (!pipeClient.IsConnected) pipeClient.Connect();
-                    sw.WriteLine("TRACK:"+_epsilonTrackMode.ToString()+":"+clickX.ToString()+":"+clickY.ToString());
-                    sw.Flush();
-                    //sw.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            SendEpsilonCommand(epsilonCommands.set_track_point, _epsilonTrackMode.ToString() + ":" + clickX.ToString() + ":" + clickY.ToString() + ":" + _boxsize.ToString());
 
             if (_epsilonTrackMode == 5) btnSceneMode.BackColor = ButBGSelect; else btnSceneMode.BackColor = ButBGDeselect;
             btnRateMode.BackColor = ButBGDeselect;
@@ -421,20 +472,8 @@ namespace MissionPlanner.Elistair
 
         private void btnRateMode_Click(object sender, EventArgs e)
         {
-            try
-            {
-                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
-                using (StreamWriter sw = new StreamWriter(pipeClient))
-                {
-                    if (!pipeClient.IsConnected) pipeClient.Connect();
-                    sw.WriteLine("TRACK:1:0:0");
-                    sw.Flush();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+
+            SendEpsilonCommand(epsilonCommands.set_track_point, "1:0:0:" + _boxsize.ToString());
             _epsilonTrackMode = 1;
 
             btnSceneMode.BackColor = ButBGDeselect;
@@ -445,20 +484,7 @@ namespace MissionPlanner.Elistair
 
         private void btnSceneMode_Click(object sender, EventArgs e)
         {
-            try
-            {
-                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
-                using (StreamWriter sw = new StreamWriter(pipeClient))
-                {
-                    if (!pipeClient.IsConnected) pipeClient.Connect();
-                    sw.WriteLine("TRACK:5:0:0");
-                    sw.Flush();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            SendEpsilonCommand(epsilonCommands.set_track_point, "5:0:0:" + _boxsize.ToString());
             _epsilonTrackMode = 5;
             btnSceneMode.BackColor = ButBGSelect;
             btnRateMode.BackColor = ButBGDeselect;
@@ -468,20 +494,7 @@ namespace MissionPlanner.Elistair
 
         private void btnVehicleMode_Click(object sender, EventArgs e)
         {
-            try
-            {
-                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
-                using (StreamWriter sw = new StreamWriter(pipeClient))
-                {
-                    if (!pipeClient.IsConnected) pipeClient.Connect();
-                    sw.WriteLine("TRACK:4:0:0");
-                    sw.Flush();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            SendEpsilonCommand(epsilonCommands.set_track_point,"4:0:0:" + _boxsize.ToString());
             _epsilonTrackMode = 4;
             btnSceneMode.BackColor = ButBGDeselect;
             btnRateMode.BackColor = ButBGDeselect;
@@ -496,20 +509,7 @@ namespace MissionPlanner.Elistair
 
             ucVideoStreamPlayer.Stop();
             //Thread.Sleep(500);
-            try
-            {
-                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
-                using (StreamWriter sw = new StreamWriter(pipeClient))
-                {
-                    if (!pipeClient.IsConnected) pipeClient.Connect();
-                    sw.WriteLine("INFRA");
-                    sw.Flush();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            SendEpsilonCommand(epsilonCommands.thermal);
             Thread.Sleep(500);
             ucVideoStreamPlayer.Play();
             _epsilonCameraMode = 2;
@@ -523,23 +523,20 @@ namespace MissionPlanner.Elistair
 
             ucVideoStreamPlayer.Stop();
             Thread.Sleep(500);
-            try
-            {
-                using (System.IO.Pipes.NamedPipeClientStream pipeClient = new System.IO.Pipes.NamedPipeClientStream(".", "\\\\.\\pipe\\SamplePipeSend1", System.IO.Pipes.PipeDirection.Out, System.IO.Pipes.PipeOptions.None))
-                using (StreamWriter sw = new StreamWriter(pipeClient))
-                {
-                    if (!pipeClient.IsConnected) pipeClient.Connect();
-                    sw.WriteLine("DAYLIGHT");
-                    sw.Flush();
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
+            SendEpsilonCommand(epsilonCommands.daylight);
             Thread.Sleep(500);
             ucVideoStreamPlayer.Play();
             _epsilonCameraMode = 1;
+        }
+
+        private void menuH264_Click(object sender, EventArgs e)
+        {
+            SendEpsilonCommand(epsilonCommands.set_compression, _bitrate.ToString() + ":" + _iframes.ToString());
+        }
+
+        private void menuSaveAndResetVP_Click(object sender, EventArgs e)
+        {
+            SendEpsilonCommand(epsilonCommands.save_and_reset_vp);
         }
 
         private void btnAltPlus_Click(object sender, EventArgs e)
@@ -680,6 +677,7 @@ namespace MissionPlanner.Elistair
 
         private bool AddNewControls()
         {
+            this.components = new System.ComponentModel.Container();
 
             this.lMessage = new System.Windows.Forms.Label();
             this.lMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top)
@@ -721,13 +719,94 @@ namespace MissionPlanner.Elistair
             MainH.Panel2.Controls.Add(ucVideoStreamPlayer);
             ucVideoStreamPlayer.Play();
 
+
+            this.cmMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            
+            this.setH264MenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.setH264MenuItem.Name = "setH264MenuItem";
+            this.setH264MenuItem.Text = "Update Encoder Settings";
+            this.setH264MenuItem.Click += new System.EventHandler(this.menuH264_Click);
+
+            this.saveAndResetVideoProcMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveAndResetVideoProcMenuItem.Name = "saveAndResetVideoProcMenuItem";
+            this.saveAndResetVideoProcMenuItem.Text = "Save and Reset Video Proc";
+            this.saveAndResetVideoProcMenuItem.Click += new System.EventHandler(this.menuSaveAndResetVP_Click);
+
+
+            this.cmMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.setH264MenuItem,
+            this.saveAndResetVideoProcMenuItem});
+            this.cmMenu.Name = "cmMenu";
+
+
+            this.cmBox = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuBox50 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuBox100 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuBox150 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuBox200 = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuBox250 = new System.Windows.Forms.ToolStripMenuItem();
+            // 
+            // menuBox50
+            // 
+            this.menuBox50.Name = "menuBox50";
+            this.menuBox50.Text = "Box Size 50";
+            // 
+            // menuBox100
+            // 
+            this.menuBox100.Name = "menuBox100";
+            this.menuBox100.Text = "Box Size 100";
+            // 
+            // menuBox150
+            // 
+            this.menuBox150.Name = "menuBox150";
+            this.menuBox150.Text = "Box Size 150";
+            // 
+            // menuBox200
+            // 
+            this.menuBox200.Name = "menuBox200";
+            this.menuBox200.Text = "Box Size 200";
+            // 
+            // menuBox250
+            // 
+            this.menuBox250.Name = "menuBox250";
+            this.menuBox250.Text = "Box Size 250";
+
+            this.cmBox.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuBox50,
+            this.menuBox100,
+            this.menuBox150,
+            this.menuBox200,
+            this.menuBox250});
+            this.cmBox.Name = "cmBox";
+
+
+            this.cmIR = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.menuFFCShort = new System.Windows.Forms.ToolStripMenuItem();
+            this.menuFFCLong = new System.Windows.Forms.ToolStripMenuItem();
+
+            this.menuFFCShort.Name = "menuBoxFFCShort";
+            this.menuFFCShort.Text = "Short Calibration";
+
+            this.menuFFCLong.Name = "menuBoxFFCLong";
+            this.menuFFCLong.Text = "Long Calibration";
+
+            this.cmIR.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.menuFFCShort,
+            this.menuFFCLong});
+            this.cmIR.Name = "cmIR";
+
+
+
             btnSwitchToIR = new Button();
             btnSwitchToIR.Location = new Point(MainH.Panel2.Size.Width - 90, 40);
             btnSwitchToIR.Size = new Size(80, 80);
             btnSwitchToIR.Anchor = (AnchorStyles)(AnchorStyles.Top | AnchorStyles.Right);
             btnSwitchToIR.Text = "";
             btnSwitchToIR.Name = "btnSwitchToIR";
+            btnSwitchToIR.ContextMenuStrip = this.cmIR;
             btnSwitchToIR.Click += new System.EventHandler(btnSwitchToIR_Click);
+
+
             MainH.Panel2.Controls.Add(btnSwitchToIR);
 
             btnSwitchToDaylight = new Button();
@@ -737,6 +816,8 @@ namespace MissionPlanner.Elistair
             btnSwitchToDaylight.Text = "";
             btnSwitchToDaylight.Name = "btnSwitchToDayLight";
             btnSwitchToDaylight.Click += new System.EventHandler(btnSwitchToDayLight_Click);
+            btnSwitchToDaylight.ContextMenuStrip = this.cmMenu;
+
             MainH.Panel2.Controls.Add(btnSwitchToDaylight);
 
             btnRateMode = new Button();
@@ -764,6 +845,7 @@ namespace MissionPlanner.Elistair
             btnVehicleMode.Text = "";
             btnVehicleMode.Name = "btnVehicleMode";
             btnVehicleMode.Click += new System.EventHandler(btnVehicleMode_Click);
+            btnVehicleMode.ContextMenuStrip = this.cmBox;
             MainH.Panel2.Controls.Add(btnVehicleMode);
 
 
