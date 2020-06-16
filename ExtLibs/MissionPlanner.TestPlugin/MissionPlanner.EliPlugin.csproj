@@ -59,13 +59,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="EliPlugin.cs" />
-    <Compile Include="ElistairClass.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EliPlugin.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>EliPlugin.resx</DependentUpon>
     </Compile>
+    <Compile Include="ElistairClass.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="EliPLuginUI.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -73,7 +73,7 @@
       <DependentUpon>EliPLuginUI.cs</DependentUpon>
     </Compile>
     <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>PublicResXFileCodeGenerator</Generator>
+      <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
     </EmbeddedResource>
@@ -85,6 +85,7 @@
     <EmbeddedResource Include="EliPlugin.resx">
       <DependentUpon>EliPlugin.cs</DependentUpon>
       <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
       <LastGenOutput>EliPlugin.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="EliPLuginUI.resx">
@@ -179,6 +180,8 @@
     <None Include="Resources\daylight.png" />
     <None Include="Resources\execute.png" />
     <None Include="Resources\ir.png" />
+    <Content Include="Resources\false_color.png" />
+    <Content Include="Resources\zoom.png" />
     <Content Include="Resources\minus.png" />
     <Content Include="Resources\plus.png" />
   </ItemGroup>

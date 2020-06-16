@@ -49,9 +49,11 @@ namespace MissionPlanner.Elistair
         private int _epsilonCameraMode = 0;
         private byte _boxsize;
 
+        private bool _pip_on = false;
+        private FalseColor _false_color = FalseColor.White_hot;
+
         private ushort _bitrate;
         private byte _iframes;
-
 
         private Color ButBGDeselect = Color.FromArgb(0xFF, 0xFF, 0x99);                       // This changes the colour of button backgrounds (Top)
         private Color ButBGSelect = Color.OrangeRed;
@@ -76,13 +78,11 @@ namespace MissionPlanner.Elistair
             set_track_point = 3,                    //Set Tracking mode and point
             do_ffc_short = 4,                       //Do Short FFC calibration
             do_ffc_long = 5,                        //Do Long FFC calibration
-            set_compression = 6,                    //Set H264 compression parameters
-            set_false_color = 7,                    //Set false color for IR
-            set_pip = 8,                            //Enable/Disable PIP mode ????
-            stab_on_track = 9,                      //Stab box on center vhen stab is on
-            stow_camera = 10,                        //Stow camera for landing
-            set_box_size = 11,                      //Set tracking box size 60-255
-            save_and_reset_vp = 12                  //Save and reset video processor
+            set_false_color = 6,                    //Set false color for IR
+            set_pip = 7,                            //Enable/Disable PIP mode ????
+            stow_camera = 8,                        //Stow camera for landing
+            reset_epsilon = 9,                      //Reset Epsilon camera, do not do this inflight
+            reset_video_proc = 10                    //Reset video processor (last resort???)
         }
 
 
@@ -133,6 +133,10 @@ namespace MissionPlanner.Elistair
 
         private System.Windows.Forms.Button btnSwitchToIR;
         private System.Windows.Forms.Button btnSwitchToDaylight;
+
+        private System.Windows.Forms.Button btnPIP;
+        private System.Windows.Forms.Button btnColor;
+
 
         private System.Windows.Forms.Button btnRateMode;
         private System.Windows.Forms.Button btnSceneMode;
@@ -529,15 +533,39 @@ namespace MissionPlanner.Elistair
             _epsilonCameraMode = 1;
         }
 
-        private void menuH264_Click(object sender, EventArgs e)
+        private void btnPIP_Click(object sender, EventArgs e)
         {
-            SendEpsilonCommand(epsilonCommands.set_compression, _bitrate.ToString() + ":" + _iframes.ToString());
+            _pip_on = !_pip_on;
+            //Send command;
+            if (_pip_on)
+            {
+                btnPIP.BackColor = ButBGSelect;
+                SendEpsilonCommand(epsilonCommands.set_pip, "2:0");
+            }
+            else
+            {
+                btnPIP.BackColor = ButBGDeselect;
+                SendEpsilonCommand(epsilonCommands.set_pip, "0:0");
+            }
         }
+
+        private void MenuFFCShort_Click(object sender, EventArgs e)
+        {
+            SendEpsilonCommand(epsilonCommands.do_ffc_short);
+        }
+
+
+        private void btnColor_Click(object sender, EventArgs e)
+        {
+        }
+
+
 
         private void menuSaveAndResetVP_Click(object sender, EventArgs e)
         {
-            SendEpsilonCommand(epsilonCommands.save_and_reset_vp);
+            SendEpsilonCommand(epsilonCommands.reset_video_proc);
         }
+
 
         private void btnAltPlus_Click(object sender, EventArgs e)
         {
@@ -725,7 +753,6 @@ namespace MissionPlanner.Elistair
             this.setH264MenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setH264MenuItem.Name = "setH264MenuItem";
             this.setH264MenuItem.Text = "Update Encoder Settings";
-            this.setH264MenuItem.Click += new System.EventHandler(this.menuH264_Click);
 
             this.saveAndResetVideoProcMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAndResetVideoProcMenuItem.Name = "saveAndResetVideoProcMenuItem";
@@ -786,6 +813,7 @@ namespace MissionPlanner.Elistair
 
             this.menuFFCShort.Name = "menuBoxFFCShort";
             this.menuFFCShort.Text = "Short Calibration";
+            this.menuFFCShort.Click += MenuFFCShort_Click;
 
             this.menuFFCLong.Name = "menuBoxFFCLong";
             this.menuFFCLong.Text = "Long Calibration";
@@ -848,6 +876,25 @@ namespace MissionPlanner.Elistair
             btnVehicleMode.ContextMenuStrip = this.cmBox;
             MainH.Panel2.Controls.Add(btnVehicleMode);
 
+            btnPIP = new Button();
+            btnPIP.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 400);
+            btnPIP.Size = new Size(80, 80);
+            btnPIP.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
+            btnPIP.Text = "";
+            btnPIP.Name = "btnPIP";
+            btnPIP.Click += new System.EventHandler(btnPIP_Click);
+            btnPIP.BackColor = ButBGDeselect;
+            MainH.Panel2.Controls.Add(btnPIP);
+
+            btnColor = new Button();
+            btnColor.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 500);
+            btnColor.Size = new Size(80, 80);
+            btnColor.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
+            btnColor.Text = "";
+            btnColor.Name = "btnColor";
+            btnColor.BackColor = ButBGDeselect;
+            btnColor.Click += new System.EventHandler(btnColor_Click);
+            MainH.Panel2.Controls.Add(btnColor);
 
 
             this.EliStatPanel = new System.Windows.Forms.Panel();
@@ -1173,6 +1220,14 @@ namespace MissionPlanner.Elistair
             Image imageDay = (Image)(resources.GetObject("daylight"));
             this.btnSwitchToDaylight.BackgroundImage = imageDay;
             this.btnSwitchToDaylight.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imagePIP = (Image)(resources.GetObject("zoom"));
+            this.btnPIP.BackgroundImage = imagePIP;
+            this.btnPIP.BackgroundImageLayout = ImageLayout.Stretch;
+
+            Image imageColor = (Image)(resources.GetObject("false_color"));
+            this.btnColor.BackgroundImage = imageColor;
+            this.btnColor.BackgroundImageLayout = ImageLayout.Stretch;
 
             Image imageRate = (Image)(resources.GetObject("rate"));
             this.btnRateMode.BackgroundImage = imageRate;
