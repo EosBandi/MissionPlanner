@@ -23,6 +23,7 @@ using OpenTK.Graphics.OpenGL;
 using racPlayerControl;
 using System.Threading;
 using MissionPlanner;
+using OpenTK.Input;
 
 namespace MissionPlanner.Elistair
 {
@@ -158,6 +159,30 @@ namespace MissionPlanner.Elistair
         private System.Windows.Forms.ContextMenuStrip cmIR;
         private System.Windows.Forms.ToolStripMenuItem menuFFCShort;
         private System.Windows.Forms.ToolStripMenuItem menuFFCLong;
+
+        private System.Windows.Forms.ContextMenuStrip cmFalseColor;
+
+
+        private List<System.Windows.Forms.ToolStripMenuItem> fcItems;
+
+
+        /*
+        private System.Windows.Forms.ToolStripMenuItem fc0;
+        private System.Windows.Forms.ToolStripMenuItem fc1;
+        private System.Windows.Forms.ToolStripMenuItem fc2;
+        private System.Windows.Forms.ToolStripMenuItem fc3;
+        private System.Windows.Forms.ToolStripMenuItem fc4;
+        private System.Windows.Forms.ToolStripMenuItem fc5;
+        private System.Windows.Forms.ToolStripMenuItem fc6;
+        private System.Windows.Forms.ToolStripMenuItem fc7;
+        private System.Windows.Forms.ToolStripMenuItem fc8;
+        private System.Windows.Forms.ToolStripMenuItem fc9;
+        private System.Windows.Forms.ToolStripMenuItem fc10;
+        private System.Windows.Forms.ToolStripMenuItem fc11;
+        private System.Windows.Forms.ToolStripMenuItem fc12;
+        private System.Windows.Forms.ToolStripMenuItem fc13;
+        private System.Windows.Forms.ToolStripMenuItem fc14;
+        */
 
 
 
@@ -557,9 +582,9 @@ namespace MissionPlanner.Elistair
 
         private void btnColor_Click(object sender, EventArgs e)
         {
+            cmFalseColor.Show(btnColor.PointToScreen(new Point(0, btnColor.Height)));
+
         }
-
-
 
         private void menuSaveAndResetVP_Click(object sender, EventArgs e)
         {
@@ -742,31 +767,32 @@ namespace MissionPlanner.Elistair
             ucVideoStreamPlayer.VisiblePlayerMenu = true;
             ucVideoStreamPlayer.VisibleStatus = true;
             //ucPlayerControl1.DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
+
+            //ucVideoStreamPlayer.Controls["panel1"].Controls["streamPlayerControl1"].Click += new System.EventHandler(ucPlayer_MouseDblClick);
             ucVideoStreamPlayer.Controls["panel1"].Controls["streamPlayerControl1"].DoubleClick += new System.EventHandler(ucPlayer_MouseDblClick);
 
             MainH.Panel2.Controls.Add(ucVideoStreamPlayer);
             ucVideoStreamPlayer.Play();
 
+            this.cmFalseColor = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cmFalseColor.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
-            this.cmMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
-            
-            this.setH264MenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.setH264MenuItem.Name = "setH264MenuItem";
-            this.setH264MenuItem.Text = "Update Encoder Settings";
+            fcItems = new List<System.Windows.Forms.ToolStripMenuItem>();
+            foreach (FalseColor fcId in (FalseColor[]) Enum.GetValues(typeof(FalseColor)))
+            {
+                System.Windows.Forms.ToolStripMenuItem fc = new System.Windows.Forms.ToolStripMenuItem();
+                fc.Name = fcId.ToString();
+                fc.Text = fcId.ToString();
+                fc.Click += FalseColorChange_Click;
+                cmFalseColor.Items.Add(fc);
+                fcItems.Add(fc);
+            }
 
-            this.saveAndResetVideoProcMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveAndResetVideoProcMenuItem.Name = "saveAndResetVideoProcMenuItem";
-            this.saveAndResetVideoProcMenuItem.Text = "Save and Reset Video Proc";
-            this.saveAndResetVideoProcMenuItem.Click += new System.EventHandler(this.menuSaveAndResetVP_Click);
-
-
-            this.cmMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.setH264MenuItem,
-            this.saveAndResetVideoProcMenuItem});
-            this.cmMenu.Name = "cmMenu";
 
 
             this.cmBox = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cmBox.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+
             this.menuBox50 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuBox100 = new System.Windows.Forms.ToolStripMenuItem();
             this.menuBox150 = new System.Windows.Forms.ToolStripMenuItem();
@@ -775,28 +801,33 @@ namespace MissionPlanner.Elistair
             // 
             // menuBox50
             // 
-            this.menuBox50.Name = "menuBox50";
+            this.menuBox50.Name = "bs50";
             this.menuBox50.Text = "Box Size 50";
+            this.menuBox50.Click += SetBoxSize_Click;
             // 
             // menuBox100
             // 
-            this.menuBox100.Name = "menuBox100";
+            this.menuBox100.Name = "bs100";
             this.menuBox100.Text = "Box Size 100";
+            this.menuBox100.Click += SetBoxSize_Click;
             // 
             // menuBox150
             // 
-            this.menuBox150.Name = "menuBox150";
+            this.menuBox150.Name = "bs150";
             this.menuBox150.Text = "Box Size 150";
+            this.menuBox150.Click += SetBoxSize_Click;
             // 
             // menuBox200
             // 
-            this.menuBox200.Name = "menuBox200";
+            this.menuBox200.Name = "bs200";
             this.menuBox200.Text = "Box Size 200";
+            this.menuBox200.Click += SetBoxSize_Click;
             // 
             // menuBox250
             // 
-            this.menuBox250.Name = "menuBox250";
+            this.menuBox250.Name = "bs250";
             this.menuBox250.Text = "Box Size 250";
+            this.menuBox250.Click += SetBoxSize_Click;
 
             this.cmBox.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.menuBox50,
@@ -808,19 +839,16 @@ namespace MissionPlanner.Elistair
 
 
             this.cmIR = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cmIR.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.menuFFCShort = new System.Windows.Forms.ToolStripMenuItem();
-            this.menuFFCLong = new System.Windows.Forms.ToolStripMenuItem();
 
             this.menuFFCShort.Name = "menuBoxFFCShort";
-            this.menuFFCShort.Text = "Short Calibration";
+            this.menuFFCShort.Text = "FF Calibration";
             this.menuFFCShort.Click += MenuFFCShort_Click;
 
-            this.menuFFCLong.Name = "menuBoxFFCLong";
-            this.menuFFCLong.Text = "Long Calibration";
 
             this.cmIR.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuFFCShort,
-            this.menuFFCLong});
+            this.menuFFCShort });
             this.cmIR.Name = "cmIR";
 
 
@@ -844,7 +872,7 @@ namespace MissionPlanner.Elistair
             btnSwitchToDaylight.Text = "";
             btnSwitchToDaylight.Name = "btnSwitchToDayLight";
             btnSwitchToDaylight.Click += new System.EventHandler(btnSwitchToDayLight_Click);
-            btnSwitchToDaylight.ContextMenuStrip = this.cmMenu;
+            //btnSwitchToDaylight.ContextMenuStrip = this.cmMenu;
 
             MainH.Panel2.Controls.Add(btnSwitchToDaylight);
 
@@ -893,6 +921,7 @@ namespace MissionPlanner.Elistair
             btnColor.Text = "";
             btnColor.Name = "btnColor";
             btnColor.BackColor = ButBGDeselect;
+            btnColor.ContextMenuStrip = this.cmFalseColor;
             btnColor.Click += new System.EventHandler(btnColor_Click);
             MainH.Panel2.Controls.Add(btnColor);
 
@@ -1245,9 +1274,40 @@ namespace MissionPlanner.Elistair
             this.bDoChangeAlt.BackgroundImage = imageExecute;
             this.bDoChangeAlt.BackgroundImageLayout = ImageLayout.Stretch;
 
+            this.btnColor.PerformLayout();
+            this.btnPIP.PerformLayout();
+
+
+
             return true;
         }
 
+        private void FalseColorChange_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem s = sender as ToolStripMenuItem;
+            string f = s.Name;
 
+            FalseColor fc = (FalseColor)Enum.Parse(typeof(FalseColor), f);
+
+            SendEpsilonCommand(epsilonCommands.set_false_color, ((byte)fc).ToString() );
+
+        }
+
+        private void SetBoxSize_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem s = sender as ToolStripMenuItem;
+            string size = s.Name;
+
+            if (size.Equals("bs50")) _boxsize = 50;
+            else if (size.Equals("bs100")) _boxsize = 100;
+            else if (size.Equals("bs150")) _boxsize = 150;
+            else if (size.Equals("bs200")) _boxsize = 200;
+            else if (size.Equals("bs250")) _boxsize = 250;
+            else _boxsize = 50;
+
+            Host.config["BoxSize"] = _boxsize.ToString();
+
+
+        }
     }
 }
