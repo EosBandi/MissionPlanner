@@ -31,7 +31,6 @@ namespace MissionPlanner.Elistair
     public class EliPlugin : MissionPlanner.Plugin.Plugin
     {
 
-
         //Config variables
         private string configEliURL { get; set; }
         private string configStreamURL { get; set; }
@@ -51,13 +50,21 @@ namespace MissionPlanner.Elistair
         private byte _boxsize;
 
         private bool _pip_on = false;
-        private FalseColor _false_color = FalseColor.White_hot;
-
-        private ushort _bitrate;
-        private byte _iframes;
 
         private Color ButBGDeselect = Color.FromArgb(0xFF, 0xFF, 0x99);                       // This changes the colour of button backgrounds (Top)
         private Color ButBGSelect = Color.OrangeRed;
+
+
+        struct str_enhancement
+        {
+           public Enhance_level level;
+           public byte sharpening;
+           public byte blend;
+           public byte strength;
+           public byte denoise;
+        }
+
+        private List<str_enhancement> Enhancements;
 
         //MainV2 elements
         MenuStrip           mainmenu;
@@ -83,10 +90,9 @@ namespace MissionPlanner.Elistair
             set_pip = 7,                            //Enable/Disable PIP mode ????
             stow_camera = 8,                        //Stow camera for landing
             reset_epsilon = 9,                      //Reset Epsilon camera, do not do this inflight
-            reset_video_proc = 10                    //Reset video processor (last resort???)
+            reset_video_proc = 10,                  //Reset video processor (last resort???)
+            set_enhancements = 11                   //Set video enhancements (post processing)
         }
-
-
 
         enum FalseColor : byte
         {
@@ -105,6 +111,14 @@ namespace MissionPlanner.Elistair
             IceFire = 26,
             Iron256 = 30,
             XVolcano = 34
+        }
+
+        enum Enhance_level : byte
+        {
+            Enhance_None = 0,
+            Enhance_Low  = 1,
+            Enhance_Middle = 2,
+            Enhance_High = 3
         }
 
         //Create controls for new UI elements
@@ -137,15 +151,13 @@ namespace MissionPlanner.Elistair
 
         private System.Windows.Forms.Button btnPIP;
         private System.Windows.Forms.Button btnColor;
+        private System.Windows.Forms.Button btnEnhance;
 
 
         private System.Windows.Forms.Button btnRateMode;
         private System.Windows.Forms.Button btnSceneMode;
         private System.Windows.Forms.Button btnVehicleMode;
 
-        private System.Windows.Forms.ContextMenuStrip cmMenu;
-        private System.Windows.Forms.ToolStripMenuItem setH264MenuItem;
-        private System.Windows.Forms.ToolStripMenuItem saveAndResetVideoProcMenuItem;
         private System.ComponentModel.IContainer components = null;
 
 
@@ -158,34 +170,12 @@ namespace MissionPlanner.Elistair
 
         private System.Windows.Forms.ContextMenuStrip cmIR;
         private System.Windows.Forms.ToolStripMenuItem menuFFCShort;
-        private System.Windows.Forms.ToolStripMenuItem menuFFCLong;
 
         private System.Windows.Forms.ContextMenuStrip cmFalseColor;
-
+        private System.Windows.Forms.ContextMenuStrip cmEnhance;
 
         private List<System.Windows.Forms.ToolStripMenuItem> fcItems;
-
-
-        /*
-        private System.Windows.Forms.ToolStripMenuItem fc0;
-        private System.Windows.Forms.ToolStripMenuItem fc1;
-        private System.Windows.Forms.ToolStripMenuItem fc2;
-        private System.Windows.Forms.ToolStripMenuItem fc3;
-        private System.Windows.Forms.ToolStripMenuItem fc4;
-        private System.Windows.Forms.ToolStripMenuItem fc5;
-        private System.Windows.Forms.ToolStripMenuItem fc6;
-        private System.Windows.Forms.ToolStripMenuItem fc7;
-        private System.Windows.Forms.ToolStripMenuItem fc8;
-        private System.Windows.Forms.ToolStripMenuItem fc9;
-        private System.Windows.Forms.ToolStripMenuItem fc10;
-        private System.Windows.Forms.ToolStripMenuItem fc11;
-        private System.Windows.Forms.ToolStripMenuItem fc12;
-        private System.Windows.Forms.ToolStripMenuItem fc13;
-        private System.Windows.Forms.ToolStripMenuItem fc14;
-        */
-
-
-
+        private List<System.Windows.Forms.ToolStripMenuItem> enhanceItems;
 
         //Use resources
         private ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(EliPlugin));
@@ -215,10 +205,25 @@ namespace MissionPlanner.Elistair
 
             configStreamURL = addconfig("StreamURL", "udp://224.10.10.10:15004");
             configRecordLocation = addconfig("RecordPath", "e:\\epvideodir\\");
-            _bitrate = Convert.ToUInt16(addconfig("H264Bitrate", "6000"));
-            _iframes = Convert.ToByte(addconfig("H264Iframes", "10"));
-
             _boxsize = Convert.ToByte(addconfig("BoxSize", "100"));
+
+
+            //Fill in a list for enhancements
+
+            Enhancements = new List<str_enhancement>();
+
+            foreach (Enhance_level e in (Enhance_level[])Enum.GetValues(typeof(Enhance_level)))
+            {
+
+                str_enhancement item = new str_enhancement();
+                item.level = e;
+                item.sharpening = Convert.ToByte(addconfig(e + "_sharpening", "0"));
+                item.blend = Convert.ToByte(addconfig(e + "_blend", "0"));
+                item.strength = Convert.ToByte(addconfig(e + "_strength", "0"));
+                item.denoise = Convert.ToByte(addconfig(e + "_denoise", "0"));
+                Enhancements.Add(item);
+            }
+
 
 
             //Init message queue
@@ -579,18 +584,20 @@ namespace MissionPlanner.Elistair
             SendEpsilonCommand(epsilonCommands.do_ffc_short);
         }
 
-
         private void btnColor_Click(object sender, EventArgs e)
         {
             cmFalseColor.Show(btnColor.PointToScreen(new Point(0, btnColor.Height)));
 
         }
+        private void btnEnhance_Click(object sender, EventArgs e)
+        {
+            cmEnhance.Show(btnEnhance.PointToScreen(new Point(0, btnEnhance.Height)));
 
+        }
         private void menuSaveAndResetVP_Click(object sender, EventArgs e)
         {
             SendEpsilonCommand(epsilonCommands.reset_video_proc);
         }
-
 
         private void btnAltPlus_Click(object sender, EventArgs e)
         {
@@ -665,7 +672,6 @@ namespace MissionPlanner.Elistair
             messageQueue.Enqueue("Landing is in progress! You can abort via manual control only.");
         }
 
-
         private void CustomiseLook()
         {
             // Change splash screen at plugin load
@@ -732,6 +738,7 @@ namespace MissionPlanner.Elistair
         {
             this.components = new System.ComponentModel.Container();
 
+            #region lMessage
             this.lMessage = new System.Windows.Forms.Label();
             this.lMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top)
                                        | System.Windows.Forms.AnchorStyles.Left)
@@ -746,8 +753,8 @@ namespace MissionPlanner.Elistair
             this.lMessage.TextAlign = ContentAlignment.MiddleCenter;
             this.lMessage.ForeColor = Color.DarkOrange;
             MainH.Panel2.Controls.Add(lMessage);
-
-
+            #endregion
+            #region ucVideoStreamPlayer
             //Create and Add StreamPlayerControl to the place of tblMap
             ucVideoStreamPlayer = new racPlayerControl.racPlayerControl();
             ucVideoStreamPlayer.AutoRecconect = false;
@@ -773,7 +780,8 @@ namespace MissionPlanner.Elistair
 
             MainH.Panel2.Controls.Add(ucVideoStreamPlayer);
             ucVideoStreamPlayer.Play();
-
+            #endregion
+            #region FalseColorContextMenu
             this.cmFalseColor = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cmFalseColor.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
@@ -787,9 +795,24 @@ namespace MissionPlanner.Elistair
                 cmFalseColor.Items.Add(fc);
                 fcItems.Add(fc);
             }
+            #endregion
+            #region EnhanceMenu
 
+            this.cmEnhance = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.cmEnhance.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
-
+            enhanceItems = new List<System.Windows.Forms.ToolStripMenuItem>();
+            foreach (Enhance_level enhanceId in (Enhance_level[])Enum.GetValues(typeof(Enhance_level)))
+            {
+                System.Windows.Forms.ToolStripMenuItem ec = new System.Windows.Forms.ToolStripMenuItem();
+                ec.Name = enhanceId.ToString();
+                ec.Text = enhanceId.ToString();
+                ec.Click += Enhance_menuitem_Click;
+                cmEnhance.Items.Add(ec);
+                enhanceItems.Add(ec);
+            }
+            #endregion
+            #region menuBox
             this.cmBox = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cmBox.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
 
@@ -836,8 +859,8 @@ namespace MissionPlanner.Elistair
             this.menuBox200,
             this.menuBox250});
             this.cmBox.Name = "cmBox";
-
-
+            #endregion
+            #region IRToolStrip
             this.cmIR = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.cmIR.Font = new System.Drawing.Font("Segoe UI", 18F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.menuFFCShort = new System.Windows.Forms.ToolStripMenuItem();
@@ -851,8 +874,8 @@ namespace MissionPlanner.Elistair
             this.menuFFCShort });
             this.cmIR.Name = "cmIR";
 
-
-
+            #endregion
+            #region BtnSwitchToIR
             btnSwitchToIR = new Button();
             btnSwitchToIR.Location = new Point(MainH.Panel2.Size.Width - 90, 40);
             btnSwitchToIR.Size = new Size(80, 80);
@@ -861,10 +884,9 @@ namespace MissionPlanner.Elistair
             btnSwitchToIR.Name = "btnSwitchToIR";
             btnSwitchToIR.ContextMenuStrip = this.cmIR;
             btnSwitchToIR.Click += new System.EventHandler(btnSwitchToIR_Click);
-
-
             MainH.Panel2.Controls.Add(btnSwitchToIR);
-
+            #endregion
+            #region BtnSwitchToDaylight
             btnSwitchToDaylight = new Button();
             btnSwitchToDaylight.Location = new Point(MainH.Panel2.Size.Width - 90, 140);
             btnSwitchToDaylight.Size = new Size(80, 80);
@@ -873,9 +895,9 @@ namespace MissionPlanner.Elistair
             btnSwitchToDaylight.Name = "btnSwitchToDayLight";
             btnSwitchToDaylight.Click += new System.EventHandler(btnSwitchToDayLight_Click);
             //btnSwitchToDaylight.ContextMenuStrip = this.cmMenu;
-
             MainH.Panel2.Controls.Add(btnSwitchToDaylight);
-
+            #endregion
+            #region btnRateMode
             btnRateMode = new Button();
             btnRateMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 100);
             btnRateMode.Size = new Size(80, 80);
@@ -884,7 +906,8 @@ namespace MissionPlanner.Elistair
             btnRateMode.Name = "btnRateMode";
             btnRateMode.Click += new System.EventHandler(btnRateMode_Click);
             MainH.Panel2.Controls.Add(btnRateMode);
-
+            #endregion
+            #region btnSceneMode
             btnSceneMode = new Button();
             btnSceneMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 200);
             btnSceneMode.Size = new Size(80, 80);
@@ -893,7 +916,8 @@ namespace MissionPlanner.Elistair
             btnSceneMode.Name = "btnSceneMode";
             btnSceneMode.Click += new System.EventHandler(btnSceneMode_Click);
             MainH.Panel2.Controls.Add(btnSceneMode);
-
+            #endregion
+            #region btnVehicleMode
             btnVehicleMode = new Button();
             btnVehicleMode.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 300);
             btnVehicleMode.Size = new Size(80, 80);
@@ -903,7 +927,19 @@ namespace MissionPlanner.Elistair
             btnVehicleMode.Click += new System.EventHandler(btnVehicleMode_Click);
             btnVehicleMode.ContextMenuStrip = this.cmBox;
             MainH.Panel2.Controls.Add(btnVehicleMode);
-
+            #endregion
+            #region btnEnhance
+            btnEnhance = new Button();
+            btnEnhance.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 600);
+            btnEnhance.Size = new Size(80, 80);
+            btnEnhance.Anchor = (AnchorStyles)(AnchorStyles.Bottom | AnchorStyles.Right);
+            btnEnhance.Text = "";
+            btnEnhance.Name = "btnEnhance";
+            btnEnhance.Click += new System.EventHandler(btnEnhance_Click);
+            btnEnhance.BackColor = ButBGDeselect;
+            MainH.Panel2.Controls.Add(btnEnhance);
+            #endregion
+            #region btnPIP
             btnPIP = new Button();
             btnPIP.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 400);
             btnPIP.Size = new Size(80, 80);
@@ -913,7 +949,8 @@ namespace MissionPlanner.Elistair
             btnPIP.Click += new System.EventHandler(btnPIP_Click);
             btnPIP.BackColor = ButBGDeselect;
             MainH.Panel2.Controls.Add(btnPIP);
-
+            #endregion
+            #region btnColor
             btnColor = new Button();
             btnColor.Location = new Point(MainH.Panel2.Size.Width - 90, MainH.Panel2.Size.Height - 500);
             btnColor.Size = new Size(80, 80);
@@ -924,8 +961,9 @@ namespace MissionPlanner.Elistair
             btnColor.ContextMenuStrip = this.cmFalseColor;
             btnColor.Click += new System.EventHandler(btnColor_Click);
             MainH.Panel2.Controls.Add(btnColor);
+            #endregion
 
-
+            #region flightAndElistair
             this.EliStatPanel = new System.Windows.Forms.Panel();
             this.groupBoxWinch = new System.Windows.Forms.GroupBox();
             this.groupBoxButton = new System.Windows.Forms.GroupBox();
@@ -1226,6 +1264,10 @@ namespace MissionPlanner.Elistair
             SubMainLeft.Panel2.Controls.Add(EliStatPanel);
             EliStatPanel.Width = SubMainLeft.Panel2.Width;
 
+            #endregion
+
+            #region buttonImages
+
             Image imageLand = (Image)(resources.GetObject("landing_512"));
             this.btnDoLand.BackgroundImage = imageLand;
             this.btnDoLand.BackgroundImageLayout = ImageLayout.Stretch;
@@ -1258,6 +1300,10 @@ namespace MissionPlanner.Elistair
             this.btnColor.BackgroundImage = imageColor;
             this.btnColor.BackgroundImageLayout = ImageLayout.Stretch;
 
+            Image imageEnhance = (Image)(resources.GetObject("enhance"));
+            this.btnEnhance.BackgroundImage = imageEnhance;
+            this.btnEnhance.BackgroundImageLayout = ImageLayout.Stretch;
+
             Image imageRate = (Image)(resources.GetObject("rate"));
             this.btnRateMode.BackgroundImage = imageRate;
             this.btnRateMode.BackgroundImageLayout = ImageLayout.Stretch;
@@ -1274,6 +1320,9 @@ namespace MissionPlanner.Elistair
             this.bDoChangeAlt.BackgroundImage = imageExecute;
             this.bDoChangeAlt.BackgroundImageLayout = ImageLayout.Stretch;
 
+
+            #endregion
+
             this.btnColor.PerformLayout();
             this.btnPIP.PerformLayout();
 
@@ -1281,6 +1330,21 @@ namespace MissionPlanner.Elistair
 
             return true;
         }
+
+        private void Enhance_menuitem_Click(object sender, EventArgs e)
+        {
+            ToolStripMenuItem s = sender as ToolStripMenuItem;
+            string f = s.Name;
+
+            Enhance_level ef = (Enhance_level)Enum.Parse(typeof(Enhance_level), f);
+
+            str_enhancement  enh = Enhancements.Find(ei => ei.level == ef);
+
+            SendEpsilonCommand(epsilonCommands.set_enhancements, "2:" + enh.sharpening.ToString() + ":" + enh.blend.ToString() + ":" + enh.strength.ToString() + ":" + enh.denoise.ToString());
+
+        }
+
+
 
         private void FalseColorChange_Click(object sender, EventArgs e)
         {

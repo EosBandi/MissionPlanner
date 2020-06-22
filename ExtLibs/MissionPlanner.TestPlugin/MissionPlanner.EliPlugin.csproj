@@ -180,6 +180,7 @@
     <None Include="Resources\daylight.png" />
     <None Include="Resources\execute.png" />
     <None Include="Resources\ir.png" />
+    <Content Include="Resources\enhance.png" />
     <Content Include="Resources\false_color.png" />
     <Content Include="Resources\zoom.png" />
     <Content Include="Resources\minus.png" />

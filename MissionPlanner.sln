@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MissionPlanner", "MissionPlanner.csproj", "{A2E22272-95FE-47B6-B050-9AE7E2055BF5}"
 EndProject
@@ -113,8 +113,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MissionPlanner.EliPlugin", "ExtLibs\MissionPlanner.TestPlugin\MissionPlanner.EliPlugin.csproj", "{C371589D-A8D6-4883-95CF-56B2D78193C6}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "racPlayerControl", "ExtLibs\racPlayerControl\racPlayerControl.csproj", "{D85D7828-A8BB-4879-86C1-1084577A66B2}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "videoTest", "..\videoTest\videoTest.csproj", "{E69A6262-F90C-479D-BBA8-8419A456AC50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -723,18 +721,6 @@ Global
 		{D85D7828-A8BB-4879-86C1-1084577A66B2}.Release|x64.Build.0 = Release|Any CPU
 		{D85D7828-A8BB-4879-86C1-1084577A66B2}.Release|x86.ActiveCfg = Release|Any CPU
 		{D85D7828-A8BB-4879-86C1-1084577A66B2}.Release|x86.Build.0 = Release|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Debug|x64.Build.0 = Debug|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Debug|x86.Build.0 = Debug|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Release|x64.ActiveCfg = Release|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Release|x64.Build.0 = Release|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Release|x86.ActiveCfg = Release|Any CPU
-		{E69A6262-F90C-479D-BBA8-8419A456AC50}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
