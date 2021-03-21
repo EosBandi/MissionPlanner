@@ -10,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GMap.NET;
 using log4net;
-using System.Runtime.Caching;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace MissionPlanner.Utilities
 {
