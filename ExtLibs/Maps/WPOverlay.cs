@@ -57,9 +57,13 @@ namespace MissionPlanner.ArduPilot
                 ushort command = item.id;
 
                 // invalid locationwp
-                if(command == 0)
+                if (command == 0)
+                {
+                    pointlist.Add(null);
                     continue;
+                }
 
+                // navigatable points
                 if (command < (ushort) MAVLink.MAV_CMD.LAST &&
                     command != (ushort) MAVLink.MAV_CMD.RETURN_TO_LAUNCH &&
                     command != (ushort) MAVLink.MAV_CMD.CONTINUE_AND_CHANGE_ALT &&
@@ -139,6 +143,7 @@ namespace MissionPlanner.ArduPilot
                     {
                         if (item.lat == 0 && item.lng == 0)
                         {
+                            pointlist.Add(null);
                             // loiter at current location.
                             if (route.Count >= 1)
                             {
@@ -202,6 +207,7 @@ namespace MissionPlanner.ArduPilot
                     {
                         if(pointlist.Count > 0)
                             route.Add(pointlist[pointlist.Count - 1]);
+                        pointlist.Add(null);
                     }
                     else
                     {
@@ -218,6 +224,10 @@ namespace MissionPlanner.ArduPilot
                             {
                                 addpolygonmarker((a + 1).ToString(), item.lng, item.lat, item.alt * altunitmultiplier, Color.White, wpradius);
                             }
+                        }
+                        else
+                        {
+                            pointlist.Add(null);
                         }
                     }
 
@@ -245,12 +255,14 @@ namespace MissionPlanner.ArduPilot
                                 list.Add(pointlist[no]);
                         }
                     }
-
+                    /*
                     if (repeat == -1)
                     {
                         for (int wps = wpno; wps < missionitems.Count; wps++)
                         {
                             var newitem = missionitems[wps-1];
+                            if (newitem.lat == 0 && newitem.lng == 0 && newitem.id < (ushort)MAVLink.MAV_CMD.LAST)
+                                continue;
                             list.Add((PointLatLngAlt) newitem);
                             if (newitem.id == (ushort) MAVLink.MAV_CMD.LAND)
                             {
@@ -262,7 +274,7 @@ namespace MissionPlanner.ArduPilot
                             }
                         }
                     }
-
+                    */
                     route.AddRange(list);
                 }
                 else if (command == (ushort)MAVLink.MAV_CMD.FENCE_POLYGON_VERTEX_INCLUSION) // fence
