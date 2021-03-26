@@ -2297,8 +2297,9 @@ namespace MissionPlanner
                                 if(armed == false && newarmed == true)
                                 {
                                     timeSinceArmInAir = 0;
-                                    armed = newarmed;
                                 }
+
+                                armed = newarmed;
 
                                 // saftey switch
                                 if (armed && sensors_enabled.motor_control == false && sensors_enabled.seen)
