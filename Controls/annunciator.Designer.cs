@@ -2,6 +2,7 @@
 namespace MissionPlanner.Controls
 {
 
+
     partial class annunciator
     {
         /// <summary> 
@@ -31,15 +32,10 @@ namespace MissionPlanner.Controls
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.layoutPanel = new System.Windows.Forms.FlowLayoutPanel();
             this.contextMenu1 = new System.Windows.Forms.ContextMenu();
             this.menuUndockDock = new System.Windows.Forms.MenuItem();
             this.SuspendLayout();
-            // 
-            // timer1
-            // 
-            this.timer1.Enabled = true;
             // 
             // layoutPanel
             // 
@@ -75,7 +71,6 @@ namespace MissionPlanner.Controls
         }
 
         #endregion
-        private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.FlowLayoutPanel layoutPanel;
         private System.Windows.Forms.ContextMenu contextMenu1;
         private System.Windows.Forms.MenuItem menuUndockDock;

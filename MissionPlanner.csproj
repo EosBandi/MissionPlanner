@@ -4639,6 +4639,8 @@
     <None Include="Resources\ready.png" />
     <None Include="Resources\noimage.png" />
     <None Include="Resources\splashdark1.jpg" />
+    <None Include="Resources\button_shadow_inv.png" />
+    <None Include="Resources\button_shadow.png" />
     <Content Include="restore.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
