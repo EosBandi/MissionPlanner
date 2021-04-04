@@ -142,7 +142,7 @@ namespace MissionPlanner.Controls
 
                 if (_mousedown)
                 {
-                    Image shadow = Image.FromFile("button_shadow_inv.png");
+                    Image shadow = Properties.Resources.button_shadow_inv;
                     gr.DrawImage(shadow, 0, 0, this.Width, this.Height);
 
                     //SolidBrush brush = new SolidBrush(ColorMouseDown);
@@ -150,7 +150,7 @@ namespace MissionPlanner.Controls
                 }
                 else
                 {
-                    Image shadow = Image.FromFile("button_shadow.png");
+                    Image shadow = Properties.Resources.button_shadow_inv;
                     gr.DrawImage(shadow, 0, 0, this.Width, this.Height);
                 }
 

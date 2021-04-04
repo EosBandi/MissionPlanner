@@ -63,6 +63,26 @@ namespace MissionPlanner.Controls.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap button_shadow {
+            get {
+                object obj = ResourceManager.GetObject("button_shadow", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap button_shadow_inv {
+            get {
+                object obj = ResourceManager.GetObject("button_shadow_inv", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap guagebg {
             get {
                 object obj = ResourceManager.GetObject("guagebg", resourceCulture);
