@@ -2286,6 +2286,10 @@ namespace MissionPlanner
                             }
                             else
                             {
+                                //This should come from the parameter list, not from here ?
+                                //TODO CurrentState SysID
+                                sysid = mavLinkMessage.sysid;
+
                                 var newarmed = (hb.base_mode & (byte)MAVLink.MAV_MODE_FLAG.SAFETY_ARMED) ==
                                         (byte)MAVLink.MAV_MODE_FLAG.SAFETY_ARMED;
 
