@@ -32,8 +32,8 @@ namespace MissionPlanner.Utilities
         {
             enum modeltype
             {
-                ModelTypeProjected = 1 ,  /* Projection Coordinate System         */
-                ModelTypeGeographic = 2 , /* Geographic latitude-longitude System */
+                ModelTypeProjected = 1,  /* Projection Coordinate System         */
+                ModelTypeGeographic = 2, /* Geographic latitude-longitude System */
                 ModelTypeGeocentric = 3   /* Geocentric (X,Y,Z) Coordinate System */
             }
 
@@ -117,13 +117,13 @@ namespace MissionPlanner.Utilities
                     var GeoKeyDirectoryTag = tiff.GetField((TiffTag)34735);
 
                     var KeyDirectoryVersion = BitConverter.ToUInt16(GeoKeyDirectoryTag[1].ToByteArray(), 0);
-                    var KeyRevision= BitConverter.ToUInt16(GeoKeyDirectoryTag[1].ToByteArray(), 2);
-                    var MinorRevision= BitConverter.ToUInt16(GeoKeyDirectoryTag[1].ToByteArray(), 4);
+                    var KeyRevision = BitConverter.ToUInt16(GeoKeyDirectoryTag[1].ToByteArray(), 2);
+                    var MinorRevision = BitConverter.ToUInt16(GeoKeyDirectoryTag[1].ToByteArray(), 4);
                     var NumberOfKeys = BitConverter.ToUInt16(GeoKeyDirectoryTag[1].ToByteArray(), 6);
 
                     ProjectedCSTypeGeoKey = 0;
 
-                    for (int i = 8; i < 8 + NumberOfKeys * 8;i+=8)
+                    for (int i = 8; i < 8 + NumberOfKeys * 8; i += 8)
                     {
                         var KeyID = BitConverter.ToUInt16(GeoKeyDirectoryTag[1].ToByteArray(), i);
                         var TIFFTagLocation = BitConverter.ToUInt16(GeoKeyDirectoryTag[1].ToByteArray(), i + 2);
@@ -140,9 +140,9 @@ namespace MissionPlanner.Utilities
                         {
                             if (TIFFTagLocation == 34737)
                             {
-                                var value = tiff.GetField((TiffTag) TIFFTagLocation)[1].ToByteArray().Skip(Value_Offset)
+                                var value = tiff.GetField((TiffTag)TIFFTagLocation)[1].ToByteArray().Skip(Value_Offset)
                                     .Take(Count);
-                                log.InfoFormat("GeoKeyDirectoryTag ID={0} Value={1}", (GKID) KeyID,
+                                log.InfoFormat("GeoKeyDirectoryTag ID={0} Value={1}", (GKID)KeyID,
                                     Encoding.ASCII.GetString(value.ToArray()));
                             }
                             if (TIFFTagLocation == 34736)
@@ -241,7 +241,7 @@ namespace MissionPlanner.Utilities
                         xmax = Math.Max(Math.Max(Math.Max(pnt.Lng, pnt2.Lng), pnt3.Lng), pnt4.Lng);
                     }
 
-                    
+
 
                     Area = new RectLatLng(ymax, xmin, xmax - xmin, ymax - ymin);
 
@@ -257,12 +257,10 @@ namespace MissionPlanner.Utilities
                         GeoTiff.index.Add(this);
 
                     /*
-
                 short numberOfDirectories = tiff.NumberOfDirectories();
                 for (short d = 0; d < numberOfDirectories; ++d)
                 {
                     tiff.SetDirectory((short)d);
-
                     for (ushort t = ushort.MinValue; t < ushort.MaxValue; ++t)
                     {
                         TiffTag tag = (TiffTag)t;
@@ -350,9 +348,9 @@ namespace MissionPlanner.Utilities
                 if (geotiffdata.Area.Contains(lat, lng))
                 {
                     // get answer
-                    var xf = map(lat, geotiffdata.Area.Top, geotiffdata.Area.Bottom, 0, geotiffdata.height-1);
-                    var yf = map(lng, geotiffdata.Area.Left, geotiffdata.Area.Right, 0, geotiffdata.width-1);
-                   
+                    var xf = map(lat, geotiffdata.Area.Top, geotiffdata.Area.Bottom, 0, geotiffdata.height - 1);
+                    var yf = map(lng, geotiffdata.Area.Left, geotiffdata.Area.Right, 0, geotiffdata.width - 1);
+
                     //wgs84 && etrs89
                     if (geotiffdata.ProjectedCSTypeGeoKey >= 3038 && geotiffdata.ProjectedCSTypeGeoKey <= 3051 ||
                         geotiffdata.ProjectedCSTypeGeoKey >= 32601 && geotiffdata.ProjectedCSTypeGeoKey <= 32760 ||
@@ -366,15 +364,15 @@ namespace MissionPlanner.Utilities
                             geotiffdata.width - 1);
                     }
 
-                    int x_int = (int) xf;
+                    int x_int = (int)xf;
                     double x_frac = xf - x_int;
 
-                    int y_int = (int) yf;
+                    int y_int = (int)yf;
                     double y_frac = yf - y_int;
 
-                    
+
                     //could be on one of the other images
-                    if (x_int < 0 || y_int < 0 || x_int >= geotiffdata.width -1  || y_int >= geotiffdata.height-1)
+                    if (x_int < 0 || y_int < 0 || x_int >= geotiffdata.width - 1 || y_int >= geotiffdata.height - 1)
                         continue;
 
                     double alt00 = GetAlt(geotiffdata, x_int, y_int);
@@ -388,7 +386,7 @@ namespace MissionPlanner.Utilities
 
                     if (v > -1000)
                         answer.currenttype = srtm.tiletype.valid;
-                    if(alt00 < -1000 || alt10 < -1000 || alt01 < -1000 || alt11 < -1000 )
+                    if (alt00 < -1000 || alt10 < -1000 || alt01 < -1000 || alt11 < -1000)
                         answer.currenttype = srtm.tiletype.invalid;
                     answer.alt = v;
                     answer.altsource = "GeoTiff";
@@ -399,15 +397,19 @@ namespace MissionPlanner.Utilities
             return srtm.altresponce.Invalid;
         }
 
+        private static MemoryCache cachescanlines =
+            new MemoryCache(new MemoryCacheOptions() { SizeLimit = 1024 * 1024 * 500 });
+
         private static double GetAltNoCache(geotiffdata geotiffdata, int x, int y)
         {
-            ObjectCache cache = MemoryCache.Default;
-            byte[] scanline = cache[geotiffdata.FileName + x.ToString()] as byte[];
+            byte[] scanline;
+            lock (cachescanlines)
+                scanline = cachescanlines.Get(geotiffdata.FileName + x.ToString()) as byte[];
             if (scanline == null)
             {
                 Task.Run(() =>
                 {
-                    lock(geotiffdata)
+                    lock (geotiffdata)
                         if (geotiffdata.Tiff == null)
                             geotiffdata.Tiff = Tiff.Open(geotiffdata.FileName, "r");
 
@@ -451,7 +453,7 @@ namespace MissionPlanner.Utilities
             {
                 var ci = cachescanlines.CreateEntry(geotiffdata.FileName + x.ToString());
                 ci.Value = scanline;
-                ci.Size = ((byte[]) ci.Value).Length;
+                ci.Size = ((byte[])ci.Value).Length;
                 // evict after no access
                 ci.SlidingExpiration = TimeSpan.FromMinutes(5);
                 ci.Dispose();
@@ -486,7 +488,7 @@ namespace MissionPlanner.Utilities
             {
                 for (int x = 0; x < imageWidth; x += tileWidth)
                 {
-                    if(y + tileLength < line || y > line)
+                    if (y + tileLength < line || y > line)
                         break;
 
                     tiley = y;
@@ -517,7 +519,7 @@ namespace MissionPlanner.Utilities
             }
             if (geotiffdata.bits == 16)
             {
-                return (short) ((scanline[y * 2 + 1] << 8) + scanline[y * 2]);
+                return (short)((scanline[y * 2 + 1] << 8) + scanline[y * 2]);
             }
             else if (geotiffdata.bits == 32 && geotiffdata.type == 1)
             {
@@ -545,12 +547,12 @@ namespace MissionPlanner.Utilities
 
         private static double avg(double v1, double v2, double weight)
         {
-            return v2*weight + v1*(1 - weight);
+            return v2 * weight + v1 * (1 - weight);
         }
 
         private static double map(double x, double in_min, double in_max, double out_min, double out_max)
         {
-            return (x - in_min)*(out_max - out_min)/(in_max - in_min) + out_min;
+            return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
         }
     }
 }
