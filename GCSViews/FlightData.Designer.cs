@@ -669,7 +669,6 @@
             // 
             // quickView1
             // 
-            this.quickView1.BackColor = System.Drawing.SystemColors.Control;
             this.quickView1.ContextMenuStrip = this.contextMenuStripQuickView;
             this.quickView1.DataBindings.Add(new System.Windows.Forms.Binding("number", this.bindingSourceQuickTab, "alt", true));
             this.quickView1.desc = "alt";
