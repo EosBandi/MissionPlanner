@@ -836,6 +836,8 @@ namespace MissionPlanner
                 MainV2.comPort.MAV.cs.messageHigh = s;
             };
 
+            Warnings.WarningEngine.QuickPanelColoring += WarningEngine_QuickPanelColoring;
+
             // proxy loader - dll load now instead of on config form load
             new Transition(new TransitionType_EaseInEaseOut(2000));
 
@@ -3541,7 +3543,7 @@ namespace MissionPlanner
                                      MainV2._connectionControl.UpdateSysIDS();
                                  });
 
-                             } 
+                             }
                              // add to seen list, so we skip on next refresh
                              seen.Add(zeroconfHost.Id);
                          }
@@ -5538,5 +5540,42 @@ namespace MissionPlanner
         }
 
 
+        //Handle QV panel coloring from warning engine
+        private void WarningEngine_QuickPanelColoring(string name, string color)
+        {
+            // return if we still initialize
+            if (FlightData == null) return;
+
+            //Find panel with
+            foreach (var q in FlightData.tabQuick.Controls["tableLayoutPanelQuick"].Controls)
+            {
+                QuickView qv = (QuickView)q;
+
+                //Get the data field name bind to the control
+                var fieldname = qv.DataBindings[0].BindingMemberInfo.BindingField;
+
+                if (fieldname == name)
+                {
+
+                    if (color == "NoColor")
+                    {
+                        qv.BackColor = ThemeManager.BGColor;
+                        qv.numberColor = qv.numberColorBackup;  //Restore original color from backup :)
+                        qv.ForeColor = ThemeManager.TextColor;
+
+
+                    }
+                    else
+                    {
+                        qv.BackColor = Color.FromName(color);
+                        // Ensure color is readable on the background
+                        qv.numberColor = (((qv.BackColor.R + qv.BackColor.B + qv.BackColor.G) / 3) > 128) ? Color.Black : Color.White;
+                        qv.ForeColor = qv.numberColor;      //Same as the number
+                    }
+                    //We have our panel, color it and exit loop
+                    break;
+                }
+            }
+        }
     }
 }
