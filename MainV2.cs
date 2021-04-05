@@ -5396,7 +5396,7 @@ namespace MissionPlanner
             //messages status
             if ((DateTime.Now - lastMsgCheck) >= TimeSpan.FromMilliseconds(500))
             {
-                lastBattCheck = DateTime.Now;
+                lastMsgCheck = DateTime.Now;
                 var newmsgcount = MainV2.comPort.MAV.cs.messages.Count;
                 if (messagecount != newmsgcount)
                 {
