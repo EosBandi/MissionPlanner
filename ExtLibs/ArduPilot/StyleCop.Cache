@@ -1,9 +1,5 @@
 <stylecopresultscache>
   <version>12</version>
-  <project key="-480071247">
-    <configuration>
-    </configuration>
-  </project>
   <sourcecode name="CurrentState.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2020/12/09 21:26:30.887</styleCop>
@@ -5028,4 +5024,8 @@
       </violation>
     </violations>
   </sourcecode>
+  <project key="-480071247">
+    <configuration>
+    </configuration>
+  </project>
 </stylecopresultscache>

@@ -1619,12 +1619,20 @@ namespace MissionPlanner.Controls
 
         public void SetClip(Rectangle rect)
         {
+            if (opengl)
+            {
+                GL.Enable(EnableCap.ScissorTest);
+                GL.Scissor(rect.X, rect.Y, rect.Width, rect.Height);
+            }
 
         }
 
         public void ResetClip()
         {
-
+            if (opengl)
+            {
+                GL.Disable(EnableCap.ScissorTest);
+            }
         }
 
         public void ResetTransform()
@@ -2530,80 +2538,96 @@ namespace MissionPlanner.Controls
                     graphicsObject.DrawRectangle(this._whitePen, scrollbg);
                     graphicsObject.FillRectangle(SolidBrush, scrollbg);
 
-                    GL.Enable(EnableCap.ScissorTest);
-                    
-                    GL.Scissor(0, halfheight - halfheight / 2 - halfheight / 4, this.Width / 10, this.Height / 2 + this.Height / 4);
 
 
+                    graphicsObject.SetClip(scrollbg);
+
+
+                    int h = scrollbg.Height / 20;
                     //Draw Actual marker background
-                    Point[] arrow = new Point[5];
-
-                    arrow[0] = new Point(0, -15);
-                    arrow[1] = new Point(scrollbg.Width - 10, -15);
-                    arrow[2] = new Point(scrollbg.Width - 5, 0);
-                    arrow[3] = new Point(scrollbg.Width - 10, 15);
-                    arrow[4] = new Point(0, 15);
+                    Point[] arrow = new Point[7];
+                    arrow[0] = new Point(2, -h);
+                    arrow[1] = new Point(scrollbg.Width - 15, -h);
+                    arrow[2] = new Point(scrollbg.Width - 15, -5);
+                    arrow[3] = new Point(scrollbg.Width - 5, 0);
+                    arrow[4] = new Point(scrollbg.Width - 15, 5);
+                    arrow[5] = new Point(scrollbg.Width - 15, h);
+                    arrow[6] = new Point(2, h);
 
                     //graphicsObject.TranslateTransform(0, center);
                     graphicsObject.TranslateTransform(0, this.Height / 2);
+                    float viewrange = 440;
 
-
-                    ////Draw TargetSpeed
-                    //if (start > _targetspeed)
-                    //{
-                    //    this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
-                    //    this._greenPen.Width = 6;
-                    //    graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top, scrollbg.Left + scrollbg.Width, scrollbg.Top);
-                    //    this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
-                    //}
-
-                    //if ((speed + viewrange / 2) < _targetspeed)
-                    //{
-                    //    this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
-                    //    this._greenPen.Width = 6;
-                    //    graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top - space * viewrange,
-                    //        scrollbg.Left + scrollbg.Width, scrollbg.Top - space * viewrange);
-                    //    this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
-                    //}
-
-                    float viewrange = 44;
-
-                    float speed = _airspeed;
+                    float speed = _airspeed*10;
                     if (speed == 0)
-                        speed = _groundspeed;
+                        speed = _groundspeed*10;
 
                     float space = (scrollbg.Height) / viewrange;
                     long start = (long)(speed - viewrange / 2);
                     long end = (long)(speed + viewrange / 2);
 
-                    for (long a = (long)start; a <= end; a += 1)
+                    //Draw TargetSpeed out of range
+
+                    if (start > _targetspeed*10)
                     {
-                        //if (a == (long)_targetspeed && _targetspeed != 0)
-                        //{
-                        //    this._greenPen.Width = 6;
-                        //    graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top - space * (a - start), scrollbg.Left + scrollbg.Width, scrollbg.Top - space * (a - start));
-                        //}
+                        this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
+                        this._greenPen.Width = 6;
+                        graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Height/2, scrollbg.Left + scrollbg.Width, scrollbg.Height / 2);
+                        this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
+                    }
 
-                        if (a % 5 == 0)
+                    if (end < _targetspeed*10)
+                    {
+                        this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
+                        this._greenPen.Width = 6;
+                        graphicsObject.DrawLine(this._greenPen, scrollbg.Left, -scrollbg.Height / 2, scrollbg.Left + scrollbg.Width, -scrollbg.Height / 2);
+                        this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
+                    }
+
+
+
+
+
+                    for ( long a = start; a <= end; a += 1)
+                    {
+
+                        if (a == _targetspeed*10 && _targetspeed != 0)
                         {
-                            //Console.WriteLine(a + " " + scrollbg.Right + " " + (scrollbg.Top - space * (a - start)) + " " + (scrollbg.Right - 20) + " " + (scrollbg.Top - space * (a - start)));
-                            //graphicsObject.DrawLine(_redPen, 0, space*-15, 20, space*-15);
-
-                            graphicsObject.DrawLine(this._whitePen, scrollbg.Right, scrollbg.Height/2 - space * (a-start), scrollbg.Right - 10, scrollbg.Height / 2 - space * (a-start));
-                            drawstring(String.Format("{0,5}", a), font, fontsize, _whiteBrush, 0, (float)scrollbg.Height/2-(space * (a-start)) - 6 - fontoffset);
+                            this._greenPen.Width = 6;
+                            graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Height / 2 - space * (a - start), scrollbg.Left + scrollbg.Width, scrollbg.Height / 2 - space * (a - start));
                         }
+
+                        if ((long)a % 50 == 0)
+                        {
+                            graphicsObject.DrawLine(this._whitePen, scrollbg.Right, scrollbg.Height/2 - space * (a-start), scrollbg.Right - 10, scrollbg.Height / 2 - space * (a-start));
+                            drawstring(String.Format("{0,5}", a/10), font, fontsize, _whiteBrush, 0, (float)scrollbg.Height/2-(space * ((float)a-start)) - 6 - fontoffset);
+                        }
+                        else if ((long)a % 10 ==0)
+                        {
+                            graphicsObject.DrawLine(this._whitePen, scrollbg.Right, scrollbg.Height / 2 - space * (a - start), scrollbg.Right - 5, scrollbg.Height / 2 - space * (a - start));
+
+                        }
+
                     }
 
 
 
                     graphicsObject.DrawPolygon(this._blackPen, arrow);
                     graphicsObject.FillPolygon(Brushes.Black, arrow);
-                    drawstring((speed).ToString("0") + speedunit, font, 10, (SolidBrush)Brushes.AliceBlue, 0, -9);
+                    drawstringCentered((speed/10).ToString("0"), font, fontsize+3, (SolidBrush)Brushes.AliceBlue, (scrollbg.Width-15)/2, 0);
                     graphicsObject.ResetTransform();
+                    graphicsObject.ResetClip();
 
-                    GL.Disable(EnableCap.ScissorTest);
 
                     // extra text data
+
+                    //graphicsObject.DrawRectangle(_whitePen, scrollbg.Left, scrollbg.Top - fontsize * 2, scrollbg.Width, fontsize * 2);
+                    //drawstringCentered("TAS", font, fontsize / 2.5f, _whiteBrush, scrollbg.Width/2, scrollbg.Top - fontsize * 2);
+                    //drawstringCentered(_targetspeed.ToString("0.0") + speedunit, font, fontsize / 2.5f, _whiteBrush, scrollbg.Width / 2, scrollbg.Top - fontsize);
+
+
+
+
 
                     if (_lowairspeed)
                     {
@@ -3262,6 +3286,14 @@ namespace MissionPlanner.Controls
             n |= (n >> 1);
             ++n;
             return n;
+        }
+
+        private void drawstringCentered(string text, Font font, float fontsize, SolidBrush brush, float x, float y)
+        {
+            Font newfont = new Font(font.FontFamily, fontsize);
+            var s = graphicsObjectGDIP.MeasureString(text, newfont).ToSize();
+            drawstring(text, font, fontsize, brush, x - s.Width / 2, y-s.Height/2);
+
         }
 
         void drawstring(string text, Font font, float fontsize, SolidBrush brush, float x, float y)
