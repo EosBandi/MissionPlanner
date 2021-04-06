@@ -435,6 +435,7 @@ namespace MissionPlanner.GCSViews
             }
 
             hud1.doResize();
+            myTabControl1_Resize(this, EventArgs.Empty);
         }
 
         public void BUT_playlog_Click(object sender, EventArgs e)
@@ -5445,6 +5446,7 @@ namespace MissionPlanner.GCSViews
             dropout.Show();
 
             hideLeftPanel();
+            myTabControl1_Resize(null, EventArgs.Empty);
 
         }
 
@@ -5455,6 +5457,8 @@ namespace MissionPlanner.GCSViews
             tabControlactions.Controls.Add(tabQuick);
             tabControlactions.SelectedTab = tabQuick;
             tabQuickDetached = false;
+            myTabControl1_Resize(null, EventArgs.Empty);
+
         }
 
 
@@ -5482,6 +5486,8 @@ namespace MissionPlanner.GCSViews
             dropout.Show();
 
             hideLeftPanel();
+            myTabControl1_Resize(null, EventArgs.Empty);
+
 
         }
 
@@ -5492,6 +5498,8 @@ namespace MissionPlanner.GCSViews
             tabControlactions.Controls.Add(tabPayloadControl);
             tabControlactions.SelectedTab = tabPayloadControl;
             tabPayloadDetached = false;
+            myTabControl1_Resize(null, EventArgs.Empty);
+
         }
 
         private void undockDockToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -5517,6 +5525,8 @@ namespace MissionPlanner.GCSViews
             dropout.RestoreStartupLocation();
             dropout.Show();
             hideLeftPanel();
+            myTabControl1_Resize(null, EventArgs.Empty);
+
 
         }
 
@@ -5527,9 +5537,7 @@ namespace MissionPlanner.GCSViews
             tabControlactions.Controls.Add(tabFlightControl);
             tabControlactions.SelectedTab = tabFlightControl;
             tabFlightControlDetached = false;
-
-
-
+            myTabControl1_Resize(null, EventArgs.Empty);
         }
 
         private void hideLeftPanel()
@@ -5592,5 +5600,19 @@ namespace MissionPlanner.GCSViews
             if (MainV2.supervisor) protarComm.outQueue[1].Enqueue(protarComm.createPacket(packetID.motorAtMax));
 
         }
+
+        // The tabStrip Size can be updated only when we finished component init
+        private void myTabControl1_Resize(object sender, EventArgs e)
+        {
+            if (this.Created && !this.IsDisposed)
+            {
+                //Do not resize if only 1 or zero tabs are present
+                if (tabControlactions.TabCount <= 1) return;
+                Size tabSize = new Size((tabControlactions.Width - 3) / tabControlactions.TabCount, 50);
+                if (tabControlactions.ItemSize != tabSize)
+                    tabControlactions.ItemSize = tabSize;
+            }
+        }
+
     }
 }

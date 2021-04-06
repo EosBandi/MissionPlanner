@@ -150,7 +150,7 @@ namespace MissionPlanner.Controls
                 }
                 else
                 {
-                    Image shadow = Properties.Resources.button_shadow_inv;
+                    Image shadow = Properties.Resources.button_shadow;
                     gr.DrawImage(shadow, 0, 0, this.Width, this.Height);
                 }
 

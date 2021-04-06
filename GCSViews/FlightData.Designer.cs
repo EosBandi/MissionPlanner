@@ -27,7 +27,7 @@
             this.groundColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.setBatteryCellCountToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bindingSourceHud = new System.Windows.Forms.BindingSource(this.components);
-            this.tabControlactions = new System.Windows.Forms.TabControl();
+            this.tabControlactions = new MissionPlanner.Controls.myTabControl();
             this.contextMenuStripactionstab = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.customizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabQuick = new System.Windows.Forms.TabPage();
@@ -528,7 +528,6 @@
             // 
             // tabControlactions
             // 
-            resources.ApplyResources(this.tabControlactions, "tabControlactions");
             this.tabControlactions.ContextMenuStrip = this.contextMenuStripactionstab;
             this.tabControlactions.Controls.Add(this.tabQuick);
             this.tabControlactions.Controls.Add(this.tabActions);
@@ -544,11 +543,17 @@
             this.tabControlactions.Controls.Add(this.tablogbrowse);
             this.tabControlactions.Controls.Add(this.tabFlightControl);
             this.tabControlactions.Controls.Add(this.tabPayloadControl);
+            resources.ApplyResources(this.tabControlactions, "tabControlactions");
             this.tabControlactions.Name = "tabControlactions";
             this.tabControlactions.SelectedIndex = 0;
             this.tabControlactions.SizeMode = System.Windows.Forms.TabSizeMode.Fixed;
+            this.tabControlactions.tabBGColorBot = System.Drawing.Color.SlateGray;
+            this.tabControlactions.tabBGColorTop = System.Drawing.Color.Gray;
+            this.tabControlactions.tabSelectedBGColorBot = System.Drawing.Color.YellowGreen;
+            this.tabControlactions.tabSelectedBGColorTop = System.Drawing.Color.LightGreen;
             this.tabControlactions.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.tabControl1_DrawItem);
             this.tabControlactions.SelectedIndexChanged += new System.EventHandler(this.tabControl1_SelectedIndexChanged);
+            this.tabControlactions.Resize += new System.EventHandler(this.myTabControl1_Resize);
             // 
             // contextMenuStripactionstab
             // 
@@ -2402,7 +2407,7 @@
             this.windDir1.BackColor = System.Drawing.Color.Transparent;
             this.windDir1.DataBindings.Add(new System.Windows.Forms.Binding("Direction", this.bindingSource1, "wind_dir", true, System.Windows.Forms.DataSourceUpdateMode.Never));
             this.windDir1.DataBindings.Add(new System.Windows.Forms.Binding("Speed", this.bindingSource1, "wind_vel", true, System.Windows.Forms.DataSourceUpdateMode.Never));
-            this.windDir1.Direction = 360D;
+            this.windDir1.Direction = 180D;
             resources.ApplyResources(this.windDir1, "windDir1");
             this.windDir1.Name = "windDir1";
             this.windDir1.Speed = 0D;
@@ -2752,7 +2757,7 @@
         private System.Windows.Forms.CheckBox CHK_autopan;
         public Controls.myGMAP gMapControl1;
         private ZedGraph.ZedGraphControl zg1;
-        public System.Windows.Forms.TabControl tabControlactions;
+        public Controls.myTabControl tabControlactions;
         public System.Windows.Forms.TabPage tabStatus;
         public System.Windows.Forms.TabPage tabActions;
         public System.Windows.Forms.TabPage tabTLogs;
