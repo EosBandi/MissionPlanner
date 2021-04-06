@@ -61,6 +61,11 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Update="ground_texture.JPG">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
     <Reference Update="System.IO.Compression.FileSystem">
       <Private>false</Private>
     </Reference>

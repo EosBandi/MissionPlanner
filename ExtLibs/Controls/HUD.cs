@@ -856,7 +856,7 @@ namespace MissionPlanner.Controls
         private readonly SolidBrush _whiteBrush = new SolidBrush(Color.White);
         private readonly SolidBrush _redBrush = new SolidBrush(Color.Red);
 
-        private static readonly SolidBrush SolidBrush = new SolidBrush(Color.FromArgb(0x55, 0xff, 0xff, 0xff));
+        private static readonly SolidBrush SolidBrush = new SolidBrush(Color.FromArgb(0x44, 0x00, 0x00, 0x00));
 
         private static readonly SolidBrush SlightlyTransparentWhiteBrush =
             new SolidBrush(Color.FromArgb(220, 255, 255, 255));
@@ -1031,7 +1031,16 @@ namespace MissionPlanner.Controls
                 {
                     log.Error("HUD opengl onload 3 ", ex);
                 }
+
+
+                log.Info("Load Texture no 4 Ground");
+                LoadFillTexture(Properties.Resources.ground_texture_128, 0);
             }
+
+
+
+
+
 
             log.Info("OnLoad Done");
 
@@ -1326,7 +1335,67 @@ namespace MissionPlanner.Controls
             return destImage;
         }
 
-        private character[] _texture = new character[2];
+        private character[] _texture = new character[5];
+
+
+        private character[] _fillTextures = new character[4];
+
+
+        public void LoadFillTexture(Image img, int textureno)
+        {
+            if (opengl)
+            {
+                if (img == null)
+                    return;
+
+                if (_fillTextures[textureno] == null)
+                    _fillTextures[textureno] = new character();
+
+                // If the image is already a bitmap and we support NPOT textures then simply use it.
+                if (npotSupported && img is Bitmap)
+                {
+                    _fillTextures[textureno].bitmap = (Bitmap)img;
+                }
+                else
+                {
+                    // Otherwise we have to resize img to be POT.
+                    _fillTextures[textureno].bitmap = ResizeImage(img, 512, 512);
+                }
+
+                // generate the texture
+                if (_fillTextures[textureno].gltextureid == 0)
+                {
+                    GL.GenTextures(1, out _fillTextures[textureno].gltextureid);
+                }
+
+                GL.BindTexture(TextureTarget.Texture2D, _fillTextures[textureno].gltextureid);
+
+                BitmapData data = _fillTextures[textureno].bitmap.LockBits(
+                    new Rectangle(0, 0, _fillTextures[textureno].bitmap.Width, _fillTextures[textureno].bitmap.Height),
+                    ImageLockMode.ReadOnly,
+                    System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                // create the texture type/dimensions
+                if (_fillTextures[textureno].width != _fillTextures[textureno].bitmap.Width)
+                {
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
+                        OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+
+                    _fillTextures[textureno].width = data.Width;
+                }
+                else
+                {
+                    GL.TexSubImage2D(TextureTarget.Texture2D, 0, 0, 0, data.Width, data.Height,
+                        OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+                }
+
+                _fillTextures[textureno].bitmap.UnlockBits(data);
+            }
+        }
+
+
+
+        //===================
 
         public void DrawImage(Image img, int x, int y, int width, int height, int textureno = 0)
         {
@@ -1677,8 +1746,59 @@ namespace MissionPlanner.Controls
         }
 
 
+        public void FillGround(RectangleF rectf)
+        {
+//            if (opengl)
+//            {
+                float x1 = rectf.X;
+                float y1 = rectf.Y;
+
+                float width = rectf.Width;
+                float height = rectf.Height;
+
+
+            bool polySmoothEnabled = GL.IsEnabled(EnableCap.PolygonSmooth);
+                if (polySmoothEnabled) GL.Disable(EnableCap.PolygonSmooth);
+
+
+                GL.Enable(EnableCap.Texture2D);
+                GL.BindTexture(TextureTarget.Texture2D, _fillTextures[0].gltextureid);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
+
+            GL.Begin(PrimitiveType.TriangleFan);
+
+
+
+            GL.LineWidth(1);
+            GL.TexCoord2(0.0f, 0.0f);
+            GL.Vertex2(x1, y1);
+            GL.TexCoord2(width/128f, 0.0f);
+            GL.Vertex2(x1 + width, y1);
+            GL.TexCoord2(width/128f, height/128f);
+            GL.Vertex2(x1 + width, y1 + height);
+            GL.TexCoord2(0.0f, height/128f);
+            GL.Vertex2(x1, y1 + height);
+
+                GL.End();
+                GL.Disable(EnableCap.Texture2D);
+
+                if (polySmoothEnabled) GL.Enable(EnableCap.PolygonSmooth);
+            //}
+            //else
+            //{
+            //    Console.WriteLine("NON GL");
+            //}
+
+
+        }
+
+
         public void FillRectangle(Brush brushh, RectangleF rectf)
         {
+
             if (opengl)
             {
                 float x1 = rectf.X;
@@ -1689,31 +1809,31 @@ namespace MissionPlanner.Controls
 
                 GL.Begin(PrimitiveType.TriangleFan);
 
-                GL.LineWidth(0);
+                GL.LineWidth(1);
 
-                if (((Type) brushh.GetType()) == typeof(LinearGradientBrush))
+                if (((Type)brushh.GetType()) == typeof(LinearGradientBrush))
                 {
-                    LinearGradientBrush temp = (LinearGradientBrush) brushh;
+                    LinearGradientBrush temp = (LinearGradientBrush)brushh;
                     GL.Color4(temp.LinearColors[0]);
                 }
                 else
                 {
-                    GL.Color4(((SolidBrush) brushh).Color.R / 255f, ((SolidBrush) brushh).Color.G / 255f,
-                        ((SolidBrush) brushh).Color.B / 255f, ((SolidBrush) brushh).Color.A / 255f);
+                    GL.Color4(((SolidBrush)brushh).Color.R / 255f, ((SolidBrush)brushh).Color.G / 255f,
+                        ((SolidBrush)brushh).Color.B / 255f, ((SolidBrush)brushh).Color.A / 255f);
                 }
 
                 GL.Vertex2(x1, y1);
                 GL.Vertex2(x1 + width, y1);
 
-                if (((Type) brushh.GetType()) == typeof(LinearGradientBrush))
+                if (((Type)brushh.GetType()) == typeof(LinearGradientBrush))
                 {
-                    LinearGradientBrush temp = (LinearGradientBrush) brushh;
+                    LinearGradientBrush temp = (LinearGradientBrush)brushh;
                     GL.Color4(temp.LinearColors[1]);
                 }
                 else
                 {
-                    GL.Color4(((SolidBrush) brushh).Color.R / 255f, ((SolidBrush) brushh).Color.G / 255f,
-                        ((SolidBrush) brushh).Color.B / 255f, ((SolidBrush) brushh).Color.A / 255f);
+                    GL.Color4(((SolidBrush)brushh).Color.R / 255f, ((SolidBrush)brushh).Color.G / 255f,
+                        ((SolidBrush)brushh).Color.B / 255f, ((SolidBrush)brushh).Color.A / 255f);
                 }
 
                 GL.Vertex2(x1 + width, y1 + height);
@@ -1726,7 +1846,9 @@ namespace MissionPlanner.Controls
             }
         }
 
-        public void DrawRectangle(Pen penn, RectangleF rect)
+
+
+    public void DrawRectangle(Pen penn, RectangleF rect)
         {
             DrawRectangle(penn, rect.X, rect.Y, rect.Width, rect.Height);
         }
@@ -1896,8 +2018,12 @@ namespace MissionPlanner.Controls
 
                     if (bg.Height != 0)
                     {
+
+                        //using (LinearGradientBrush linearBrush = new LinearGradientBrush(
+                        //    bg, _skyColor1, _skyColor2, LinearGradientMode.Vertical))
+
                         using (LinearGradientBrush linearBrush = new LinearGradientBrush(
-                            bg, _skyColor1, _skyColor2, LinearGradientMode.Vertical))
+                            bg, Color.FromArgb(22,41,82), Color.FromArgb(38,121,197), LinearGradientMode.Vertical))
                         {
                             graphicsObject.FillRectangle(linearBrush, bg);
                         }
@@ -1908,12 +2034,21 @@ namespace MissionPlanner.Controls
 
                     if (bg.Height != 0)
                     {
-                        using (
-                            LinearGradientBrush linearBrush = new LinearGradientBrush(
+
+                        if (opengl)
+                        {
+                            graphicsObject.FillGround(bg);
+                        }
+                        else
+                        {
+
+                            using (
+                                LinearGradientBrush linearBrush = new LinearGradientBrush(
                                 bg, _groundColor1, _groundColor2,
                                 LinearGradientMode.Vertical))
-                        {
-                            graphicsObject.FillRectangle(linearBrush, bg);
+                            {
+                                graphicsObject.FillRectangle(linearBrush, bg);
+                            }
                         }
                     }
 
@@ -1947,9 +2082,9 @@ namespace MissionPlanner.Controls
                             {
                                 if (a == 0)
                                 {
-                                    graphicsObject.DrawLine(this._greenPen, this.Width / 2 - lengthlong - halfwidth,
-                                        pitchoffset + a * every5deg, this.Width / 2 + lengthlong - halfwidth,
-                                        pitchoffset + a * every5deg);
+                                    //graphicsObject.DrawLine(this._greenPen, this.Width / 2 - lengthlong - halfwidth,
+                                    //    pitchoffset + a * every5deg, this.Width / 2 + lengthlong - halfwidth,
+                                    //    pitchoffset + a * every5deg);
                                 }
                                 else
                                 {
@@ -1958,7 +2093,7 @@ namespace MissionPlanner.Controls
                                         pitchoffset + a * every5deg);
                                 }
 
-                                drawstring(a.ToString(), font, fontsize + 2, _whiteBrush,
+                                drawstring(Math.Abs(a).ToString(), font, fontsize + 2, _whiteBrush,
                                     this.Width / 2 - lengthlong - 30 - halfwidth - (int)(fontoffset * 1.7),
                                     pitchoffset + a * every5deg - 8 - fontoffset);
                             }
@@ -1976,7 +2111,9 @@ namespace MissionPlanner.Controls
 
                     // draw roll ind needle
 
-                    graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2);
+                    var shiftUp = 10f;
+
+                    graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2 - shiftUp);
 
                     lengthlong = this.Height / 66;
 
@@ -1986,17 +2123,46 @@ namespace MissionPlanner.Controls
 
                     Point[] pointlist = new Point[3];
                     pointlist[0] = new Point(0, -lengthlongex * 2 - extra);
-                    pointlist[1] = new Point(-lengthlongex, -lengthlongex - extra);
-                    pointlist[2] = new Point(lengthlongex, -lengthlongex - extra);
+                    pointlist[1] = new Point(-lengthlongex,  -extra);
+                    pointlist[2] = new Point(lengthlongex,  -extra);
 
-                    this._redPen.Width = 2;
+                    Brush needle = Brushes.White;
 
                     if (Math.Abs(_roll) > 45)
                     {
-                        this._redPen.Width = 4;
+                        needle = Brushes.OrangeRed;
                     }
 
-                    graphicsObject.DrawPolygon(this._redPen, pointlist);
+                    graphicsObject.FillPolygon(needle, pointlist);
+
+                    pointlist = new Point[4];
+                    pointlist[0] = new Point(-lengthlongex, - extra + 2);
+                    pointlist[1] = new Point(lengthlongex, - extra + 2);
+                    pointlist[2] = new Point(lengthlongex,  - extra + lengthlongex /2 );
+                    pointlist[3] = new Point(-lengthlongex, - extra + lengthlongex /2);
+
+
+                    graphicsObject.FillPolygon(needle, pointlist);
+
+                    graphicsObject.ResetTransform();
+
+
+                    //Draw SSA indicator
+                    //use lenghtlong, exta and lengthlongex from previous block
+                    graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2 - shiftUp);
+
+                    pointlist = new Point[3];
+                    pointlist[0] = new Point(0, (-lengthlongex-6) * 2 - extra); // Head of the triangle
+                    pointlist[1] = new Point(-lengthlongex, -lengthlongex * 5 - extra);
+                    pointlist[2] = new Point(lengthlongex, -lengthlongex * 5  - extra);
+
+                    graphicsObject.RotateTransform(_SSA);
+                    graphicsObject.FillPolygon(Brushes.White, pointlist);
+                    graphicsObject.ResetTransform();
+
+
+
+
 
                     this._redPen.Width = 2;
 
@@ -2005,16 +2171,17 @@ namespace MissionPlanner.Controls
                     foreach (int a in array)
                     {
                         graphicsObject.ResetTransform();
-                        graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2);
+                        graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2 - shiftUp);
                         graphicsObject.RotateTransform(a - _roll);
-                        drawstring(String.Format("{0,2}", Math.Abs(a)), font, fontsize, _whiteBrush,
-                            0 - 6 - fontoffset, -lengthlong * 8 - extra);
-                        graphicsObject.DrawLine(this._whitePen, 0, -lengthlong * 3 - extra, 0,
-                            -lengthlong * 3 - extra - lengthlong);
+
+                        //drawstring(String.Format("{0,2}", Math.Abs(a)), font, fontsize, _whiteBrush,
+                        //    0 - 6 - fontoffset, -lengthlong * 8 - extra-slip);
+
+                        graphicsObject.DrawLine(this._whitePen, 0, -lengthlong * 3 - extra, 0, -lengthlong * 3 - extra - lengthlong);
                     }
 
                     graphicsObject.ResetTransform();
-                    graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2);
+                    graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2 - shiftUp);
 
                     // draw roll ind
                     RectangleF arcrect = new RectangleF(-lengthlong * 3 - extra, -lengthlong * 3 - extra,
@@ -2036,37 +2203,78 @@ namespace MissionPlanner.Controls
 
                     Rectangle centercircle = new Rectangle(-halfwidth / 2, -halfwidth / 2, halfwidth, halfwidth);
 
-                    //  graphicsObject.DrawEllipse(redPen, centercircle);
-                    using (Pen redtemp =
-                        new Pen(Color.FromArgb(200, this._redPen.Color.R, this._redPen.Color.G, this._redPen.Color.B),
-                            4.0f))
+                    //graphicsObject.DrawEllipse(Pens.Gray, centercircle);
+
+                    using (SolidBrush darkBrush =
+                        new SolidBrush(Color.FromArgb(126, 124, 1)))
                     {
-                        // left
-                        graphicsObject.DrawLine(redtemp, centercircle.Left - halfwidth / 5, 0, centercircle.Left, 0);
-                        // right
-                        graphicsObject.DrawLine(redtemp, centercircle.Right, 0, centercircle.Right + halfwidth / 5, 0);
-                        // center point
-                        graphicsObject.DrawLine(redtemp, 0 - 1, 0, centercircle.Right - halfwidth / 3,
-                            0 + halfheight / 10);
-                        graphicsObject.DrawLine(redtemp, 0 + 1, 0, centercircle.Left + halfwidth / 3,
-                            0 + halfheight / 10);
+
+
+                        var l = centercircle.Left + 20;
+                        var r = centercircle.Right - 20;
+                        int h = 5;
+                        SolidBrush lightBrush = new SolidBrush(Color.Yellow);
+                        //Right
+
+                        pointlist = new Point[4];
+                        pointlist[0] = new Point(l - halfwidth / 5, -h);
+                        pointlist[1] = new Point(l, -h);
+                        pointlist[2] = new Point(l + 10, 0);
+                        pointlist[3] = new Point(l - halfwidth / 5, 0);
+                        graphicsObject.FillPolygon(lightBrush, pointlist);
+
+                        pointlist[0] = new Point(l - halfwidth / 5, 0);
+                        pointlist[1] = new Point(l - halfwidth / 5, h);
+                        pointlist[2] = new Point(l, h);
+                        pointlist[3] = new Point(l + 10, 0);
+                        graphicsObject.FillPolygon(darkBrush, pointlist);
+
+                        //Left
+                        pointlist[0] = new Point(r + halfwidth / 5, -h);
+                        pointlist[1] = new Point(r, -h);
+                        pointlist[2] = new Point(r - 10, 0);
+                        pointlist[3] = new Point(r + halfwidth / 5, 0);
+                        graphicsObject.FillPolygon(lightBrush, pointlist);
+
+                        pointlist[0] = new Point(r + halfwidth / 5, 0);
+                        pointlist[1] = new Point(r + halfwidth / 5, h);
+                        pointlist[2] = new Point(r, h);
+                        pointlist[3] = new Point(r - 10, 0);
+                        graphicsObject.FillPolygon(darkBrush, pointlist);
+
+                        //Center
+                        pointlist[0] = new Point(0, 0);
+                        pointlist[1] = new Point(centercircle.Right - halfwidth / 3, halfheight / 10);
+                        pointlist[2] = new Point(0, halfheight / 25);
+                        pointlist[3] = new Point(centercircle.Left + halfwidth / 3, halfheight / 10);
+                        graphicsObject.FillPolygon(lightBrush, pointlist);
+
+                        pointlist[0] = new Point(0, halfheight / 25);
+                        pointlist[1] = new Point(centercircle.Right - halfwidth / 3, halfheight / 10);
+                        pointlist[2] = new Point(0, halfheight / 25 * 2);
+                        pointlist[3] = new Point(centercircle.Left + halfwidth / 3, halfheight / 10);
+                        graphicsObject.FillPolygon(darkBrush, pointlist);
                     }
                 }
 
-                // Flight Path vector
-                if (displayAOASSA)
-                {
-                    graphicsObject.DrawEllipse(this._redPen,
-                        new Rectangle((int)(-halfwidth / 40 - _SSA * every5deg),
-                            (int)(-halfwidth / 40 - _AOA * every5deg), halfwidth / 20, halfwidth / 20));
-                    graphicsObject.DrawLine(this._redPen, -halfwidth / 20 - _SSA * every5deg, 0 - _AOA * every5deg,
-                        -halfwidth / 40 - _SSA * every5deg, 0 - _AOA * every5deg);
-                    graphicsObject.DrawLine(this._redPen, halfwidth / 20 - _SSA * every5deg, 0 - _AOA * every5deg,
-                        halfwidth / 40 - _SSA * every5deg, 0 - _AOA * every5deg);
-                    graphicsObject.DrawLine(this._redPen, 0 - _SSA * every5deg, -halfwidth / 20 - _AOA * every5deg,
-                        0 - _SSA * every5deg, -halfwidth / 40 - _AOA * every5deg);
+                //// Flight Path vector
+                //if (displayAOASSA)
+                //{
+                //    graphicsObject.DrawEllipse(this._redPen,
+                //        new Rectangle((int)(-halfwidth / 40 - _SSA * every5deg),
+                //            (int)(-halfwidth / 40 - _AOA * every5deg), halfwidth / 20, halfwidth / 20));
+                //    graphicsObject.DrawLine(this._redPen, -halfwidth / 20 - _SSA * every5deg, 0 - _AOA * every5deg,
+                //        -halfwidth / 40 - _SSA * every5deg, 0 - _AOA * every5deg);
+                //    graphicsObject.DrawLine(this._redPen, halfwidth / 20 - _SSA * every5deg, 0 - _AOA * every5deg,
+                //        halfwidth / 40 - _SSA * every5deg, 0 - _AOA * every5deg);
+                //    graphicsObject.DrawLine(this._redPen, 0 - _SSA * every5deg, -halfwidth / 20 - _AOA * every5deg,
+                //        0 - _SSA * every5deg, -halfwidth / 40 - _AOA * every5deg);
 
-                }
+                //}
+
+
+
+
 
                 //draw heading ind
                 Rectangle headbg = new Rectangle(0, 0, this.Width - 0, this.Height / 14);
@@ -2306,76 +2514,94 @@ namespace MissionPlanner.Controls
                 }
 
                 // left scroller
-                Rectangle scrollbg = new Rectangle(0, halfheight - halfheight / 2, this.Width / 10, this.Height / 2);
+                int hUnit = this.Height / 13;
+                //Rectangle scrollbg = new Rectangle(0, hUnit, this.Width / 10, this.Height - hUnit * 3);
+                //Rectangle scrollbg = new Rectangle(0, halfheight - halfheight / 2, this.Width / 10, this.Height / 2);
+                Rectangle scrollbg = new Rectangle(0, halfheight - halfheight / 2 - halfheight/4 , this.Width / 10, this.Height / 2 + this.Height/4);
+
 
                 if (displayspeed)
                 {
-                    graphicsObject.DrawRectangle(this._whitePen, scrollbg);
 
+                    //Center of the scroller
+                    float center = (this.Height - (hUnit * 3) ) / 2 + hUnit;
+
+                    //Draw the scroller background and outline
+                    graphicsObject.DrawRectangle(this._whitePen, scrollbg);
                     graphicsObject.FillRectangle(SolidBrush, scrollbg);
 
+                    GL.Enable(EnableCap.ScissorTest);
+                    
+                    GL.Scissor(0, halfheight - halfheight / 2 - halfheight / 4, this.Width / 10, this.Height / 2 + this.Height / 4);
+
+
+                    //Draw Actual marker background
                     Point[] arrow = new Point[5];
 
-                    arrow[0] = new Point(0, -10);
-                    arrow[1] = new Point(scrollbg.Width - 10, -10);
+                    arrow[0] = new Point(0, -15);
+                    arrow[1] = new Point(scrollbg.Width - 10, -15);
                     arrow[2] = new Point(scrollbg.Width - 5, 0);
-                    arrow[3] = new Point(scrollbg.Width - 10, 10);
-                    arrow[4] = new Point(0, 10);
+                    arrow[3] = new Point(scrollbg.Width - 10, 15);
+                    arrow[4] = new Point(0, 15);
 
+                    //graphicsObject.TranslateTransform(0, center);
                     graphicsObject.TranslateTransform(0, this.Height / 2);
 
-                    float viewrange = 26;
+
+                    ////Draw TargetSpeed
+                    //if (start > _targetspeed)
+                    //{
+                    //    this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
+                    //    this._greenPen.Width = 6;
+                    //    graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top, scrollbg.Left + scrollbg.Width, scrollbg.Top);
+                    //    this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
+                    //}
+
+                    //if ((speed + viewrange / 2) < _targetspeed)
+                    //{
+                    //    this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
+                    //    this._greenPen.Width = 6;
+                    //    graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top - space * viewrange,
+                    //        scrollbg.Left + scrollbg.Width, scrollbg.Top - space * viewrange);
+                    //    this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
+                    //}
+
+                    float viewrange = 44;
 
                     float speed = _airspeed;
                     if (speed == 0)
                         speed = _groundspeed;
 
                     float space = (scrollbg.Height) / viewrange;
-                    float start = (long)(speed - viewrange / 2);
-
-                    if (start > _targetspeed)
-                    {
-                        this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
-                        this._greenPen.Width = 6;
-                        graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top,
-                            scrollbg.Left + scrollbg.Width, scrollbg.Top);
-                        this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
-                    }
-
-                    if ((speed + viewrange / 2) < _targetspeed)
-                    {
-                        this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
-                        this._greenPen.Width = 6;
-                        graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top - space * viewrange,
-                            scrollbg.Left + scrollbg.Width, scrollbg.Top - space * viewrange);
-                        this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
-                    }
-
+                    long start = (long)(speed - viewrange / 2);
                     long end = (long)(speed + viewrange / 2);
+
                     for (long a = (long)start; a <= end; a += 1)
                     {
-                        if (a == (long)_targetspeed && _targetspeed != 0)
-                        {
-                            this._greenPen.Width = 6;
-                            graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top - space * (a - start),
-                                scrollbg.Left + scrollbg.Width, scrollbg.Top - space * (a - start));
-                        }
+                        //if (a == (long)_targetspeed && _targetspeed != 0)
+                        //{
+                        //    this._greenPen.Width = 6;
+                        //    graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top - space * (a - start), scrollbg.Left + scrollbg.Width, scrollbg.Top - space * (a - start));
+                        //}
 
                         if (a % 5 == 0)
                         {
                             //Console.WriteLine(a + " " + scrollbg.Right + " " + (scrollbg.Top - space * (a - start)) + " " + (scrollbg.Right - 20) + " " + (scrollbg.Top - space * (a - start)));
-                            graphicsObject.DrawLine(this._whitePen, scrollbg.Right, scrollbg.Top - space * (a - start),
-                                scrollbg.Right - 10, scrollbg.Top - space * (a - start));
-                            drawstring(String.Format("{0,5}", a), font, fontsize, _whiteBrush, 0,
-                                (float)(scrollbg.Top - space * (a - start) - 6 - fontoffset));
+                            //graphicsObject.DrawLine(_redPen, 0, space*-15, 20, space*-15);
+
+                            graphicsObject.DrawLine(this._whitePen, scrollbg.Right, scrollbg.Height/2 - space * (a-start), scrollbg.Right - 10, scrollbg.Height / 2 - space * (a-start));
+                            drawstring(String.Format("{0,5}", a), font, fontsize, _whiteBrush, 0, (float)scrollbg.Height/2-(space * (a-start)) - 6 - fontoffset);
                         }
                     }
+
+
 
                     graphicsObject.DrawPolygon(this._blackPen, arrow);
                     graphicsObject.FillPolygon(Brushes.Black, arrow);
                     drawstring((speed).ToString("0") + speedunit, font, 10, (SolidBrush)Brushes.AliceBlue, 0, -9);
-
                     graphicsObject.ResetTransform();
+
+                    GL.Disable(EnableCap.ScissorTest);
 
                     // extra text data
 
@@ -2666,15 +2892,15 @@ namespace MissionPlanner.Controls
 
                 }
 
-                if (displaysysid)
-                {
-                    graphicsObject.ResetTransform();
-                    string text = "ID:" + _sysid.ToString("0");
-                    drawstring(text, font, fontsize + 2, _whiteBrush, fontsize,
-                        ((fontsize + 2)) - fontoffset);
+                //if (displaysysid)
+                //{
+                //    graphicsObject.ResetTransform();
+                //    string text = "ID:" + _sysid.ToString("0");
+                //    drawstring(text, font, fontsize + 2, _whiteBrush, fontsize,
+                //        ((fontsize + 2)) - fontoffset);
 
 
-                }
+                //}
 
                 // battery
                 //if (batteryon)
@@ -2811,8 +3037,10 @@ namespace MissionPlanner.Controls
 
                         height -= fontsize + 5;
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        log.Error("HUD draw ", ex);
+
                     }
 
                 }

@@ -899,8 +899,8 @@ namespace MissionPlanner
                 }
                 else
                 {
-                    int win = NativeMethods.FindWindow("ConsoleWindowClass", null);
-                    NativeMethods.ShowWindow(win, NativeMethods.SW_HIDE); // hide window
+                    //int win = NativeMethods.FindWindow("ConsoleWindowClass", null);
+                    //NativeMethods.ShowWindow(win, NativeMethods.SW_HIDE); // hide window
                 }
 
                 // prevent system from sleeping while mp open
@@ -3834,33 +3834,35 @@ namespace MissionPlanner
 
 
 
-            if (supervisor)
-            {
-                log.Info("start protarcomm server thread");
+            MainV2.comPort.MAV.cs.messageHigh = "PortarComm disabled";
 
-                protarcommthread = new Thread(protarComm.ServerThread)
-                {
-                    IsBackground = true,
-                    Name = "protar supervisor server"
+            //if (supervisor)
+            //{
+            //    log.Info("start protarcomm server thread");
 
-                };
-                protarcommthread.Start();
-                protarComm.isRunning = true;
-            }
-            else
-            {
-                log.Info("start protarcomm client thread");
-                protarComm.myNodeID = (byte)nodeID.plane1;
+            //    protarcommthread = new Thread(protarComm.ServerThread)
+            //    {
+            //        IsBackground = true,
+            //        Name = "protar supervisor server"
 
-                protarcommthread = new Thread(protarComm.ClientThread)
-                {
-                    IsBackground = true,
-                    Name = "protar supervisor client"
+            //    };
+            //    protarcommthread.Start();
+            //    protarComm.isRunning = true;
+            //}
+            //else
+            //{
+            //    log.Info("start protarcomm client thread");
+            //    protarComm.myNodeID = (byte)nodeID.plane1;
 
-                };
-                protarcommthread.Start();
-                protarComm.isRunning = true;
-            }
+            //    protarcommthread = new Thread(protarComm.ClientThread)
+            //    {
+            //        IsBackground = true,
+            //        Name = "protar supervisor client"
+
+            //    };
+            //    protarcommthread.Start();
+            //    protarComm.isRunning = true;
+            //}
 
 
             setAnnunciatorInitialState();

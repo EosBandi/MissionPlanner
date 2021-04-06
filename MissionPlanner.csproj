@@ -583,6 +583,12 @@
     <Compile Include="GCSViews\ConfigurationView\UAVCANModel.cs" />
     <Compile Include="GCSViews\ConfigurationView\uitype.cs" />
     <Compile Include="GlobalSuppressions.cs" />
+    <Compile Include="hudtest_tobedelete.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="hudtest_tobedelete.Designer.cs">
+      <DependentUpon>hudtest_tobedelete.cs</DependentUpon>
+    </Compile>
     <Compile Include="Joystick\JoystickAxis.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -828,6 +834,9 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>preflightCheckControl1.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <EmbeddedResource Include="hudtest_tobedelete.resx">
+      <DependentUpon>hudtest_tobedelete.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="StatusForms\airspeedStatusForm.resx">
       <DependentUpon>airspeedStatusForm.cs</DependentUpon>
