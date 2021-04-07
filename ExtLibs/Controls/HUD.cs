@@ -78,6 +78,7 @@ namespace MissionPlanner.Controls
             public int gltextureid;
             public int width;
             public int size;
+            public int height;
         }
 
         private Dictionary<int, character> charDict = new Dictionary<int, character>();
@@ -231,6 +232,37 @@ namespace MissionPlanner.Controls
         float _redSSAp = 90;
         float _yellowSSAp = 60;
         float _greenSSAp = 10;
+
+
+        private float _spdMinRed = 10;
+
+        public float spdMinRed
+        {
+            get { return _spdMinRed; }
+            set { _spdMinRed = value; }
+        }
+
+        private float _spdMinYellow = 13;
+
+        public float spdMinYellow
+        {
+            get { return _spdMinYellow; }
+            set { _spdMinYellow = value; }
+        }
+        private float _spdMaxYellow = 26;
+
+        public float spdMaxYellow
+        {
+            get { return _spdMaxYellow; }
+            set { _spdMaxYellow = value; }
+        }
+        private float _spdMaxRed = 30;
+
+        public float spdMaxRed
+        {
+            get { return _spdMaxRed; }
+            set { _spdMaxRed = value; }
+        }
 
         [System.ComponentModel.Browsable(true), System.ComponentModel.Category("Values")]
         public float fuelLevel
@@ -788,6 +820,7 @@ namespace MissionPlanner.Controls
 
         private bool statuslast = false;
         private DateTime armedtimer = DateTime.MinValue;
+        private int armedboxLeftSide = 0;
 
         public struct Custom
         {
@@ -856,7 +889,9 @@ namespace MissionPlanner.Controls
         private readonly SolidBrush _whiteBrush = new SolidBrush(Color.White);
         private readonly SolidBrush _redBrush = new SolidBrush(Color.Red);
 
-        private static readonly SolidBrush SolidBrush = new SolidBrush(Color.FromArgb(0x44, 0x00, 0x00, 0x00));
+        private static readonly SolidBrush transparentBlackSolidBrush = new SolidBrush(Color.FromArgb(0x66, 0x00, 0x00, 0x00));
+        private static readonly SolidBrush blackSolidBrush = new SolidBrush(Color.Black);
+        private static readonly SolidBrush greenSolidBrush = new SolidBrush(Color.Green);
 
         private static readonly SolidBrush SlightlyTransparentWhiteBrush =
             new SolidBrush(Color.FromArgb(220, 255, 255, 255));
@@ -1803,6 +1838,18 @@ namespace MissionPlanner.Controls
 
         }
 
+        public void FillRectangle(Brush b, float X, float Y, float w, float h)
+        {
+            FillRectangle(b, new RectangleF(X, Y, w, h));
+        }
+
+        public void FillRectangle(Brush b, Rectangle r)
+        {
+
+            FillRectangle(b, (RectangleF)r);
+        }
+
+
 
         public void FillRectangle(Brush brushh, RectangleF rectf)
         {
@@ -2295,7 +2342,7 @@ namespace MissionPlanner.Controls
                     graphicsObject.DrawRectangle(this._blackPen, headbg);
 
 
-                    graphicsObject.FillRectangle(SolidBrush, headbg);
+                    graphicsObject.FillRectangle(transparentBlackSolidBrush, headbg);
 
                     // center
                     //   graphicsObject.DrawLine(redPen, headbg.Width / 2, headbg.Bottom, headbg.Width / 2, headbg.Top);
@@ -2522,41 +2569,26 @@ namespace MissionPlanner.Controls
                 }
 
                 // left scroller
+
                 int hUnit = this.Height / 13;
-                //Rectangle scrollbg = new Rectangle(0, hUnit, this.Width / 10, this.Height - hUnit * 3);
-                //Rectangle scrollbg = new Rectangle(0, halfheight - halfheight / 2, this.Width / 10, this.Height / 2);
-                Rectangle scrollbg = new Rectangle(0, halfheight - halfheight / 2 - halfheight/4 , this.Width / 10, this.Height / 2 + this.Height/4);
+                Rectangle scrollbg = new Rectangle(0, halfheight - halfheight / 2 - halfheight / 4, this.Width / 10, this.Height / 2 + this.Height / 4);
 
 
                 if (displayspeed)
                 {
-
                     //Center of the scroller
                     float center = (this.Height - (hUnit * 3) ) / 2 + hUnit;
+                    int needleH = scrollbg.Height / 20;
 
                     //Draw the scroller background and outline
                     graphicsObject.DrawRectangle(this._whitePen, scrollbg);
-                    graphicsObject.FillRectangle(SolidBrush, scrollbg);
-
-
+                    graphicsObject.FillRectangle(transparentBlackSolidBrush, scrollbg);
 
                     graphicsObject.SetClip(scrollbg);
 
-
-                    int h = scrollbg.Height / 20;
-                    //Draw Actual marker background
-                    Point[] arrow = new Point[7];
-                    arrow[0] = new Point(2, -h);
-                    arrow[1] = new Point(scrollbg.Width - 15, -h);
-                    arrow[2] = new Point(scrollbg.Width - 15, -5);
-                    arrow[3] = new Point(scrollbg.Width - 5, 0);
-                    arrow[4] = new Point(scrollbg.Width - 15, 5);
-                    arrow[5] = new Point(scrollbg.Width - 15, h);
-                    arrow[6] = new Point(2, h);
-
-                    //graphicsObject.TranslateTransform(0, center);
                     graphicsObject.TranslateTransform(0, this.Height / 2);
-                    float viewrange = 440;
+
+                    float viewrange = 300;
 
                     float speed = _airspeed*10;
                     if (speed == 0)
@@ -2570,31 +2602,60 @@ namespace MissionPlanner.Controls
 
                     if (start > _targetspeed*10)
                     {
-                        this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
-                        this._greenPen.Width = 6;
-                        graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Height/2, scrollbg.Left + scrollbg.Width, scrollbg.Height / 2);
-                        this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
+                        graphicsObject.DrawLine((new Pen(Color.Cyan,6)) , scrollbg.Left, scrollbg.Height/2, scrollbg.Left + scrollbg.Width, scrollbg.Height / 2);
                     }
 
                     if (end < _targetspeed*10)
                     {
-                        this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
-                        this._greenPen.Width = 6;
-                        graphicsObject.DrawLine(this._greenPen, scrollbg.Left, -scrollbg.Height / 2, scrollbg.Left + scrollbg.Width, -scrollbg.Height / 2);
-                        this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
+                        graphicsObject.DrawLine((new Pen(Color.Cyan,6)), scrollbg.Left, -scrollbg.Height / 2, scrollbg.Left + scrollbg.Width, -scrollbg.Height / 2);
                     }
 
 
+                    //Draw speed warning scale
+                    // start min speed displayed
+                    // end max speed displayed
 
+                    int bot = Math.Min((int)(scrollbg.Height / 2 - space * (0 - start)), scrollbg.Height / 2);
+                    int top = Math.Max((int)(scrollbg.Height / 2 - space * (_spdMinRed * 10 - start)), -scrollbg.Height / 2);
+                    graphicsObject.FillRectangle(Brushes.Red, new RectangleF(scrollbg.Width - 5, top, 4, bot - top));
 
+                    bot = Math.Min((int)(scrollbg.Height / 2 - space * (_spdMinRed * 10 - start)), scrollbg.Height / 2);
+                    top = Math.Max((int)(scrollbg.Height / 2 - space * (_spdMinYellow * 10 - start)), -scrollbg.Height / 2);
+                    graphicsObject.FillRectangle(Brushes.Gold, new RectangleF(scrollbg.Width - 5, top, 4, bot - top));
+
+                    bot = Math.Min((int)(scrollbg.Height / 2 - space * (_spdMinYellow * 10 - start)), scrollbg.Height / 2);
+                    top = Math.Max((int)(scrollbg.Height / 2 - space * (_spdMaxYellow * 10 - start)), -scrollbg.Height / 2);
+                    graphicsObject.FillRectangle(Brushes.Green, new RectangleF(scrollbg.Width - 5, top, 4, bot - top));
+
+                    bot = Math.Min((int)(scrollbg.Height / 2 - space * (_spdMaxYellow * 10 - start)), scrollbg.Height / 2);
+                    top = Math.Max((int)(scrollbg.Height / 2 - space * (_spdMaxRed * 10 - start)), -scrollbg.Height / 2);
+                    graphicsObject.FillRectangle(Brushes.Gold, new RectangleF(scrollbg.Width - 5, top, 4, bot - top));
+
+                    bot = Math.Min((int)(scrollbg.Height / 2 - space * (_spdMaxRed * 10 - start)), scrollbg.Height / 2);
+                    top = -scrollbg.Height / 2;
+                    graphicsObject.FillRectangle(Brushes.Red, new RectangleF(scrollbg.Width - 5, top, 4, bot - top));
 
                     for ( long a = start; a <= end; a += 1)
                     {
 
-                        if (a == _targetspeed*10 && _targetspeed != 0)
+                        if (a == Math.Round(_targetspeed*10) && _targetspeed != 0)
                         {
-                            this._greenPen.Width = 6;
-                            graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Height / 2 - space * (a - start), scrollbg.Left + scrollbg.Width, scrollbg.Height / 2 - space * (a - start));
+                                int c = (int)(scrollbg.Height / 2 - space * (a - start));  //center of the bug
+                                var widthBug = scrollbg.Width - 14;                               //width of the bug
+
+                                Point[] altBug = new Point[8];
+                                altBug[0] = new Point(widthBug + 10, c);
+                                altBug[1] = new Point(widthBug, c + 5);
+                                altBug[2] = new Point(widthBug, c + needleH / 2);
+                                altBug[3] = new Point(widthBug + 12, c + needleH / 2);
+                                altBug[4] = new Point(widthBug + 12, c - needleH / 2);
+                                altBug[5] = new Point(widthBug, c - needleH / 2);
+                                altBug[6] = new Point(widthBug, c - 5);
+                                altBug[7] = new Point(widthBug + 11, c);
+                                graphicsObject.DrawPolygon(Pens.Cyan, altBug);
+                                graphicsObject.FillPolygon(Brushes.Cyan, altBug);
+
+
                         }
 
                         if ((long)a % 50 == 0)
@@ -2610,219 +2671,254 @@ namespace MissionPlanner.Controls
 
                     }
 
-
-
+                    //Draw Actual marker background
+                    Point[] arrow = new Point[7];
+                    arrow[0] = new Point(2, -needleH);
+                    arrow[1] = new Point(scrollbg.Width - 15, -needleH);
+                    arrow[2] = new Point(scrollbg.Width - 15, -5);
+                    arrow[3] = new Point(scrollbg.Width - 5, 0);
+                    arrow[4] = new Point(scrollbg.Width - 15, 5);
+                    arrow[5] = new Point(scrollbg.Width - 15, needleH);
+                    arrow[6] = new Point(2, needleH);
                     graphicsObject.DrawPolygon(this._blackPen, arrow);
                     graphicsObject.FillPolygon(Brushes.Black, arrow);
-                    drawstringCentered((speed/10).ToString("0"), font, fontsize+3, (SolidBrush)Brushes.AliceBlue, (scrollbg.Width-15)/2, 0);
+
+
+                    //Speed value
                     graphicsObject.ResetTransform();
+
+                    drawstringCentered((speed/10).ToString("0"), font, fontsize+3, (SolidBrush)Brushes.AliceBlue, (scrollbg.Width-15)/2, this.Height/2);
                     graphicsObject.ResetClip();
 
 
                     // extra text data
+                    int w = scrollbg.Width;
+                    int h = (int)(hUnit * 1.5f);
 
-                    //graphicsObject.DrawRectangle(_whitePen, scrollbg.Left, scrollbg.Top - fontsize * 2, scrollbg.Width, fontsize * 2);
-                    //drawstringCentered("TAS", font, fontsize / 2.5f, _whiteBrush, scrollbg.Width/2, scrollbg.Top - fontsize * 2);
-                    //drawstringCentered(_targetspeed.ToString("0.0") + speedunit, font, fontsize / 2.5f, _whiteBrush, scrollbg.Width / 2, scrollbg.Top - fontsize);
+                    graphicsObject.TranslateTransform(0, scrollbg.Top - h);
+                    graphicsObject.DrawRectangle(_whitePen, 0,0,w,h);
+                    graphicsObject.FillRectangle(blackSolidBrush, new Rectangle(0,0,w,h));
 
-
-
-
-
-                    if (_lowairspeed)
+                    SizeF s = getTextSizeGL("GS", font, fontsize / 1.5f);
+                    drawstringCentered("GS", font, fontsize / 1.5f, _whiteBrush, w/2, h/4);           //First line
+                    if (_targetspeed != 0)
                     {
-                        drawstring(HUDT.AS + _airspeed.ToString("0.0") + speedunit, font, fontsize,
-                            (SolidBrush)Brushes.Red, 1, scrollbg.Bottom + 5);
+                        drawstringCentered(_groundspeed.ToString("0") + speedunit, font, fontsize / 1.5f, _whiteBrush, w / 2, h/4*3); //Second Line
                     }
                     else
                     {
-                        drawstring(HUDT.AS + _airspeed.ToString("0.0") + speedunit, font, fontsize, _whiteBrush, 1,
-                            scrollbg.Bottom + 5);
-                    }
+                        drawstringCentered("----", font, fontsize / 1.5f, _whiteBrush, w / 2, h/4*3); //Second Line
 
-                    if (_lowgroundspeed)
-                    {
-                        drawstring(HUDT.GS + _groundspeed.ToString("0.0") + speedunit, font, fontsize,
-                            (SolidBrush)Brushes.Red, 1, scrollbg.Bottom + fontsize + 2 + 10);
                     }
-                    else
-                    {
-                        drawstring(HUDT.GS + _groundspeed.ToString("0.0") + speedunit, font, fontsize, _whiteBrush,
-                            1, scrollbg.Bottom + fontsize + 2 + 10);
-                    }
+                    graphicsObject.ResetTransform();
+                    graphicsObject.TranslateTransform(0, scrollbg.Bottom);
+                    w = scrollbg.Width;
+                    h = (int)(hUnit * .6f);
+                    graphicsObject.DrawRectangle(_whitePen, 0, 0, w, h);
+                    graphicsObject.FillRectangle(blackSolidBrush, new Rectangle(0, 0, w, h));
+                    drawstringCentered(speedunit, font, fontsize /1.5f, new SolidBrush(Color.LightBlue), w / 2, h/2); //Second Line
+                    graphicsObject.ResetTransform();
+
                 }
 
-                //drawstring(e,, new Font("Arial", fontsize + 2), whiteBrush, 1, scrollbg.Bottom + fontsize + 2 + 10);
 
                 // right scroller
-                scrollbg = new Rectangle(this.Width - this.Width / 10, halfheight - halfheight / 2, this.Width / 10,
-                    this.Height / 2);
+
+
+                //scrollbg = new Rectangle(0, halfheight - halfheight / 2 - halfheight / 4, this.Width / 10, this.Height / 2 + this.Height / 4);
+
+                scrollbg = new Rectangle((this.Width - this.Width / 9), halfheight - halfheight / 2 - halfheight / 4, (this.Width / 9)-1, this.Height / 2 + this.Height / 4);
 
                 if (displayalt)
                 {
                     graphicsObject.DrawRectangle(this._whitePen, scrollbg);
+                    graphicsObject.FillRectangle(transparentBlackSolidBrush, scrollbg);
 
-                    graphicsObject.FillRectangle(SolidBrush, scrollbg);
+                    graphicsObject.SetClip(new Rectangle(scrollbg.X-1, scrollbg.Y-1, scrollbg.Width-2, scrollbg.Height-2));
+                    float center = (this.Height - (hUnit * 3)) / 2 + hUnit;
+                    int needleH = scrollbg.Height / 20;
 
-                    Point[] arrow = new Point[5];
 
-                    arrow[0] = new Point(0, -10);
-                    arrow[1] = new Point(scrollbg.Width - 10, -10);
-                    arrow[2] = new Point(scrollbg.Width - 5, 0);
-                    arrow[3] = new Point(scrollbg.Width - 10, 10);
-                    arrow[4] = new Point(0, 10);
+                    //Draw Actual marker background
+                    Point[] arrow = new Point[7];
+                    arrow[0] = new Point(2, -needleH);
+                    arrow[1] = new Point(scrollbg.Width - 15, -needleH);
+                    arrow[2] = new Point(scrollbg.Width - 15, -5);
+                    arrow[3] = new Point(scrollbg.Width - 5, 0);
+                    arrow[4] = new Point(scrollbg.Width - 15, 5);
+                    arrow[5] = new Point(scrollbg.Width - 15, needleH);
+                    arrow[6] = new Point(2, needleH);
 
                     graphicsObject.TranslateTransform(0, this.Height / 2);
 
-                    int viewrange = 26;
-
+                    int viewrange = 30;
                     float space = (scrollbg.Height) / (float)viewrange;
                     long start = ((int)_alt - viewrange / 2);
+                    long end = ((int)_alt + viewrange / 2);
 
                     if (start > _targetalt)
                     {
-                        this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
-                        this._greenPen.Width = 6;
-                        graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top,
-                            scrollbg.Left + scrollbg.Width, scrollbg.Top);
-                        this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
+                        graphicsObject.DrawLine((new Pen(Color.Cyan, 6)), scrollbg.Left, scrollbg.Height/2, scrollbg.Left + scrollbg.Width, scrollbg.Height/2);
                     }
 
                     if ((_alt + viewrange / 2) < _targetalt)
                     {
-                        this._greenPen.Color = Color.FromArgb(128, this._greenPen.Color);
-                        this._greenPen.Width = 6;
-                        graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top - space * viewrange,
-                            scrollbg.Left + scrollbg.Width, scrollbg.Top - space * viewrange);
-                        this._greenPen.Color = Color.FromArgb(255, this._greenPen.Color);
+
+                        graphicsObject.DrawLine((new Pen(Color.Cyan, 6)), scrollbg.Left, -scrollbg.Height/2, scrollbg.Left + scrollbg.Width, -scrollbg.Height /2);
                     }
 
-                    bool ground = false;
-
-                    for (long a = start; a <= (_alt + viewrange / 2); a += 1)
+                    for (long a = start; a <= end; a += 1)
                     {
                         if (a == Math.Round(_targetalt) && _targetalt != 0)
                         {
-                            this._greenPen.Width = 6;
-                            graphicsObject.DrawLine(this._greenPen, scrollbg.Left, scrollbg.Top - space * (a - start),
-                                scrollbg.Left + scrollbg.Width, scrollbg.Top - space * (a - start));
+                            int c = (int)(scrollbg.Height / 2 - space * (a - start));   // This is the location for the altBug center
+                            var r = scrollbg.Left + 1;
+                            // and use needleH as well
+                            Point[] altBug = new Point[7];
+                            altBug[0] = new Point(r + 5, c);
+                            altBug[1] = new Point(r + 13, c + 5);
+                            altBug[2] = new Point(r + 13, c + needleH / 2);
+                            altBug[3] = new Point(r, c + needleH / 2);
+                            altBug[4] = new Point(r, c - needleH / 2);
+                            altBug[5] = new Point(r + 13, c - needleH / 2);
+                            altBug[6] = new Point(r + 13, c - 5);
+                            graphicsObject.DrawPolygon(Pens.Cyan, altBug);
+                            graphicsObject.FillPolygon(Brushes.Cyan, altBug);
+
                         }
-
-
-                        // ground doesnt appear if we are not in view or below ground level
-                        if (a == Math.Round(groundalt) && groundalt != 0 && ground == false)
-                        {
-                            graphicsObject.FillRectangle(AltGroundBrush,
-                                new RectangleF(scrollbg.Left, scrollbg.Top - space * (a - start), scrollbg.Width,
-                                    (space * (a - start))));
-                        }
-
                         if (a % 5 == 0)
                         {
-                            //Console.WriteLine(a + " " + scrollbg.Left + " " + (scrollbg.Top - space * (a - start)) + " " + (scrollbg.Left + 20) + " " + (scrollbg.Top - space * (a - start)));
-                            graphicsObject.DrawLine(this._whitePen, scrollbg.Left, scrollbg.Top - space * (a - start),
-                                scrollbg.Left + 10, scrollbg.Top - space * (a - start));
-                            drawstring(String.Format("{0,5}", a), font, fontsize, _whiteBrush,
-                                scrollbg.Left + 0 + (int)(0 * fontoffset),
-                                scrollbg.Top - space * (a - start) - 6 - fontoffset);
+                            graphicsObject.DrawLine(this._whitePen, scrollbg.Left, scrollbg.Height / 2 - space * (a - start), scrollbg.Left + 10, scrollbg.Height / 2 - space * (a - start));
+                            drawstring(String.Format("{0,5}", a), font, fontsize, _whiteBrush, scrollbg.Left + fontoffset, scrollbg.Height / 2 - space * (a - start) - 6 - fontoffset);
                         }
+                        else
+                        {
+                            graphicsObject.DrawLine(this._whitePen, scrollbg.Left, scrollbg.Height / 2 - space * (a - start), scrollbg.Left + 5, scrollbg.Height / 2 - space * (a - start));
 
+                        }
                     }
 
-                    this._greenPen.Width = 4;
-
-                    // vsi
-
-                    graphicsObject.ResetTransform();
-
-                    PointF[] poly = new PointF[4];
-
-                    poly[0] = new PointF(scrollbg.Left, scrollbg.Top);
-                    poly[1] = new PointF(scrollbg.Left - scrollbg.Width / 4, scrollbg.Top + scrollbg.Width / 4);
-                    poly[2] = new PointF(scrollbg.Left - scrollbg.Width / 4, scrollbg.Bottom - scrollbg.Width / 4);
-                    poly[3] = new PointF(scrollbg.Left, scrollbg.Bottom);
-
-                    //verticalspeed
-
-                    viewrange = 12;
-
-                    _verticalspeed = Math.Min(viewrange / 2, _verticalspeed);
-                    _verticalspeed = Math.Max(viewrange / -2, _verticalspeed);
-
-                    float scaledvalue = _verticalspeed / -viewrange * (scrollbg.Bottom - scrollbg.Top);
-
-                    float linespace = (float)1 / -viewrange * (scrollbg.Bottom - scrollbg.Top);
-
-                    PointF[] polyn = new PointF[4];
-
-                    polyn[0] = new PointF(scrollbg.Left, scrollbg.Top + (scrollbg.Bottom - scrollbg.Top) / 2);
-                    polyn[1] = new PointF(scrollbg.Left - scrollbg.Width / 4,
-                        scrollbg.Top + (scrollbg.Bottom - scrollbg.Top) / 2);
-                    polyn[2] = polyn[1];
-                    float peak = 0;
-                    if (scaledvalue > 0)
-                    {
-                        peak = -scrollbg.Width / 4;
-                        if (scrollbg.Top + (scrollbg.Bottom - scrollbg.Top) / 2 + scaledvalue + peak <
-                            scrollbg.Top + (scrollbg.Bottom - scrollbg.Top) / 2)
-                            peak = -scaledvalue;
-                    }
-                    else if (scaledvalue < 0)
-                    {
-                        peak = +scrollbg.Width / 4;
-                        if (scrollbg.Top + (scrollbg.Bottom - scrollbg.Top) / 2 + scaledvalue + peak >
-                            scrollbg.Top + (scrollbg.Bottom - scrollbg.Top) / 2)
-                            peak = -scaledvalue;
-                    }
-
-                    polyn[2] = new PointF(scrollbg.Left - scrollbg.Width / 4,
-                        scrollbg.Top + (scrollbg.Bottom - scrollbg.Top) / 2 + scaledvalue + peak);
-                    polyn[3] = new PointF(scrollbg.Left,
-                        scrollbg.Top + (scrollbg.Bottom - scrollbg.Top) / 2 + scaledvalue);
-
-                    //graphicsObject.DrawPolygon(redPen, poly);
-                    graphicsObject.FillPolygon(Brushes.Blue, polyn);
-
-                    // draw outsidebox
-                    graphicsObject.DrawPolygon(this._whitePen, poly);
-
-                    for (int a = 1; a < viewrange; a++)
-                    {
-                        graphicsObject.DrawLine(this._whitePen, scrollbg.Left - scrollbg.Width / 4,
-                            scrollbg.Top - linespace * a, scrollbg.Left - scrollbg.Width / 8,
-                            scrollbg.Top - linespace * a);
-                    }
-
-                    // draw arrow and text
 
                     graphicsObject.ResetTransform();
                     graphicsObject.TranslateTransform(this.Width, this.Height / 2);
                     graphicsObject.RotateTransform(180);
-
                     graphicsObject.DrawPolygon(this._blackPen, arrow);
                     graphicsObject.FillPolygon(Brushes.Black, arrow);
                     graphicsObject.ResetTransform();
+                    //And draw text
                     graphicsObject.TranslateTransform(0, this.Height / 2);
-
-                    drawstring(((int)_alt).ToString("0 ") + altunit, font, 10, (SolidBrush)Brushes.AliceBlue,
-                        scrollbg.Left + 10, -9);
+                    SizeF s = getTextSizeGL(((int)_alt).ToString("0"), font, fontsize);
+                    //No need for alt Unit, it will be displayed at the bottom
+                    drawstring(((int)_alt).ToString("0"), font, fontsize, (SolidBrush)Brushes.AliceBlue, scrollbg.Right - s.Width - 5, -s.Height / 2);
+                    graphicsObject.ResetTransform();
+                    graphicsObject.ResetClip();
+                    //Bottom Box
+                    graphicsObject.TranslateTransform(0, scrollbg.Bottom);
+                    int w = scrollbg.Width;
+                    int h = (int)(hUnit * .6f);
+                    graphicsObject.DrawRectangle(_whitePen, scrollbg.Left, 0, w, h);
+                    graphicsObject.FillRectangle(blackSolidBrush, new Rectangle(scrollbg.Left, 0, w, h));
+                    string text = "meters";
+                    if (altunit != "m") text = "whonos";
+                    drawstringCentered(text, font, fontsize / 1.5f, new SolidBrush(Color.LightBlue), scrollbg.Left + (w / 2), h / 2);
                     graphicsObject.ResetTransform();
 
-                    // mode and wp dist and wp
-                    if (_modechanged.AddSeconds(2) > datetime)
+
+                    // vsi
+                    graphicsObject.ResetTransform();
+
+                    // zero Y is the center -up, + down, zero x it vsiWidth from alt ladder left
+                    int vsiWidth = this.Width / 22;
+                    int vsiHeight = this.Height / 2;
+
+
+                    graphicsObject.TranslateTransform(scrollbg.Left - vsiWidth, this.Height / 2);
+
+                    Point[] vsiBorder = new Point[7];
+                    vsiBorder[0] = new Point(vsiWidth - 3, 0);
+                    vsiBorder[1] = new Point(0, 15);
+                    vsiBorder[2] = new Point(0, vsiHeight / 2);
+                    vsiBorder[3] = new Point(vsiWidth, vsiHeight / 2);
+                    vsiBorder[4] = new Point(vsiWidth, -vsiHeight / 2);
+                    vsiBorder[5] = new Point(0, -vsiHeight / 2);
+                    vsiBorder[6] = new Point(0, -15);
+                    graphicsObject.DrawPolygon(this._whitePen, vsiBorder);
+                    graphicsObject.FillPolygon(transparentBlackSolidBrush, vsiBorder);
+
+
+                    viewrange = 98;
+                    space = (float)vsiHeight / (float)viewrange;
+                    start = -viewrange / 2;
+                    end = viewrange / 2;
+
+                    s = getTextSizeGL("5", font, fontsize / 1.5f);
+
+
+                    for (long a = start; a <= end ; a += 1)
                     {
-                        drawstring(_mode, font, fontsize, _redBrush, scrollbg.Left - 30,
-                            scrollbg.Bottom + 5);
+                        if (a % 10 == 0 && a != 0)
+                        {
+                            graphicsObject.DrawLine(this._whitePen, vsiWidth - vsiWidth/4, (float)vsiHeight / 2 - space * (a - start), vsiWidth, (float)vsiHeight / 2 - space * (a - start));
+                            drawstring(Math.Abs((a / 10)).ToString("0"), font, fontsize / 1.5f, _whiteBrush, vsiWidth - vsiWidth/4 - s.Width - 1, (float)vsiHeight / 2 - space * (a - start) - s.Height/2);
+
+                        }
+                    }
+                    //Now Draw the needle (in vsi the needle moves instead of the scale)
+
+                    int ci;  //Location of the needle
+                    SolidBrush needleColor;
+                    if (Math.Round(_verticalspeed * 10) >= end)
+                    {
+                        ci = -vsiHeight / 2;
+                        needleColor = _redBrush;
+                    }
+                    else if (Math.Round(_verticalspeed * 10) <= start)
+                    {
+                        ci = vsiHeight / 2;
+                        needleColor = _redBrush;
                     }
                     else
                     {
-                        drawstring(_mode, font, fontsize, _whiteBrush, scrollbg.Left - 30,
-                            scrollbg.Bottom + 5);
+                        ci = (int)(vsiHeight / 2 - space * (Math.Round(_verticalspeed * 10) - start)); //This will be the position
+                        needleColor = blackSolidBrush;
                     }
 
-                    drawstring((int)_disttowp + distunit + ">" + _wpno, font, fontsize, _whiteBrush,
-                        scrollbg.Left - 30, scrollbg.Bottom + fontsize + 2 + 10);
+                        float wi = vsiWidth * 1.5f; // length
+                        int nH = (int)(needleH / 1.7f);
+
+                        Point[] vsiNeedle = new Point[5];
+                        vsiNeedle[0] = new Point(vsiWidth - 2, ci);  //center
+                        vsiNeedle[1] = new Point(vsiWidth - 10, ci - nH);
+                        vsiNeedle[2] = new Point(vsiWidth - (int)wi, ci - nH);
+                        vsiNeedle[3] = new Point(vsiWidth - (int)wi, ci + nH);
+                        vsiNeedle[4] = new Point(vsiWidth - 10, ci + nH);
+
+                        graphicsObject.DrawPolygon(new Pen(needleColor.Color, 1), vsiNeedle);
+                        graphicsObject.FillPolygon(needleColor, vsiNeedle);
+
+                        drawstring(Math.Abs(_verticalspeed).ToString("0.0"), font, fontsize / 1.5f, _whiteBrush, vsiWidth - vsiWidth * 1.5f+4, ci - s.Height / 2-2);
+
+
+
+
+                    //// mode and wp dist and wp
+                    //if (_modechanged.AddSeconds(2) > datetime)
+                    //{
+                    //    drawstring(_mode, font, fontsize, _redBrush, scrollbg.Left - 30,
+                    //        scrollbg.Bottom + 5);
+                    //}
+                    //else
+                    //{
+                    //    drawstring(_mode, font, fontsize, _whiteBrush, scrollbg.Left - 30,
+                    //        scrollbg.Bottom + 5);
+                    //}
+
+                    //drawstring((int)_disttowp + distunit + ">" + _wpno, font, fontsize, _whiteBrush,
+                    //    scrollbg.Left - 30, scrollbg.Bottom + fontsize + 2 + 10);
                 }
+
+
+                //Display bottom info panel
 
                 if (displayconninfo)
                 {
@@ -2856,6 +2952,7 @@ namespace MissionPlanner.Controls
                 }
 
                 // AOA
+                displayAOASSA = false;
                 if (displayAOASSA)
                 {
                     scrollbg = new Rectangle((int)(this.Width - (double)this.Width / 6), halfheight + halfheight / 10,
@@ -2902,15 +2999,14 @@ namespace MissionPlanner.Controls
                 {
                     graphicsObject.ResetTransform();
                     string text = "FUEL: " + _fuellevel.ToString("0") + "%";
+                    SizeF s = getTextSizeGL(text, font, fontsize);
                     if (_fuellevel < 15)
                     {
-                        drawstring(text, font, fontsize + 2, (SolidBrush)Brushes.Red, fontsize,
-                            this.Height - ((fontsize + 2) * 3) - fontoffset);
+                        drawstring(text, font, fontsize + 2, (SolidBrush)Brushes.Red, fontsize,this.Height - s.Height - 5);
                     }
                     else
                     {
-                        drawstring(text, font, fontsize + 2, _whiteBrush, fontsize,
-                            this.Height - ((fontsize + 2) * 3) - fontoffset);
+                        drawstring(text, font, fontsize + 2, _whiteBrush, fontsize, this.Height - s.Height - 5);
 
                     }
 
@@ -3072,7 +3168,6 @@ namespace MissionPlanner.Controls
 
 
 
-                graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2);
 
                 // draw armed
 
@@ -3081,12 +3176,14 @@ namespace MissionPlanner.Controls
                     armedtimer = DateTime.Now;
                 }
 
+                armedboxLeftSide = 0;
+
                 if (status == false) // not armed
                 {
                     //if ((armedtimer.AddSeconds(8) > DateTime.Now))
                     {
-                        drawstring(HUDT.DISARMED, font, fontsize + 10, (SolidBrush) Brushes.Red, -85,
-                            halfheight / -3);
+
+                        drawBannerRight(HUDT.DISARMED, font, fontsize + 5, _redBrush, blackSolidBrush, 10,10,0,0);
                         statuslast = status;
                     }
                 }
@@ -3094,18 +3191,22 @@ namespace MissionPlanner.Controls
                 {
                     if ((armedtimer.AddSeconds(8) > DateTime.Now))
                     {
-                        drawstring(HUDT.ARMED, font, fontsize + 20, (SolidBrush) Brushes.Red, -70,
-                            halfheight / -3);
+                        drawBannerRight(HUDT.ARMED, font, fontsize + 5, greenSolidBrush, blackSolidBrush, 10, 10, 8,(int)(armedtimer.AddSeconds(8) - DateTime.Now).TotalMilliseconds);
                         statuslast = status;
                     }
                 }
 
+
                 if (failsafe == true)
                 {
-                    drawstring(HUDT.FAILSAFE, font, fontsize + 20, (SolidBrush) Brushes.Red, -85,
-                        halfheight / -HUDT.FailsafeH);
+                    drawBannerRight(HUDT.FAILSAFE, font, fontsize + 5, _redBrush, blackSolidBrush, armedboxLeftSide+10, 10, 0, 0);
                     statuslast = status;
                 }
+
+
+
+
+                graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2);
 
                 if (message != null && message != "")
                 {
@@ -3288,12 +3389,49 @@ namespace MissionPlanner.Controls
             return n;
         }
 
+        private void drawBannerCentered(string text, Font font, float fontsize, SolidBrush fore, SolidBrush back, float y)
+        {
+            SizeF s = getTextSizeGL(text, font, fontsize);
+
+
+            graphicsObject.DrawRectangle(this._whitePen, this.Width / 2 - s.Width/2 - 5 , y, s.Width + 10, s.Height);
+            graphicsObject.FillRectangle(back, this.Width / 2 - s.Width / 2 -5 , y, s.Width+10, s.Height);
+            graphicsObject.drawstringCentered(text, font, fontsize, fore, this.Width/2, y + s.Height / 2);
+
+        }
+
+        private void drawBannerRight(string text, Font font, float fontsize, SolidBrush fore, SolidBrush back, float x, float y, int timer = 0, int millisBack = 0)
+        {
+            SizeF s = getTextSizeGL(text, font, fontsize);
+
+            // start is this.Width - s.Width + 10 + x
+
+            graphicsObject.DrawRectangle(this._whitePen, this.Width - s.Width - 10 - x, y, s.Width + 10 , s.Height);
+            graphicsObject.FillRectangle(back, this.Width - s.Width - 10 - x, y, s.Width+10, s.Height);
+            graphicsObject.drawstringCentered(text, font, fontsize, fore, (this.Width - s.Width - 10 - x) + s.Width/2 + 5, y + s.Height / 2);
+
+            if (timer > 0)
+            {
+                float length = (s.Width + 9) / (timer * 1000f) * millisBack;
+
+                graphicsObject.FillRectangle(Brushes.Gold, this.Width - s.Width - 9 - x, y + s.Height - 4, length, 3);
+            }
+
+            if (text == "ARMED" || text == "DISARMED") armedboxLeftSide = (int)(s.Width + 10+x);
+
+        }
+
+
+        //private Size getStringSize(string s, Font font, float fontsize)
+        //{
+        //    Font newfont = new Font(font.FontFamily, fontsize);
+        //    return graphicsObjectGDIP.MeasureString(s, newfont).ToSize();
+        //}
+
         private void drawstringCentered(string text, Font font, float fontsize, SolidBrush brush, float x, float y)
         {
-            Font newfont = new Font(font.FontFamily, fontsize);
-            var s = graphicsObjectGDIP.MeasureString(text, newfont).ToSize();
+            var s = getTextSizeGL(text, font, fontsize);
             drawstring(text, font, fontsize, brush, x - s.Width / 2, y-s.Height/2);
-
         }
 
         void drawstring(string text, Font font, float fontsize, SolidBrush brush, float x, float y)
@@ -3446,6 +3584,122 @@ namespace MissionPlanner.Controls
                 x += charDict[charid].width * scale;
             }
         }
+
+        private SizeF getTextSizeGL(string text, Font font, float fontsize)
+        {
+            float x = 0;
+            float y = 0;
+
+            SolidBrush brush = new SolidBrush(Color.White);
+            Font newfont = new Font(font.FontFamily, fontsize);
+            SizeF gdiSize = graphicsObjectGDIP.MeasureString(text, newfont).ToSize();
+            if (!opengl)
+            {
+                return gdiSize;
+            }
+
+            if (text == null || text == "")
+                return new SizeF(0,0);
+
+            float maxy = 1;
+
+            foreach (char cha in text)
+            {
+                int charno = (int)cha;
+
+                int charid = charno ^ (int)(fontsize * 1000) ^ brush.Color.ToArgb();
+
+                if (!charDict.ContainsKey(charid))
+                {
+                    //charbitmaptexid
+
+                    float maxx = this.Width / 150; // for space
+
+                    var pth = new GraphicsPath();
+
+                    if (text != null)
+                        pth.AddString(cha + "", font.FontFamily, 0, fontsize + 5, new Point((int)0, (int)0),
+                            StringFormat.GenericTypographic);
+
+
+                    if (pth.PointCount > 0)
+                    {
+                        foreach (PointF pnt in pth.PathPoints)
+                        {
+                            if (pnt.X > maxx)
+                                maxx = pnt.X;
+
+                            if (pnt.Y > maxy)
+                                maxy = pnt.Y;
+                        }
+                    }
+
+                    var larger = maxx > maxy ? (int)maxx + 1 : (int)maxy + 1;
+
+                    charDict[charid] = new character()
+                    {
+                        bitmap = new Bitmap(NextPowerOf2(larger), NextPowerOf2(larger),
+                            System.Drawing.Imaging.PixelFormat.Format32bppArgb),
+                        size = (int)fontsize,
+                        pth = pth,
+                        height = (int)pth.GetBounds().Height
+                    };
+
+                    charDict[charid].bitmap.MakeTransparent(Color.Transparent);
+
+                    // create bitmap
+                    using (var gfx = Graphics.FromImage(charDict[charid].bitmap))
+                    {
+                        gfx.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+
+                        gfx.DrawPath(this._p, pth);
+
+                        //Draw the face
+
+                        gfx.FillPath(Brushes.White, pth);
+                    }
+                    charDict[charid].width = (int)(maxx + 2);
+
+                    // create texture
+                    int textureId;
+                    GL.TexEnv(TextureEnvTarget.TextureEnv, TextureEnvParameter.TextureEnvMode,
+                        (float)TextureEnvModeCombine.Replace); //Important, or wrong color on some computers
+
+                    Bitmap bitmap = charDict[charid].bitmap;
+                    GL.GenTextures(1, out textureId);
+                    GL.BindTexture(TextureTarget.Texture2D, textureId);
+
+                    BitmapData data = bitmap.LockBits(new System.Drawing.Rectangle(0, 0, bitmap.Width, bitmap.Height),
+                        ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                    GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, data.Width, data.Height, 0,
+                        OpenTK.Graphics.OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, data.Scan0);
+
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter,
+                        (int)TextureMinFilter.Linear);
+                    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,
+                        (int)TextureMagFilter.Linear);
+
+                    //    GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Nearest);
+                    //GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Nearest);
+                    GL.Flush();
+                    bitmap.UnlockBits(data);
+
+                    charDict[charid].gltextureid = textureId;
+
+                    // tweak here for font generation
+                    huddrawtime = 0;
+                }
+
+                float scale = 1.0f;
+
+                x += charDict[charid].width * scale;
+                y = Math.Max(y, charDict[charid].height*scale);
+            }
+            return new SizeF(x, gdiSize.Height);
+        }
+
+
 
         void drawstringGDI(string text, Font font, float fontsize, SolidBrush brush, float x, float y)
         {
