@@ -168,7 +168,7 @@
     <value>0, 0</value>
   </data>
   <data name="annunciator1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1034, 65</value>
+    <value>1034, 58</value>
   </data>
   <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="annunciator1.TabIndex" type="System.Int32, mscorlib">
@@ -223,7 +223,7 @@
     <value>133332, 123</value>
   </data>
   <data name="panel1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1034, 65</value>
+    <value>1034, 58</value>
   </data>
   <data name="panel1.TabIndex" type="System.Int32, mscorlib">
     <value>7</value>

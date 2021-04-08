@@ -795,6 +795,8 @@ namespace MissionPlanner
             ThemeManager.LoadTheme(Settings.Instance["theme"]);
 
             Utilities.ThemeManager.ApplyThemeTo(this);
+            annunciator1.BackColor = ThemeManager.BGColor;
+
 
             MyView = new MainSwitcher(this);
 
@@ -5538,7 +5540,7 @@ namespace MissionPlanner
             MainV2.instance.panel1.Controls.Add(annunciator1);
             annunciator1.Size = MainV2.instance.panel1.Size;
             annunciatorUndocked = false;
-            this.Dispose();
+            (sender as Form).Dispose();
         }
 
 

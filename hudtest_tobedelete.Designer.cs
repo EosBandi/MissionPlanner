@@ -34,9 +34,9 @@ namespace MissionPlanner
             // 
             // hud1
             // 
-            this.hud1.airspeed = 35F;
-            this.hud1.alt = 0F;
-            this.hud1.altunit = "";
+            this.hud1.airspeed = 28F;
+            this.hud1.alt = 25F;
+            this.hud1.altunit = "meter";
             this.hud1.AOA = 0F;
             this.hud1.BackColor = System.Drawing.Color.Black;
             this.hud1.batterycellcount = 0;
@@ -86,19 +86,23 @@ namespace MissionPlanner
             this.hud1.pitch = 0F;
             this.hud1.roll = 15F;
             this.hud1.Russian = false;
-            this.hud1.Size = new System.Drawing.Size(801, 511);
+            this.hud1.Size = new System.Drawing.Size(571, 392);
             this.hud1.skyColor1 = System.Drawing.Color.Blue;
             this.hud1.skyColor2 = System.Drawing.Color.LightBlue;
-            this.hud1.speedunit = "";
+            this.hud1.spdMaxRed = 30F;
+            this.hud1.spdMaxYellow = 26F;
+            this.hud1.spdMinRed = 10F;
+            this.hud1.spdMinYellow = 13F;
+            this.hud1.speedunit = "m/s";
             this.hud1.SSA = 0F;
             this.hud1.status = false;
             this.hud1.sysid = 0F;
             this.hud1.TabIndex = 0;
-            this.hud1.targetalt = 0F;
+            this.hud1.targetalt = 20F;
             this.hud1.targetheading = 0F;
-            this.hud1.targetspeed = 42.5F;
+            this.hud1.targetspeed = 20F;
             this.hud1.turnrate = 0F;
-            this.hud1.verticalspeed = 0F;
+            this.hud1.verticalspeed = 4F;
             this.hud1.vibex = 0F;
             this.hud1.vibey = 0F;
             this.hud1.vibez = 0F;
@@ -110,7 +114,7 @@ namespace MissionPlanner
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(801, 511);
+            this.ClientSize = new System.Drawing.Size(571, 392);
             this.Controls.Add(this.hud1);
             this.Name = "hudtest_tobedelete";
             this.Text = "hudtest_tobedelete";
