@@ -2164,6 +2164,9 @@ namespace MissionPlanner.Controls
 
                     graphicsObject.ResetTransform();
 
+
+
+
                     // draw roll ind needle
 
                     var shiftUp = 10f;
@@ -2190,30 +2193,22 @@ namespace MissionPlanner.Controls
 
                     graphicsObject.FillPolygon(needle, pointlist);
 
-                    pointlist = new Point[4];
-                    pointlist[0] = new Point(-lengthlongex, - extra + 2);
-                    pointlist[1] = new Point(lengthlongex, - extra + 2);
-                    pointlist[2] = new Point(lengthlongex,  - extra + lengthlongex /2 );
-                    pointlist[3] = new Point(-lengthlongex, - extra + lengthlongex /2);
 
+                    //graphicsObject.DrawEllipse(this._redPen,
+                    //    new Rectangle((int)(-halfwidth / 40 - _SSA * every5deg),
+                    //        (int)(-halfwidth / 40 - _AOA * every5deg), halfwidth / 20, halfwidth / 20));
 
-                    graphicsObject.FillPolygon(needle, pointlist);
 
                     graphicsObject.ResetTransform();
-
-
-                    //Draw SSA indicator
-                    //use lenghtlong, exta and lengthlongex from previous block
                     graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2 - shiftUp);
-
-                    pointlist = new Point[3];
-                    pointlist[0] = new Point(0, (-lengthlongex-6) * 2 - extra); // Head of the triangle
-                    pointlist[1] = new Point(-lengthlongex, -lengthlongex * 5 - extra);
-                    pointlist[2] = new Point(lengthlongex, -lengthlongex * 5  - extra);
-
-                    graphicsObject.RotateTransform(_SSA);
-                    graphicsObject.FillPolygon(Brushes.White, pointlist);
-                    graphicsObject.ResetTransform();
+                    pointlist = new Point[4];
+                    pointlist[0] = new Point(-lengthlongex+(lengthlongex / 8), -extra + (lengthlongex/2));
+                    pointlist[1] = new Point(lengthlongex- (lengthlongex / 8), -extra + (lengthlongex/2));
+                    pointlist[2] = new Point(lengthlongex+ (lengthlongex / 2), -extra + lengthlongex + (lengthlongex / 6));
+                    pointlist[3] = new Point(-lengthlongex- (lengthlongex / 2), -extra + lengthlongex + (lengthlongex / 6));
+                    graphicsObject.TranslateTransform(-_SSA * every5deg/3, 0);
+                   graphicsObject.FillPolygon(Brushes.White, pointlist);
+                   graphicsObject.ResetTransform();
 
 
 
@@ -2227,34 +2222,50 @@ namespace MissionPlanner.Controls
                     {
                         graphicsObject.ResetTransform();
                         graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2 - shiftUp);
+
+
                         graphicsObject.RotateTransform(a - _roll);
+                        if (Math.Abs(a) == 30 || Math.Abs(a) == 60)
+                        {
+                            graphicsObject.DrawLine(this._whitePen, 0, -lengthlong * 3 - extra, 0, -lengthlong * 3 - extra - lengthlong*2);
+                        }
+                        else
+                        {
+                            graphicsObject.DrawLine(this._whitePen, 0, -lengthlong * 3 - extra, 0, -lengthlong * 3 - extra - lengthlong);
 
-                        //drawstring(String.Format("{0,2}", Math.Abs(a)), font, fontsize, _whiteBrush,
-                        //    0 - 6 - fontoffset, -lengthlong * 8 - extra-slip);
-
-                        graphicsObject.DrawLine(this._whitePen, 0, -lengthlong * 3 - extra, 0, -lengthlong * 3 - extra - lengthlong);
+                        }
                     }
 
                     graphicsObject.ResetTransform();
                     graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2 - shiftUp);
+                    pointlist = new Point[3];
+                    pointlist[0] = new Point(0, (-lengthlongex-4) * 2 - extra); // Head of the triangle
+                    pointlist[1] = new Point(-lengthlongex, -lengthlongex * 5 - extra);
+                    pointlist[2] = new Point(lengthlongex, -lengthlongex * 5 - extra);
+                    graphicsObject.RotateTransform(-_roll);
+                    graphicsObject.FillPolygon(Brushes.White, pointlist);
+                    graphicsObject.ResetTransform();
+                    graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2 - shiftUp);
+
 
                     // draw roll ind
                     RectangleF arcrect = new RectangleF(-lengthlong * 3 - extra, -lengthlong * 3 - extra,
                         (extra + lengthlong * 3) * 2f, (extra + lengthlong * 3) * 2f);
 
-                    //DrawRectangle(Pens.Beige, arcrect);
-
                     graphicsObject.DrawArc(this._whitePen, arcrect, 180 + 30 + -_roll, 120); // 120
 
                     graphicsObject.ResetTransform();
+
+
+
+
+
+
 
                     //draw centre / current att
 
                     graphicsObject.TranslateTransform(this.Width / 2, this.Height / 2); //  +this.Height / 14);
 
-                    // plane wings
-                    if (Russian)
-                        graphicsObject.RotateTransform(-_roll);
 
                     Rectangle centercircle = new Rectangle(-halfwidth / 2, -halfwidth / 2, halfwidth, halfwidth);
 
