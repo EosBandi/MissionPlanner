@@ -244,9 +244,10 @@ namespace MissionPlanner.Utilities
                         xmax = Math.Max(Math.Max(Math.Max(pnt.Lng, pnt2.Lng), pnt3.Lng), pnt4.Lng);
                     }
 
+                    
 
-
-                    Area = new RectLatLng(ymax, xmin, xmax - xmin, ymax - ymin);
+                        Area = new RectLatLng(y, x, width*xscale, height*yscale);
+                    }
 
                     log.InfoFormat("Coverage {0}", Area.ToString());
 
