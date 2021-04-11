@@ -27,7 +27,7 @@ namespace MissionPlanner.Maps
 
             //create a new Bitmap
             Bitmap bmp = new Bitmap(imageData.GetLength(0), imageData.GetLength(1), PixelFormat.Format32bppArgb);
-            
+
             //lock it to get the BitmapData Object
             BitmapData bmData =
                 bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
@@ -44,7 +44,7 @@ namespace MissionPlanner.Maps
             }
 
             //copy the bytes
-            System.Runtime.InteropServices.Marshal.Copy(pixels, 0, bmData.Scan0, (bmData.Stride/4) * bmData.Height);            
+            System.Runtime.InteropServices.Marshal.Copy(pixels, 0, bmData.Scan0, (bmData.Stride/4) * bmData.Height);
 
             //never forget to unlock the bitmap
             bmp.UnlockBits(bmData);
@@ -99,8 +99,14 @@ namespace MissionPlanner.Maps
 
         int ConvertColor(byte incol)
         {
+
+
+
             if (incol == 0 || incol == 255)
                 return transparent;
+
+            if (incol == 1) return Color.FromArgb(60,Color.Gold).ToArgb();
+            if (incol == 2) return Color.FromArgb(60,Color.Red).ToArgb();
 
             return pal.Entries[incol].ToArgb();
         }

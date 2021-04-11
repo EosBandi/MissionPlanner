@@ -254,12 +254,18 @@ namespace MissionPlanner.Maps
                                         {
                                             var rel = altasl - alts[x, y];
 
-                                            var normvalue = normalize(rel);
+                                            byte gradcolor = 0;
 
-                                            var gradcolor = (byte)(((1-normvalue) * 254));
+                                            if (altasl == 0) gradcolor = 0;
+                                            else if (rel < 20) gradcolor = 2;
+                                            else if (rel < 50) gradcolor = 1;
 
-                                            if (alts[x, y] < -999)
-                                                gradcolor = 0;
+                                            //var normvalue = normalize(rel);
+
+                                            //var gradcolor = (byte)(((1-normvalue) * 254));
+
+                                            //if (alts[x, y] < -999)
+                                            //    gradcolor = 0;
 
                                             //Square pattern
                                             for (var i = -res / 2; i <= res / 2; i++)
