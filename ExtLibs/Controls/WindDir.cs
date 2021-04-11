@@ -17,6 +17,9 @@ namespace MissionPlanner.Controls
             InitializeComponent();
             this.BackColor = Color.Transparent;
             this.DoubleBuffered = true;
+            this.Width = 75;
+            this.Height = 40;
+
 
         }
 
@@ -35,81 +38,47 @@ namespace MissionPlanner.Controls
         Pen blackpen = new Pen(Color.Black,2);
         Pen redpen = new Pen(Color.Red, 2);
 
+
+
+
         protected override void OnPaint(PaintEventArgs e)
         {
-           // e.Graphics.Clear(Color.Transparent);
+            e.Graphics.Clear(Color.DarkSlateGray);
 
-            try
-            {
-
-               // Bitmap bg = new Bitmap(this.Width, this.Height);
-
-                //this.Visible = false;
-
-               // this.Parent.DrawToBitmap(bg, this.ClientRectangle);
-
-               // this.BackgroundImage = bg;
-
-                //this.Visible = true;
-            }
-            catch { }
 
             if (_direction > 360)
                 _direction = _direction % 360;
 
             base.OnPaint(e);
 
-            //Rectangle outside = new Rectangle(1,1,this.Width - 3, this.Height -3);
 
-            //e.Graphics.DrawArc(blackpen, outside, 0, 360);
+            var r = ClientRectangle;
+            r.X += 1;
+            r.Y += 1;
+            r.Width -= 3;
+            r.Height -= 3;
+            var g = GetRoundRectagle(r, 10);
+            e.Graphics.DrawPath(Pens.Gray, g);
 
-            //Rectangle inside = new Rectangle(this.Width / 4,this.Height / 4, (this.Width/4) * 2,(this.Height / 4) * 2);
+            Font f = new Font("Arial", 12, FontStyle.Bold);
 
-            //e.Graphics.DrawArc(blackpen, inside, 0, 360);
+            e.Graphics.DrawString(((int)Speed).ToString("D2"), f, Brushes.White, this.Width - 30, 2);
+            e.Graphics.DrawString(((int)Direction).ToString("D3") + "°", f, Brushes.White, this.Width -39, 18);
+            e.Graphics.TranslateTransform(17.5f, 20);
 
-            double x = (this.Width / 2) * Math.Cos((_direction - 90) * deg2rad);
-
-            double y = (this.Height / 2) * Math.Sin((_direction-90) * deg2rad);
-
-            // full scale is 10ms
-
-            double scale = Math.Max(maxspeed, Speed);
-
-            e.Graphics.DrawString(Speed.ToString("0"), this.Font, Brushes.Red, (float)5, (float)5);
-
-
-
-            x = x / scale * Speed;
-            y = y / scale * Speed;
-
-            if (x != 0 || y != 0)
-            {
-                float outx =  (float)(this.Width / 2 + x);
-                float outy =  (float)(this.Height / 2 + y);
-
-                //line
-                e.Graphics.DrawLine(redpen, this.Width / 2, this.Height / 2,outx,outy);
-
-                // arrow
-
-                float x1 = (this.Width / 7) * (float)Math.Cos((_direction - 60) * deg2rad);
-                float y1 = (this.Height / 7) * (float)Math.Sin((_direction - 60) * deg2rad);
-
-                e.Graphics.DrawLine(redpen, outx, outy, outx - x1, outy - y1);
-
-                x1 = (this.Width / 7) * (float)Math.Cos((_direction + 60 + 180) * deg2rad);
-                y1 = (this.Height / 7) * (float)Math.Sin((_direction + 60 + 180) * deg2rad);
-
-                e.Graphics.DrawLine(redpen, outx, outy, outx - x1, outy - y1);
-            }
-
+            Point[] arrow = new Point[3];
+            arrow[0] = new Point(0, -12);
+            arrow[1] = new Point(-5, 8);
+            arrow[2] = new Point(5, 8);
+            e.Graphics.RotateTransform((float)_direction);
+            e.Graphics.FillPolygon(Brushes.White, arrow);
         }
 
         protected override void OnPaintBackground(PaintEventArgs e)
         {
 
+            e.Graphics.Clear(Color.DarkSlateGray);
             base.OnPaintBackground(e);
-            //e.Graphics.Clear(Color.Transparent);
         }
 
         protected override void WndProc(ref Message m)
@@ -119,17 +88,8 @@ namespace MissionPlanner.Controls
 
 
         // Rounded corners
-        private int radius = 10;
-        [DefaultValue(20)]
-        public int Radius
-        {
-            get { return radius; }
-            set
-            {
-                radius = value;
-                this.RecreateRegion();
-            }
-        }
+        private int radius = 5;
+
 
         [System.Runtime.InteropServices.DllImport("gdi32.dll")]
         private static extern IntPtr CreateRoundRectRgn(int nLeftRect, int nTopRect,
@@ -153,7 +113,7 @@ namespace MissionPlanner.Controls
             var bounds = ClientRectangle;
 
             this.Region = Region.FromHrgn(CreateRoundRectRgn(bounds.Left, bounds.Top,
-                bounds.Right, bounds.Bottom, Radius, radius));
+                bounds.Right, bounds.Bottom, radius, radius));
             this.Invalidate();
         }
 
