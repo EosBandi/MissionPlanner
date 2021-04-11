@@ -84,9 +84,9 @@ namespace MissionPlanner
             this.hud1.navpitch = 0F;
             this.hud1.navroll = 0F;
             this.hud1.pitch = 0F;
-            this.hud1.roll = 15F;
+            this.hud1.roll = 40F;
             this.hud1.Russian = false;
-            this.hud1.Size = new System.Drawing.Size(729, 499);
+            this.hud1.Size = new System.Drawing.Size(903, 633);
             this.hud1.skyColor1 = System.Drawing.Color.Blue;
             this.hud1.skyColor2 = System.Drawing.Color.LightBlue;
             this.hud1.spdMaxRed = 30F;
@@ -114,7 +114,7 @@ namespace MissionPlanner
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(729, 499);
+            this.ClientSize = new System.Drawing.Size(903, 633);
             this.Controls.Add(this.hud1);
             this.Name = "hudtest_tobedelete";
             this.Text = "hudtest_tobedelete";
