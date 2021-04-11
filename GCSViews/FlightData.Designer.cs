@@ -2414,7 +2414,6 @@
             this.windDir1.Direction = 180D;
             resources.ApplyResources(this.windDir1, "windDir1");
             this.windDir1.Name = "windDir1";
-            this.windDir1.Radius = 30;
             this.windDir1.Speed = 0D;
             // 
             // bindingSource1
