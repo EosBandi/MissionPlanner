@@ -19,6 +19,21 @@ namespace MissionPlanner.Controls
         public event EventHandler buttonClicked;
         public event EventHandler undock;
 
+
+        private bool _contextMenuEnabled;
+
+        public bool contextMenuEnabled
+        {
+            get { return _contextMenuEnabled; }
+            set
+            {
+                _contextMenuEnabled = value;
+                contextMenu1.MenuItems[0].Visible = value;
+            }
+        }
+
+
+        public bool isSingleLine = true;
         private string _clickedButtonName;
 
         public string clickedButtonName
@@ -75,6 +90,35 @@ namespace MissionPlanner.Controls
                 timer1.Enabled = true;
             }
         }
+
+
+        private void doResize()
+        {
+            if (panelItems.Count == 0) return;
+
+            var w = (this.Width) / panelItems.Count - 2;
+            var h = this.Height;
+            var a = 0;
+
+            foreach (panelItem i in panelItems)
+            {
+                i.btn.Size = new Size(w, h);
+                i.btn.Location = new Point(a++ * (w), 0);
+            }
+        }
+
+
+        protected override void OnResize(EventArgs e)
+        {
+            this.SuspendLayout();
+            layoutPanel.Size = new Size(this.Width, this.Height);
+
+            if (isSingleLine) doResize();
+            //this.Invalidate();
+            this.ResumeLayout();
+        }
+
+
 
         public void setPanels(string[] panelNames, string[] panelLabels)
         {

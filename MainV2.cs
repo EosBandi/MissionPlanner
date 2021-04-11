@@ -5522,22 +5522,32 @@ namespace MissionPlanner
         private void annunciator1_undock(object sender, EventArgs e)
         {
             annunciatorForm = new FloatingForm();
+            annunciatorForm.Text = "PlaneStatus";
             annunciatorForm.Size = new Size(300,450 );
-            annunciatorForm.Text = "Plane Status (Plane 1)";
+            annunciatorForm.RestoreStartupLocation();
             MainV2.instance.panel1.Controls.Remove(annunciator1);
-            annunciator1.Size = annunciatorForm.ClientSize;
-            annunciator1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            annunciator1.isSingleLine = false;
+            panel1.Dock = DockStyle.None;
+            panel1.Visible = false;
+            annunciator1.contextMenuEnabled = false;
+            annunciator1.Size = annunciatorForm.Size;
+            //annunciator1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             annunciatorForm.Controls.Add(annunciator1);
             annunciatorForm.FormClosed += dropoutQuick_FormClosed;
-            annunciatorForm.RestoreStartupLocation();
             annunciatorUndocked = true;
+            annunciator1.Invalidate();
             annunciatorForm.Show();
         }
+           
 
         void dropoutQuick_FormClosed(object sender, FormClosedEventArgs e)
         {
             (sender as Form).SaveStartupLocation();
+            annunciator1.isSingleLine = true;
+            annunciator1.contextMenuEnabled = true;
             MainV2.instance.panel1.Controls.Add(annunciator1);
+            panel1.Dock = DockStyle.Top;
+            panel1.Visible = true;
             annunciator1.Size = MainV2.instance.panel1.Size;
             annunciatorUndocked = false;
             (sender as Form).Dispose();
