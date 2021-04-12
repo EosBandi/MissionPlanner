@@ -43,7 +43,7 @@ namespace MissionPlanner
             this.connectionOptionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.connectionListToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.annunciator1 = new MissionPlanner.Controls.annunciator(16, new System.Drawing.Size(83, 54));
+            this.annunciator1 = new MissionPlanner.Controls.annunciator(17, new System.Drawing.Size(70, 52));
             this.status1 = new MissionPlanner.Controls.Status();
             this.connectionControl1 = new MissionPlanner.Controls.ConnectionControl();
             this.MenuConnect = new MissionPlanner.Controls.MyButton();

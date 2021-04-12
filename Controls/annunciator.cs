@@ -97,7 +97,7 @@ namespace MissionPlanner.Controls
             if (panelItems.Count == 0) return;
 
             var w = (this.Width) / panelItems.Count - 2;
-            var h = this.Height;
+            var h = this.Height -1 ;
             var a = 0;
 
             foreach (panelItem i in panelItems)

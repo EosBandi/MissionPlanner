@@ -183,29 +183,16 @@
             this.onOffCameraOverlapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.altitudeAngelSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.undockDockToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
+            this.bHideComm = new MissionPlanner.Controls.MyButton();
+            this.CHK_autopan = new System.Windows.Forms.CheckBox();
+            this.CB_tuning = new System.Windows.Forms.CheckBox();
             this.but_disablejoystick = new MissionPlanner.Controls.MyButton();
-            this.distanceBar1 = new MissionPlanner.Controls.DistanceBar();
+            this.myButton8 = new MissionPlanner.Controls.MyButton();
             this.windDir1 = new MissionPlanner.Controls.WindDir();
             this.bindingSource1 = new System.Windows.Forms.BindingSource(this.components);
-            this.label6 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.lbl_hdop = new MissionPlanner.Controls.MyLabel();
-            this.lbl_sats = new MissionPlanner.Controls.MyLabel();
             this.gMapControl1 = new MissionPlanner.Controls.myGMAP();
             this.TRK_zoom = new MissionPlanner.Controls.MyTrackBar();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.btnMotorMax = new MissionPlanner.Controls.MyButton();
-            this.bCatapultAllocated = new MissionPlanner.Controls.MyButton();
-            this.myButton8 = new MissionPlanner.Controls.MyButton();
-            this.bCatapultReady = new MissionPlanner.Controls.MyButton();
-            this.bHideComm = new MissionPlanner.Controls.MyButton();
-            this.coords1 = new MissionPlanner.Controls.Coords();
-            this.Zoomlevel = new System.Windows.Forms.NumericUpDown();
-            this.label1 = new MissionPlanner.Controls.MyLabel();
-            this.CHK_autopan = new System.Windows.Forms.CheckBox();
-            this.CB_tuning = new System.Windows.Forms.CheckBox();
             this.ZedGraphTimer = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.openScriptDialog = new System.Windows.Forms.OpenFileDialog();
@@ -213,6 +200,15 @@
             this.Messagetabtimer = new System.Windows.Forms.Timer(this.components);
             this.bindingSourceGaugesTab = new System.Windows.Forms.BindingSource(this.components);
             this.bindingSourceStatusTab = new System.Windows.Forms.BindingSource(this.components);
+            this.myButtonSettings = new MissionPlanner.Controls.myButtonNoTheme();
+            this.botMenuLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.myButtonNoTheme2 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme3 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme4 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme5 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme6 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme7 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme8 = new MissionPlanner.Controls.myButtonNoTheme();
             ((System.ComponentModel.ISupportInitialize)(this.MainH)).BeginInit();
             this.MainH.Panel1.SuspendLayout();
             this.MainH.Panel2.SuspendLayout();
@@ -266,9 +262,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TRK_zoom)).BeginInit();
             this.panel1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Zoomlevel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceGaugesTab)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceStatusTab)).BeginInit();
+            this.botMenuLayout.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainH
@@ -2222,15 +2218,12 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.ContextMenuStrip = this.contextMenuStripMap;
+            this.splitContainer1.Panel2.Controls.Add(this.bHideComm);
+            this.splitContainer1.Panel2.Controls.Add(this.CHK_autopan);
+            this.splitContainer1.Panel2.Controls.Add(this.CB_tuning);
             this.splitContainer1.Panel2.Controls.Add(this.but_disablejoystick);
-            this.splitContainer1.Panel2.Controls.Add(this.distanceBar1);
+            this.splitContainer1.Panel2.Controls.Add(this.myButton8);
             this.splitContainer1.Panel2.Controls.Add(this.windDir1);
-            this.splitContainer1.Panel2.Controls.Add(this.label6);
-            this.splitContainer1.Panel2.Controls.Add(this.label5);
-            this.splitContainer1.Panel2.Controls.Add(this.label3);
-            this.splitContainer1.Panel2.Controls.Add(this.label4);
-            this.splitContainer1.Panel2.Controls.Add(this.lbl_hdop);
-            this.splitContainer1.Panel2.Controls.Add(this.lbl_sats);
             this.splitContainer1.Panel2.Controls.Add(this.gMapControl1);
             this.splitContainer1.Panel2.Controls.Add(this.TRK_zoom);
             // 
@@ -2388,6 +2381,31 @@
             resources.ApplyResources(this.undockDockToolStripMenuItem2, "undockDockToolStripMenuItem2");
             this.undockDockToolStripMenuItem2.Click += new System.EventHandler(this.undockDockToolStripMenuItem2_Click);
             // 
+            // bHideComm
+            // 
+            resources.ApplyResources(this.bHideComm, "bHideComm");
+            this.bHideComm.Name = "bHideComm";
+            this.bHideComm.UseVisualStyleBackColor = true;
+            this.bHideComm.Click += new System.EventHandler(this.bHideComm_Click);
+            // 
+            // CHK_autopan
+            // 
+            resources.ApplyResources(this.CHK_autopan, "CHK_autopan");
+            this.CHK_autopan.Checked = true;
+            this.CHK_autopan.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CHK_autopan.Name = "CHK_autopan";
+            this.toolTip1.SetToolTip(this.CHK_autopan, resources.GetString("CHK_autopan.ToolTip"));
+            this.CHK_autopan.UseVisualStyleBackColor = true;
+            this.CHK_autopan.CheckedChanged += new System.EventHandler(this.CHK_autopan_CheckedChanged);
+            // 
+            // CB_tuning
+            // 
+            resources.ApplyResources(this.CB_tuning, "CB_tuning");
+            this.CB_tuning.Name = "CB_tuning";
+            this.toolTip1.SetToolTip(this.CB_tuning, resources.GetString("CB_tuning.ToolTip"));
+            this.CB_tuning.UseVisualStyleBackColor = true;
+            this.CB_tuning.CheckedChanged += new System.EventHandler(this.CB_tuning_CheckedChanged);
+            // 
             // but_disablejoystick
             // 
             this.but_disablejoystick.ColorMouseDown = System.Drawing.Color.Empty;
@@ -2398,13 +2416,12 @@
             this.but_disablejoystick.UseVisualStyleBackColor = true;
             this.but_disablejoystick.Click += new System.EventHandler(this.but_disablejoystick_Click);
             // 
-            // distanceBar1
+            // myButton8
             // 
-            resources.ApplyResources(this.distanceBar1, "distanceBar1");
-            this.distanceBar1.BackColor = System.Drawing.Color.Transparent;
-            this.distanceBar1.Name = "distanceBar1";
-            this.distanceBar1.totaldist = 100F;
-            this.distanceBar1.traveleddist = 0F;
+            resources.ApplyResources(this.myButton8, "myButton8");
+            this.myButton8.Name = "myButton8";
+            this.myButton8.UseVisualStyleBackColor = true;
+            this.myButton8.Click += new System.EventHandler(this.myButton8_Click);
             // 
             // windDir1
             // 
@@ -2419,51 +2436,6 @@
             // bindingSource1
             // 
             this.bindingSource1.DataSource = typeof(MissionPlanner.CurrentState);
-            // 
-            // label6
-            // 
-            resources.ApplyResources(this.label6, "label6");
-            this.label6.BackColor = System.Drawing.Color.Black;
-            this.label6.ForeColor = System.Drawing.Color.White;
-            this.label6.Name = "label6";
-            this.label6.Tag = "custom";
-            // 
-            // label5
-            // 
-            resources.ApplyResources(this.label5, "label5");
-            this.label5.ForeColor = System.Drawing.Color.Green;
-            this.label5.Name = "label5";
-            this.label5.Tag = "custom";
-            // 
-            // label3
-            // 
-            resources.ApplyResources(this.label3, "label3");
-            this.label3.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
-            this.label3.Name = "label3";
-            this.label3.Tag = "custom";
-            // 
-            // label4
-            // 
-            resources.ApplyResources(this.label4, "label4");
-            this.label4.ForeColor = System.Drawing.Color.Red;
-            this.label4.Name = "label4";
-            this.label4.Tag = "custom";
-            // 
-            // lbl_hdop
-            // 
-            resources.ApplyResources(this.lbl_hdop, "lbl_hdop");
-            this.lbl_hdop.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource1, "gpshdop", true, System.Windows.Forms.DataSourceUpdateMode.Never, null, "hdop: 0.0"));
-            this.lbl_hdop.Name = "lbl_hdop";
-            this.lbl_hdop.resize = true;
-            this.toolTip1.SetToolTip(this.lbl_hdop, resources.GetString("lbl_hdop.ToolTip"));
-            // 
-            // lbl_sats
-            // 
-            resources.ApplyResources(this.lbl_sats, "lbl_sats");
-            this.lbl_sats.DataBindings.Add(new System.Windows.Forms.Binding("Text", this.bindingSource1, "satcount", true, System.Windows.Forms.DataSourceUpdateMode.Never, null, "Sats: 0"));
-            this.lbl_sats.Name = "lbl_sats";
-            this.lbl_sats.resize = true;
-            this.toolTip1.SetToolTip(this.lbl_sats, resources.GetString("lbl_sats.ToolTip"));
             // 
             // gMapControl1
             // 
@@ -2513,118 +2485,8 @@
             // panel1
             // 
             resources.ApplyResources(this.panel1, "panel1");
-            this.panel1.Controls.Add(this.btnMotorMax);
-            this.panel1.Controls.Add(this.bCatapultAllocated);
-            this.panel1.Controls.Add(this.myButton8);
-            this.panel1.Controls.Add(this.bCatapultReady);
-            this.panel1.Controls.Add(this.bHideComm);
-            this.panel1.Controls.Add(this.coords1);
-            this.panel1.Controls.Add(this.Zoomlevel);
-            this.panel1.Controls.Add(this.label1);
-            this.panel1.Controls.Add(this.CHK_autopan);
-            this.panel1.Controls.Add(this.CB_tuning);
+            this.panel1.Controls.Add(this.botMenuLayout);
             this.panel1.Name = "panel1";
-            // 
-            // btnMotorMax
-            // 
-            resources.ApplyResources(this.btnMotorMax, "btnMotorMax");
-            this.btnMotorMax.Name = "btnMotorMax";
-            this.btnMotorMax.UseVisualStyleBackColor = true;
-            this.btnMotorMax.Click += new System.EventHandler(this.btnMotorMax_Click);
-            // 
-            // bCatapultAllocated
-            // 
-            resources.ApplyResources(this.bCatapultAllocated, "bCatapultAllocated");
-            this.bCatapultAllocated.Name = "bCatapultAllocated";
-            this.bCatapultAllocated.UseVisualStyleBackColor = true;
-            this.bCatapultAllocated.Click += new System.EventHandler(this.bCatapultAllocated_Click);
-            // 
-            // myButton8
-            // 
-            resources.ApplyResources(this.myButton8, "myButton8");
-            this.myButton8.Name = "myButton8";
-            this.myButton8.UseVisualStyleBackColor = true;
-            this.myButton8.Click += new System.EventHandler(this.myButton8_Click);
-            // 
-            // bCatapultReady
-            // 
-            resources.ApplyResources(this.bCatapultReady, "bCatapultReady");
-            this.bCatapultReady.Name = "bCatapultReady";
-            this.bCatapultReady.UseVisualStyleBackColor = true;
-            this.bCatapultReady.Click += new System.EventHandler(this.bCatapultReady_Click);
-            // 
-            // bHideComm
-            // 
-            resources.ApplyResources(this.bHideComm, "bHideComm");
-            this.bHideComm.Name = "bHideComm";
-            this.bHideComm.UseVisualStyleBackColor = true;
-            this.bHideComm.Click += new System.EventHandler(this.bHideComm_Click);
-            // 
-            // coords1
-            // 
-            this.coords1.Alt = 0D;
-            this.coords1.AltSource = "";
-            this.coords1.AltUnit = "m";
-            this.coords1.DataBindings.Add(new System.Windows.Forms.Binding("Alt", this.bindingSource1, "alt", true));
-            this.coords1.DataBindings.Add(new System.Windows.Forms.Binding("Lat", this.bindingSource1, "lat", true));
-            this.coords1.DataBindings.Add(new System.Windows.Forms.Binding("Lng", this.bindingSource1, "lng", true));
-            this.coords1.Lat = 0D;
-            this.coords1.Lng = 0D;
-            resources.ApplyResources(this.coords1, "coords1");
-            this.coords1.Name = "coords1";
-            this.coords1.Vertical = false;
-            // 
-            // Zoomlevel
-            // 
-            resources.ApplyResources(this.Zoomlevel, "Zoomlevel");
-            this.Zoomlevel.DecimalPlaces = 1;
-            this.Zoomlevel.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-            this.Zoomlevel.Maximum = new decimal(new int[] {
-            18,
-            0,
-            0,
-            0});
-            this.Zoomlevel.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.Zoomlevel.Name = "Zoomlevel";
-            this.toolTip1.SetToolTip(this.Zoomlevel, resources.GetString("Zoomlevel.ToolTip"));
-            this.Zoomlevel.Value = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
-            this.Zoomlevel.ValueChanged += new System.EventHandler(this.Zoomlevel_ValueChanged);
-            // 
-            // label1
-            // 
-            resources.ApplyResources(this.label1, "label1");
-            this.label1.Name = "label1";
-            this.label1.resize = false;
-            // 
-            // CHK_autopan
-            // 
-            resources.ApplyResources(this.CHK_autopan, "CHK_autopan");
-            this.CHK_autopan.Checked = true;
-            this.CHK_autopan.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.CHK_autopan.Name = "CHK_autopan";
-            this.toolTip1.SetToolTip(this.CHK_autopan, resources.GetString("CHK_autopan.ToolTip"));
-            this.CHK_autopan.UseVisualStyleBackColor = true;
-            this.CHK_autopan.CheckedChanged += new System.EventHandler(this.CHK_autopan_CheckedChanged);
-            // 
-            // CB_tuning
-            // 
-            resources.ApplyResources(this.CB_tuning, "CB_tuning");
-            this.CB_tuning.Name = "CB_tuning";
-            this.toolTip1.SetToolTip(this.CB_tuning, resources.GetString("CB_tuning.ToolTip"));
-            this.CB_tuning.UseVisualStyleBackColor = true;
-            this.CB_tuning.CheckedChanged += new System.EventHandler(this.CB_tuning_CheckedChanged);
             // 
             // ZedGraphTimer
             // 
@@ -2655,6 +2517,71 @@
             // bindingSourceStatusTab
             // 
             this.bindingSourceStatusTab.DataSource = typeof(MissionPlanner.CurrentState);
+            // 
+            // myButtonSettings
+            // 
+            this.myButtonSettings.BGGradBot = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            this.myButtonSettings.BGGradTop = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
+            resources.ApplyResources(this.myButtonSettings, "myButtonSettings");
+            this.myButtonSettings.ForeColor = System.Drawing.Color.White;
+            this.myButtonSettings.Name = "myButtonSettings";
+            this.myButtonSettings.TextColor = System.Drawing.Color.White;
+            this.myButtonSettings.UseVisualStyleBackColor = true;
+            // 
+            // botMenuLayout
+            // 
+            resources.ApplyResources(this.botMenuLayout, "botMenuLayout");
+            this.botMenuLayout.Controls.Add(this.myButtonSettings, 0, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme2, 1, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme3, 2, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme4, 3, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme5, 4, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme6, 5, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme7, 6, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme8, 7, 0);
+            this.botMenuLayout.Name = "botMenuLayout";
+            // 
+            // myButtonNoTheme2
+            // 
+            resources.ApplyResources(this.myButtonNoTheme2, "myButtonNoTheme2");
+            this.myButtonNoTheme2.Name = "myButtonNoTheme2";
+            this.myButtonNoTheme2.UseVisualStyleBackColor = true;
+            // 
+            // myButtonNoTheme3
+            // 
+            resources.ApplyResources(this.myButtonNoTheme3, "myButtonNoTheme3");
+            this.myButtonNoTheme3.Name = "myButtonNoTheme3";
+            this.myButtonNoTheme3.UseVisualStyleBackColor = true;
+            // 
+            // myButtonNoTheme4
+            // 
+            resources.ApplyResources(this.myButtonNoTheme4, "myButtonNoTheme4");
+            this.myButtonNoTheme4.Name = "myButtonNoTheme4";
+            this.myButtonNoTheme4.UseVisualStyleBackColor = true;
+            // 
+            // myButtonNoTheme5
+            // 
+            resources.ApplyResources(this.myButtonNoTheme5, "myButtonNoTheme5");
+            this.myButtonNoTheme5.Name = "myButtonNoTheme5";
+            this.myButtonNoTheme5.UseVisualStyleBackColor = true;
+            // 
+            // myButtonNoTheme6
+            // 
+            resources.ApplyResources(this.myButtonNoTheme6, "myButtonNoTheme6");
+            this.myButtonNoTheme6.Name = "myButtonNoTheme6";
+            this.myButtonNoTheme6.UseVisualStyleBackColor = true;
+            // 
+            // myButtonNoTheme7
+            // 
+            resources.ApplyResources(this.myButtonNoTheme7, "myButtonNoTheme7");
+            this.myButtonNoTheme7.Name = "myButtonNoTheme7";
+            this.myButtonNoTheme7.UseVisualStyleBackColor = true;
+            // 
+            // myButtonNoTheme8
+            // 
+            resources.ApplyResources(this.myButtonNoTheme8, "myButtonNoTheme8");
+            this.myButtonNoTheme8.Name = "myButtonNoTheme8";
+            this.myButtonNoTheme8.UseVisualStyleBackColor = true;
             // 
             // FlightData
             // 
@@ -2728,10 +2655,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TRK_zoom)).EndInit();
             this.panel1.ResumeLayout(false);
-            this.panel1.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Zoomlevel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceGaugesTab)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceStatusTab)).EndInit();
+            this.botMenuLayout.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -2756,8 +2682,6 @@
         private Controls.MyButton BUT_loadtelem;
         private System.Windows.Forms.TableLayoutPanel tableMap;
         private System.Windows.Forms.Panel panel1;
-        private System.Windows.Forms.NumericUpDown Zoomlevel;
-        private Controls.MyLabel label1;
         private System.Windows.Forms.CheckBox CHK_autopan;
         public Controls.myGMAP gMapControl1;
         private ZedGraph.ZedGraphControl zg1;
@@ -2778,8 +2702,6 @@
         private Controls.MyLabel lbl_logpercent;
         private System.Windows.Forms.ToolStripMenuItem pointCameraHereToolStripMenuItem;
         private System.Windows.Forms.SplitContainer splitContainer1;
-        private Controls.MyLabel lbl_hdop;
-        private Controls.MyLabel lbl_sats;
         private Controls.MyLabel lbl_playbackspeed;
         private System.Windows.Forms.ToolStripMenuItem setAspectRatioToolStripMenuItem;
         public System.Windows.Forms.TabPage tabQuick;
@@ -2823,10 +2745,6 @@
         private System.Windows.Forms.Label label2;
         public System.Windows.Forms.TabPage tablogbrowse;
         private Controls.MyButton BUT_logbrowse;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
         public System.Windows.Forms.TabPage tabScripts;
         private Controls.MyButton BUT_edit_selected;
         private System.Windows.Forms.Label labelSelectedScript;
@@ -2844,7 +2762,6 @@
         private System.Windows.Forms.BindingSource bindingSourceStatusTab;
         private System.Windows.Forms.BindingSource bindingSourceGaugesTab;
         private System.Windows.Forms.ToolStripMenuItem setHomeHereToolStripMenuItem;
-        private MissionPlanner.Controls.Coords coords1;
         private Controls.MyButton BUT_matlab;
         private System.Windows.Forms.ComboBox CMB_mountmode;
         private Controls.MyButton BUT_mountmode;
@@ -2864,7 +2781,6 @@
         private System.Windows.Forms.ToolStripMenuItem addPoiToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem deleteToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveFileToolStripMenuItem;
-        private Controls.DistanceBar distanceBar1;
         private System.Windows.Forms.ToolStripMenuItem takeOffToolStripMenuItem;
         private Controls.MyButton BUT_resumemis;
         public System.Windows.Forms.TabPage tabPagePreFlight;
@@ -2934,7 +2850,6 @@
         private System.Windows.Forms.Button bFCClear;
         private System.Windows.Forms.Button bFCExecute;
         private Controls.MyButton bHideComm;
-        private Controls.MyButton bCatapultReady;
         private Controls.MyButton myButton8;
         private System.Windows.Forms.ToolStripMenuItem undockToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip contextMenuStripPayloadControl;
@@ -2942,7 +2857,14 @@
         private System.Windows.Forms.ContextMenuStrip contextMenuStripFlightControl;
         private System.Windows.Forms.ToolStripMenuItem undockDockToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem undockDockToolStripMenuItem2;
-        private Controls.MyButton bCatapultAllocated;
-        private Controls.MyButton btnMotorMax;
+        private System.Windows.Forms.TableLayoutPanel botMenuLayout;
+        private Controls.myButtonNoTheme myButtonSettings;
+        private Controls.myButtonNoTheme myButtonNoTheme2;
+        private Controls.myButtonNoTheme myButtonNoTheme3;
+        private Controls.myButtonNoTheme myButtonNoTheme4;
+        private Controls.myButtonNoTheme myButtonNoTheme5;
+        private Controls.myButtonNoTheme myButtonNoTheme6;
+        private Controls.myButtonNoTheme myButtonNoTheme7;
+        private Controls.myButtonNoTheme myButtonNoTheme8;
     }
 }

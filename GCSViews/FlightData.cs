@@ -114,7 +114,7 @@ namespace MissionPlanner.GCSViews
         bool playingLog;
         GMapOverlay polygons;
         private Propagation prop;
-        
+
         GMapRoute route;
         GMapOverlay routes;
         GMapOverlay adsbais;
@@ -333,7 +333,7 @@ namespace MissionPlanner.GCSViews
             hud1.altunit = CurrentState.AltUnit;
             hud1.speedunit = CurrentState.SpeedUnit;
             hud1.distunit = CurrentState.DistanceUnit;
-            coords1.AltUnit = CurrentState.AltUnit;
+            //coords1.AltUnit = CurrentState.AltUnit;
 
             if (MainV2.MONO)
             {
@@ -359,7 +359,7 @@ namespace MissionPlanner.GCSViews
                     if (ctls.Length > 0)
                     {
                         QuickView QV = (QuickView) ctls[0];
-                        
+
                         // set description and unit
                         string desc = Settings.Instance["quickView" + f];
                         if (QV.Tag == null)
@@ -417,16 +417,12 @@ namespace MissionPlanner.GCSViews
                     if (Math.Round(Settings.Instance.GetDouble("maplast_lat"), 1) == 0)
                     {
                         // no zoom in
-                        Zoomlevel.Value = 3;
                         TRK_zoom.Value = 3;
                     }
                     else
                     {
                         var zoom = Settings.Instance.GetFloat("maplast_zoom");
-                        if (Zoomlevel.Maximum < (decimal) zoom)
-                            zoom = (float) Zoomlevel.Maximum;
-                        Zoomlevel.Value = (decimal) zoom;
-                        TRK_zoom.Value = (float) Zoomlevel.Value;
+                        TRK_zoom.Value = (float)zoom;
                     }
                 }
                 catch
@@ -2123,9 +2119,6 @@ namespace MissionPlanner.GCSViews
 
             gMapControl1.EmptyTileColor = Color.Gray;
 
-            Zoomlevel.Minimum = gMapControl1.MapProvider.MinZoom;
-            Zoomlevel.Maximum = 24;
-            Zoomlevel.Value = Convert.ToDecimal(gMapControl1.Zoom);
 
             var item1 = ParameterMetaDataRepository.GetParameterOptionsInt("MNT_MODE",
                 MainV2.comPort.MAV.cs.firmware.ToString());
@@ -2437,7 +2430,6 @@ namespace MissionPlanner.GCSViews
             {
                 // Exception System.Runtime.InteropServices.SEHException: External component has thrown an exception.
                 TRK_zoom.Value = (float) gMapControl1.Zoom;
-                Zoomlevel.Value = Convert.ToDecimal(gMapControl1.Zoom);
             }
             catch
             {
@@ -3202,7 +3194,7 @@ namespace MissionPlanner.GCSViews
 
                                 try
                                 {
-                                    distanceBar1.ClearWPDist();
+                                    //distanceBar1.ClearWPDist();
 
                                     var i = -1;
                                     var travdist = 0.0;
@@ -3217,7 +3209,7 @@ namespace MissionPlanner.GCSViews
 
                                             var dist = lastplla.GetDistance(plla);
 
-                                            distanceBar1.AddWPDist((float) dist);
+                                            //distanceBar1.AddWPDist((float) dist);
 
                                             if (i <= MainV2.comPort.MAV.cs.wpno)
                                             {
@@ -3228,8 +3220,8 @@ namespace MissionPlanner.GCSViews
 
                                     travdist -= MainV2.comPort.MAV.cs.wp_dist;
 
-                                    if (MainV2.comPort.MAV.cs.mode.ToUpper() == "AUTO")
-                                        distanceBar1.traveleddist = (float) travdist;
+                                    //if (MainV2.comPort.MAV.cs.mode.ToUpper() == "AUTO")
+                                    //    distanceBar1.traveleddist = (float) travdist;
 
                                 }
                                 catch (Exception ex)
@@ -3687,7 +3679,7 @@ namespace MissionPlanner.GCSViews
                 }
             }
 
-            coords1.AltUnit = CurrentState.AltUnit;
+            //coords1.AltUnit = CurrentState.AltUnit;
         }
 
         private void modifyandSetAlt_Click(object sender, EventArgs e)
@@ -3737,7 +3729,7 @@ namespace MissionPlanner.GCSViews
 
         void mymap_Paint(object sender, PaintEventArgs e)
         {
-            distanceBar1.DoPaintRemote(e);
+            //distanceBar1.DoPaintRemote(e);
         }
 
         void NoFly_NoFlyEvent(object sender, NoFly.NoFly.NoFlyEventArgs e)
@@ -4631,7 +4623,7 @@ namespace MissionPlanner.GCSViews
         {
             try
             {
-                if (gMapControl1.MaxZoom + 1 == (double) TRK_zoom.Value)
+                if (gMapControl1.MaxZoom + 1 == (double)TRK_zoom.Value)
                 {
                     gMapControl1.Zoom = TRK_zoom.Value - .1;
                 }
@@ -5062,24 +5054,6 @@ namespace MissionPlanner.GCSViews
             };
 
             selectform.Show();
-        }
-
-        private void Zoomlevel_ValueChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                if (gMapControl1.MaxZoom + 1 == (double) Zoomlevel.Value)
-                {
-                    gMapControl1.Zoom = (double) Zoomlevel.Value - .1;
-                }
-                else
-                {
-                    gMapControl1.Zoom = (double) Zoomlevel.Value;
-                }
-            }
-            catch
-            {
-            }
         }
 
         private void BUT_georefimage_Click(object sender, EventArgs e)

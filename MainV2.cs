@@ -3134,9 +3134,9 @@ namespace MissionPlanner
 
             string[] btnLabels = new string[] { "EKF", "ENGINE", "BATT", "GPS", "COMM", "VIBE", "FUEL", "GEO"+ Environment.NewLine +"FENCE",
                 "AIR"+ Environment.NewLine +"SPEED", "MAG", "PAY"+ Environment.NewLine +"LOAD", "ROUTE", "PARA"+ Environment.NewLine +"CHUTE",
-                "PRE"+ Environment.NewLine +"FLIGHT", "START", "MSG" };
+                "PRE"+ Environment.NewLine +"FLIGHT", "START", "MSG","MAIN" + Environment.NewLine + "SCRN" };
 
-            string[] btnNames = new string[] { "EKF", "ENGINE", "BATT", "GPS", "COMM", "VIBE", "FUEL", "FENCE", "AIRSPD", "MAG", "PAYLD", "ROUTE", "CHUTE", "PRFLT", "START", "MSG" };
+            string[] btnNames = new string[] { "EKF", "ENGINE", "BATT", "GPS", "COMM", "VIBE", "FUEL", "FENCE", "AIRSPD", "MAG", "PAYLD", "ROUTE", "CHUTE", "PRFLT", "START", "MSG", "MAIN" };
             annunciator1.setPanels(btnNames, btnLabels);
             annunciator1.Enabled = false;
 
