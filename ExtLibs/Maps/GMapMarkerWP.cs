@@ -50,7 +50,6 @@ namespace MissionPlanner.Maps
                 using (Graphics g = Graphics.FromImage(temp))
                 {
                     txtsize = g.MeasureString(wpno, font);
-
                     g.DrawString(wpno, font, Brushes.Black, new PointF(0, 0));
                 }
                 fontBitmaps[wpno] = temp;
@@ -66,7 +65,7 @@ namespace MissionPlanner.Maps
             }
             
             base.OnRender(g);
-
+            
             var midw = LocalPosition.X + 10;
             var midh = LocalPosition.Y + 3;
 
@@ -74,7 +73,18 @@ namespace MissionPlanner.Maps
                 midw -= 4;
 
             if (Overlay.Control.Zoom> 16 || IsMouseOver)
-                g.DrawImageUnscaled(fontBitmaps[wpno], midw,midh);
+            {
+                StringFormat stringFormat = new StringFormat();
+                stringFormat.Alignment = StringAlignment.Center;
+                stringFormat.LineAlignment = StringAlignment.Center;
+                if (font == null)
+                    font = SystemFonts.DefaultFont;
+                // Draw the text and the surrounding rectangle.
+                g.DrawString(wpno, font, Brushes.Black, new Rectangle(this.LocalPosition.X,this.LocalPosition.Y-5, this.Size.Width,this.Size.Height), stringFormat);
+
+
+            }
+               //g.DrawImageUnscaled(fontBitmaps[wpno], midw,midh);
         }
     }
 }

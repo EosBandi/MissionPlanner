@@ -4020,6 +4020,7 @@ namespace MissionPlanner
             Settings.Instance["kindex"] = CurrentState.KIndexstatic.ToString();
         }
 
+        //Create thumbnail for log files 
         private void BGCreateMaps(object state)
         {
             // sort logs
