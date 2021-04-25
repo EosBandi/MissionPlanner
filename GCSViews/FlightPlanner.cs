@@ -1363,7 +1363,7 @@ namespace MissionPlanner.GCSViews
                             double.Parse(TXT_WPRad.Text) / CurrentState.multiplieralt,
                             double.Parse(TXT_loiterrad.Text) / CurrentState.multiplieralt, CurrentState.multiplieralt);
                     }
-                    catch (FormatException ex)
+                    catch (FormatException)
                     {
                         CustomMessageBox.Show(Strings.InvalidNumberEntered + "\n" + "WP Radius or Loiter Radius",
                             Strings.ERROR);
@@ -1457,7 +1457,7 @@ namespace MissionPlanner.GCSViews
                         overlay.CreateOverlay(PointLatLngAlt.Zero,
                             commandlist, 0, 0, CurrentState.multiplieralt);
                     }
-                    catch (FormatException ex)
+                    catch (FormatException)
                     {
                         CustomMessageBox.Show(Strings.InvalidNumberEntered, Strings.ERROR);
                     }
@@ -1513,7 +1513,7 @@ namespace MissionPlanner.GCSViews
                         overlay.CreateOverlay(PointLatLngAlt.Zero,
                             commandlist, 0, 0, CurrentState.multiplieralt);
                     }
-                    catch (FormatException ex)
+                    catch (FormatException)
                     {
                         CustomMessageBox.Show(Strings.InvalidNumberEntered, Strings.ERROR);
                     }
