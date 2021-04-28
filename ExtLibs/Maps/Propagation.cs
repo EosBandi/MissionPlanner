@@ -119,7 +119,8 @@ namespace MissionPlanner.Maps
         {
             this.HomeLocation = HomeLocation;
             DroneLocation = Location;
-            distance.Markers.Clear();
+            if(distance.Markers.Count > 0)
+                distance.Markers.Clear();
 
             if (connected && home_kmleft)
             {
@@ -368,7 +369,7 @@ namespace MissionPlanner.Maps
                     log.Error(ex);
                 }
 
-                Thread.Sleep(100);
+                Thread.Sleep(333);
             }
         }
 
