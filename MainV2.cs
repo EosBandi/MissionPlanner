@@ -1741,9 +1741,23 @@ namespace MissionPlanner
                     else
                     {
                         if (Settings.Instance.GetBoolean("Params_BG", false))
-                            Task.Run(() => { comPort.getParamListMavftp(comPort.MAV.sysid, comPort.MAV.compid); });
+                        {
+                            Task.Run(() =>
+                            {
+                                try
+                                {
+                                    comPort.getParamListMavftp(comPort.MAV.sysid, comPort.MAV.compid);
+                                }
+                                catch
+                                {
+
+                                }
+                            });
+                        }
                         else
+                        {
                             comPort.getParamList();
+                        }
                     }
                 }
 
