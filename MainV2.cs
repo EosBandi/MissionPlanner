@@ -1734,9 +1734,10 @@ namespace MissionPlanner
                 if (getparams)
                 {
                     if (File.Exists(comPort.MAV.ParamCachePath) && 
-                        new FileInfo(comPort.MAV.ParamCachePath).LastWriteTime > DateTime.Now.AddDays(-1))
+                        new FileInfo(comPort.MAV.ParamCachePath).LastWriteTime > DateTime.Now.AddHours(-1))
                     {
-                        comPort.MAV.param = File.ReadAllText(comPort.MAV.ParamCachePath).FromJSON<MAVLink.MAVLinkParamList>();
+                        File.ReadAllText(comPort.MAV.ParamCachePath).FromJSON<MAVLink.MAVLinkParamList>()
+                            .ForEach(a => comPort.MAV.param.Add(a));
                     }
                     else
                     {
