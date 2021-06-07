@@ -2491,7 +2491,7 @@ namespace MissionPlanner
                             }
                         }
                     }
-                    Thread.Sleep(40);
+                    Thread.Sleep(20);
                 }
                 catch
                 {
