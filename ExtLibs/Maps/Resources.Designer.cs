@@ -1202,6 +1202,16 @@ namespace MissionPlanner.Maps {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap new_wp {
+            get {
+                object obj = ResourceManager.GetObject("new_wp", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap octo {
             get {
                 object obj = ResourceManager.GetObject("octo", resourceCulture);
@@ -1745,6 +1755,26 @@ namespace MissionPlanner.Maps {
         public static System.Drawing.Bitmap wizardicon1 {
             get {
                 object obj = ResourceManager.GetObject("wizardicon1", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap wp_payload {
+            get {
+                object obj = ResourceManager.GetObject("wp_payload", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap wp_selected {
+            get {
+                object obj = ResourceManager.GetObject("wp_selected", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

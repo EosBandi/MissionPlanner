@@ -330,6 +330,16 @@ namespace GMap.NET.Drawing.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Byte[].
         /// </summary>
+        public static byte[] poi {
+            get {
+                object obj = ResourceManager.GetObject("poi", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
         public static byte[] purple {
             get {
                 object obj = ResourceManager.GetObject("purple", resourceCulture);
@@ -443,6 +453,46 @@ namespace GMap.NET.Drawing.Properties {
         public static byte[] white_small {
             get {
                 object obj = ResourceManager.GetObject("white_small", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] wp {
+            get {
+                object obj = ResourceManager.GetObject("wp", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] wp_home {
+            get {
+                object obj = ResourceManager.GetObject("wp_home", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] wp_payload {
+            get {
+                object obj = ResourceManager.GetObject("wp_payload", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] wp_selected {
+            get {
+                object obj = ResourceManager.GetObject("wp_selected", resourceCulture);
                 return ((byte[])(obj));
             }
         }

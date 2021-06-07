@@ -13,7 +13,7 @@ namespace MissionPlanner.Maps
     public class GMapMarkerPOI : GMarkerGoogle
     {
         public GMapMarkerPOI(PointLatLng p)
-            : base(p, GMarkerGoogleType.red_dot)
+            : base(p, GMarkerGoogleType.poi)
         {
         }
     }

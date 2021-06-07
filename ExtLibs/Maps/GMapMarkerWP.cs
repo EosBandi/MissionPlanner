@@ -17,8 +17,8 @@ namespace MissionPlanner.Maps
         static Dictionary<string, Bitmap> fontBitmaps = new Dictionary<string, Bitmap>();
         static Font font;
 
-        public GMapMarkerWP(PointLatLng p, string wpno)
-            : base(p, GMarkerGoogleType.green)
+        public GMapMarkerWP(PointLatLng p, string wpno, GMarkerGoogleType marker = GMarkerGoogleType.wp)
+            : base(p, marker)
         {
             this.wpno = wpno;
             if (font == null)
@@ -26,35 +26,38 @@ namespace MissionPlanner.Maps
 
             if (!fontBitmaps.ContainsKey(wpno))
             {
-                Bitmap temp = new Bitmap(100,40, PixelFormat.Format32bppArgb);
+                Bitmap temp = new Bitmap(this.Size.Width, this.Size.Height, PixelFormat.Format32bppArgb);
                 using (Graphics g = Graphics.FromImage(temp))
                 {
-                    txtsize = g.MeasureString(wpno, font);
-
-                    g.DrawString(wpno, font, Brushes.Black, new PointF(0, 0));
+                    StringFormat stringFormat = new StringFormat();
+                    stringFormat.Alignment = StringAlignment.Center;
+                    stringFormat.LineAlignment = StringAlignment.Center;
+                    g.DrawString(wpno, font, Brushes.Black, new Rectangle(0, 0, this.Size.Width, this.Size.Height-7), stringFormat);
                 }
                 fontBitmaps[wpno] = temp;
             }
         }
 
-        public GMapMarkerWP(PointLatLng p, string wpno, bool payloadAction)
-            : base(p, GMarkerGoogleType.orange)
-        {
-            this.wpno = wpno;
-            if (font == null)
-                font = SystemFonts.DefaultFont;
+        //public GMapMarkerWP(PointLatLng p, string wpno, bool payloadAction)
+        //    : base(p, GMarkerGoogleType.orange)
+        //{
+        //    this.wpno = wpno;
+        //    if (font == null)
+        //        font = SystemFonts.DefaultFont;
 
-            if (!fontBitmaps.ContainsKey(wpno))
-            {
-                Bitmap temp = new Bitmap(100, 40, PixelFormat.Format32bppArgb);
-                using (Graphics g = Graphics.FromImage(temp))
-                {
-                    txtsize = g.MeasureString(wpno, font);
-                    g.DrawString(wpno, font, Brushes.Black, new PointF(0, 0));
-                }
-                fontBitmaps[wpno] = temp;
-            }
-        }
+        //    if (!fontBitmaps.ContainsKey(wpno))
+        //    {
+        //        Bitmap temp = new Bitmap(this.Size.Width , this.Size.Height, PixelFormat.Format32bppArgb);
+        //        using (Graphics g = Graphics.FromImage(temp))
+        //        {
+        //            StringFormat stringFormat = new StringFormat();
+        //            stringFormat.Alignment = StringAlignment.Center;
+        //            stringFormat.LineAlignment = StringAlignment.Center;
+        //            g.DrawString(wpno, font, Brushes.Black, new Rectangle(0, 0, this.Size.Width, this.Size.Height), stringFormat);
+        //        }
+        //        fontBitmaps[wpno] = temp;
+        //    }
+        //}
 
         public override void OnRender(IGraphics g)
         {
@@ -63,28 +66,20 @@ namespace MissionPlanner.Maps
                 g.FillEllipse(Brushes.Red, new Rectangle(this.LocalPosition, this.Size));
                 g.DrawArc(Pens.Red, new Rectangle(this.LocalPosition, this.Size), 0, 360);
             }
-            
+
             base.OnRender(g);
-            
-            var midw = LocalPosition.X + 10;
-            var midh = LocalPosition.Y + 3;
-
-            if (txtsize.Width > 15)
-                midw -= 4;
-
-            if (Overlay.Control.Zoom> 16 || IsMouseOver)
+            if (selected)
             {
-                StringFormat stringFormat = new StringFormat();
-                stringFormat.Alignment = StringAlignment.Center;
-                stringFormat.LineAlignment = StringAlignment.Center;
-                if (font == null)
-                    font = SystemFonts.DefaultFont;
-                // Draw the text and the surrounding rectangle.
-                g.DrawString(wpno, font, Brushes.Black, new Rectangle(this.LocalPosition.X,this.LocalPosition.Y-5, this.Size.Width,this.Size.Height), stringFormat);
-
-
+                g.DrawImageUnscaled(Resources.wp_selected, this.LocalPosition);
             }
-               //g.DrawImageUnscaled(fontBitmaps[wpno], midw,midh);
+
+            if (Overlay.Control.Zoom> 11 || IsMouseOver)
+            {
+                g.DrawImageUnscaled(fontBitmaps[wpno], this.LocalPosition);
+            }
+
+
+
         }
     }
 }

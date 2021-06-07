@@ -173,8 +173,8 @@
                 {
                     Console.WriteLine("route OnRender Large Graphics Path " + graphicsPath.PointCount);
                 }
-
-               g.DrawPath(Stroke, graphicsPath);
+                g.SmoothingMode = SmoothingMode.AntiAlias;
+                g.DrawPath(Stroke, graphicsPath);
 
                if (customarrows)
                {

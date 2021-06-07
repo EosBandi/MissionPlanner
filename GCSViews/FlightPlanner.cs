@@ -4502,10 +4502,15 @@ namespace MissionPlanner.GCSViews
                 if (Math.Abs(deltax) / 1 < 40)
                     gridsize = 1;
 
+                labelGridsize.Text = "Gridsize:" + gridsize.ToString() + "m";
+
                 // round it - x
                 utm1[0] = utm1[0] - (utm1[0] % gridsize);
                 // y
                 utm2[1] = utm2[1] - (utm2[1] % gridsize);
+
+                Pen p = new Pen(Color.LightGray, 1);
+                p.DashStyle = DashStyle.Dot;
 
                 // x's
                 for (double x = utm1[0]; x < utm2[0]; x += gridsize)
@@ -4518,7 +4523,7 @@ namespace MissionPlanner.GCSViews
                     int x2 = (int)p2.X;
                     int y2 = (int)p2.Y;
 
-                    e.Graphics.DrawLine(new Pen(MainMap.SelectionPen.Color, 1), x1, y1, x2, y2);
+                    e.Graphics.DrawLine(p, x1, y1, x2, y2);
                 }
 
                 // y's
@@ -4532,8 +4537,12 @@ namespace MissionPlanner.GCSViews
                     int x2 = (int)p2.X;
                     int y2 = (int)p2.Y;
 
-                    e.Graphics.DrawLine(new Pen(MainMap.SelectionPen.Color, 1), x1, y1, x2, y2);
+                    e.Graphics.DrawLine(p, x1, y1, x2, y2);
                 }
+            }
+            else
+            {
+                labelGridsize.Text = "";
             }
 
             e.Graphics.ResetTransform();
@@ -7080,14 +7089,20 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 {
                     GMapMarkerRect rc = item as GMapMarkerRect;
                     rc.Pen.Color = Color.Red;
+                    if (rc.InnerMarker is GMapMarkerWP)
+                    {
+                        (rc.InnerMarker as GMapMarkerWP).selected = true;
+                    }
                     MainMap.Invalidate(false);
 
                     int answer;
+
                     if (item.Tag != null && rc.InnerMarker != null &&
                         int.TryParse(rc.InnerMarker.Tag.ToString(), out answer))
                     {
                         try
                         {
+                            //set the marker as current
                             Commands.CurrentCell = Commands[0, answer - 1];
                             //item.ToolTipText = "Alt: " + Commands[Alt.Index, answer - 1].Value;
                             //item.ToolTipMode = MarkerTooltipMode.OnMouseOver;
@@ -7120,7 +7135,9 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 }
                 if (item is GMapMarkerWP)
                 {
-                    //CurrentGMapMarker = item;
+                    //(item as GMapMarkerWP).selected = true;
+                    //MainMap.Invalidate(false);
+                    ////CurrentGMapMarker = item;
                 }
                 if (item is GMapMarker)
                 {
@@ -7138,6 +7155,11 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                     CurentRectMarker = null;
                     GMapMarkerRect rc = item as GMapMarkerRect;
                     rc.ResetColor();
+                    if (rc.InnerMarker is GMapMarkerWP)
+                    {
+                        (rc.InnerMarker as GMapMarkerWP).selected = false;
+                    }
+
                     MainMap.Invalidate(false);
                 }
                 if (item is GMapMarkerRallyPt)
@@ -7156,6 +7178,14 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 {
                     // when you click the context menu this triggers and causes problems
                     CurrentGMapMarker = null;
+                }
+                if (item is GMapMarkerWP)
+                {
+                    CurrentGMapMarker = null;
+
+                    //(item as GMapMarkerWP).selected = false;
+                    //MainMap.Invalidate(false);
+
                 }
             }
         }

@@ -64,10 +64,10 @@ namespace MissionPlanner.Maps
             {
             }
 
-            g.DrawImageUnscaled(icon, icon.Width / -2 + 2, icon.Height / -2);
+            g.DrawImageUnscaled(icon, icon.Width / -2, icon.Height / -2);
 
-            g.DrawString(sysid.ToString(), new Font(FontFamily.GenericMonospace, 15, FontStyle.Bold), Brushes.Red, -8,
-                -8);
+            g.DrawString(sysid.ToString(), new Font(FontFamily.GenericMonospace, 15, FontStyle.Bold), Brushes.Black, -10,
+                -10);
 
             g.Transform = temp;
 

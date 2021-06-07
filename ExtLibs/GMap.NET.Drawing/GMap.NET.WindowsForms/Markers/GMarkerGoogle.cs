@@ -56,6 +56,10 @@ namespace GMap.NET.WindowsForms.Markers
       red_big_stop,
       black_small,
       white_small,
+      wp,
+      wp_payload,
+      wp_home,
+      poi
    }
 
 #if !PocketPC
@@ -68,6 +72,7 @@ namespace GMap.NET.WindowsForms.Markers
       public float? Bearing;
       Image Bitmap;
       Image BitmapShadow;
+      Image BitmapToolTip;
 
       static Image arrowshadow;
       static Image msmarker_shadow;
@@ -90,22 +95,40 @@ namespace GMap.NET.WindowsForms.Markers
       void LoadBitmap()
       {
          Bitmap = GetIcon(Type.ToString());
-        lock(Bitmap)
+         lock(Bitmap)
+
             Size = new System.Drawing.Size(Bitmap.Width, Bitmap.Height);
 
-         switch(Type)
-         {
-            case GMarkerGoogleType.arrow:
+            switch (Type)
             {
-               Offset = new Point(-11, -Size.Height);
+            case GMarkerGoogleType.arrow:
+                {
+                    Offset = new Point(-11, -Size.Height);
 
-               if(arrowshadow == null)
-               {
-                  arrowshadow = Resources.arrowshadow.ToBitmap();
-               }
-               BitmapShadow = arrowshadow;
-            }
-            break;
+                    if (arrowshadow == null)
+                    {
+                        arrowshadow = Resources.arrowshadow.ToBitmap();
+                    }
+                    BitmapShadow = arrowshadow;
+                }
+                break;
+
+            case GMarkerGoogleType.wp:
+            case GMarkerGoogleType.wp_payload:
+            case GMarkerGoogleType.wp_home:
+            case GMarkerGoogleType.poi:
+
+
+                    {
+                        Offset = new Point(-Size.Width / 2, - Size.Height-1);
+
+                    if (msmarker_shadow == null)
+                    {
+                        msmarker_shadow = Resources.msmarker_shadow.ToBitmap();
+                    }
+                    BitmapShadow = msmarker_shadow;
+                }
+                break;
 
             case GMarkerGoogleType.blue:
             case GMarkerGoogleType.blue_dot:
@@ -124,7 +147,7 @@ namespace GMap.NET.WindowsForms.Markers
             case GMarkerGoogleType.red:
             case GMarkerGoogleType.red_dot:
             {
-               Offset = new Point(-Size.Width / 2 + 1, -Size.Height + 1);
+               Offset = new Point(-Size.Width / 2 + 1, -Size.Height - 5);
 
                if(msmarker_shadow == null)
                {
@@ -205,13 +228,12 @@ namespace GMap.NET.WindowsForms.Markers
 
       internal static Image GetIcon(string name)
       {
-          Image ret;
-         if(!iconCache.TryGetValue(name, out ret))
-         {
-             ret = new Bitmap(new MemoryStream(Resources.ResourceManager.GetObject(name, Resources.Culture) as byte[]));
-            iconCache.Add(name, ret);
-         }
-         return ret;
+            if (!iconCache.TryGetValue(name, out Image ret))
+            {
+                ret = new Bitmap(new MemoryStream(Resources.ResourceManager.GetObject(name, Resources.Culture) as byte[]));
+                iconCache.Add(name, ret);
+            }
+            return ret;
       }
 
       static readonly Point[] Arrow = new Point[] { new Point(-7, 7), new Point(0, -22), new Point(7, 7), new Point(0, 2) };
@@ -221,32 +243,11 @@ namespace GMap.NET.WindowsForms.Markers
           if (Math.Abs(LocalPosition.X) > 100000 || Math.Abs(LocalPosition.Y) > 100000)
                 return;
 
-#if !PocketPC
-         //if(!Bearing.HasValue)
-         {
             if(BitmapShadow != null)
             {
                g.DrawImage(BitmapShadow, LocalPosition.X, LocalPosition.Y, BitmapShadow.Width, BitmapShadow.Height);
             }
-         }
-
-         //if(Bearing.HasValue)
-         //{
-         //   g.RotateTransform(Bearing.Value - Overlay.Control.Bearing);
-         //   g.FillPolygon(Brushes.Red, Arrow);
-         //}
-
-         //if(!Bearing.HasValue)
-         {
             g.DrawImage(Bitmap, LocalPosition.X, LocalPosition.Y, Size.Width, Size.Height);
-         }
-#else
-         if(BitmapShadow != null)
-         {
-            DrawImageUnscaled(g, BitmapShadow, LocalPosition.X, LocalPosition.Y);
-         }
-         DrawImageUnscaled(g, Bitmap, LocalPosition.X, LocalPosition.Y);
-#endif
       }
 
       public override void Dispose()

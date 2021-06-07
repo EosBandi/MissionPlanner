@@ -46,7 +46,7 @@ namespace MissionPlanner.ArduPilot
                 home.Tag = "H";
                 pointlist.Add(home);
                 route.Add(pointlist[pointlist.Count - 1]);
-                addpolygonmarker("H", home.Lng, home.Lat, home.Alt * altunitmultiplier, null, 0);
+                addpolygonmarker("", home.Lng, home.Lat, home.Alt * altunitmultiplier, null, 0,MAVLink.MAV_MISSION_TYPE.MISSION,null,GMarkerGoogleType.wp_home);
             }
 
             for (int a = 0; a < missionitems.Count; a++)
@@ -215,14 +215,14 @@ namespace MissionPlanner.ArduPilot
                         {
                             pointlist.Add(new PointLatLngAlt(item.lat, item.lng, item.alt + gethomealt((MAVLink.MAV_FRAME)item.frame, item.lat, item.lng), (a + 1).ToString()) { color = Color.Yellow });
                             route.Add(pointlist[pointlist.Count - 1]);
-
+                            //Check if we have a payload to ignite
                             if (item.p1 == 0)
                             {
                                 addpolygonmarker((a + 1).ToString(), item.lng, item.lat, item.alt * altunitmultiplier, null, wpradius);
                             }
                             else
                             {
-                                addpolygonmarker((a + 1).ToString(), item.lng, item.lat, item.alt * altunitmultiplier, Color.White, wpradius);
+                                addpolygonmarker((a + 1).ToString(), item.lng, item.lat, item.alt * altunitmultiplier, null, wpradius,marker:GMarkerGoogleType.wp_payload);
                             }
                         }
                         else
@@ -299,7 +299,7 @@ namespace MissionPlanner.ArduPilot
                         fencepoly = new GMapPolygon(new List<PointLatLng>(), a.ToString());
                     pointlist.Add(new PointLatLngAlt(item.lat, item.lng, 0, (a + 1).ToString()));
                     fencepoly.Points.Add(new PointLatLngAlt(item.lat, item.lng, 0, (a + 1).ToString()));
-                    addpolygonmarker((a + 1).ToString(), item.lng, item.lat,null, Color.Red, 0, MAVLink.MAV_MISSION_TYPE.FENCE);
+                    addpolygonmarker((a + 1).ToString(), item.lng, item.lat, null, Color.Red, 0, MAVLink.MAV_MISSION_TYPE.FENCE);
                     if (fencepoly.Points.Count == item.p1)
                     {
                         fencepoly.Fill = new SolidBrush(Color.FromArgb(30, 255, 0, 0));
@@ -370,7 +370,7 @@ namespace MissionPlanner.ArduPilot
         /// <param name="lat"></param>
         /// <param name="alt"></param>
         /// <param name="color"></param>
-        private void addpolygonmarker(string tag, double lng, double lat, double? alt, Color? color, double wpradius, MAVLink.MAV_MISSION_TYPE type = MAVLink.MAV_MISSION_TYPE.MISSION, Color? fillcolor = null)
+        private void addpolygonmarker(string tag, double lng, double lat, double? alt, Color? color, double wpradius, MAVLink.MAV_MISSION_TYPE type = MAVLink.MAV_MISSION_TYPE.MISSION, Color? fillcolor = null, GMarkerGoogleType marker = GMarkerGoogleType.wp)
         {
             try
             {
@@ -378,15 +378,7 @@ namespace MissionPlanner.ArduPilot
                 GMapMarker m = null;
                 if(type == MAVLink.MAV_MISSION_TYPE.MISSION)
                 {
-                    if (color.HasValue)
-                    {
-                        m = new GMapMarkerWP(point, tag, true);
-
-                    }
-                    else
-                    {
-                        m = new GMapMarkerWP(point, tag);
-                    }
+                    m = new GMapMarkerWP(point, tag, marker);
                     if (alt.HasValue)
                     {
                         m.ToolTipMode = MarkerTooltipMode.OnMouseOver;
@@ -566,10 +558,10 @@ namespace MissionPlanner.ArduPilot
                     route.Points.Add(x);
                 });
 
-                homeroute.Stroke = new Pen(Color.Yellow, 2);
+                homeroute.Stroke = new Pen(Color.DarkGoldenrod, 2);
                 // if we have a large distance between home and the first/last point, it hangs on the draw of a the dashed line.
                 if (homepoint.GetDistance(lastpoint) < 5000 && homepoint.GetDistance(firstpoint) < 5000)
-                    homeroute.Stroke.DashStyle = DashStyle.Dash;
+                    homeroute.Stroke.DashStyle = DashStyle.Dot;
 
 
                 if (includehomeroute)
@@ -577,8 +569,8 @@ namespace MissionPlanner.ArduPilot
                     overlay.Routes.Add(homeroute);
                 }
 
-                route.Stroke = new Pen(Color.Yellow, 4);
-                route.Stroke.DashStyle = DashStyle.Custom;
+                route.Stroke = new Pen(Color.Goldenrod, 4);
+                route.Stroke.DashStyle = DashStyle.Solid;
                 overlay.Routes.Add(route);
             }
         }
