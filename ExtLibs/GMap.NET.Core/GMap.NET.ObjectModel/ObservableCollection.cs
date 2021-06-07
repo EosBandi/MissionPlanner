@@ -400,15 +400,18 @@ namespace GMap.NET.ObjectModel
       }
 
       protected override void ClearItems()
-      {
-         this.CheckReentrancy();
-         base.ClearItems();
-         this.OnPropertyChanged(CountString);
-         this.OnPropertyChanged(IndexerName);
-         this.OnCollectionReset();
-      }
+        {
+            this.CheckReentrancy();
+            if (this.Count > 0)
+            {
+                base.ClearItems();
+                this.OnPropertyChanged(CountString);
+                this.OnPropertyChanged(IndexerName);
+                this.OnCollectionReset();
+            }
+        }
 
-      private void CopyFrom(IEnumerable<T> collection)
+        private void CopyFrom(IEnumerable<T> collection)
       {
          IList<T> items = base.Items;
          if((collection != null) && (items != null))
