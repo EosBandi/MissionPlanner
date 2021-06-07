@@ -25,7 +25,6 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Dowding.Model;
 using Microsoft.Scripting.Utils;
 using WebCamService;
 using ZedGraph;
@@ -3422,35 +3421,6 @@ namespace MissionPlanner.GCSViews
                         {
                             log.Error(ex);
                         }
-
-                        updateMarkersAsNeeded<VehicleTick, GMapMarkerQuad>(WebAPIs.Dowding.Vehicles.Values,
-                            adsbais, tick => { return tick.Serial ?? tick.Id; },
-                            mapMarker =>
-                            {
-                                return ((VehicleTick) mapMarker.Tag).Serial ?? ((VehicleTick) mapMarker.Tag).Id;
-                            },
-                            tick =>
-                            {
-                                return new GMapMarkerQuad(new PointLatLng((double) tick.Lat, (double) tick.Lon), 0, 0,
-                                    0, 0) {Tag = tick};
-                            },
-                            (tick, mapMarker) =>
-                            {
-                                mapMarker.Position = new PointLatLng((double) tick.Lat, (double) tick.Lon);
-                                mapMarker.Tag = tick;
-
-                                var time = ((int) (tick.Ts / 1000)).fromUnixTime();
-
-                                if (time > DateTime.UtcNow.AddSeconds(-120))
-                                {
-                                    mapMarker.IsVisible = true;
-                                }
-                                else
-                                {
-                                    mapMarker.IsVisible = false;
-                                }
-
-                            });
 
                         // draw AIS
                         updateMarkersAsNeeded<MAVLink.mavlink_ais_vessel_t, GMapMarkerAISBoat>(AIS.Vessels, adsbais,
