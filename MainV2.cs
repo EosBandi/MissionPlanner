@@ -5039,8 +5039,6 @@ namespace MissionPlanner
             {
                 updateSupervisorClientComms();
             }
-
-
         }
 
         private void updateSupervisorServerComms()
