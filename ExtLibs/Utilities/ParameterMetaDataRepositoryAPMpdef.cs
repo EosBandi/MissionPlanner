@@ -70,6 +70,8 @@ namespace MissionPlanner.Utilities
                     var fileout = Path.Combine(Settings.GetDataDirectory(), a + ".apm.pdef.xml");
                     var file = Path.Combine(Settings.GetDataDirectory(), a + ".apm.pdef.xml.gz");
                     if (File.Exists(file))
+                    {
+                        if (File.Exists(fileout)) File.Delete(fileout);
                         using (var read = File.OpenRead(file))
                         {
                             //if (XZStream.IsXZStream(read))
@@ -83,6 +85,7 @@ namespace MissionPlanner.Utilities
                                 }
                             }
                         }
+                    }
                 }
                 catch (Exception ex)
                 {
