@@ -3308,35 +3308,35 @@ namespace MissionPlanner
             //    }
             //});
 
-            log.Info("start AutoConnect");
+            //log.Info("start AutoConnect");
 
-            AutoConnect.NewMavlinkConnection += (sender, serial) =>
-            {
-                try
-                {
-                    log.Info("AutoConnect.NewMavlinkConnection " + serial.PortName);
-                    MainV2.instance.BeginInvoke((Action) delegate
-                    {
-                        if (MainV2.comPort.BaseStream.IsOpen)
-                        {
-                            var mav = new MAVLinkInterface();
-                            mav.BaseStream = serial;
-                            MainV2.instance.doConnect(mav, "preset", serial.PortName);
+            //AutoConnect.NewMavlinkConnection += (sender, serial) =>
+            //{
+            //    try
+            //    {
+            //        log.Info("AutoConnect.NewMavlinkConnection " + serial.PortName);
+            //        MainV2.instance.BeginInvoke((Action) delegate
+            //        {
+            //            if (MainV2.comPort.BaseStream.IsOpen)
+            //            {
+            //                var mav = new MAVLinkInterface();
+            //                mav.BaseStream = serial;
+            //                MainV2.instance.doConnect(mav, "preset", serial.PortName);
 
-                            MainV2.Comports.Add(mav);
-                        }
-                        else
-                        {
-                            MainV2.comPort.BaseStream = serial;
-                            MainV2.instance.doConnect(MainV2.comPort, "preset", serial.PortName);
-                        }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex);
-                }
-            };
+            //                MainV2.Comports.Add(mav);
+            //            }
+            //            else
+            //            {
+            //                MainV2.comPort.BaseStream = serial;
+            //                MainV2.instance.doConnect(MainV2.comPort, "preset", serial.PortName);
+            //            }
+            //        });
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        log.Error(ex);
+            //    }
+            //};
 
             //AutoConnect.NewVideoStream += (sender, gststring) =>
             //{
@@ -3386,22 +3386,21 @@ namespace MissionPlanner
             //    }
             //};
 
-            AutoConnect.Start();
+            //AutoConnect.Start();
 
-            CameraProtocol.OnRTSPDetected += (sender, s) =>
-            {
-                if (CustomMessageBox.Show(
-                        "A video stream has been detected, Do you want to connect to it?",
-                        "Mavlink Camera", System.Windows.Forms.MessageBoxButtons.YesNo) ==
-                    (int) System.Windows.Forms.DialogResult.Yes)
-                {
-                    AutoConnect.RaiseNewVideoStream(sender,
-                        String.Format(
-                            "rtspsrc location={0} latency=41 udp-reconnect=1 timeout=0 do-retransmission=false ! application/x-rtp ! decodebin3 ! queue leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false",
-                            s));
-                }
-            };
-
+            //CameraProtocol.OnRTSPDetected += (sender, s) =>
+            //{
+            //    if (CustomMessageBox.Show(
+            //            "A video stream has been detected, Do you want to connect to it?",
+            //            "Mavlink Camera", System.Windows.Forms.MessageBoxButtons.YesNo) ==
+            //        (int) System.Windows.Forms.DialogResult.Yes)
+            //    {
+            //        AutoConnect.RaiseNewVideoStream(sender,
+            //            String.Format(
+            //                "rtspsrc location={0} latency=41 udp-reconnect=1 timeout=0 do-retransmission=false ! application/x-rtp ! decodebin3 ! queue leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false",
+            //                s));
+            //    }
+            //};
 
             BinaryLog.onFlightMode += (firmware, modeno) =>
             {
@@ -3594,30 +3593,30 @@ namespace MissionPlanner
 
             Program.Splash?.Close();
 
-            log.Info("appload time");
+            //log.Info("appload time");
 
-            MissionPlanner.Utilities.Tracking.AddTiming("AppLoad", "Load Time",
-                (DateTime.Now - Program.starttime).TotalMilliseconds, "");
+            //MissionPlanner.Utilities.Tracking.AddTiming("AppLoad", "Load Time",
+            //    (DateTime.Now - Program.starttime).TotalMilliseconds, "");
 
             int p = (int)Environment.OSVersion.Platform;
             bool isWin = (p != 4) && (p != 6) && (p != 128);
 
             bool winXp = isWin && Environment.OSVersion.Version.Major == 5;
 
-            if (winXp)
-            {
-                Common.MessageShowAgain("Windows XP",
-                    "This is the last version that will support Windows XP, please update your OS");
+            //if (winXp)
+            //{
+            //    Common.MessageShowAgain("Windows XP",
+            //        "This is the last version that will support Windows XP, please update your OS");
 
-                // invalidate update url
-                System.Configuration.ConfigurationManager.AppSettings["UpdateLocationVersion"] =
-                    "https://firmware.ardupilot.org/MissionPlanner/xp/";
-                System.Configuration.ConfigurationManager.AppSettings["UpdateLocation"] =
-                    "https://firmware.ardupilot.org/MissionPlanner/xp/";
-                System.Configuration.ConfigurationManager.AppSettings["UpdateLocationMD5"] =
-                    "https://firmware.ardupilot.org/MissionPlanner/xp/checksums.txt";
-                System.Configuration.ConfigurationManager.AppSettings["BetaUpdateLocationVersion"] = "";
-            }
+            //    // invalidate update url
+            //    System.Configuration.ConfigurationManager.AppSettings["UpdateLocationVersion"] =
+            //        "https://firmware.ardupilot.org/MissionPlanner/xp/";
+            //    System.Configuration.ConfigurationManager.AppSettings["UpdateLocation"] =
+            //        "https://firmware.ardupilot.org/MissionPlanner/xp/";
+            //    System.Configuration.ConfigurationManager.AppSettings["UpdateLocationMD5"] =
+            //        "https://firmware.ardupilot.org/MissionPlanner/xp/checksums.txt";
+            //    System.Configuration.ConfigurationManager.AppSettings["BetaUpdateLocationVersion"] = "";
+            //}
 
             //try
             //{
