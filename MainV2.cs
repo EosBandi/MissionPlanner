@@ -5165,8 +5165,9 @@ namespace MissionPlanner
 
             annunciator1.setStatus("AIRSPD", Stat.ALERT); airspeedForm.addText("AIRSPEED SENSOR NOT CALIBRATED!");
             annunciator1.setStatus("PRFLT", Stat.ALERT);
-          //  if (!supervisor) annunciator1.setStatus("ROUTE", Stat.DISABLED);
-          //  if (!supervisor) annunciator1.setStatus("FENCE", Stat.DISABLED);
+            //  if (!supervisor) annunciator1.setStatus("ROUTE", Stat.DISABLED);
+            //  if (!supervisor) annunciator1.setStatus("FENCE", Stat.DISABLED);
+            if (PreflightList.steps.Count == 0) annunciator1.setStatus("PRFLT", Stat.DISABLED);
 
 
             MainV2.instance.BeginInvoke((MethodInvoker)(() =>
