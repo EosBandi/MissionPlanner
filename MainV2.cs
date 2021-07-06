@@ -4985,17 +4985,24 @@ namespace MissionPlanner
             }
             //Comm
             else if (annunciator1.clickedButtonName == "COMM")
-            {
+
                 if (connectionStatsForm is null)
                 {
                     hideAllForms();
                     ShowConnectionStatsForm();
                     connectionStatsForm.Owner = this;
                     if (annunciatorUndocked)
+                    {
                         connectionStatsForm.Location = new Point(annunciatorForm.Location.X + annunciatorForm.Size.Width, annunciatorForm.Location.Y);
+                    }
                     else
-                        connectionStatsForm.Location = new Point(this.Location.X + this.Size.Width - connectionStatsForm.Size.Width, this.Location.Y + this.annunciator1.Location.Y + 61);
+                    {
+                        Rectangle screenRectangle = this.RectangleToScreen(this.ClientRectangle);
+                        int titleHeight = screenRectangle.Top - this.Top;
+                        connectionStatsForm.Location = new Point(this.Location.X + screenRectangle.Width - connectionStatsForm.Size.Width, this.Location.Y + this.annunciator1.Location.Y + this.annunciator1.Size.Height + 1 + titleHeight);
+                    }
                 }
+
                 else
                 {
                     if (connectionStatsForm.Visible)
@@ -5010,11 +5017,13 @@ namespace MissionPlanner
                         if (annunciatorUndocked)
                             connectionStatsForm.Location = new Point(annunciatorForm.Location.X + annunciatorForm.Size.Width, annunciatorForm.Location.Y);
                         else
-                            connectionStatsForm.Location = new Point(this.Location.X + this.Size.Width - connectionStatsForm.Size.Width, this.Location.Y + this.annunciator1.Location.Y + 61);
-
+                        {
+                            Rectangle screenRectangle = this.RectangleToScreen(this.ClientRectangle);
+                            int titleHeight = screenRectangle.Top - this.Top;
+                            connectionStatsForm.Location = new Point(this.Location.X + screenRectangle.Width - connectionStatsForm.Size.Width, this.Location.Y + this.annunciator1.Location.Y + this.annunciator1.Size.Height + 1 + titleHeight);
+                        }
                     }
                 }
-            }
 
         }
 
@@ -5158,10 +5167,6 @@ namespace MissionPlanner
 
         private void setAnnunciatorInitialState()
         {
-
-
-
-
             annunciator1.setStatus("AIRSPD", Stat.ALERT); airspeedForm.addText("AIRSPEED SENSOR NOT CALIBRATED!");
             annunciator1.setStatus("PRFLT", Stat.ALERT);
             //  if (!supervisor) annunciator1.setStatus("ROUTE", Stat.DISABLED);
