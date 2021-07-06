@@ -4942,7 +4942,11 @@ namespace MissionPlanner
                     if (annunciatorUndocked)
                         f.Location = new Point(annunciatorForm.Location.X + annunciatorForm.Size.Width, annunciatorForm.Location.Y);
                     else
-                        f.Location = new Point(this.Location.X + this.Size.Width - f.Size.Width, this.Location.Y + this.annunciator1.Location.Y + 61);
+                    {
+                        Rectangle screenRectangle = this.RectangleToScreen(this.ClientRectangle);
+                        int titleHeight = screenRectangle.Top - this.Top;
+                        f.Location = new Point(this.Location.X + screenRectangle.Width - f.Size.Width, this.Location.Y + this.annunciator1.Location.Y + this.annunciator1.Size.Height + 1 + titleHeight);
+                    }
 
 
                 }
@@ -5161,8 +5165,8 @@ namespace MissionPlanner
 
             annunciator1.setStatus("AIRSPD", Stat.ALERT); airspeedForm.addText("AIRSPEED SENSOR NOT CALIBRATED!");
             annunciator1.setStatus("PRFLT", Stat.ALERT);
-            if (!supervisor) annunciator1.setStatus("ROUTE", Stat.DISABLED);
-            if (!supervisor) annunciator1.setStatus("FENCE", Stat.DISABLED);
+          //  if (!supervisor) annunciator1.setStatus("ROUTE", Stat.DISABLED);
+          //  if (!supervisor) annunciator1.setStatus("FENCE", Stat.DISABLED);
 
 
             MainV2.instance.BeginInvoke((MethodInvoker)(() =>

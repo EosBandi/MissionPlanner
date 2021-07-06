@@ -29,8 +29,6 @@ namespace MissionPlanner.Controls
 
         public void displayStep(PreflightStep s)
         {
-
-
             string preflightPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + Path.DirectorySeparatorChar + "Mission Planner" +
                 Path.DirectorySeparatorChar + "preflight" + Path.DirectorySeparatorChar;
 
@@ -119,6 +117,8 @@ namespace MissionPlanner.Controls
 
         private void bDone_Click(object sender, EventArgs e)
         {
+            if (PreflightList.steps.Count == 0) return;
+
             PreflightList.currentStep.status = true;
             pictureBox1.Invalidate();
             pictureBox2.Invalidate();
@@ -134,6 +134,7 @@ namespace MissionPlanner.Controls
 
         private void bNext_Click(object sender, EventArgs e)
         {
+            if (PreflightList.steps.Count == 0) return;
             if (PreflightList.stepNumber == PreflightList.steps.Count - 1) return;
             PreflightList.stepNumber++;
             PreflightList.currentStep = PreflightList.steps[PreflightList.stepNumber];
