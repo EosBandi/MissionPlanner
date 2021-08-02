@@ -274,11 +274,11 @@
             // 
             // MainH.Panel1
             // 
-            this.MainH.Panel1.Controls.Add(this.SubMainLeft);
+            this.MainH.Panel2.Controls.Add(this.SubMainLeft);
             // 
             // MainH.Panel2
             // 
-            this.MainH.Panel2.Controls.Add(this.tableMap);
+            this.MainH.Panel1.Controls.Add(this.tableMap);
             // 
             // SubMainLeft
             // 
