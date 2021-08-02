@@ -193,6 +193,14 @@
             this.gMapControl1 = new MissionPlanner.Controls.myGMAP();
             this.TRK_zoom = new MissionPlanner.Controls.MyTrackBar();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.botMenuLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.myButtonSettings = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme2 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme3 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme4 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme5 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme6 = new MissionPlanner.Controls.myButtonNoTheme();
+            this.myButtonNoTheme7 = new MissionPlanner.Controls.myButtonNoTheme();
             this.ZedGraphTimer = new System.Windows.Forms.Timer(this.components);
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.openScriptDialog = new System.Windows.Forms.OpenFileDialog();
@@ -200,15 +208,6 @@
             this.Messagetabtimer = new System.Windows.Forms.Timer(this.components);
             this.bindingSourceGaugesTab = new System.Windows.Forms.BindingSource(this.components);
             this.bindingSourceStatusTab = new System.Windows.Forms.BindingSource(this.components);
-            this.myButtonSettings = new MissionPlanner.Controls.myButtonNoTheme();
-            this.botMenuLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.myButtonNoTheme2 = new MissionPlanner.Controls.myButtonNoTheme();
-            this.myButtonNoTheme3 = new MissionPlanner.Controls.myButtonNoTheme();
-            this.myButtonNoTheme4 = new MissionPlanner.Controls.myButtonNoTheme();
-            this.myButtonNoTheme5 = new MissionPlanner.Controls.myButtonNoTheme();
-            this.myButtonNoTheme6 = new MissionPlanner.Controls.myButtonNoTheme();
-            this.myButtonNoTheme7 = new MissionPlanner.Controls.myButtonNoTheme();
-            this.myButtonNoTheme8 = new MissionPlanner.Controls.myButtonNoTheme();
             ((System.ComponentModel.ISupportInitialize)(this.MainH)).BeginInit();
             this.MainH.Panel1.SuspendLayout();
             this.MainH.Panel2.SuspendLayout();
@@ -262,9 +261,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TRK_zoom)).BeginInit();
             this.panel1.SuspendLayout();
+            this.botMenuLayout.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceGaugesTab)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceStatusTab)).BeginInit();
-            this.botMenuLayout.SuspendLayout();
             this.SuspendLayout();
             // 
             // MainH
@@ -595,7 +594,7 @@
             resources.ApplyResources(this.quickView6, "quickView6");
             this.quickView6.Name = "quickView6";
             this.quickView6.number = 0D;
-            this.quickView6.numberColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(252)))));
+            this.quickView6.numberColor = System.Drawing.Color.White;
             this.quickView6.numberColorBackup = System.Drawing.Color.Empty;
             this.quickView6.numberformat = "0.00";
             this.quickView6.DoubleClick += new System.EventHandler(this.quickView_DoubleClick);
@@ -632,7 +631,7 @@
             resources.ApplyResources(this.quickView5, "quickView5");
             this.quickView5.Name = "quickView5";
             this.quickView5.number = 0D;
-            this.quickView5.numberColor = System.Drawing.Color.FromArgb(((int)(((byte)(254)))), ((int)(((byte)(254)))), ((int)(((byte)(86)))));
+            this.quickView5.numberColor = System.Drawing.Color.White;
             this.quickView5.numberColorBackup = System.Drawing.Color.Empty;
             this.quickView5.numberformat = "0.00";
             this.quickView5.DoubleClick += new System.EventHandler(this.quickView_DoubleClick);
@@ -645,7 +644,7 @@
             resources.ApplyResources(this.quickView4, "quickView4");
             this.quickView4.Name = "quickView4";
             this.quickView4.number = 0D;
-            this.quickView4.numberColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(255)))), ((int)(((byte)(83)))));
+            this.quickView4.numberColor = System.Drawing.Color.White;
             this.quickView4.numberColorBackup = System.Drawing.Color.Empty;
             this.quickView4.numberformat = "0.00";
             // 
@@ -657,7 +656,7 @@
             resources.ApplyResources(this.quickView3, "quickView3");
             this.quickView3.Name = "quickView3";
             this.quickView3.number = 0D;
-            this.quickView3.numberColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(96)))), ((int)(((byte)(91)))));
+            this.quickView3.numberColor = System.Drawing.Color.White;
             this.quickView3.numberColorBackup = System.Drawing.Color.Empty;
             this.quickView3.numberformat = "0.00";
             this.quickView3.DoubleClick += new System.EventHandler(this.quickView_DoubleClick);
@@ -670,7 +669,7 @@
             resources.ApplyResources(this.quickView2, "quickView2");
             this.quickView2.Name = "quickView2";
             this.quickView2.number = 0D;
-            this.quickView2.numberColor = System.Drawing.Color.FromArgb(((int)(((byte)(254)))), ((int)(((byte)(132)))), ((int)(((byte)(46)))));
+            this.quickView2.numberColor = System.Drawing.Color.White;
             this.quickView2.numberColorBackup = System.Drawing.Color.Empty;
             this.quickView2.numberformat = "0.00";
             this.quickView2.DoubleClick += new System.EventHandler(this.quickView_DoubleClick);
@@ -683,7 +682,7 @@
             resources.ApplyResources(this.quickView1, "quickView1");
             this.quickView1.Name = "quickView1";
             this.quickView1.number = 0D;
-            this.quickView1.numberColor = System.Drawing.Color.FromArgb(((int)(((byte)(209)))), ((int)(((byte)(151)))), ((int)(((byte)(248)))));
+            this.quickView1.numberColor = System.Drawing.Color.White;
             this.quickView1.numberColorBackup = System.Drawing.Color.Empty;
             this.quickView1.numberformat = "0.00";
             this.toolTip1.SetToolTip(this.quickView1, resources.GetString("quickView1.ToolTip"));
@@ -2218,7 +2217,6 @@
             // splitContainer1.Panel2
             // 
             this.splitContainer1.Panel2.ContextMenuStrip = this.contextMenuStripMap;
-            this.splitContainer1.Panel2.Controls.Add(this.bHideComm);
             this.splitContainer1.Panel2.Controls.Add(this.CHK_autopan);
             this.splitContainer1.Panel2.Controls.Add(this.CB_tuning);
             this.splitContainer1.Panel2.Controls.Add(this.but_disablejoystick);
@@ -2428,7 +2426,7 @@
             this.windDir1.BackColor = System.Drawing.Color.Transparent;
             this.windDir1.DataBindings.Add(new System.Windows.Forms.Binding("Direction", this.bindingSource1, "wind_dir", true, System.Windows.Forms.DataSourceUpdateMode.Never));
             this.windDir1.DataBindings.Add(new System.Windows.Forms.Binding("Speed", this.bindingSource1, "wind_vel", true, System.Windows.Forms.DataSourceUpdateMode.Never));
-            this.windDir1.Direction = 180D;
+            this.windDir1.Direction = 360D;
             resources.ApplyResources(this.windDir1, "windDir1");
             this.windDir1.Name = "windDir1";
             this.windDir1.Speed = 0D;
@@ -2488,35 +2486,18 @@
             this.panel1.Controls.Add(this.botMenuLayout);
             this.panel1.Name = "panel1";
             // 
-            // ZedGraphTimer
+            // botMenuLayout
             // 
-            this.ZedGraphTimer.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
-            // toolTip1
-            // 
-            this.toolTip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(205)))), ((int)(((byte)(226)))), ((int)(((byte)(150)))));
-            this.toolTip1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(121)))), ((int)(((byte)(148)))), ((int)(((byte)(41)))));
-            // 
-            // openScriptDialog
-            // 
-            resources.ApplyResources(this.openScriptDialog, "openScriptDialog");
-            // 
-            // scriptChecker
-            // 
-            this.scriptChecker.Tick += new System.EventHandler(this.scriptChecker_Tick);
-            // 
-            // Messagetabtimer
-            // 
-            this.Messagetabtimer.Interval = 200;
-            this.Messagetabtimer.Tick += new System.EventHandler(this.Messagetabtimer_Tick);
-            // 
-            // bindingSourceGaugesTab
-            // 
-            this.bindingSourceGaugesTab.DataSource = typeof(MissionPlanner.CurrentState);
-            // 
-            // bindingSourceStatusTab
-            // 
-            this.bindingSourceStatusTab.DataSource = typeof(MissionPlanner.CurrentState);
+            resources.ApplyResources(this.botMenuLayout, "botMenuLayout");
+            this.botMenuLayout.Controls.Add(this.bHideComm, 7, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonSettings, 0, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme2, 1, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme3, 2, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme4, 3, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme5, 4, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme6, 5, 0);
+            this.botMenuLayout.Controls.Add(this.myButtonNoTheme7, 6, 0);
+            this.botMenuLayout.Name = "botMenuLayout";
             // 
             // myButtonSettings
             // 
@@ -2527,19 +2508,6 @@
             this.myButtonSettings.Name = "myButtonSettings";
             this.myButtonSettings.TextColor = System.Drawing.Color.White;
             this.myButtonSettings.UseVisualStyleBackColor = true;
-            // 
-            // botMenuLayout
-            // 
-            resources.ApplyResources(this.botMenuLayout, "botMenuLayout");
-            this.botMenuLayout.Controls.Add(this.myButtonSettings, 0, 0);
-            this.botMenuLayout.Controls.Add(this.myButtonNoTheme2, 1, 0);
-            this.botMenuLayout.Controls.Add(this.myButtonNoTheme3, 2, 0);
-            this.botMenuLayout.Controls.Add(this.myButtonNoTheme4, 3, 0);
-            this.botMenuLayout.Controls.Add(this.myButtonNoTheme5, 4, 0);
-            this.botMenuLayout.Controls.Add(this.myButtonNoTheme6, 5, 0);
-            this.botMenuLayout.Controls.Add(this.myButtonNoTheme7, 6, 0);
-            this.botMenuLayout.Controls.Add(this.myButtonNoTheme8, 7, 0);
-            this.botMenuLayout.Name = "botMenuLayout";
             // 
             // myButtonNoTheme2
             // 
@@ -2577,11 +2545,35 @@
             this.myButtonNoTheme7.Name = "myButtonNoTheme7";
             this.myButtonNoTheme7.UseVisualStyleBackColor = true;
             // 
-            // myButtonNoTheme8
+            // ZedGraphTimer
             // 
-            resources.ApplyResources(this.myButtonNoTheme8, "myButtonNoTheme8");
-            this.myButtonNoTheme8.Name = "myButtonNoTheme8";
-            this.myButtonNoTheme8.UseVisualStyleBackColor = true;
+            this.ZedGraphTimer.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // toolTip1
+            // 
+            this.toolTip1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(205)))), ((int)(((byte)(226)))), ((int)(((byte)(150)))));
+            this.toolTip1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(121)))), ((int)(((byte)(148)))), ((int)(((byte)(41)))));
+            // 
+            // openScriptDialog
+            // 
+            resources.ApplyResources(this.openScriptDialog, "openScriptDialog");
+            // 
+            // scriptChecker
+            // 
+            this.scriptChecker.Tick += new System.EventHandler(this.scriptChecker_Tick);
+            // 
+            // Messagetabtimer
+            // 
+            this.Messagetabtimer.Interval = 200;
+            this.Messagetabtimer.Tick += new System.EventHandler(this.Messagetabtimer_Tick);
+            // 
+            // bindingSourceGaugesTab
+            // 
+            this.bindingSourceGaugesTab.DataSource = typeof(MissionPlanner.CurrentState);
+            // 
+            // bindingSourceStatusTab
+            // 
+            this.bindingSourceStatusTab.DataSource = typeof(MissionPlanner.CurrentState);
             // 
             // FlightData
             // 
@@ -2655,9 +2647,10 @@
             ((System.ComponentModel.ISupportInitialize)(this.bindingSource1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TRK_zoom)).EndInit();
             this.panel1.ResumeLayout(false);
+            this.botMenuLayout.ResumeLayout(false);
+            this.botMenuLayout.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceGaugesTab)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.bindingSourceStatusTab)).EndInit();
-            this.botMenuLayout.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -2865,6 +2858,5 @@
         private Controls.myButtonNoTheme myButtonNoTheme5;
         private Controls.myButtonNoTheme myButtonNoTheme6;
         private Controls.myButtonNoTheme myButtonNoTheme7;
-        private Controls.myButtonNoTheme myButtonNoTheme8;
     }
 }

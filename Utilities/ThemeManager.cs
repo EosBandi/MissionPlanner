@@ -318,6 +318,9 @@ namespace MissionPlanner.Utilities
 
         public static Color getQvNumberColor()
         {
+            
+            /*
+            
             //The mix color is set to the inverse of background color, so white background will get dark colors
             Color mix = Color.FromArgb(ThemeManager.BGColor.ToArgb() ^ 0xffffff);
 
@@ -337,6 +340,8 @@ namespace MissionPlanner.Utilities
 
             var col = Color.FromArgb(red, green, blue);
             return col;
+            */
+            return Color.White;
         }
 
         public static void doxamlgen()
@@ -1092,34 +1097,33 @@ mc:Ignorable=""d""
                 else if (ctl.GetType() == typeof(QuickView))
                 {
                     //set default QuickView item color to mix with background
-                    Color mix = Color.FromArgb(ThemeManager.BGColor.ToArgb() ^ 0xffffff);
-
-                    Controls.QuickView but = (QuickView)ctl;
-                    if (but.Name == "quickView6")
-                    {
-                        but.numberColor = Color.FromArgb((0 + mix.R) / 2, (255 + mix.G) / 2, (252 + mix.B) / 2);
-                    }
-                    else if (but.Name == "quickView5")
-                    {
-                        but.numberColor = Color.FromArgb((254 + mix.R) / 2, (254 + mix.G) / 2, (86 + mix.B) / 2);
-                    }
-                    else if (but.Name == "quickView4")
-                    {
-                        but.numberColor = Color.FromArgb((0 + mix.R) / 2, (255 + mix.G) / 2, (83 + mix.B) / 2);
-                    }
-                    else if (but.Name == "quickView3")
-                    {
-                        but.numberColor = Color.FromArgb((255 + mix.R) / 2, (96 + mix.G) / 2, (91 + mix.B) / 2);
-                    }
-                    else if (but.Name == "quickView2")
-                    {
-                        but.numberColor = Color.FromArgb((254 + mix.R) / 2, (132 + mix.G) / 2, (46 + mix.B) / 2);
-                    }
-                    else if (but.Name == "quickView1")
-                    {
-                        but.numberColor = Color.FromArgb((209 + mix.R) / 2, (151 + mix.G) / 2, (248 + mix.B) / 2);
-                    }
-                    but.numberColorBackup = but.numberColor;
+                    //Color mix = Color.FromArgb(ThemeManager.BGColor.ToArgb() ^ 0xffffff);
+                    //Controls.QuickView but = (QuickView)ctl;
+                    //if (but.Name == "quickView6")
+                    //{
+                    //    but.numberColor = Color.FromArgb((0 + mix.R) / 2, (255 + mix.G) / 2, (252 + mix.B) / 2);
+                    //}
+                    //else if (but.Name == "quickView5")
+                    //{
+                    //    but.numberColor = Color.FromArgb((254 + mix.R) / 2, (254 + mix.G) / 2, (86 + mix.B) / 2);
+                    //}
+                    //else if (but.Name == "quickView4")
+                    //{
+                    //    but.numberColor = Color.FromArgb((0 + mix.R) / 2, (255 + mix.G) / 2, (83 + mix.B) / 2);
+                    //}
+                    //else if (but.Name == "quickView3")
+                    //{
+                    //    but.numberColor = Color.FromArgb((255 + mix.R) / 2, (96 + mix.G) / 2, (91 + mix.B) / 2);
+                    //}
+                    //else if (but.Name == "quickView2")
+                    //{
+                    //    but.numberColor = Color.FromArgb((254 + mix.R) / 2, (132 + mix.G) / 2, (46 + mix.B) / 2);
+                    //}
+                    //else if (but.Name == "quickView1")
+                    //{
+                    //    but.numberColor = Color.FromArgb((209 + mix.R) / 2, (151 + mix.G) / 2, (248 + mix.B) / 2);
+                    //}
+                    //but.numberColorBackup = but.numberColor;
                     //return;  //return removed to process all quickView controls
                 }
                 else if (ctl.GetType() == typeof(TreeView))
