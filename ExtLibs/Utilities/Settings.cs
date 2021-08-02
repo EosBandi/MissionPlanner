@@ -44,7 +44,7 @@ namespace MissionPlanner.Utilities
         /// </summary>
         public static Dictionary<string, string> config = new Dictionary<string, string>();
 
-        public static string FileName { get; set; } = "config.xml";
+        public static string FileName { get; set; } = "protarconfig.xml";
 
         public string this[string key]
         {
