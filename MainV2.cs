@@ -5588,7 +5588,7 @@ namespace MissionPlanner
                     if (color == "NoColor")
                     {
                         qv.BackColor = ThemeManager.BGColor;
-                        qv.numberColor = qv.numberColorBackup;  //Restore original color from backup :)
+                        qv.numberColor = Color.White;  //Restore original color from backup :)
                         qv.ForeColor = ThemeManager.TextColor;
 
 
