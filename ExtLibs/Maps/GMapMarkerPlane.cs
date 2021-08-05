@@ -125,17 +125,17 @@ namespace MissionPlanner.Maps
             if (which == 0)
                 g.DrawImageUnscaled(icon, icon.Width / -2 -5 , icon.Height / -2 -10 );
             if (which == 1)
-                g.DrawImageUnscaled(icon1, icon1.Width / -2, icon1.Height / -2);
+                g.DrawImageUnscaled(icon1, icon1.Width / -2 -5, icon1.Height / -2 -10 );
             if (which == 2)
-                g.DrawImageUnscaled(icon2, icon2.Width / -2, icon2.Height / -2);
+                g.DrawImageUnscaled(icon2, icon2.Width / -2 -5, icon2.Height / -2 -10 );
             if (which == 3)
-                g.DrawImageUnscaled(icon3, icon3.Width / -2, icon3.Height / -2);
+                g.DrawImageUnscaled(icon3, icon3.Width / -2 -5 , icon3.Height / -2 -10);
             if (which == 4)
-                g.DrawImageUnscaled(icon4, icon4.Width / -2, icon4.Height / -2);
+                g.DrawImageUnscaled(icon4, icon4.Width / -2 -5 , icon4.Height / -2 -10);
             if (which == 5)
-                g.DrawImageUnscaled(icon5, icon5.Width / -2, icon5.Height / -2);
+                g.DrawImageUnscaled(icon5, icon5.Width / -2 -5, icon5.Height / -2 -10 );
             if (which == 6)
-                g.DrawImageUnscaled(icon6, icon6.Width / -2, icon6.Height / -2);
+                g.DrawImageUnscaled(icon6, icon6.Width / -2 -5 , icon6.Height / -2 -10);
 
 
 
