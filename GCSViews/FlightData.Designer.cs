@@ -183,7 +183,6 @@
             this.onOffCameraOverlapToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.altitudeAngelSettingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.undockDockToolStripMenuItem2 = new System.Windows.Forms.ToolStripMenuItem();
-            this.bHideComm = new MissionPlanner.Controls.MyButton();
             this.CHK_autopan = new System.Windows.Forms.CheckBox();
             this.CB_tuning = new System.Windows.Forms.CheckBox();
             this.but_disablejoystick = new MissionPlanner.Controls.MyButton();
@@ -194,6 +193,7 @@
             this.TRK_zoom = new MissionPlanner.Controls.MyTrackBar();
             this.panel1 = new System.Windows.Forms.Panel();
             this.botMenuLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.bHideComm = new MissionPlanner.Controls.MyButton();
             this.myButtonSettings = new MissionPlanner.Controls.myButtonNoTheme();
             this.myButtonNoTheme2 = new MissionPlanner.Controls.myButtonNoTheme();
             this.myButtonNoTheme3 = new MissionPlanner.Controls.myButtonNoTheme();
@@ -274,11 +274,11 @@
             // 
             // MainH.Panel1
             // 
-            this.MainH.Panel2.Controls.Add(this.SubMainLeft);
+            this.MainH.Panel1.Controls.Add(this.tableMap);
             // 
             // MainH.Panel2
             // 
-            this.MainH.Panel1.Controls.Add(this.tableMap);
+            this.MainH.Panel2.Controls.Add(this.SubMainLeft);
             // 
             // SubMainLeft
             // 
@@ -2379,13 +2379,6 @@
             resources.ApplyResources(this.undockDockToolStripMenuItem2, "undockDockToolStripMenuItem2");
             this.undockDockToolStripMenuItem2.Click += new System.EventHandler(this.undockDockToolStripMenuItem2_Click);
             // 
-            // bHideComm
-            // 
-            resources.ApplyResources(this.bHideComm, "bHideComm");
-            this.bHideComm.Name = "bHideComm";
-            this.bHideComm.UseVisualStyleBackColor = true;
-            this.bHideComm.Click += new System.EventHandler(this.bHideComm_Click);
-            // 
             // CHK_autopan
             // 
             resources.ApplyResources(this.CHK_autopan, "CHK_autopan");
@@ -2426,7 +2419,7 @@
             this.windDir1.BackColor = System.Drawing.Color.Transparent;
             this.windDir1.DataBindings.Add(new System.Windows.Forms.Binding("Direction", this.bindingSource1, "wind_dir", true, System.Windows.Forms.DataSourceUpdateMode.Never));
             this.windDir1.DataBindings.Add(new System.Windows.Forms.Binding("Speed", this.bindingSource1, "wind_vel", true, System.Windows.Forms.DataSourceUpdateMode.Never));
-            this.windDir1.Direction = 360D;
+            this.windDir1.Direction = 180D;
             resources.ApplyResources(this.windDir1, "windDir1");
             this.windDir1.Name = "windDir1";
             this.windDir1.Speed = 0D;
@@ -2498,6 +2491,13 @@
             this.botMenuLayout.Controls.Add(this.myButtonNoTheme6, 5, 0);
             this.botMenuLayout.Controls.Add(this.myButtonNoTheme7, 6, 0);
             this.botMenuLayout.Name = "botMenuLayout";
+            // 
+            // bHideComm
+            // 
+            resources.ApplyResources(this.bHideComm, "bHideComm");
+            this.bHideComm.Name = "bHideComm";
+            this.bHideComm.UseVisualStyleBackColor = true;
+            this.bHideComm.Click += new System.EventHandler(this.bHideComm_Click);
             // 
             // myButtonSettings
             // 

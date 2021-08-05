@@ -3118,8 +3118,8 @@ namespace MissionPlanner
 
             //Set up annunciator
 
-            string[] btnLabels = new string[] { "EKF", "ENGINE", "BATT", "GPS", "COMM", "VIBE", "FUEL", "GEO"+ Environment.NewLine +"FENCE",
-                "AIR"+ Environment.NewLine +"SPEED", "MAG", "PAY"+ Environment.NewLine +"LOAD", "ROUTE", "PARA"+ Environment.NewLine +"CHUTE",
+            string[] btnLabels = new string[] { "IMU", "ENGINE", "POWER", "NAV", "COM", "VIBE", "FUEL", "GEO"+ Environment.NewLine +"FENCE",
+                "AIR"+ Environment.NewLine +"SPEED", "MAG", "PAY"+ Environment.NewLine +"LOAD", "MISSION", "PARA"+ Environment.NewLine +"CHUTE",
                 "PRE"+ Environment.NewLine +"FLIGHT", "START", "MSG","MAIN" + Environment.NewLine + "SCRN" };
 
             string[] btnNames = new string[] { "EKF", "ENGINE", "BATT", "GPS", "COMM", "VIBE", "FUEL", "FENCE", "AIRSPD", "MAG", "PAYLD", "ROUTE", "CHUTE", "PRFLT", "START", "MSG", "MAIN" };
@@ -4944,7 +4944,7 @@ namespace MissionPlanner
                     {
                         Rectangle screenRectangle = this.RectangleToScreen(this.ClientRectangle);
                         int titleHeight = screenRectangle.Top - this.Top;
-                        f.Location = new Point(this.Location.X + screenRectangle.Width - f.Size.Width, this.Location.Y + this.annunciator1.Location.Y + this.annunciator1.Size.Height + 1 + titleHeight);
+                        f.Location = new Point(this.Location.X + 120 , this.Location.Y + this.annunciator1.Location.Y + this.annunciator1.Size.Height + 1 + titleHeight);
                     }
 
 
@@ -4999,7 +4999,7 @@ namespace MissionPlanner
                     {
                         Rectangle screenRectangle = this.RectangleToScreen(this.ClientRectangle);
                         int titleHeight = screenRectangle.Top - this.Top;
-                        connectionStatsForm.Location = new Point(this.Location.X + screenRectangle.Width - connectionStatsForm.Size.Width, this.Location.Y + this.annunciator1.Location.Y + this.annunciator1.Size.Height + 1 + titleHeight);
+                        connectionStatsForm.Location = new Point(this.Location.X + 120, this.Location.Y + this.annunciator1.Location.Y + this.annunciator1.Size.Height + 1 + titleHeight);
                     }
                 }
 
@@ -5020,7 +5020,7 @@ namespace MissionPlanner
                         {
                             Rectangle screenRectangle = this.RectangleToScreen(this.ClientRectangle);
                             int titleHeight = screenRectangle.Top - this.Top;
-                            connectionStatsForm.Location = new Point(this.Location.X + screenRectangle.Width - connectionStatsForm.Size.Width, this.Location.Y + this.annunciator1.Location.Y + this.annunciator1.Size.Height + 1 + titleHeight);
+                            connectionStatsForm.Location = new Point(this.Location.X + 120, this.Location.Y + this.annunciator1.Location.Y + this.annunciator1.Size.Height + 1 + titleHeight);
                         }
                     }
                 }

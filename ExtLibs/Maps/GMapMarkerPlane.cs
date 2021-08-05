@@ -123,7 +123,7 @@ namespace MissionPlanner.Maps
 
             // 'which' variable simply selects different coloured plane icon/s from the resource library
             if (which == 0)
-                g.DrawImageUnscaled(icon, icon.Width / -2, icon.Height / -2);
+                g.DrawImageUnscaled(icon, icon.Width / -2 -5 , icon.Height / -2 -10 );
             if (which == 1)
                 g.DrawImageUnscaled(icon1, icon1.Width / -2, icon1.Height / -2);
             if (which == 2)

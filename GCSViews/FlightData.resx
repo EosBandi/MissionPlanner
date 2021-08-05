@@ -128,6 +128,784 @@
   <data name="MainH.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
     <value>0, 0, 0, 0</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="tableMap.ColumnCount" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="splitContainer1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="splitContainer1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 3</value>
+  </data>
+  <data name="splitContainer1.Orientation" type="System.Windows.Forms.Orientation, System.Windows.Forms">
+    <value>Horizontal</value>
+  </data>
+  <data name="zg1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="zg1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="zg1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>4, 4, 4, 4</value>
+  </data>
+  <data name="zg1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>599, 210</value>
+  </data>
+  <data name="zg1.TabIndex" type="System.Int32, mscorlib">
+    <value>67</value>
+  </data>
+  <data name="&gt;&gt;zg1.Name" xml:space="preserve">
+    <value>zg1</value>
+  </data>
+  <data name="&gt;&gt;zg1.Type" xml:space="preserve">
+    <value>ZedGraph.ZedGraphControl, ZedGraph, Version=5.1.5.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;zg1.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel1</value>
+  </data>
+  <data name="&gt;&gt;zg1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Panel1.Name" xml:space="preserve">
+    <value>splitContainer1.Panel1</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Panel1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.SplitterPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Panel1.Parent" xml:space="preserve">
+    <value>splitContainer1</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Panel1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <metadata name="contextMenuStripMap.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>444, 17</value>
+  </metadata>
+  <data name="goHereToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="goHereToolStripMenuItem.Text" xml:space="preserve">
+    <value>Fly To Here</value>
+  </data>
+  <data name="flyToHereAltToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="flyToHereAltToolStripMenuItem.Text" xml:space="preserve">
+    <value>Fly To Here Alt</value>
+  </data>
+  <data name="flyToCoordsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="flyToCoordsToolStripMenuItem.Text" xml:space="preserve">
+    <value>Fly To Coords</value>
+  </data>
+  <data name="deleteToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>121, 22</value>
+  </data>
+  <data name="deleteToolStripMenuItem.Text" xml:space="preserve">
+    <value>Delete</value>
+  </data>
+  <data name="saveFileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>121, 22</value>
+  </data>
+  <data name="saveFileToolStripMenuItem.Text" xml:space="preserve">
+    <value>Save File</value>
+  </data>
+  <data name="loadFileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>121, 22</value>
+  </data>
+  <data name="loadFileToolStripMenuItem.Text" xml:space="preserve">
+    <value>Load File</value>
+  </data>
+  <data name="poiatcoordsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>121, 22</value>
+  </data>
+  <data name="poiatcoordsToolStripMenuItem.Text" xml:space="preserve">
+    <value>Coords</value>
+  </data>
+  <data name="addPoiToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="addPoiToolStripMenuItem.Text" xml:space="preserve">
+    <value>Add Poi</value>
+  </data>
+  <data name="pointCameraHereToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="pointCameraHereToolStripMenuItem.Text" xml:space="preserve">
+    <value>Point Camera Here</value>
+  </data>
+  <data name="PointCameraCoordsToolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="PointCameraCoordsToolStripMenuItem1.Text" xml:space="preserve">
+    <value>Point Camera Coords</value>
+  </data>
+  <data name="triggerCameraToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="triggerCameraToolStripMenuItem.Text" xml:space="preserve">
+    <value>Trigger Camera NOW</value>
+  </data>
+  <data name="flightPlannerToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="flightPlannerToolStripMenuItem.Text" xml:space="preserve">
+    <value>Flight Planner</value>
+  </data>
+  <data name="setEKFHomeHereToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>176, 22</value>
+  </data>
+  <data name="setEKFHomeHereToolStripMenuItem.Text" xml:space="preserve">
+    <value>Set EKF Origin Here</value>
+  </data>
+  <data name="setHomeHereToolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>176, 22</value>
+  </data>
+  <data name="setHomeHereToolStripMenuItem1.Text" xml:space="preserve">
+    <value>Set Home Here</value>
+  </data>
+  <data name="setHomeHereToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="setHomeHereToolStripMenuItem.Text" xml:space="preserve">
+    <value>Set Home Here</value>
+  </data>
+  <data name="takeOffToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="takeOffToolStripMenuItem.Text" xml:space="preserve">
+    <value>TakeOff</value>
+  </data>
+  <data name="onOffCameraOverlapToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="onOffCameraOverlapToolStripMenuItem.Text" xml:space="preserve">
+    <value>Camera Overlap</value>
+  </data>
+  <data name="altitudeAngelSettingsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="altitudeAngelSettingsToolStripMenuItem.Text" xml:space="preserve">
+    <value>Altitude Angel Settings</value>
+  </data>
+  <data name="undockDockToolStripMenuItem2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 22</value>
+  </data>
+  <data name="undockDockToolStripMenuItem2.Text" xml:space="preserve">
+    <value>Undock/Dock</value>
+  </data>
+  <data name="contextMenuStripMap.Size" type="System.Drawing.Size, System.Drawing">
+    <value>196, 290</value>
+  </data>
+  <data name="&gt;&gt;contextMenuStripMap.Name" xml:space="preserve">
+    <value>contextMenuStripMap</value>
+  </data>
+  <data name="&gt;&gt;contextMenuStripMap.Type" xml:space="preserve">
+    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="CHK_autopan.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="CHK_autopan.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="CHK_autopan.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="CHK_autopan.Location" type="System.Drawing.Point, System.Drawing">
+    <value>41, 238</value>
+  </data>
+  <data name="CHK_autopan.Size" type="System.Drawing.Size, System.Drawing">
+    <value>70, 17</value>
+  </data>
+  <data name="CHK_autopan.TabIndex" type="System.Int32, mscorlib">
+    <value>68</value>
+  </data>
+  <data name="CHK_autopan.Text" xml:space="preserve">
+    <value>Auto Pan</value>
+  </data>
+  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>617, 17</value>
+  </metadata>
+  <data name="CHK_autopan.ToolTip" xml:space="preserve">
+    <value>Makes the map autopan based on current location</value>
+  </data>
+  <data name="&gt;&gt;CHK_autopan.Name" xml:space="preserve">
+    <value>CHK_autopan</value>
+  </data>
+  <data name="&gt;&gt;CHK_autopan.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;CHK_autopan.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel2</value>
+  </data>
+  <data name="&gt;&gt;CHK_autopan.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="CB_tuning.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="CB_tuning.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="CB_tuning.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="CB_tuning.Location" type="System.Drawing.Point, System.Drawing">
+    <value>41, 215</value>
+  </data>
+  <data name="CB_tuning.Size" type="System.Drawing.Size, System.Drawing">
+    <value>59, 17</value>
+  </data>
+  <data name="CB_tuning.TabIndex" type="System.Int32, mscorlib">
+    <value>62</value>
+  </data>
+  <data name="CB_tuning.Text" xml:space="preserve">
+    <value>Tuning</value>
+  </data>
+  <data name="CB_tuning.ToolTip" xml:space="preserve">
+    <value>Show the tunning graph, chowing target attitudes vs actual</value>
+  </data>
+  <data name="CB_tuning.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="&gt;&gt;CB_tuning.Name" xml:space="preserve">
+    <value>CB_tuning</value>
+  </data>
+  <data name="&gt;&gt;CB_tuning.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;CB_tuning.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel2</value>
+  </data>
+  <data name="&gt;&gt;CB_tuning.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="but_disablejoystick.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="but_disablejoystick.Location" type="System.Drawing.Point, System.Drawing">
+    <value>4, 67</value>
+  </data>
+  <data name="but_disablejoystick.Size" type="System.Drawing.Size, System.Drawing">
+    <value>56, 23</value>
+  </data>
+  <data name="but_disablejoystick.TabIndex" type="System.Int32, mscorlib">
+    <value>77</value>
+  </data>
+  <data name="but_disablejoystick.Text" xml:space="preserve">
+    <value>Disable Joystick</value>
+  </data>
+  <data name="but_disablejoystick.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="&gt;&gt;but_disablejoystick.Name" xml:space="preserve">
+    <value>but_disablejoystick</value>
+  </data>
+  <data name="&gt;&gt;but_disablejoystick.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.MyButton, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;but_disablejoystick.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel2</value>
+  </data>
+  <data name="&gt;&gt;but_disablejoystick.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="myButton8.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Bottom, Left</value>
+  </data>
+  <data name="myButton8.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="myButton8.Location" type="System.Drawing.Point, System.Drawing">
+    <value>164, 265</value>
+  </data>
+  <data name="myButton8.Size" type="System.Drawing.Size, System.Drawing">
+    <value>60, 20</value>
+  </data>
+  <data name="myButton8.TabIndex" type="System.Int32, mscorlib">
+    <value>76</value>
+  </data>
+  <data name="myButton8.Text" xml:space="preserve">
+    <value>EXIT</value>
+  </data>
+  <data name="&gt;&gt;myButton8.Name" xml:space="preserve">
+    <value>myButton8</value>
+  </data>
+  <data name="&gt;&gt;myButton8.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.MyButton, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;myButton8.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel2</value>
+  </data>
+  <data name="&gt;&gt;myButton8.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <metadata name="bindingSource1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <value>307, 17</value>
+  </metadata>
+  <data name="windDir1.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Arial, 12pt, style=Bold</value>
+  </data>
+  <data name="windDir1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="windDir1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>70, 40</value>
+  </data>
+  <data name="windDir1.TabIndex" type="System.Int32, mscorlib">
+    <value>75</value>
+  </data>
+  <data name="&gt;&gt;windDir1.Name" xml:space="preserve">
+    <value>windDir1</value>
+  </data>
+  <data name="&gt;&gt;windDir1.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.WindDir, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;windDir1.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel2</value>
+  </data>
+  <data name="&gt;&gt;windDir1.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="gMapControl1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="gMapControl1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="gMapControl1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>0, 0, 0, 0</value>
+  </data>
+  <data name="gMapControl1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>536, 416</value>
+  </data>
+  <data name="gMapControl1.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;gMapControl1.Name" xml:space="preserve">
+    <value>gMapControl1</value>
+  </data>
+  <data name="&gt;&gt;gMapControl1.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.myGMAP, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;gMapControl1.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel2</value>
+  </data>
+  <data name="&gt;&gt;gMapControl1.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="TRK_zoom.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Right</value>
+  </data>
+  <data name="TRK_zoom.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="TRK_zoom.Location" type="System.Drawing.Point, System.Drawing">
+    <value>536, 0</value>
+  </data>
+  <data name="TRK_zoom.Orientation" type="System.Windows.Forms.Orientation, System.Windows.Forms">
+    <value>Vertical</value>
+  </data>
+  <data name="TRK_zoom.Size" type="System.Drawing.Size, System.Drawing">
+    <value>45, 416</value>
+  </data>
+  <data name="TRK_zoom.TabIndex" type="System.Int32, mscorlib">
+    <value>72</value>
+  </data>
+  <data name="TRK_zoom.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="&gt;&gt;TRK_zoom.Name" xml:space="preserve">
+    <value>TRK_zoom</value>
+  </data>
+  <data name="&gt;&gt;TRK_zoom.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.MyTrackBar, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;TRK_zoom.Parent" xml:space="preserve">
+    <value>splitContainer1.Panel2</value>
+  </data>
+  <data name="&gt;&gt;TRK_zoom.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Panel2.Name" xml:space="preserve">
+    <value>splitContainer1.Panel2</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Panel2.Type" xml:space="preserve">
+    <value>System.Windows.Forms.SplitterPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Panel2.Parent" xml:space="preserve">
+    <value>splitContainer1</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Panel2.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="splitContainer1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>581, 416</value>
+  </data>
+  <data name="splitContainer1.SplitterDistance" type="System.Int32, mscorlib">
+    <value>210</value>
+  </data>
+  <data name="splitContainer1.TabIndex" type="System.Int32, mscorlib">
+    <value>76</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Name" xml:space="preserve">
+    <value>splitContainer1</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.SplitContainer, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.Parent" xml:space="preserve">
+    <value>tableMap</value>
+  </data>
+  <data name="&gt;&gt;splitContainer1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="panel1.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="botMenuLayout.ColumnCount" type="System.Int32, mscorlib">
+    <value>8</value>
+  </data>
+  <data name="bHideComm.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
+    <value>Top, Left, Right</value>
+  </data>
+  <data name="bHideComm.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="bHideComm.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt</value>
+  </data>
+  <data name="bHideComm.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="bHideComm.Location" type="System.Drawing.Point, System.Drawing">
+    <value>514, 3</value>
+  </data>
+  <data name="bHideComm.Size" type="System.Drawing.Size, System.Drawing">
+    <value>70, 19</value>
+  </data>
+  <data name="bHideComm.TabIndex" type="System.Int32, mscorlib">
+    <value>72</value>
+  </data>
+  <data name="bHideComm.Text" xml:space="preserve">
+    <value>Comm</value>
+  </data>
+  <data name="&gt;&gt;bHideComm.Name" xml:space="preserve">
+    <value>bHideComm</value>
+  </data>
+  <data name="&gt;&gt;bHideComm.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.MyButton, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;bHideComm.Parent" xml:space="preserve">
+    <value>botMenuLayout</value>
+  </data>
+  <data name="&gt;&gt;bHideComm.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="myButtonSettings.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="myButtonSettings.Font" type="System.Drawing.Font, System.Drawing">
+    <value>Microsoft Sans Serif, 8.25pt, style=Bold</value>
+  </data>
+  <data name="myButtonSettings.Location" type="System.Drawing.Point, System.Drawing">
+    <value>3, 3</value>
+  </data>
+  <data name="myButtonSettings.Size" type="System.Drawing.Size, System.Drawing">
+    <value>67, 19</value>
+  </data>
+  <data name="myButtonSettings.TabIndex" type="System.Int32, mscorlib">
+    <value>71</value>
+  </data>
+  <data name="myButtonSettings.Text" xml:space="preserve">
+    <value>SETTINGS</value>
+  </data>
+  <data name="&gt;&gt;myButtonSettings.Name" xml:space="preserve">
+    <value>myButtonSettings</value>
+  </data>
+  <data name="&gt;&gt;myButtonSettings.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;myButtonSettings.Parent" xml:space="preserve">
+    <value>botMenuLayout</value>
+  </data>
+  <data name="&gt;&gt;myButtonSettings.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="myButtonNoTheme2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="myButtonNoTheme2.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
+    <value>Flat</value>
+  </data>
+  <data name="myButtonNoTheme2.Location" type="System.Drawing.Point, System.Drawing">
+    <value>76, 3</value>
+  </data>
+  <data name="myButtonNoTheme2.Size" type="System.Drawing.Size, System.Drawing">
+    <value>67, 19</value>
+  </data>
+  <data name="myButtonNoTheme2.TabIndex" type="System.Int32, mscorlib">
+    <value>72</value>
+  </data>
+  <data name="myButtonNoTheme2.Text" xml:space="preserve">
+    <value>myButtonNoTheme2</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme2.Name" xml:space="preserve">
+    <value>myButtonNoTheme2</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme2.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme2.Parent" xml:space="preserve">
+    <value>botMenuLayout</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme2.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="myButtonNoTheme3.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="myButtonNoTheme3.Location" type="System.Drawing.Point, System.Drawing">
+    <value>149, 3</value>
+  </data>
+  <data name="myButtonNoTheme3.Size" type="System.Drawing.Size, System.Drawing">
+    <value>67, 19</value>
+  </data>
+  <data name="myButtonNoTheme3.TabIndex" type="System.Int32, mscorlib">
+    <value>73</value>
+  </data>
+  <data name="myButtonNoTheme3.Text" xml:space="preserve">
+    <value>myButtonNoTheme3</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme3.Name" xml:space="preserve">
+    <value>myButtonNoTheme3</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme3.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme3.Parent" xml:space="preserve">
+    <value>botMenuLayout</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme3.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
+  <data name="myButtonNoTheme4.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="myButtonNoTheme4.Location" type="System.Drawing.Point, System.Drawing">
+    <value>222, 3</value>
+  </data>
+  <data name="myButtonNoTheme4.Size" type="System.Drawing.Size, System.Drawing">
+    <value>67, 19</value>
+  </data>
+  <data name="myButtonNoTheme4.TabIndex" type="System.Int32, mscorlib">
+    <value>74</value>
+  </data>
+  <data name="myButtonNoTheme4.Text" xml:space="preserve">
+    <value>myButtonNoTheme4</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme4.Name" xml:space="preserve">
+    <value>myButtonNoTheme4</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme4.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme4.Parent" xml:space="preserve">
+    <value>botMenuLayout</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme4.ZOrder" xml:space="preserve">
+    <value>4</value>
+  </data>
+  <data name="myButtonNoTheme5.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="myButtonNoTheme5.Location" type="System.Drawing.Point, System.Drawing">
+    <value>295, 3</value>
+  </data>
+  <data name="myButtonNoTheme5.Size" type="System.Drawing.Size, System.Drawing">
+    <value>67, 19</value>
+  </data>
+  <data name="myButtonNoTheme5.TabIndex" type="System.Int32, mscorlib">
+    <value>75</value>
+  </data>
+  <data name="myButtonNoTheme5.Text" xml:space="preserve">
+    <value>myButtonNoTheme5</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme5.Name" xml:space="preserve">
+    <value>myButtonNoTheme5</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme5.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme5.Parent" xml:space="preserve">
+    <value>botMenuLayout</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme5.ZOrder" xml:space="preserve">
+    <value>5</value>
+  </data>
+  <data name="myButtonNoTheme6.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="myButtonNoTheme6.Location" type="System.Drawing.Point, System.Drawing">
+    <value>368, 3</value>
+  </data>
+  <data name="myButtonNoTheme6.Size" type="System.Drawing.Size, System.Drawing">
+    <value>67, 19</value>
+  </data>
+  <data name="myButtonNoTheme6.TabIndex" type="System.Int32, mscorlib">
+    <value>76</value>
+  </data>
+  <data name="myButtonNoTheme6.Text" xml:space="preserve">
+    <value>myButtonNoTheme6</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme6.Name" xml:space="preserve">
+    <value>myButtonNoTheme6</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme6.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme6.Parent" xml:space="preserve">
+    <value>botMenuLayout</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme6.ZOrder" xml:space="preserve">
+    <value>6</value>
+  </data>
+  <data name="myButtonNoTheme7.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="myButtonNoTheme7.Location" type="System.Drawing.Point, System.Drawing">
+    <value>441, 3</value>
+  </data>
+  <data name="myButtonNoTheme7.Size" type="System.Drawing.Size, System.Drawing">
+    <value>67, 19</value>
+  </data>
+  <data name="myButtonNoTheme7.TabIndex" type="System.Int32, mscorlib">
+    <value>77</value>
+  </data>
+  <data name="myButtonNoTheme7.Text" xml:space="preserve">
+    <value>myButtonNoTheme7</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme7.Name" xml:space="preserve">
+    <value>myButtonNoTheme7</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme7.Type" xml:space="preserve">
+    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme7.Parent" xml:space="preserve">
+    <value>botMenuLayout</value>
+  </data>
+  <data name="&gt;&gt;myButtonNoTheme7.ZOrder" xml:space="preserve">
+    <value>7</value>
+  </data>
+  <data name="botMenuLayout.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="botMenuLayout.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="botMenuLayout.RowCount" type="System.Int32, mscorlib">
+    <value>1</value>
+  </data>
+  <data name="botMenuLayout.Size" type="System.Drawing.Size, System.Drawing">
+    <value>587, 25</value>
+  </data>
+  <data name="botMenuLayout.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;botMenuLayout.Name" xml:space="preserve">
+    <value>botMenuLayout</value>
+  </data>
+  <data name="&gt;&gt;botMenuLayout.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;botMenuLayout.Parent" xml:space="preserve">
+    <value>panel1</value>
+  </data>
+  <data name="&gt;&gt;botMenuLayout.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="botMenuLayout.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="bHideComm" Row="0" RowSpan="1" Column="7" ColumnSpan="1" /&gt;&lt;Control Name="myButtonSettings" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme2" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme3" Row="0" RowSpan="1" Column="2" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme4" Row="0" RowSpan="1" Column="3" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme5" Row="0" RowSpan="1" Column="4" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme6" Row="0" RowSpan="1" Column="5" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme7" Row="0" RowSpan="1" Column="6" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,12.5,Percent,12.5,Percent,12.5,Percent,12.5,Percent,12.5,Percent,12.5,Percent,12.5,Percent,12.5" /&gt;&lt;Rows Styles="Percent,100" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
+  <data name="panel1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="panel1.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 422</value>
+  </data>
+  <data name="panel1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>0, 0, 0, 0</value>
+  </data>
+  <data name="panel1.Size" type="System.Drawing.Size, System.Drawing">
+    <value>587, 25</value>
+  </data>
+  <data name="panel1.TabIndex" type="System.Int32, mscorlib">
+    <value>0</value>
+  </data>
+  <data name="&gt;&gt;panel1.Name" xml:space="preserve">
+    <value>panel1</value>
+  </data>
+  <data name="&gt;&gt;panel1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;panel1.Parent" xml:space="preserve">
+    <value>tableMap</value>
+  </data>
+  <data name="&gt;&gt;panel1.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="tableMap.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
+    <value>Fill</value>
+  </data>
+  <data name="tableMap.Location" type="System.Drawing.Point, System.Drawing">
+    <value>0, 0</value>
+  </data>
+  <data name="tableMap.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
+    <value>0, 0, 0, 0</value>
+  </data>
+  <data name="tableMap.RowCount" type="System.Int32, mscorlib">
+    <value>2</value>
+  </data>
+  <data name="tableMap.Size" type="System.Drawing.Size, System.Drawing">
+    <value>587, 447</value>
+  </data>
+  <data name="tableMap.TabIndex" type="System.Int32, mscorlib">
+    <value>75</value>
+  </data>
+  <data name="&gt;&gt;tableMap.Name" xml:space="preserve">
+    <value>tableMap</value>
+  </data>
+  <data name="&gt;&gt;tableMap.Type" xml:space="preserve">
+    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;tableMap.Parent" xml:space="preserve">
+    <value>MainH.Panel1</value>
+  </data>
+  <data name="&gt;&gt;tableMap.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="tableMap.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
+    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="splitContainer1" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="panel1" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100" /&gt;&lt;Rows Styles="Percent,100,Absolute,25" /&gt;&lt;/TableLayoutSettings&gt;</value>
+  </data>
+  <data name="&gt;&gt;MainH.Panel1.Name" xml:space="preserve">
+    <value>MainH.Panel1</value>
+  </data>
+  <data name="&gt;&gt;MainH.Panel1.Type" xml:space="preserve">
+    <value>System.Windows.Forms.SplitterPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;MainH.Panel1.Parent" xml:space="preserve">
+    <value>MainH</value>
+  </data>
+  <data name="&gt;&gt;MainH.Panel1.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="MainH.Panel1MinSize" type="System.Int32, mscorlib">
+    <value>300</value>
+  </data>
   <data name="SubMainLeft.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
     <value>Fill</value>
   </data>
@@ -215,7 +993,6 @@
   <data name="swapWithMapToolStripMenuItem.Text" xml:space="preserve">
     <value>Swap With Map</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="swapWithMapToolStripMenuItem.Visible" type="System.Boolean, mscorlib">
     <value>False</value>
   </data>
@@ -253,7 +1030,7 @@
     <value>0, 0, 0, 0</value>
   </data>
   <data name="hud1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>300, 214</value>
+    <value>318, 214</value>
   </data>
   <data name="hud1.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -346,13 +1123,13 @@
     <value>Microsoft Sans Serif, 9.75pt</value>
   </data>
   <data name="quickView6.Location" type="System.Drawing.Point, System.Drawing">
-    <value>146, 119</value>
+    <value>155, 119</value>
   </data>
   <data name="quickView6.MinimumSize" type="System.Drawing.Size, System.Drawing">
     <value>100, 27</value>
   </data>
   <data name="quickView6.Size" type="System.Drawing.Size, System.Drawing">
-    <value>137, 53</value>
+    <value>146, 53</value>
   </data>
   <data name="quickView6.TabIndex" type="System.Int32, mscorlib">
     <value>10</value>
@@ -382,7 +1159,7 @@
     <value>100, 27</value>
   </data>
   <data name="quickView5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>137, 53</value>
+    <value>146, 53</value>
   </data>
   <data name="quickView5.TabIndex" type="System.Int32, mscorlib">
     <value>9</value>
@@ -406,13 +1183,13 @@
     <value>Microsoft Sans Serif, 9.75pt</value>
   </data>
   <data name="quickView4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>146, 61</value>
+    <value>155, 61</value>
   </data>
   <data name="quickView4.MinimumSize" type="System.Drawing.Size, System.Drawing">
     <value>100, 27</value>
   </data>
   <data name="quickView4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>137, 52</value>
+    <value>146, 52</value>
   </data>
   <data name="quickView4.TabIndex" type="System.Int32, mscorlib">
     <value>8</value>
@@ -442,7 +1219,7 @@
     <value>100, 27</value>
   </data>
   <data name="quickView3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>137, 52</value>
+    <value>146, 52</value>
   </data>
   <data name="quickView3.TabIndex" type="System.Int32, mscorlib">
     <value>3</value>
@@ -466,13 +1243,13 @@
     <value>Microsoft Sans Serif, 9.75pt</value>
   </data>
   <data name="quickView2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>146, 3</value>
+    <value>155, 3</value>
   </data>
   <data name="quickView2.MinimumSize" type="System.Drawing.Size, System.Drawing">
     <value>100, 27</value>
   </data>
   <data name="quickView2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>137, 52</value>
+    <value>146, 52</value>
   </data>
   <data name="quickView2.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
@@ -502,14 +1279,11 @@
     <value>100, 27</value>
   </data>
   <data name="quickView1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>137, 52</value>
+    <value>146, 52</value>
   </data>
   <data name="quickView1.TabIndex" type="System.Int32, mscorlib">
     <value>1</value>
   </data>
-  <metadata name="toolTip1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>617, 17</value>
-  </metadata>
   <data name="quickView1.ToolTip" xml:space="preserve">
     <value>Double Click me to change</value>
   </data>
@@ -535,7 +1309,7 @@
     <value>3</value>
   </data>
   <data name="tableLayoutPanelQuick.Size" type="System.Drawing.Size, System.Drawing">
-    <value>286, 175</value>
+    <value>304, 175</value>
   </data>
   <data name="tableLayoutPanelQuick.TabIndex" type="System.Int32, mscorlib">
     <value>73</value>
@@ -562,7 +1336,7 @@
     <value>3, 3, 3, 3</value>
   </data>
   <data name="tabQuick.Size" type="System.Drawing.Size, System.Drawing">
-    <value>292, 181</value>
+    <value>310, 181</value>
   </data>
   <data name="tabQuick.TabIndex" type="System.Int32, mscorlib">
     <value>4</value>
@@ -652,7 +1426,7 @@
     <value>modifyandSetLoiterRad</value>
   </data>
   <data name="&gt;&gt;modifyandSetLoiterRad.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ModifyandSet, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ModifyandSet, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;modifyandSetLoiterRad.Parent" xml:space="preserve">
     <value>tableLayoutPanel1</value>
@@ -811,7 +1585,7 @@
     <value>modifyandSetAlt</value>
   </data>
   <data name="&gt;&gt;modifyandSetAlt.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ModifyandSet, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ModifyandSet, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;modifyandSetAlt.Parent" xml:space="preserve">
     <value>tableLayoutPanel1</value>
@@ -847,7 +1621,7 @@
     <value>modifyandSetSpeed</value>
   </data>
   <data name="&gt;&gt;modifyandSetSpeed.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ModifyandSet, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ModifyandSet, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;modifyandSetSpeed.Parent" xml:space="preserve">
     <value>tableLayoutPanel1</value>
@@ -1540,7 +2314,7 @@
     <value>checkListControl1</value>
   </data>
   <data name="&gt;&gt;checkListControl1.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.PreFlight.CheckListControl, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.PreFlight.CheckListControl, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;checkListControl1.Parent" xml:space="preserve">
     <value>tabPagePreFlight</value>
@@ -2543,7 +3317,7 @@
     <value>servoOptions1</value>
   </data>
   <data name="&gt;&gt;servoOptions1.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;servoOptions1.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2564,7 +3338,7 @@
     <value>servoOptions2</value>
   </data>
   <data name="&gt;&gt;servoOptions2.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;servoOptions2.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2585,7 +3359,7 @@
     <value>servoOptions3</value>
   </data>
   <data name="&gt;&gt;servoOptions3.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;servoOptions3.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2606,7 +3380,7 @@
     <value>servoOptions4</value>
   </data>
   <data name="&gt;&gt;servoOptions4.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;servoOptions4.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2627,7 +3401,7 @@
     <value>servoOptions5</value>
   </data>
   <data name="&gt;&gt;servoOptions5.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;servoOptions5.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2648,7 +3422,7 @@
     <value>servoOptions6</value>
   </data>
   <data name="&gt;&gt;servoOptions6.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;servoOptions6.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2669,7 +3443,7 @@
     <value>servoOptions7</value>
   </data>
   <data name="&gt;&gt;servoOptions7.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;servoOptions7.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2690,7 +3464,7 @@
     <value>servoOptions8</value>
   </data>
   <data name="&gt;&gt;servoOptions8.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;servoOptions8.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2711,7 +3485,7 @@
     <value>servoOptions9</value>
   </data>
   <data name="&gt;&gt;servoOptions9.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;servoOptions9.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2732,7 +3506,7 @@
     <value>servoOptions10</value>
   </data>
   <data name="&gt;&gt;servoOptions10.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.ServoOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;servoOptions10.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2753,7 +3527,7 @@
     <value>relayOptions1</value>
   </data>
   <data name="&gt;&gt;relayOptions1.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.RelayOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.RelayOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;relayOptions1.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2774,7 +3548,7 @@
     <value>relayOptions2</value>
   </data>
   <data name="&gt;&gt;relayOptions2.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.RelayOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.RelayOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;relayOptions2.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2795,7 +3569,7 @@
     <value>relayOptions3</value>
   </data>
   <data name="&gt;&gt;relayOptions3.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.RelayOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.RelayOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;relayOptions3.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -2816,7 +3590,7 @@
     <value>relayOptions4</value>
   </data>
   <data name="&gt;&gt;relayOptions4.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.RelayOptions, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.RelayOptions, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;relayOptions4.Parent" xml:space="preserve">
     <value>flowLayoutPanelServos</value>
@@ -4541,7 +5315,7 @@
     <value>payloadcontrol1</value>
   </data>
   <data name="&gt;&gt;payloadcontrol1.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.payloadcontrol, MissionPlanner, Version=1.3.7884.27577, Culture=neutral, PublicKeyToken=null</value>
+    <value>MissionPlanner.Controls.payloadcontrol, MissionPlanner, Version=0.9.7887.22071, Culture=neutral, PublicKeyToken=null</value>
   </data>
   <data name="&gt;&gt;payloadcontrol1.Parent" xml:space="preserve">
     <value>tabPayloadControl</value>
@@ -4592,7 +5366,7 @@
     <value>0, 0</value>
   </data>
   <data name="tabControlactions.Size" type="System.Drawing.Size, System.Drawing">
-    <value>300, 229</value>
+    <value>318, 229</value>
   </data>
   <data name="tabControlactions.TabIndex" type="System.Int32, mscorlib">
     <value>84</value>
@@ -4622,7 +5396,7 @@
     <value>1</value>
   </data>
   <data name="SubMainLeft.Size" type="System.Drawing.Size, System.Drawing">
-    <value>300, 447</value>
+    <value>318, 447</value>
   </data>
   <data name="SubMainLeft.SplitterDistance" type="System.Int32, mscorlib">
     <value>214</value>
@@ -4637,784 +5411,10 @@
     <value>System.Windows.Forms.SplitContainer, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </data>
   <data name="&gt;&gt;SubMainLeft.Parent" xml:space="preserve">
-    <value>MainH.Panel1</value>
+    <value>MainH.Panel2</value>
   </data>
   <data name="&gt;&gt;SubMainLeft.ZOrder" xml:space="preserve">
     <value>0</value>
-  </data>
-  <data name="&gt;&gt;MainH.Panel1.Name" xml:space="preserve">
-    <value>MainH.Panel1</value>
-  </data>
-  <data name="&gt;&gt;MainH.Panel1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.SplitterPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;MainH.Panel1.Parent" xml:space="preserve">
-    <value>MainH</value>
-  </data>
-  <data name="&gt;&gt;MainH.Panel1.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="MainH.Panel1MinSize" type="System.Int32, mscorlib">
-    <value>300</value>
-  </data>
-  <data name="tableMap.ColumnCount" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="splitContainer1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="splitContainer1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 3</value>
-  </data>
-  <data name="splitContainer1.Orientation" type="System.Windows.Forms.Orientation, System.Windows.Forms">
-    <value>Horizontal</value>
-  </data>
-  <data name="zg1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="zg1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="zg1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>4, 4, 4, 4</value>
-  </data>
-  <data name="zg1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>599, 210</value>
-  </data>
-  <data name="zg1.TabIndex" type="System.Int32, mscorlib">
-    <value>67</value>
-  </data>
-  <data name="&gt;&gt;zg1.Name" xml:space="preserve">
-    <value>zg1</value>
-  </data>
-  <data name="&gt;&gt;zg1.Type" xml:space="preserve">
-    <value>ZedGraph.ZedGraphControl, ZedGraph, Version=5.1.5.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;zg1.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel1</value>
-  </data>
-  <data name="&gt;&gt;zg1.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Panel1.Name" xml:space="preserve">
-    <value>splitContainer1.Panel1</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Panel1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.SplitterPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Panel1.Parent" xml:space="preserve">
-    <value>splitContainer1</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Panel1.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <metadata name="contextMenuStripMap.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>444, 17</value>
-  </metadata>
-  <data name="goHereToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="goHereToolStripMenuItem.Text" xml:space="preserve">
-    <value>Fly To Here</value>
-  </data>
-  <data name="flyToHereAltToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="flyToHereAltToolStripMenuItem.Text" xml:space="preserve">
-    <value>Fly To Here Alt</value>
-  </data>
-  <data name="flyToCoordsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="flyToCoordsToolStripMenuItem.Text" xml:space="preserve">
-    <value>Fly To Coords</value>
-  </data>
-  <data name="deleteToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>121, 22</value>
-  </data>
-  <data name="deleteToolStripMenuItem.Text" xml:space="preserve">
-    <value>Delete</value>
-  </data>
-  <data name="saveFileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>121, 22</value>
-  </data>
-  <data name="saveFileToolStripMenuItem.Text" xml:space="preserve">
-    <value>Save File</value>
-  </data>
-  <data name="loadFileToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>121, 22</value>
-  </data>
-  <data name="loadFileToolStripMenuItem.Text" xml:space="preserve">
-    <value>Load File</value>
-  </data>
-  <data name="poiatcoordsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>121, 22</value>
-  </data>
-  <data name="poiatcoordsToolStripMenuItem.Text" xml:space="preserve">
-    <value>Coords</value>
-  </data>
-  <data name="addPoiToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="addPoiToolStripMenuItem.Text" xml:space="preserve">
-    <value>Add Poi</value>
-  </data>
-  <data name="pointCameraHereToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="pointCameraHereToolStripMenuItem.Text" xml:space="preserve">
-    <value>Point Camera Here</value>
-  </data>
-  <data name="PointCameraCoordsToolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="PointCameraCoordsToolStripMenuItem1.Text" xml:space="preserve">
-    <value>Point Camera Coords</value>
-  </data>
-  <data name="triggerCameraToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="triggerCameraToolStripMenuItem.Text" xml:space="preserve">
-    <value>Trigger Camera NOW</value>
-  </data>
-  <data name="flightPlannerToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="flightPlannerToolStripMenuItem.Text" xml:space="preserve">
-    <value>Flight Planner</value>
-  </data>
-  <data name="setEKFHomeHereToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>176, 22</value>
-  </data>
-  <data name="setEKFHomeHereToolStripMenuItem.Text" xml:space="preserve">
-    <value>Set EKF Origin Here</value>
-  </data>
-  <data name="setHomeHereToolStripMenuItem1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>176, 22</value>
-  </data>
-  <data name="setHomeHereToolStripMenuItem1.Text" xml:space="preserve">
-    <value>Set Home Here</value>
-  </data>
-  <data name="setHomeHereToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="setHomeHereToolStripMenuItem.Text" xml:space="preserve">
-    <value>Set Home Here</value>
-  </data>
-  <data name="takeOffToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="takeOffToolStripMenuItem.Text" xml:space="preserve">
-    <value>TakeOff</value>
-  </data>
-  <data name="onOffCameraOverlapToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="onOffCameraOverlapToolStripMenuItem.Text" xml:space="preserve">
-    <value>Camera Overlap</value>
-  </data>
-  <data name="altitudeAngelSettingsToolStripMenuItem.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="altitudeAngelSettingsToolStripMenuItem.Text" xml:space="preserve">
-    <value>Altitude Angel Settings</value>
-  </data>
-  <data name="undockDockToolStripMenuItem2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>195, 22</value>
-  </data>
-  <data name="undockDockToolStripMenuItem2.Text" xml:space="preserve">
-    <value>Undock/Dock</value>
-  </data>
-  <data name="contextMenuStripMap.Size" type="System.Drawing.Size, System.Drawing">
-    <value>196, 290</value>
-  </data>
-  <data name="&gt;&gt;contextMenuStripMap.Name" xml:space="preserve">
-    <value>contextMenuStripMap</value>
-  </data>
-  <data name="&gt;&gt;contextMenuStripMap.Type" xml:space="preserve">
-    <value>System.Windows.Forms.ContextMenuStrip, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="CHK_autopan.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom, Left</value>
-  </data>
-  <data name="CHK_autopan.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="CHK_autopan.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="CHK_autopan.Location" type="System.Drawing.Point, System.Drawing">
-    <value>41, 238</value>
-  </data>
-  <data name="CHK_autopan.Size" type="System.Drawing.Size, System.Drawing">
-    <value>70, 17</value>
-  </data>
-  <data name="CHK_autopan.TabIndex" type="System.Int32, mscorlib">
-    <value>68</value>
-  </data>
-  <data name="CHK_autopan.Text" xml:space="preserve">
-    <value>Auto Pan</value>
-  </data>
-  <data name="CHK_autopan.ToolTip" xml:space="preserve">
-    <value>Makes the map autopan based on current location</value>
-  </data>
-  <data name="&gt;&gt;CHK_autopan.Name" xml:space="preserve">
-    <value>CHK_autopan</value>
-  </data>
-  <data name="&gt;&gt;CHK_autopan.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;CHK_autopan.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel2</value>
-  </data>
-  <data name="&gt;&gt;CHK_autopan.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="CB_tuning.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom, Left</value>
-  </data>
-  <data name="CB_tuning.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="CB_tuning.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="CB_tuning.Location" type="System.Drawing.Point, System.Drawing">
-    <value>41, 215</value>
-  </data>
-  <data name="CB_tuning.Size" type="System.Drawing.Size, System.Drawing">
-    <value>59, 17</value>
-  </data>
-  <data name="CB_tuning.TabIndex" type="System.Int32, mscorlib">
-    <value>62</value>
-  </data>
-  <data name="CB_tuning.Text" xml:space="preserve">
-    <value>Tuning</value>
-  </data>
-  <data name="CB_tuning.ToolTip" xml:space="preserve">
-    <value>Show the tunning graph, chowing target attitudes vs actual</value>
-  </data>
-  <data name="CB_tuning.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="&gt;&gt;CB_tuning.Name" xml:space="preserve">
-    <value>CB_tuning</value>
-  </data>
-  <data name="&gt;&gt;CB_tuning.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;CB_tuning.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel2</value>
-  </data>
-  <data name="&gt;&gt;CB_tuning.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="but_disablejoystick.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="but_disablejoystick.Location" type="System.Drawing.Point, System.Drawing">
-    <value>4, 67</value>
-  </data>
-  <data name="but_disablejoystick.Size" type="System.Drawing.Size, System.Drawing">
-    <value>56, 23</value>
-  </data>
-  <data name="but_disablejoystick.TabIndex" type="System.Int32, mscorlib">
-    <value>77</value>
-  </data>
-  <data name="but_disablejoystick.Text" xml:space="preserve">
-    <value>Disable Joystick</value>
-  </data>
-  <data name="but_disablejoystick.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="&gt;&gt;but_disablejoystick.Name" xml:space="preserve">
-    <value>but_disablejoystick</value>
-  </data>
-  <data name="&gt;&gt;but_disablejoystick.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.MyButton, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;but_disablejoystick.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel2</value>
-  </data>
-  <data name="&gt;&gt;but_disablejoystick.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="myButton8.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Bottom, Left</value>
-  </data>
-  <data name="myButton8.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="myButton8.Location" type="System.Drawing.Point, System.Drawing">
-    <value>164, 265</value>
-  </data>
-  <data name="myButton8.Size" type="System.Drawing.Size, System.Drawing">
-    <value>60, 20</value>
-  </data>
-  <data name="myButton8.TabIndex" type="System.Int32, mscorlib">
-    <value>76</value>
-  </data>
-  <data name="myButton8.Text" xml:space="preserve">
-    <value>EXIT</value>
-  </data>
-  <data name="&gt;&gt;myButton8.Name" xml:space="preserve">
-    <value>myButton8</value>
-  </data>
-  <data name="&gt;&gt;myButton8.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.MyButton, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;myButton8.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel2</value>
-  </data>
-  <data name="&gt;&gt;myButton8.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <metadata name="bindingSource1.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-    <value>307, 17</value>
-  </metadata>
-  <data name="windDir1.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Arial, 12pt, style=Bold</value>
-  </data>
-  <data name="windDir1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="windDir1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>70, 40</value>
-  </data>
-  <data name="windDir1.TabIndex" type="System.Int32, mscorlib">
-    <value>75</value>
-  </data>
-  <data name="&gt;&gt;windDir1.Name" xml:space="preserve">
-    <value>windDir1</value>
-  </data>
-  <data name="&gt;&gt;windDir1.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.WindDir, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;windDir1.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel2</value>
-  </data>
-  <data name="&gt;&gt;windDir1.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="gMapControl1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="gMapControl1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="gMapControl1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>0, 0, 0, 0</value>
-  </data>
-  <data name="gMapControl1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>554, 416</value>
-  </data>
-  <data name="gMapControl1.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;gMapControl1.Name" xml:space="preserve">
-    <value>gMapControl1</value>
-  </data>
-  <data name="&gt;&gt;gMapControl1.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.myGMAP, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;gMapControl1.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel2</value>
-  </data>
-  <data name="&gt;&gt;gMapControl1.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="TRK_zoom.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Right</value>
-  </data>
-  <data name="TRK_zoom.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="TRK_zoom.Location" type="System.Drawing.Point, System.Drawing">
-    <value>554, 0</value>
-  </data>
-  <data name="TRK_zoom.Orientation" type="System.Windows.Forms.Orientation, System.Windows.Forms">
-    <value>Vertical</value>
-  </data>
-  <data name="TRK_zoom.Size" type="System.Drawing.Size, System.Drawing">
-    <value>45, 416</value>
-  </data>
-  <data name="TRK_zoom.TabIndex" type="System.Int32, mscorlib">
-    <value>72</value>
-  </data>
-  <data name="TRK_zoom.Visible" type="System.Boolean, mscorlib">
-    <value>False</value>
-  </data>
-  <data name="&gt;&gt;TRK_zoom.Name" xml:space="preserve">
-    <value>TRK_zoom</value>
-  </data>
-  <data name="&gt;&gt;TRK_zoom.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.MyTrackBar, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;TRK_zoom.Parent" xml:space="preserve">
-    <value>splitContainer1.Panel2</value>
-  </data>
-  <data name="&gt;&gt;TRK_zoom.ZOrder" xml:space="preserve">
-    <value>6</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Panel2.Name" xml:space="preserve">
-    <value>splitContainer1.Panel2</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Panel2.Type" xml:space="preserve">
-    <value>System.Windows.Forms.SplitterPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Panel2.Parent" xml:space="preserve">
-    <value>splitContainer1</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Panel2.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="splitContainer1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>599, 416</value>
-  </data>
-  <data name="splitContainer1.SplitterDistance" type="System.Int32, mscorlib">
-    <value>210</value>
-  </data>
-  <data name="splitContainer1.TabIndex" type="System.Int32, mscorlib">
-    <value>76</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Name" xml:space="preserve">
-    <value>splitContainer1</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.SplitContainer, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.Parent" xml:space="preserve">
-    <value>tableMap</value>
-  </data>
-  <data name="&gt;&gt;splitContainer1.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="panel1.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="botMenuLayout.ColumnCount" type="System.Int32, mscorlib">
-    <value>8</value>
-  </data>
-  <data name="bHideComm.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
-    <value>Top, Left, Right</value>
-  </data>
-  <data name="bHideComm.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="bHideComm.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Microsoft Sans Serif, 8.25pt</value>
-  </data>
-  <data name="bHideComm.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="bHideComm.Location" type="System.Drawing.Point, System.Drawing">
-    <value>528, 3</value>
-  </data>
-  <data name="bHideComm.Size" type="System.Drawing.Size, System.Drawing">
-    <value>74, 19</value>
-  </data>
-  <data name="bHideComm.TabIndex" type="System.Int32, mscorlib">
-    <value>72</value>
-  </data>
-  <data name="bHideComm.Text" xml:space="preserve">
-    <value>Comm</value>
-  </data>
-  <data name="&gt;&gt;bHideComm.Name" xml:space="preserve">
-    <value>bHideComm</value>
-  </data>
-  <data name="&gt;&gt;bHideComm.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.MyButton, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;bHideComm.Parent" xml:space="preserve">
-    <value>botMenuLayout</value>
-  </data>
-  <data name="&gt;&gt;bHideComm.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="myButtonSettings.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="myButtonSettings.Font" type="System.Drawing.Font, System.Drawing">
-    <value>Microsoft Sans Serif, 8.25pt, style=Bold</value>
-  </data>
-  <data name="myButtonSettings.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 3</value>
-  </data>
-  <data name="myButtonSettings.Size" type="System.Drawing.Size, System.Drawing">
-    <value>69, 19</value>
-  </data>
-  <data name="myButtonSettings.TabIndex" type="System.Int32, mscorlib">
-    <value>71</value>
-  </data>
-  <data name="myButtonSettings.Text" xml:space="preserve">
-    <value>SETTINGS</value>
-  </data>
-  <data name="&gt;&gt;myButtonSettings.Name" xml:space="preserve">
-    <value>myButtonSettings</value>
-  </data>
-  <data name="&gt;&gt;myButtonSettings.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;myButtonSettings.Parent" xml:space="preserve">
-    <value>botMenuLayout</value>
-  </data>
-  <data name="&gt;&gt;myButtonSettings.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="myButtonNoTheme2.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="myButtonNoTheme2.FlatStyle" type="System.Windows.Forms.FlatStyle, System.Windows.Forms">
-    <value>Flat</value>
-  </data>
-  <data name="myButtonNoTheme2.Location" type="System.Drawing.Point, System.Drawing">
-    <value>78, 3</value>
-  </data>
-  <data name="myButtonNoTheme2.Size" type="System.Drawing.Size, System.Drawing">
-    <value>69, 19</value>
-  </data>
-  <data name="myButtonNoTheme2.TabIndex" type="System.Int32, mscorlib">
-    <value>72</value>
-  </data>
-  <data name="myButtonNoTheme2.Text" xml:space="preserve">
-    <value>myButtonNoTheme2</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme2.Name" xml:space="preserve">
-    <value>myButtonNoTheme2</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme2.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme2.Parent" xml:space="preserve">
-    <value>botMenuLayout</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme2.ZOrder" xml:space="preserve">
-    <value>2</value>
-  </data>
-  <data name="myButtonNoTheme3.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="myButtonNoTheme3.Location" type="System.Drawing.Point, System.Drawing">
-    <value>153, 3</value>
-  </data>
-  <data name="myButtonNoTheme3.Size" type="System.Drawing.Size, System.Drawing">
-    <value>69, 19</value>
-  </data>
-  <data name="myButtonNoTheme3.TabIndex" type="System.Int32, mscorlib">
-    <value>73</value>
-  </data>
-  <data name="myButtonNoTheme3.Text" xml:space="preserve">
-    <value>myButtonNoTheme3</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme3.Name" xml:space="preserve">
-    <value>myButtonNoTheme3</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme3.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme3.Parent" xml:space="preserve">
-    <value>botMenuLayout</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme3.ZOrder" xml:space="preserve">
-    <value>3</value>
-  </data>
-  <data name="myButtonNoTheme4.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="myButtonNoTheme4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>228, 3</value>
-  </data>
-  <data name="myButtonNoTheme4.Size" type="System.Drawing.Size, System.Drawing">
-    <value>69, 19</value>
-  </data>
-  <data name="myButtonNoTheme4.TabIndex" type="System.Int32, mscorlib">
-    <value>74</value>
-  </data>
-  <data name="myButtonNoTheme4.Text" xml:space="preserve">
-    <value>myButtonNoTheme4</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme4.Name" xml:space="preserve">
-    <value>myButtonNoTheme4</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme4.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme4.Parent" xml:space="preserve">
-    <value>botMenuLayout</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme4.ZOrder" xml:space="preserve">
-    <value>4</value>
-  </data>
-  <data name="myButtonNoTheme5.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="myButtonNoTheme5.Location" type="System.Drawing.Point, System.Drawing">
-    <value>303, 3</value>
-  </data>
-  <data name="myButtonNoTheme5.Size" type="System.Drawing.Size, System.Drawing">
-    <value>69, 19</value>
-  </data>
-  <data name="myButtonNoTheme5.TabIndex" type="System.Int32, mscorlib">
-    <value>75</value>
-  </data>
-  <data name="myButtonNoTheme5.Text" xml:space="preserve">
-    <value>myButtonNoTheme5</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme5.Name" xml:space="preserve">
-    <value>myButtonNoTheme5</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme5.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme5.Parent" xml:space="preserve">
-    <value>botMenuLayout</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme5.ZOrder" xml:space="preserve">
-    <value>5</value>
-  </data>
-  <data name="myButtonNoTheme6.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="myButtonNoTheme6.Location" type="System.Drawing.Point, System.Drawing">
-    <value>378, 3</value>
-  </data>
-  <data name="myButtonNoTheme6.Size" type="System.Drawing.Size, System.Drawing">
-    <value>69, 19</value>
-  </data>
-  <data name="myButtonNoTheme6.TabIndex" type="System.Int32, mscorlib">
-    <value>76</value>
-  </data>
-  <data name="myButtonNoTheme6.Text" xml:space="preserve">
-    <value>myButtonNoTheme6</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme6.Name" xml:space="preserve">
-    <value>myButtonNoTheme6</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme6.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme6.Parent" xml:space="preserve">
-    <value>botMenuLayout</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme6.ZOrder" xml:space="preserve">
-    <value>6</value>
-  </data>
-  <data name="myButtonNoTheme7.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="myButtonNoTheme7.Location" type="System.Drawing.Point, System.Drawing">
-    <value>453, 3</value>
-  </data>
-  <data name="myButtonNoTheme7.Size" type="System.Drawing.Size, System.Drawing">
-    <value>69, 19</value>
-  </data>
-  <data name="myButtonNoTheme7.TabIndex" type="System.Int32, mscorlib">
-    <value>77</value>
-  </data>
-  <data name="myButtonNoTheme7.Text" xml:space="preserve">
-    <value>myButtonNoTheme7</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme7.Name" xml:space="preserve">
-    <value>myButtonNoTheme7</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme7.Type" xml:space="preserve">
-    <value>MissionPlanner.Controls.myButtonNoTheme, MissionPlanner.Controls, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme7.Parent" xml:space="preserve">
-    <value>botMenuLayout</value>
-  </data>
-  <data name="&gt;&gt;myButtonNoTheme7.ZOrder" xml:space="preserve">
-    <value>7</value>
-  </data>
-  <data name="botMenuLayout.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="botMenuLayout.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="botMenuLayout.RowCount" type="System.Int32, mscorlib">
-    <value>1</value>
-  </data>
-  <data name="botMenuLayout.Size" type="System.Drawing.Size, System.Drawing">
-    <value>605, 25</value>
-  </data>
-  <data name="botMenuLayout.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;botMenuLayout.Name" xml:space="preserve">
-    <value>botMenuLayout</value>
-  </data>
-  <data name="&gt;&gt;botMenuLayout.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;botMenuLayout.Parent" xml:space="preserve">
-    <value>panel1</value>
-  </data>
-  <data name="&gt;&gt;botMenuLayout.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="botMenuLayout.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="bHideComm" Row="0" RowSpan="1" Column="7" ColumnSpan="1" /&gt;&lt;Control Name="myButtonSettings" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme2" Row="0" RowSpan="1" Column="1" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme3" Row="0" RowSpan="1" Column="2" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme4" Row="0" RowSpan="1" Column="3" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme5" Row="0" RowSpan="1" Column="4" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme6" Row="0" RowSpan="1" Column="5" ColumnSpan="1" /&gt;&lt;Control Name="myButtonNoTheme7" Row="0" RowSpan="1" Column="6" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,12.5,Percent,12.5,Percent,12.5,Percent,12.5,Percent,12.5,Percent,12.5,Percent,12.5,Percent,12.5" /&gt;&lt;Rows Styles="Percent,100" /&gt;&lt;/TableLayoutSettings&gt;</value>
-  </data>
-  <data name="panel1.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="panel1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 422</value>
-  </data>
-  <data name="panel1.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>0, 0, 0, 0</value>
-  </data>
-  <data name="panel1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>605, 25</value>
-  </data>
-  <data name="panel1.TabIndex" type="System.Int32, mscorlib">
-    <value>0</value>
-  </data>
-  <data name="&gt;&gt;panel1.Name" xml:space="preserve">
-    <value>panel1</value>
-  </data>
-  <data name="&gt;&gt;panel1.Type" xml:space="preserve">
-    <value>System.Windows.Forms.Panel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;panel1.Parent" xml:space="preserve">
-    <value>tableMap</value>
-  </data>
-  <data name="&gt;&gt;panel1.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="tableMap.Dock" type="System.Windows.Forms.DockStyle, System.Windows.Forms">
-    <value>Fill</value>
-  </data>
-  <data name="tableMap.Location" type="System.Drawing.Point, System.Drawing">
-    <value>0, 0</value>
-  </data>
-  <data name="tableMap.Margin" type="System.Windows.Forms.Padding, System.Windows.Forms">
-    <value>0, 0, 0, 0</value>
-  </data>
-  <data name="tableMap.RowCount" type="System.Int32, mscorlib">
-    <value>2</value>
-  </data>
-  <data name="tableMap.Size" type="System.Drawing.Size, System.Drawing">
-    <value>605, 447</value>
-  </data>
-  <data name="tableMap.TabIndex" type="System.Int32, mscorlib">
-    <value>75</value>
-  </data>
-  <data name="&gt;&gt;tableMap.Name" xml:space="preserve">
-    <value>tableMap</value>
-  </data>
-  <data name="&gt;&gt;tableMap.Type" xml:space="preserve">
-    <value>System.Windows.Forms.TableLayoutPanel, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;tableMap.Parent" xml:space="preserve">
-    <value>MainH.Panel2</value>
-  </data>
-  <data name="&gt;&gt;tableMap.ZOrder" xml:space="preserve">
-    <value>0</value>
-  </data>
-  <data name="tableMap.LayoutSettings" type="System.Windows.Forms.TableLayoutSettings, System.Windows.Forms">
-    <value>&lt;?xml version="1.0" encoding="utf-16"?&gt;&lt;TableLayoutSettings&gt;&lt;Controls&gt;&lt;Control Name="splitContainer1" Row="0" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;Control Name="panel1" Row="1" RowSpan="1" Column="0" ColumnSpan="1" /&gt;&lt;/Controls&gt;&lt;Columns Styles="Percent,100" /&gt;&lt;Rows Styles="Percent,100,Absolute,25" /&gt;&lt;/TableLayoutSettings&gt;</value>
   </data>
   <data name="&gt;&gt;MainH.Panel2.Name" xml:space="preserve">
     <value>MainH.Panel2</value>
@@ -5432,7 +5432,7 @@
     <value>909, 447</value>
   </data>
   <data name="MainH.SplitterDistance" type="System.Int32, mscorlib">
-    <value>300</value>
+    <value>587</value>
   </data>
   <data name="MainH.TabIndex" type="System.Int32, mscorlib">
     <value>68</value>
