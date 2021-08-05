@@ -5592,5 +5592,9 @@ namespace MissionPlanner.GCSViews
             }
         }
 
+        private void btmMenuExit_Click(object sender, EventArgs e)
+        {
+            MainV2.ActiveForm.Close();
+        }
     }
 }
