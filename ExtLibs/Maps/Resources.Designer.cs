@@ -113,6 +113,36 @@ namespace MissionPlanner.Maps {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        public static System.Drawing.Bitmap ADSB_green {
+            get {
+                object obj = ResourceManager.GetObject("ADSB_green", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap ADSB_orange {
+            get {
+                object obj = ResourceManager.GetObject("ADSB_orange", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        public static System.Drawing.Bitmap ADSB_red {
+            get {
+                object obj = ResourceManager.GetObject("ADSB_red", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         public static System.Drawing.Bitmap airspeed {
             get {
                 object obj = ResourceManager.GetObject("airspeed", resourceCulture);

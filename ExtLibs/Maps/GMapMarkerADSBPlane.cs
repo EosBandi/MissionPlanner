@@ -8,13 +8,13 @@ namespace MissionPlanner.Maps
     [Serializable]
     public class GMapMarkerADSBPlane : GMapMarker
     {
-        private static readonly Bitmap icong = new Bitmap(global::MissionPlanner.Maps.Resources.FW_icons_2013_logos_01,
+        private static readonly Bitmap icong = new Bitmap(global::MissionPlanner.Maps.Resources.ADSB_green,
             new Size(40, 40));
 
-        private static readonly Bitmap iconr = new Bitmap(global::MissionPlanner.Maps.Resources.FW_icons_2013_logos_011,
+        private static readonly Bitmap iconr = new Bitmap(global::MissionPlanner.Maps.Resources.ADSB_red,
             new Size(40, 40));
 
-        private static readonly Bitmap icono = new Bitmap(global::MissionPlanner.Maps.Resources.FW_icons_2013_logos_012,
+        private static readonly Bitmap icono = new Bitmap(global::MissionPlanner.Maps.Resources.ADSB_orange,
             new Size(40, 40));
 
         public float heading = 0;
