@@ -5596,5 +5596,10 @@ namespace MissionPlanner.GCSViews
         {
             MainV2.ActiveForm.Close();
         }
+
+        private void myButtonNoTheme3_Click(object sender, EventArgs e)
+        {
+            MainV2.instance.MyView.ShowScreen("Simulation");
+        }
     }
 }
