@@ -753,6 +753,24 @@ namespace MissionPlanner.GCSViews
             }
             updateUndoBuffer(true);
             setfromMap(lat, lng, alt);
+
+            //Todo do some checks
+
+            if (selectedrow != 0)
+            {
+                if ( Commands.Rows[selectedrow-1].Cells[Command.Index].Value.ToString() == MAVLink.MAV_CMD.DO_SEND_SCRIPT_MESSAGE.ToString() )
+                {
+
+                    Double distance = Convert.ToDouble(Commands.Rows[selectedrow].Cells[Dist.Index].Value);
+                    Double speed = Convert.ToDouble(Commands.Rows[selectedrow - 1].Cells[Param3.Index].Value);
+
+                    Commands.Rows[selectedrow - 1].Cells[Param2.Index].Value = (distance / speed).ToString();
+
+                }
+            }
+
+
+
         }
 
         public T DeepClone<T>(T obj)
@@ -3359,8 +3377,8 @@ namespace MissionPlanner.GCSViews
 
             if (Settings.Instance["WMSTserver"] != null)
             {
-                Task.Run(()=>{ 
-                    try { 
+                Task.Run(()=>{
+                    try {
                     WMTSProvider.CustomWMTSURL = Settings.Instance["WMSTserver"];
                     WMTSProvider.LayerName = WMTSProvider.Layers[int.Parse(Settings.Instance["WMSTLayer"])];
                      this.BeginInvokeIfRequired(()=>{ MainMap.Core.ReloadMap(); });
@@ -7690,5 +7708,41 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             if (MainMap.Zoom < 17)
                 MainMap.Zoom = 17;
         }
+
+        private void addTimedWPToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+
+
+            if (Commands.Rows.Count == 0)
+            {
+                CustomMessageBox.Show("First WP cannot be timed", "Error");
+                return;
+            }
+
+
+            int timingRow = Commands.Rows.Add();
+            Commands.Rows[timingRow].Cells[Command.Index].Value = MAVLink.MAV_CMD.DO_SEND_SCRIPT_MESSAGE.ToString();
+            //ChangeColumnHeader(MAVLink.MAV_CMD.DO_SET_ROI.ToString());
+
+            selectedrow = Commands.Rows.Add();
+            Commands.Rows[selectedrow].Cells[Command.Index].Value = MAVLink.MAV_CMD.WAYPOINT.ToString();
+            ChangeColumnHeader(MAVLink.MAV_CMD.WAYPOINT.ToString());
+            updateUndoBuffer(false);
+            setfromMap(MouseDownEnd.Lat, MouseDownEnd.Lng, (int)float.Parse(TXT_DefaultAlt.Text));
+            writeKML();
+            int speed;
+            speed = 18;
+            InputBox.Show("Speed", "Enter desired speed in formation leg", ref speed);
+
+
+            double distance = Convert.ToDouble(Commands.Rows[selectedrow].Cells[Dist.Index].Value);
+            Commands.Rows[timingRow].Cells[Param1.Index].Value = (selectedrow+1).ToString();
+            Commands.Rows[timingRow].Cells[Param2.Index].Value = (distance / speed).ToString();
+            Commands.Rows[timingRow].Cells[Param3.Index].Value = speed.ToString();
+
+        }
+
+
     }
 }

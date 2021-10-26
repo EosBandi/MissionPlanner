@@ -217,8 +217,17 @@ namespace MissionPlanner.ArduPilot
                                 item.alt + gethomealt((MAVLink.MAV_FRAME) item.frame, item.lat, item.lng),
                                 (a + 1).ToString()));
                             route.Add(pointlist[pointlist.Count - 1]);
-                            addpolygonmarker((a + 1).ToString(), item.lng, item.lat,
-                                item.alt * altunitmultiplier, null, wpradius);
+
+                            if ( (a>1) && (missionitems[a-1].id  == (ushort) MAVLink.MAV_CMD.DO_SEND_SCRIPT_MESSAGE) )
+                            {
+                                addpolygonmarker((a + 1).ToString(), item.lng, item.lat,item.alt * altunitmultiplier,Color.AliceBlue, wpradius);
+
+                            }
+                            else
+                            {
+                                addpolygonmarker((a + 1).ToString(), item.lng, item.lat,
+                                    item.alt * altunitmultiplier, null, wpradius);
+                            }
                         }
                         else
                         {
@@ -370,16 +379,31 @@ namespace MissionPlanner.ArduPilot
             try
             {
                 PointLatLng point = new PointLatLng(lat, lng);
-                GMapMarker m = null;                
+                GMapMarker m = null;
                 if(type == MAVLink.MAV_MISSION_TYPE.MISSION)
                 {
-                    m = new GMapMarkerWP(point, tag);
-                    if (alt.HasValue)
+
+                    if (color.HasValue)
                     {
-                        m.ToolTipMode = MarkerTooltipMode.OnMouseOver;
-                        m.ToolTipText = "Alt: " + alt.Value.ToString("0");
+                        m = new GMarkerGoogle(point, GMarkerGoogleType.purple_dot);
+                        if (alt.HasValue)
+                        {
+                            m.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                            m.ToolTipText = "Alt: " + alt.Value.ToString("0");
+                        }
+                        m.Tag = tag;
+
                     }
-                    m.Tag = tag;
+                    else
+                    {
+                        m = new GMapMarkerWP(point, tag);
+                        if (alt.HasValue)
+                        {
+                            m.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                            m.ToolTipText = "Alt: " + alt.Value.ToString("0");
+                        }
+                        m.Tag = tag;
+                    }
                 }
                 else if (type == MAVLink.MAV_MISSION_TYPE.FENCE)
                 {
@@ -564,7 +588,7 @@ namespace MissionPlanner.ArduPilot
                     overlay.Routes.Add(homeroute);
                 }
 
-                route.Stroke = new Pen(Color.Yellow, 4);
+                route.Stroke = new Pen(Color.Orange, 4);
                 route.Stroke.DashStyle = DashStyle.Custom;
                 overlay.Routes.Add(route);
             }

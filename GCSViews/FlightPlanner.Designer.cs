@@ -218,6 +218,7 @@ namespace MissionPlanner.GCSViews
             this.zoomToVehicleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToMissionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToHomeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addTimedWPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel5.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelWaypoints.SuspendLayout();
@@ -830,6 +831,7 @@ namespace MissionPlanner.GCSViews
             // contextMenuStrip1
             // 
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addTimedWPToolStripMenuItem,
             this.deleteWPToolStripMenuItem,
             this.insertWpToolStripMenuItem,
             this.insertSplineWPToolStripMenuItem,
@@ -1454,6 +1456,12 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.zoomToHomeToolStripMenuItem, "zoomToHomeToolStripMenuItem");
             this.zoomToHomeToolStripMenuItem.Click += new System.EventHandler(this.zoomToHomeToolStripMenuItem_Click);
             // 
+            // addTimedWPToolStripMenuItem
+            // 
+            this.addTimedWPToolStripMenuItem.Name = "addTimedWPToolStripMenuItem";
+            resources.ApplyResources(this.addTimedWPToolStripMenuItem, "addTimedWPToolStripMenuItem");
+            this.addTimedWPToolStripMenuItem.Click += new System.EventHandler(this.addTimedWPToolStripMenuItem_Click);
+            // 
             // FlightPlanner
             // 
             this.BackColor = System.Drawing.SystemColors.Control;
@@ -1654,5 +1662,6 @@ namespace MissionPlanner.GCSViews
         private DataGridViewTextBoxColumn TagData;
         private ToolStripMenuItem convertWPToPolygonToolStripMenuItem;
         private ToolStripMenuItem fromCurrentWaypointsToolStripMenuItem;
+        private ToolStripMenuItem addTimedWPToolStripMenuItem;
     }
 }
