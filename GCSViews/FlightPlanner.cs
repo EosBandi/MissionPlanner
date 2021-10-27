@@ -7743,6 +7743,45 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
         }
 
+        private void addOffsetToTimedWPToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //Ask offsets for timed waypoints and move them in the current list
 
+            if (Commands.Rows.Count < 3) return;
+
+            int xOffset = 0;
+            int yOffset = 0;
+            int zOffset = 0;
+
+            InputBox.Show("Offset X", "Enter horizontal X offset", ref xOffset);
+            InputBox.Show("Offset Y", "Enter horizontal Y offset", ref yOffset);
+            InputBox.Show("Offset Z", "Enter altitude offset", ref zOffset);
+
+
+
+
+            for (int i = 0; i < Commands.Rows.Count; i++)
+            {
+                if (i>0)
+                {
+                    if (Commands.Rows[i-1].Cells[Command.Index].Value.ToString() == MAVLink.MAV_CMD.DO_SEND_SCRIPT_MESSAGE.ToString())
+                    {
+
+                        PointLatLngAlt c = new PointLatLngAlt();
+                        c.Lat = Convert.ToDouble(Commands.Rows[i].Cells[Lat.Index].Value);
+                        c.Lng = Convert.ToDouble(Commands.Rows[i].Cells[Lon.Index].Value);
+                        c.Alt = Convert.ToDouble(Commands.Rows[i].Cells[Alt.Index].Value);
+                        double azimuth = Convert.ToDouble(Commands.Rows[i].Cells[AZ.Index].Value);
+
+                        //PointLatLngAlt o = c.newpos(azimuth)
+
+
+
+                    }
+                }
+
+            }
+
+        }
     }
 }

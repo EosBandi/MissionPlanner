@@ -128,6 +128,7 @@ namespace MissionPlanner.GCSViews
             this.cmb_missiontype = new System.Windows.Forms.ComboBox();
             this.MainMap = new MissionPlanner.Controls.myGMAP();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.addTimedWPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.deleteWPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.insertWpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.currentPositionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -218,7 +219,7 @@ namespace MissionPlanner.GCSViews
             this.zoomToVehicleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToMissionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToHomeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.addTimedWPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addOffsetToTimedWPToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.panel5.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelWaypoints.SuspendLayout();
@@ -842,6 +843,7 @@ namespace MissionPlanner.GCSViews
             this.takeoffToolStripMenuItem,
             this.setROIToolStripMenuItem,
             this.clearMissionToolStripMenuItem,
+            this.addOffsetToTimedWPToolStripMenuItem,
             this.toolStripSeparator1,
             this.polygonToolStripMenuItem,
             this.geoFenceToolStripMenuItem,
@@ -860,6 +862,12 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.contextMenuStrip1, "contextMenuStrip1");
             this.contextMenuStrip1.Closed += new System.Windows.Forms.ToolStripDropDownClosedEventHandler(this.contextMenuStrip1_Closed);
             this.contextMenuStrip1.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenuStrip1_Opening);
+            // 
+            // addTimedWPToolStripMenuItem
+            // 
+            this.addTimedWPToolStripMenuItem.Name = "addTimedWPToolStripMenuItem";
+            resources.ApplyResources(this.addTimedWPToolStripMenuItem, "addTimedWPToolStripMenuItem");
+            this.addTimedWPToolStripMenuItem.Click += new System.EventHandler(this.addTimedWPToolStripMenuItem_Click);
             // 
             // deleteWPToolStripMenuItem
             // 
@@ -1456,11 +1464,11 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.zoomToHomeToolStripMenuItem, "zoomToHomeToolStripMenuItem");
             this.zoomToHomeToolStripMenuItem.Click += new System.EventHandler(this.zoomToHomeToolStripMenuItem_Click);
             // 
-            // addTimedWPToolStripMenuItem
+            // addOffsetToTimedWPToolStripMenuItem
             // 
-            this.addTimedWPToolStripMenuItem.Name = "addTimedWPToolStripMenuItem";
-            resources.ApplyResources(this.addTimedWPToolStripMenuItem, "addTimedWPToolStripMenuItem");
-            this.addTimedWPToolStripMenuItem.Click += new System.EventHandler(this.addTimedWPToolStripMenuItem_Click);
+            this.addOffsetToTimedWPToolStripMenuItem.Name = "addOffsetToTimedWPToolStripMenuItem";
+            resources.ApplyResources(this.addOffsetToTimedWPToolStripMenuItem, "addOffsetToTimedWPToolStripMenuItem");
+            this.addOffsetToTimedWPToolStripMenuItem.Click += new System.EventHandler(this.addOffsetToTimedWPToolStripMenuItem_Click);
             // 
             // FlightPlanner
             // 
@@ -1663,5 +1671,6 @@ namespace MissionPlanner.GCSViews
         private ToolStripMenuItem convertWPToPolygonToolStripMenuItem;
         private ToolStripMenuItem fromCurrentWaypointsToolStripMenuItem;
         private ToolStripMenuItem addTimedWPToolStripMenuItem;
+        private ToolStripMenuItem addOffsetToTimedWPToolStripMenuItem;
     }
 }
