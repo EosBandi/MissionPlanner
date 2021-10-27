@@ -7760,6 +7760,8 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
 
 
+            //Todo: do checks for integrity
+
 
             for (int i = 0; i < Commands.Rows.Count; i++)
             {
@@ -7789,7 +7791,6 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                         double dist = Convert.ToDouble(Commands.Rows[i].Cells[Dist.Index].Value);
 
                         Commands.Rows[i-1].Cells[Param2.Index].Value = (dist / speed).ToString();
-
 
                     }
 
