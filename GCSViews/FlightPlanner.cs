@@ -7731,6 +7731,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             updateUndoBuffer(false);
             setfromMap(MouseDownEnd.Lat, MouseDownEnd.Lng, (int)float.Parse(TXT_DefaultAlt.Text));
             writeKML();
+
             int speed;
             speed = 18;
             InputBox.Show("Speed", "Enter desired speed in formation leg", ref speed);
@@ -7773,14 +7774,30 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                         c.Alt = Convert.ToDouble(Commands.Rows[i].Cells[Alt.Index].Value);
                         double azimuth = Convert.ToDouble(Commands.Rows[i].Cells[AZ.Index].Value);
 
-                        //PointLatLngAlt o = c.newpos(azimuth)
+                        double distance = Math.Sqrt(xOffset * xOffset + yOffset * yOffset);
+                        double angle = 90 - (MathHelper.rad2deg * Math.Atan2(xOffset, yOffset));
+                        PointLatLngAlt newPoint = c.newpos(azimuth + 90 - angle, distance);
+                        newPoint.Alt = c.Alt + zOffset;
 
+                        Commands.Rows[i].Cells[Lat.Index].Value = newPoint.Lat.ToString();
+                        Commands.Rows[i].Cells[Lon.Index].Value = newPoint.Lng.ToString();
+                        Commands.Rows[i].Cells[Alt.Index].Value = newPoint.Alt.ToString();
+                        writeKML();
+
+
+                        double speed = Convert.ToDouble(Commands.Rows[i - 1].Cells[Param3.Index].Value);
+                        double dist = Convert.ToDouble(Commands.Rows[i].Cells[Dist.Index].Value);
+
+                        Commands.Rows[i-1].Cells[Param2.Index].Value = (dist / speed).ToString();
 
 
                     }
+
                 }
 
             }
+
+
 
         }
     }
