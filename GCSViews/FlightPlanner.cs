@@ -7723,7 +7723,6 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
             int timingRow = Commands.Rows.Add();
             Commands.Rows[timingRow].Cells[Command.Index].Value = MAVLink.MAV_CMD.DO_SEND_SCRIPT_MESSAGE.ToString();
-            //ChangeColumnHeader(MAVLink.MAV_CMD.DO_SET_ROI.ToString());
 
             selectedrow = Commands.Rows.Add();
             Commands.Rows[selectedrow].Cells[Command.Index].Value = MAVLink.MAV_CMD.WAYPOINT.ToString();

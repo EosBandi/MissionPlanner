@@ -12,11 +12,12 @@ namespace GMap.NET.WindowsForms.Markers
     using GMap.NET.Drawing.Properties;
    using System;
    using System.Runtime.Serialization;
+    using System.Drawing.Imaging;
 #else
    using GMap.NET.WindowsMobile.Properties;
 #endif
 
-   public enum GMarkerGoogleType
+    public enum GMarkerGoogleType
    {
       none = 0,
       arrow,
@@ -66,6 +67,7 @@ namespace GMap.NET.WindowsForms.Markers
 #endif
    {
       public float? Bearing;
+
       Image Bitmap;
       Image BitmapShadow;
 
@@ -76,10 +78,13 @@ namespace GMap.NET.WindowsForms.Markers
 
       public readonly GMarkerGoogleType Type;
 
-      public GMarkerGoogle(PointLatLng p, GMarkerGoogleType type)
+      private float alpha = 1.0f;
+
+      public GMarkerGoogle(PointLatLng p, GMarkerGoogleType type, float transparency = 1.0f)
          : base(p)
       {
          this.Type = type;
+         alpha = transparency;
 
          if(type != GMarkerGoogleType.none)
          {
@@ -233,17 +238,21 @@ namespace GMap.NET.WindowsForms.Markers
          if(Bearing.HasValue)
          {
                 var old = g.Transform;
-                
+
                 g.TranslateTransform(this.LocalPosition.X - this.Offset.X, this.LocalPosition.Y - this.Offset.Y);
                 g.RotateTransform(Bearing.Value - Overlay.Control.Bearing);
-            g.FillPolygon(Brushes.Red, Arrow);
+                g.FillPolygon(Brushes.Red, Arrow);
 
                 g.Transform = old;
             }
 
          if(!Bearing.HasValue)
          {
-            g.DrawImage(Bitmap, LocalPosition.X, LocalPosition.Y, Size.Width, Size.Height);
+                ColorMatrix cm = new ColorMatrix();
+                cm.Matrix33 = alpha;
+                ImageAttributes ia = new ImageAttributes();
+                ia.SetColorMatrix(cm);
+                g.DrawImage(Bitmap, new Rectangle(LocalPosition.X, LocalPosition.Y, Size.Width, Size.Height), 0, 0, Size.Width, Size.Height, GraphicsUnit.Pixel, ia);
          }
 #else
          if(BitmapShadow != null)

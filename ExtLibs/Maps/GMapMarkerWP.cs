@@ -17,8 +17,8 @@ namespace MissionPlanner.Maps
         static Dictionary<string, Bitmap> fontBitmaps = new Dictionary<string, Bitmap>();
         static Font font;
 
-        public GMapMarkerWP(PointLatLng p, string wpno)
-            : base(p, GMarkerGoogleType.green)
+        public GMapMarkerWP(PointLatLng p, string wpno, float transp = 1.0f)
+            : base(p, GMarkerGoogleType.green, transp)
         {
             this.wpno = wpno;
             if (font == null)
@@ -46,7 +46,7 @@ namespace MissionPlanner.Maps
                 g.FillEllipse(Brushes.Red, new Rectangle(this.LocalPosition, this.Size));
                 g.DrawArc(Pens.Red, new Rectangle(this.LocalPosition, this.Size), 0, 360);
             }
-            
+
             base.OnRender(g);
 
             var midw = LocalPosition.X + 10;
