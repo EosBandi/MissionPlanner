@@ -173,5 +173,10 @@ namespace MissionPlanner.Utilities
         public double lat;				// Lattitude * 10**7
         public double lng;				// Longitude * 10**7
         public float alt;				// Altitude in centimeters (meters * 100)
+
+
+        public double dist;
+        public double Az;
+
     };
 }
