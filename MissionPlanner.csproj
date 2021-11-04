@@ -624,6 +624,12 @@
     <None Include="plugins\example13-herelink2.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Compile Include="PayloadToIgnite.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PayloadToIgnite.Designer.cs">
+      <DependentUpon>PayloadToIgnite.cs</DependentUpon>
+    </Compile>
     <Compile Include="Utilities\AirMarket.cs">
       <SubType>UserControl</SubType>
     </Compile>

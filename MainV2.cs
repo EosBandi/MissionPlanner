@@ -38,6 +38,7 @@ using System.Linq;
 using MissionPlanner.Joystick;
 using System.Net;
 using Newtonsoft.Json;
+using MissionPlanner.StatusForms;
 
 namespace MissionPlanner
 {
@@ -684,6 +685,10 @@ namespace MissionPlanner
                 MainV2.instance.FlightPlanner.updateDisplayView();
             }
         }
+
+
+
+        public static payloadIgnite payloadToIgnite = new payloadIgnite();
 
 
         public MainV2()

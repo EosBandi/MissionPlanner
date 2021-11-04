@@ -25,7 +25,7 @@ namespace MissionPlanner.ArduPilot
         /// </summary>
         List<PointLatLngAlt> route = new List<PointLatLngAlt>();
 
-        public void CreateOverlay(PointLatLngAlt home, List<Locationwp> missionitems, double wpradius, double loiterradius, double altunitmultiplier, float transparency = 1.0f)
+        public void CreateOverlay(PointLatLngAlt home, List<Locationwp> missionitems, double wpradius, double loiterradius, double altunitmultiplier, bool active = true)
         {
             overlay.Clear();
 
@@ -201,7 +201,7 @@ namespace MissionPlanner.ArduPilot
                             {Tag2 = "spline"});
                         route.Add(pointlist[pointlist.Count - 1]);
                         addpolygonmarker((a + 1).ToString(), item.lng, item.lat,
-                            item.alt * altunitmultiplier, Color.Green, wpradius, MAVLink.MAV_MISSION_TYPE.MISSION, null, transparency);
+                            item.alt * altunitmultiplier, Color.Green, wpradius, MAVLink.MAV_MISSION_TYPE.MISSION, null, active);
                     }
                     else if (command == (ushort) MAVLink.MAV_CMD.WAYPOINT && item.lat == 0 && item.lng == 0)
                     {
@@ -220,13 +220,13 @@ namespace MissionPlanner.ArduPilot
 
                             if ( (a>1) && (missionitems[a-1].id  == (ushort) MAVLink.MAV_CMD.DO_SEND_SCRIPT_MESSAGE) )
                             {
-                                addpolygonmarker((a + 1).ToString(), item.lng, item.lat,item.alt * altunitmultiplier,Color.AliceBlue, wpradius,MAVLink.MAV_MISSION_TYPE.MISSION,null, transparency);
+                                addpolygonmarker((a + 1).ToString(), item.lng, item.lat,item.alt * altunitmultiplier,Color.AliceBlue, wpradius,MAVLink.MAV_MISSION_TYPE.MISSION,null, active);
 
                             }
                             else
                             {
                                 addpolygonmarker((a + 1).ToString(), item.lng, item.lat,
-                                    item.alt * altunitmultiplier, null, wpradius, MAVLink.MAV_MISSION_TYPE.MISSION, null, transparency);
+                                    item.alt * altunitmultiplier, null, wpradius, MAVLink.MAV_MISSION_TYPE.MISSION, null, active);
                             }
                         }
                         else
@@ -344,7 +344,7 @@ namespace MissionPlanner.ArduPilot
                 //a++;
             }
 
-            RegenerateWPRoute(route, home, true , transparency);
+            RegenerateWPRoute(route, home, true , active);
 
         }
 
@@ -374,12 +374,23 @@ namespace MissionPlanner.ArduPilot
         /// <param name="lat"></param>
         /// <param name="alt"></param>
         /// <param name="color"></param>
-        private void addpolygonmarker(string tag, double lng, double lat, double? alt, Color? color, double wpradius, MAVLink.MAV_MISSION_TYPE type = MAVLink.MAV_MISSION_TYPE.MISSION, Color? fillcolor = null, float transparency = 1.0f)
+        private void addpolygonmarker(string tag, double lng, double lat, double? alt, Color? color, double wpradius, MAVLink.MAV_MISSION_TYPE type = MAVLink.MAV_MISSION_TYPE.MISSION, Color? fillcolor = null, bool active = true)
         {
             try
             {
                 PointLatLng point = new PointLatLng(lat, lng);
                 GMapMarker m = null;
+                float transparency;
+                if (active)
+                {
+                    transparency = 1.0f;
+                }
+                else
+                {
+                    transparency = .5f;
+                }
+
+
                 if(type == MAVLink.MAV_MISSION_TYPE.MISSION)
                 {
                     //If it has a value then change color
@@ -450,7 +461,7 @@ namespace MissionPlanner.ArduPilot
         }
 
         private void RegenerateWPRoute(List<PointLatLngAlt> fullpointlist, PointLatLngAlt HomeLocation,
-            bool includehomeroute = true, float transparency = 1.0f)
+            bool includehomeroute = true, bool active = true)
         {
             if (fullpointlist.Count == 0)
                 return;
@@ -581,7 +592,12 @@ namespace MissionPlanner.ArduPilot
                     route.Points.Add(x);
                 });
 
-                homeroute.Stroke = new Pen(Color.FromArgb((int)(255*transparency), Color.Yellow), 2);
+
+                int transparency = 255;
+                if (!active) transparency = 128;
+
+
+                homeroute.Stroke = new Pen(Color.FromArgb(transparency, Color.Yellow), 2);
                 // if we have a large distance between home and the first/last point, it hangs on the draw of a the dashed line.
                 if (homepoint.GetDistance(lastpoint) < 5000 && homepoint.GetDistance(firstpoint) < 5000)
                     homeroute.Stroke.DashStyle = DashStyle.Dash;
@@ -592,13 +608,13 @@ namespace MissionPlanner.ArduPilot
                     overlay.Routes.Add(homeroute);
                 }
 
-                if (transparency == 1)
+                if (active == true)
                 {
-                    route.Stroke = new Pen(Color.FromArgb((int)(255 * transparency), Color.Orange), 4);
+                    route.Stroke = new Pen(Color.FromArgb(transparency, Color.Orange), 4);
                 }
                 else
                 {
-                    route.Stroke = new Pen(Color.FromArgb((int)(255 * transparency), Color.LimeGreen), 2);
+                    route.Stroke = new Pen(Color.FromArgb(transparency, Color.LimeGreen), 2);
 
                 }
 

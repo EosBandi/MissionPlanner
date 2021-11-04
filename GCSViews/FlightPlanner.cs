@@ -111,9 +111,8 @@ namespace MissionPlanner.GCSViews
         public GMapOverlay kmlpolygonsoverlay;
         private string startupWPradius = "5.0";
 
-        public List<Locationwp> mission1 = new List<Locationwp>();
-        public List<Locationwp> mission2 = new List<Locationwp>();
-        public List<Locationwp> mission3 = new List<Locationwp>();
+        public List<Locationwp>[] mission = new List<Locationwp>[3];
+        public int currentPlaneIndex = 0;
 
 
 
@@ -287,6 +286,12 @@ namespace MissionPlanner.GCSViews
 
             timer.Start();
             */
+
+            cmb_currentplane.SelectedIndex = 0;
+            mission[0] = new List<Locationwp>();
+            mission[1] = new List<Locationwp>();
+            mission[2] = new List<Locationwp>();
+
         }
 
         public static FlightPlanner instance { get; set; }
@@ -332,6 +337,11 @@ namespace MissionPlanner.GCSViews
                 CustomMessageBox.Show("Please fix your default alt value");
                 TXT_DefaultAlt.Text = (50 * CurrentState.multiplieralt).ToString("0");
             }
+
+
+            // Todo: call check selected index and update mission items.
+
+
         }
 
         public void Deactivate()
@@ -1392,6 +1402,12 @@ namespace MissionPlanner.GCSViews
             if (Disposing)
                 return;
 
+
+            //Get the active plane and draw accordingly
+            int activePlane = Convert.ToInt32(cmb_currentplane.SelectedItem);
+
+            if (activePlane < 1 || activePlane > 3) return;
+
             updateRowNumbers();
 
             PointLatLngAlt home = new PointLatLngAlt();
@@ -1413,10 +1429,18 @@ namespace MissionPlanner.GCSViews
 
             try
             {
+
+
+                mission[activePlane - 1] = GetCommandList();
                 var commandlist = GetCommandList();
+
 
                 if ((MAVLink.MAV_MISSION_TYPE) cmb_missiontype.SelectedValue == MAVLink.MAV_MISSION_TYPE.MISSION)
                 {
+
+
+                    //*** first plane overlay
+
                     wpOverlay = new WPOverlay();
                     wpOverlay.overlay.Id = "WPOverlay";
 
@@ -1425,35 +1449,13 @@ namespace MissionPlanner.GCSViews
                         if (TXT_WPRad.Text == "") TXT_WPRad.Text = startupWPradius;
                         if (TXT_loiterrad.Text == "") TXT_loiterrad.Text = "30";
 
-                        wpOverlay.CreateOverlay(home,
-                            commandlist,
-                            double.Parse(TXT_WPRad.Text) / CurrentState.multiplieralt,
-                            double.Parse(TXT_loiterrad.Text) / CurrentState.multiplieralt, CurrentState.multiplieralt);
+                        wpOverlay.CreateOverlay(home, mission[0], double.Parse(TXT_WPRad.Text) / CurrentState.multiplieralt, double.Parse(TXT_loiterrad.Text) / CurrentState.multiplieralt, CurrentState.multiplieralt, activePlane == 1);
                     }
                     catch (FormatException)
                     {
                         CustomMessageBox.Show(Strings.InvalidNumberEntered + "\n" + "WP Radius or Loiter Radius",
                             Strings.ERROR);
                     }
-
-                    WPOverlay wpOverlay2 = new WPOverlay();
-                    wpOverlay2.overlay.Id = "WPOverlay2";
-                    wpOverlay2.CreateOverlay(home,
-                            mission2,
-                            double.Parse(TXT_WPRad.Text) / CurrentState.multiplieralt,
-                            double.Parse(TXT_loiterrad.Text) / CurrentState.multiplieralt, CurrentState.multiplieralt,.5f);
-
-                    WPOverlay wpOverlay3 = new WPOverlay();
-                    wpOverlay3.overlay.Id = "WPOverlay3";
-                    wpOverlay3.CreateOverlay(home,
-                            mission3,
-                            double.Parse(TXT_WPRad.Text) / CurrentState.multiplieralt,
-                            double.Parse(TXT_loiterrad.Text) / CurrentState.multiplieralt, CurrentState.multiplieralt, .55f);
-
-
-
-
-
 
                     MainMap.HoldInvalidation = true;
 
@@ -1463,36 +1465,54 @@ namespace MissionPlanner.GCSViews
                         MainMap.Overlays.Remove(b);
                     }
 
+                    //Update Overlay
                     MainMap.Overlays.Insert(1, wpOverlay.overlay);
-
                     wpOverlay.overlay.ForceUpdate();
 
-                    //---
-                    existing = MainMap.Overlays.Where(a => a.Id == wpOverlay2.overlay.Id).ToList();
-                    foreach (var b in existing)
+
+                    //** Second plane overlay
+                    if (mission[1].Count > 0)
                     {
-                        MainMap.Overlays.Remove(b);
+
+                        WPOverlay wpOverlay2 = new WPOverlay();
+                        wpOverlay2.overlay.Id = "WPOverlay2";
+                        wpOverlay2.CreateOverlay(home, mission[1], double.Parse(TXT_WPRad.Text) / CurrentState.multiplieralt, double.Parse(TXT_loiterrad.Text) / CurrentState.multiplieralt, CurrentState.multiplieralt, activePlane == 2);
+
+                        //Remove existing overlay of plane 1
+                        //Remove existing overlay of plane 1
+                        existing = MainMap.Overlays.Where(a => a.Id == wpOverlay2.overlay.Id).ToList();
+                        foreach (var b in existing)
+                        {
+                            MainMap.Overlays.Remove(b);
+                        }
+
+                        MainMap.Overlays.Insert(1, wpOverlay2.overlay);
+                        wpOverlay2.overlay.ForceUpdate();
+
                     }
 
-                    MainMap.Overlays.Insert(1, wpOverlay2.overlay);
-
-                    wpOverlay2.overlay.ForceUpdate();
-
-                    //---
-                    existing = MainMap.Overlays.Where(a => a.Id == wpOverlay3.overlay.Id).ToList();
-                    foreach (var b in existing)
+                    if (mission[2].Count > 0)
                     {
-                        MainMap.Overlays.Remove(b);
+                        //** Third plane overlay
+
+                        WPOverlay wpOverlay3 = new WPOverlay();
+                        wpOverlay3.overlay.Id = "WPOverlay3";
+                        wpOverlay3.CreateOverlay(home, mission[2], double.Parse(TXT_WPRad.Text) / CurrentState.multiplieralt, double.Parse(TXT_loiterrad.Text) / CurrentState.multiplieralt, CurrentState.multiplieralt, activePlane == 3);
+
+
+
+
+                        //Remove existing overlay of plane 1
+                        existing = MainMap.Overlays.Where(a => a.Id == wpOverlay3.overlay.Id).ToList();
+                        foreach (var b in existing)
+                        {
+                            MainMap.Overlays.Remove(b);
+                        }
+
+                        MainMap.Overlays.Insert(1, wpOverlay3.overlay);
+                        wpOverlay3.overlay.ForceUpdate();
+
                     }
-
-                    MainMap.Overlays.Insert(1, wpOverlay3.overlay);
-
-                    wpOverlay3.overlay.ForceUpdate();
-
-
-
-
-
 
                     lbl_distance.Text = rm.GetString("lbl_distance.Text") + ": " +
                                         FormatDistance((
@@ -1500,6 +1520,7 @@ namespace MissionPlanner.GCSViews
                                                 .Select(a => (PointLatLngAlt) a)
                                                 .Aggregate(0.0, (d, p1, p2) => d + p1.GetDistance(p2))
                                         ) / 1000.0, false);
+
 
                     setgradanddistandaz(wpOverlay.pointlist, home);
 
@@ -1514,8 +1535,9 @@ namespace MissionPlanner.GCSViews
                         MainMap_OnMapZoomChanged();
                     }
 
-                    pointlist = wpOverlay.pointlist;
 
+                    // Add crosses to split line between waypoints
+                    pointlist = wpOverlay.pointlist;
                     {
                         foreach (var pointLatLngAlt in pointlist.PrevNowNext())
                         {
@@ -1561,6 +1583,9 @@ namespace MissionPlanner.GCSViews
 
                     MainMap.Refresh();
                 }
+
+
+
 
                 if ((MAVLink.MAV_MISSION_TYPE) cmb_missiontype.SelectedValue == MAVLink.MAV_MISSION_TYPE.FENCE)
                 {
@@ -2307,6 +2332,23 @@ namespace MissionPlanner.GCSViews
                     Commands.Rows.Insert(e.RowIndex + 1, myrow);
                     writeKML();
                 }
+
+                if ((e.ColumnIndex == PayLoadCol.Index))
+                {
+
+                    string mode = Commands.CurrentRow.Cells[Command.Index].Value.ToString();
+
+                    if (mode == "WAYPOINT")
+                    {
+                        MainV2.payloadToIgnite.igniteMask = Convert.ToInt16(Commands.CurrentRow.Cells[Param1.Index].Value);
+                        MainV2.payloadToIgnite.ShowDialog();
+                        Commands.CurrentRow.Cells[Param1.Index].Value = MainV2.payloadToIgnite.igniteMask;
+                        writeKML();
+                    }
+                }
+
+
+
             }
             catch (Exception)
             {
@@ -2346,6 +2388,14 @@ namespace MissionPlanner.GCSViews
                 }
             }
 
+            //We modified Param3 (speed), it is easier to redo all points
+            if (e.ColumnIndex == Param3.Index)
+            {
+                recalculate_timings();
+            }
+
+
+
             Commands_RowEnter(null,
                 new DataGridViewCellEventArgs(Commands.CurrentCell.ColumnIndex, Commands.CurrentCell.RowIndex));
 
@@ -2371,6 +2421,7 @@ namespace MissionPlanner.GCSViews
         {
             e.Row.Cells[Frame.Index].Value = CMB_altmode.SelectedValue;
             e.Row.Cells[Delete.Index].Value = "X";
+            e.Row.Cells[PayLoadCol.Index].Value = "Pyl Ignite";
             e.Row.Cells[Up.Index].Value = Resources.up;
             e.Row.Cells[Down.Index].Value = Resources.down;
         }
@@ -2447,6 +2498,7 @@ namespace MissionPlanner.GCSViews
                 cell.Value = "WAYPOINT";
                 cell.DropDownWidth = 200;
                 Commands.Rows[e.RowIndex].Cells[Delete.Index].Value = "X";
+                Commands.Rows[e.RowIndex].Cells[PayLoadCol.Index].Value = "SET PAYLOAD";
                 if (!quickadd)
                 {
                     Commands_RowEnter(sender, new DataGridViewCellEventArgs(0, e.RowIndex - 0)); // do header labels
@@ -7819,8 +7871,14 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
         {
 
             //Ask offsets for timed waypoints and move them in the current list
+            //mission 1 is the first, mission2 and mission3 are the wingmans mission.
 
+            //if there are not at least three waypoints then we do nothing
             if (Commands.Rows.Count < 3) return;
+
+
+            //Switch back to plane1, this will trigger a redo.
+            cmb_currentplane.SelectedIndex = 0;
 
 
             int xOffset = 0;
@@ -7830,7 +7888,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
             xOffset = Convert.ToInt32(tPlane2X.Text);
             yOffset = Convert.ToInt32(tPlane2Y.Text);
-            zOffset = Convert.ToInt32(tPlane2X.Text);
+            zOffset = Convert.ToInt32(tPlane2Z.Text);
 
 
             //Todo: do checks for integrity
@@ -7871,13 +7929,29 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 }
             }
 
-            mission2 = GetCommandList();
+            var updated_commands = GetCommandList();        //This contains the actual list
+            if (mission[1].Count != updated_commands.Count)
+            {
+                //The mission items are different, update the whole list including non timed points
+                mission[1] = updated_commands;
+            }
+            else
+            {
+                for (int i =0;i<mission[1].Count;i++)
+                {
+                    if ( (mission[1][i].id == (ushort)MAVLink.MAV_CMD.DO_SEND_SCRIPT_MESSAGE) )
+                    {
+                        mission[1][i] = updated_commands[i];
+                        mission[1][i + 1] = updated_commands[i + 1];
+                    }
+                }
+            }
+
 
             Locationwp h = new Locationwp();
             h.lat = Convert.ToDouble(TXT_homelat.Text);
             h.lng = Convert.ToDouble(TXT_homelng.Text);
             h.alt = (float)Convert.ToDouble(TXT_homealt.Text);
-
             temp.Insert(0, h);
             //Restore back originals
             processToScreen(temp, false);
@@ -7885,7 +7959,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             //------------------------
             xOffset = Convert.ToInt32(tPlane3X.Text);
             yOffset = Convert.ToInt32(tPlane3Y.Text);
-            zOffset = Convert.ToInt32(tPlane3X.Text);
+            zOffset = Convert.ToInt32(tPlane3Z.Text);
 
             if (xOffset == 0 && yOffset == 0 && zOffset == 0) return;
 
@@ -7927,7 +8001,24 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 }
             }
 
-            mission3 = GetCommandList();
+            updated_commands = GetCommandList();        //This contains the actual list
+            if (mission[2].Count != updated_commands.Count)
+            {
+                //The mission items are different, update the whole list including non timed points
+                mission[2] = updated_commands;
+            }
+            else
+            {
+                for (int i = 0; i < mission[2].Count; i++)
+                {
+                    if ((mission[2][i].id == (ushort)MAVLink.MAV_CMD.DO_SEND_SCRIPT_MESSAGE))
+                    {
+                        mission[2][i] = updated_commands[i];
+                        mission[2][i + 1] = updated_commands[i + 1];
+                    }
+                }
+            }
+
 
             h = new Locationwp();
             h.lat = Convert.ToDouble(TXT_homelat.Text);
@@ -7939,5 +8030,76 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             processToScreen(temp, false);
 
         }
+
+        private void cmb_currentplane_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
+            if (mission[0] is null || mission[1] is null || mission[2] is null) return;
+
+
+            var newPlaneIndex = Convert.ToInt32(cmb_currentplane.SelectedItem);
+
+            if (newPlaneIndex <1 || newPlaneIndex>3)
+            {
+                cmb_currentplane.SelectedIndex = 0;
+                return;
+            }
+
+            if (newPlaneIndex == 2 && mission[1].Count == 0)
+            {
+                cmb_currentplane.SelectedIndex = 0;
+                return;
+            }
+
+            if (newPlaneIndex == 3 && mission[2].Count == 0)
+            {
+                cmb_currentplane.SelectedIndex = 0;
+                return;
+            }
+
+            //Save current plane index
+            mission[currentPlaneIndex] = GetCommandList();
+            currentPlaneIndex = newPlaneIndex-1;            //It is ugly must do with is something
+
+            //add home
+            var h = new Locationwp();
+            h.lat = Convert.ToDouble(TXT_homelat.Text);
+            h.lng = Convert.ToDouble(TXT_homelng.Text);
+            h.alt = (float)Convert.ToDouble(TXT_homealt.Text);
+
+            var temp = mission[currentPlaneIndex];
+            temp.Insert(0, h);
+            processToScreen(temp, false);
+
+            //We change id
+            writeKML(); // ?? Ez eleg lenne ? (nem mert a waypointokat is fel kell tolteni....
+
+        }
+
+
+        //Recalculate timings on the Commands list.... not in te individual missions
+        private void recalculate_timings()
+        {
+
+            if (Commands.Rows.Count < 3) return;
+
+            for (int i = 0; i<Commands.RowCount; i++)
+            {
+                if (i>0)
+                {
+                    if (Commands.Rows[i - 1].Cells[Command.Index].Value.ToString() == MAVLink.MAV_CMD.DO_SEND_SCRIPT_MESSAGE.ToString())
+                    {
+
+                        double speed = Convert.ToDouble(Commands.Rows[i - 1].Cells[Param3.Index].Value);
+                        double dist = Convert.ToDouble(Commands.Rows[i].Cells[Dist.Index].Value);
+                        Commands.Rows[i - 1].Cells[Param2.Index].Value = (dist / speed).ToString();
+                    }
+
+                }
+            }
+        }
+
+
+
     }
 }

@@ -5567,5 +5567,22 @@ namespace MissionPlanner.GCSViews
                 XPDRConnect_btn.Text = "Connect to Transponder";
             }
         }
+
+        private void myButton4_Click(object sender, EventArgs e)
+        {
+            if (myButton4.Text == "Pause Mission")
+            {
+                myButton4.Text = "Continue/Restart";
+
+            }
+            else
+            {
+                int a = 0;
+                InputBox.Show("Continue/Restart", "Continue/Restart from WP#:", ref a);
+                myButton4.Text = "Pause Mission";
+
+            }
+
+        }
     }
 }

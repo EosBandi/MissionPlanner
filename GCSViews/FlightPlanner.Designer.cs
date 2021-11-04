@@ -96,6 +96,21 @@ namespace MissionPlanner.GCSViews
             this.lbl_wpfile = new System.Windows.Forms.Label();
             this.BUT_loadwpfile = new MissionPlanner.Controls.MyButton();
             this.BUT_saveWPFile = new MissionPlanner.Controls.MyButton();
+            this.panel6 = new System.Windows.Forms.Panel();
+            this.label13 = new System.Windows.Forms.Label();
+            this.cmb_currentplane = new System.Windows.Forms.ComboBox();
+            this.bUpdateFormation = new MissionPlanner.Controls.MyButton();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
+            this.tPlane3Y = new System.Windows.Forms.TextBox();
+            this.tPlane3Z = new System.Windows.Forms.TextBox();
+            this.tPlane3X = new System.Windows.Forms.TextBox();
+            this.tPlane2Z = new System.Windows.Forms.TextBox();
+            this.tPlane2Y = new System.Windows.Forms.TextBox();
+            this.tPlane2X = new System.Windows.Forms.TextBox();
             this.splitter2 = new System.Windows.Forms.Splitter();
             this.panelMap = new System.Windows.Forms.Panel();
             this.lbl_homedist = new System.Windows.Forms.Label();
@@ -198,18 +213,6 @@ namespace MissionPlanner.GCSViews
             this.zoomToVehicleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToMissionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToHomeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.panel6 = new System.Windows.Forms.Panel();
-            this.tPlane2X = new System.Windows.Forms.TextBox();
-            this.tPlane2Y = new System.Windows.Forms.TextBox();
-            this.tPlane2Z = new System.Windows.Forms.TextBox();
-            this.tPlane3X = new System.Windows.Forms.TextBox();
-            this.tPlane3Z = new System.Windows.Forms.TextBox();
-            this.tPlane3Y = new System.Windows.Forms.TextBox();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.label12 = new System.Windows.Forms.Label();
             this.Commands = new MissionPlanner.Controls.MyDataGridView();
             this.Command = new System.Windows.Forms.DataGridViewComboBoxColumn();
             this.Param1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -232,7 +235,7 @@ namespace MissionPlanner.GCSViews
             this.Dist = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.AZ = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.TagData = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.bUpdateFormation = new MissionPlanner.Controls.MyButton();
+            this.PayLoadCol = new System.Windows.Forms.DataGridViewButtonColumn();
             this.panel5.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelWaypoints.SuspendLayout();
@@ -241,13 +244,13 @@ namespace MissionPlanner.GCSViews
             this.panel4.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.panel6.SuspendLayout();
             this.panelMap.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.panelBASE.SuspendLayout();
             this.contextMenuStripPoly.SuspendLayout();
             this.contextMenuStripZoom.SuspendLayout();
-            this.panel6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Commands)).BeginInit();
             this.SuspendLayout();
             // 
@@ -563,6 +566,104 @@ namespace MissionPlanner.GCSViews
             this.BUT_saveWPFile.Name = "BUT_saveWPFile";
             this.BUT_saveWPFile.UseVisualStyleBackColor = true;
             this.BUT_saveWPFile.Click += new System.EventHandler(this.BUT_saveWPFile_Click);
+            // 
+            // panel6
+            // 
+            this.panel6.Controls.Add(this.label13);
+            this.panel6.Controls.Add(this.cmb_currentplane);
+            this.panel6.Controls.Add(this.bUpdateFormation);
+            this.panel6.Controls.Add(this.label12);
+            this.panel6.Controls.Add(this.label10);
+            this.panel6.Controls.Add(this.label9);
+            this.panel6.Controls.Add(this.label8);
+            this.panel6.Controls.Add(this.label7);
+            this.panel6.Controls.Add(this.tPlane3Y);
+            this.panel6.Controls.Add(this.tPlane3Z);
+            this.panel6.Controls.Add(this.tPlane3X);
+            this.panel6.Controls.Add(this.tPlane2Z);
+            this.panel6.Controls.Add(this.tPlane2Y);
+            this.panel6.Controls.Add(this.tPlane2X);
+            resources.ApplyResources(this.panel6, "panel6");
+            this.panel6.Name = "panel6";
+            // 
+            // label13
+            // 
+            resources.ApplyResources(this.label13, "label13");
+            this.label13.Name = "label13";
+            // 
+            // cmb_currentplane
+            // 
+            this.cmb_currentplane.FormattingEnabled = true;
+            this.cmb_currentplane.Items.AddRange(new object[] {
+            resources.GetString("cmb_currentplane.Items"),
+            resources.GetString("cmb_currentplane.Items1"),
+            resources.GetString("cmb_currentplane.Items2")});
+            resources.ApplyResources(this.cmb_currentplane, "cmb_currentplane");
+            this.cmb_currentplane.Name = "cmb_currentplane";
+            this.cmb_currentplane.SelectedIndexChanged += new System.EventHandler(this.cmb_currentplane_SelectedIndexChanged);
+            // 
+            // bUpdateFormation
+            // 
+            resources.ApplyResources(this.bUpdateFormation, "bUpdateFormation");
+            this.bUpdateFormation.Name = "bUpdateFormation";
+            this.bUpdateFormation.UseVisualStyleBackColor = true;
+            this.bUpdateFormation.Click += new System.EventHandler(this.bUpdateFormation_Click);
+            // 
+            // label12
+            // 
+            resources.ApplyResources(this.label12, "label12");
+            this.label12.Name = "label12";
+            // 
+            // label10
+            // 
+            resources.ApplyResources(this.label10, "label10");
+            this.label10.Name = "label10";
+            // 
+            // label9
+            // 
+            resources.ApplyResources(this.label9, "label9");
+            this.label9.Name = "label9";
+            // 
+            // label8
+            // 
+            resources.ApplyResources(this.label8, "label8");
+            this.label8.Name = "label8";
+            // 
+            // label7
+            // 
+            resources.ApplyResources(this.label7, "label7");
+            this.label7.Name = "label7";
+            this.label7.Click += new System.EventHandler(this.label7_Click);
+            // 
+            // tPlane3Y
+            // 
+            resources.ApplyResources(this.tPlane3Y, "tPlane3Y");
+            this.tPlane3Y.Name = "tPlane3Y";
+            // 
+            // tPlane3Z
+            // 
+            resources.ApplyResources(this.tPlane3Z, "tPlane3Z");
+            this.tPlane3Z.Name = "tPlane3Z";
+            // 
+            // tPlane3X
+            // 
+            resources.ApplyResources(this.tPlane3X, "tPlane3X");
+            this.tPlane3X.Name = "tPlane3X";
+            // 
+            // tPlane2Z
+            // 
+            resources.ApplyResources(this.tPlane2Z, "tPlane2Z");
+            this.tPlane2Z.Name = "tPlane2Z";
+            // 
+            // tPlane2Y
+            // 
+            resources.ApplyResources(this.tPlane2Y, "tPlane2Y");
+            this.tPlane2Y.Name = "tPlane2Y";
+            // 
+            // tPlane2X
+            // 
+            resources.ApplyResources(this.tPlane2X, "tPlane2X");
+            this.tPlane2X.Name = "tPlane2X";
             // 
             // splitter2
             // 
@@ -1298,79 +1399,6 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.zoomToHomeToolStripMenuItem, "zoomToHomeToolStripMenuItem");
             this.zoomToHomeToolStripMenuItem.Click += new System.EventHandler(this.zoomToHomeToolStripMenuItem_Click);
             // 
-            // panel6
-            // 
-            this.panel6.Controls.Add(this.bUpdateFormation);
-            this.panel6.Controls.Add(this.label12);
-            this.panel6.Controls.Add(this.label10);
-            this.panel6.Controls.Add(this.label9);
-            this.panel6.Controls.Add(this.label8);
-            this.panel6.Controls.Add(this.label7);
-            this.panel6.Controls.Add(this.tPlane3Y);
-            this.panel6.Controls.Add(this.tPlane3Z);
-            this.panel6.Controls.Add(this.tPlane3X);
-            this.panel6.Controls.Add(this.tPlane2Z);
-            this.panel6.Controls.Add(this.tPlane2Y);
-            this.panel6.Controls.Add(this.tPlane2X);
-            resources.ApplyResources(this.panel6, "panel6");
-            this.panel6.Name = "panel6";
-            // 
-            // tPlane2X
-            // 
-            resources.ApplyResources(this.tPlane2X, "tPlane2X");
-            this.tPlane2X.Name = "tPlane2X";
-            // 
-            // tPlane2Y
-            // 
-            resources.ApplyResources(this.tPlane2Y, "tPlane2Y");
-            this.tPlane2Y.Name = "tPlane2Y";
-            // 
-            // tPlane2Z
-            // 
-            resources.ApplyResources(this.tPlane2Z, "tPlane2Z");
-            this.tPlane2Z.Name = "tPlane2Z";
-            // 
-            // tPlane3X
-            // 
-            resources.ApplyResources(this.tPlane3X, "tPlane3X");
-            this.tPlane3X.Name = "tPlane3X";
-            // 
-            // tPlane3Z
-            // 
-            resources.ApplyResources(this.tPlane3Z, "tPlane3Z");
-            this.tPlane3Z.Name = "tPlane3Z";
-            // 
-            // tPlane3Y
-            // 
-            resources.ApplyResources(this.tPlane3Y, "tPlane3Y");
-            this.tPlane3Y.Name = "tPlane3Y";
-            // 
-            // label7
-            // 
-            resources.ApplyResources(this.label7, "label7");
-            this.label7.Name = "label7";
-            this.label7.Click += new System.EventHandler(this.label7_Click);
-            // 
-            // label8
-            // 
-            resources.ApplyResources(this.label8, "label8");
-            this.label8.Name = "label8";
-            // 
-            // label9
-            // 
-            resources.ApplyResources(this.label9, "label9");
-            this.label9.Name = "label9";
-            // 
-            // label10
-            // 
-            resources.ApplyResources(this.label10, "label10");
-            this.label10.Name = "label10";
-            // 
-            // label12
-            // 
-            resources.ApplyResources(this.label12, "label12");
-            this.label12.Name = "label12";
-            // 
             // Commands
             // 
             this.Commands.AllowUserToAddRows = false;
@@ -1404,7 +1432,8 @@ namespace MissionPlanner.GCSViews
             this.Angle,
             this.Dist,
             this.AZ,
-            this.TagData});
+            this.TagData,
+            this.PayLoadCol});
             this.Commands.Name = "Commands";
             dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
             dataGridViewCellStyle7.BackColor = System.Drawing.SystemColors.Control;
@@ -1559,12 +1588,10 @@ namespace MissionPlanner.GCSViews
             this.TagData.Name = "TagData";
             this.TagData.ReadOnly = true;
             // 
-            // bUpdateFormation
+            // PayLoadCol
             // 
-            resources.ApplyResources(this.bUpdateFormation, "bUpdateFormation");
-            this.bUpdateFormation.Name = "bUpdateFormation";
-            this.bUpdateFormation.UseVisualStyleBackColor = true;
-            this.bUpdateFormation.Click += new System.EventHandler(this.bUpdateFormation_Click);
+            resources.ApplyResources(this.PayLoadCol, "PayLoadCol");
+            this.PayLoadCol.Name = "PayLoadCol";
             // 
             // FlightPlanner
             // 
@@ -1587,6 +1614,8 @@ namespace MissionPlanner.GCSViews
             this.panel3.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
+            this.panel6.ResumeLayout(false);
+            this.panel6.PerformLayout();
             this.panelMap.ResumeLayout(false);
             this.panelMap.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.trackBar1)).EndInit();
@@ -1594,8 +1623,6 @@ namespace MissionPlanner.GCSViews
             this.panelBASE.ResumeLayout(false);
             this.contextMenuStripPoly.ResumeLayout(false);
             this.contextMenuStripZoom.ResumeLayout(false);
-            this.panel6.ResumeLayout(false);
-            this.panel6.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.Commands)).EndInit();
             this.ResumeLayout(false);
 
@@ -1745,6 +1772,25 @@ namespace MissionPlanner.GCSViews
         private ToolStripMenuItem zoomToVehicleToolStripMenuItem;
         private ToolStripMenuItem zoomToMissionToolStripMenuItem;
         private ToolStripMenuItem zoomToHomeToolStripMenuItem;
+        private ToolStripMenuItem convertWPToPolygonToolStripMenuItem;
+        private ToolStripMenuItem fromCurrentWaypointsToolStripMenuItem;
+        private ToolStripMenuItem addTimedWPToolStripMenuItem;
+        private ToolStripMenuItem addOffsetToTimedWPToolStripMenuItem;
+        private Panel panel6;
+        private TextBox tPlane2Y;
+        private TextBox tPlane2X;
+        private Label label7;
+        private TextBox tPlane3Y;
+        private TextBox tPlane3Z;
+        private TextBox tPlane3X;
+        private TextBox tPlane2Z;
+        private Label label12;
+        private Label label10;
+        private Label label9;
+        private Label label8;
+        private MyButton bUpdateFormation;
+        private Label label13;
+        private ComboBox cmb_currentplane;
         private DataGridViewComboBoxColumn Command;
         private DataGridViewTextBoxColumn Param1;
         private DataGridViewTextBoxColumn Param2;
@@ -1766,22 +1812,6 @@ namespace MissionPlanner.GCSViews
         private DataGridViewTextBoxColumn Dist;
         private DataGridViewTextBoxColumn AZ;
         private DataGridViewTextBoxColumn TagData;
-        private ToolStripMenuItem convertWPToPolygonToolStripMenuItem;
-        private ToolStripMenuItem fromCurrentWaypointsToolStripMenuItem;
-        private ToolStripMenuItem addTimedWPToolStripMenuItem;
-        private ToolStripMenuItem addOffsetToTimedWPToolStripMenuItem;
-        private Panel panel6;
-        private TextBox tPlane2Y;
-        private TextBox tPlane2X;
-        private Label label7;
-        private TextBox tPlane3Y;
-        private TextBox tPlane3Z;
-        private TextBox tPlane3X;
-        private TextBox tPlane2Z;
-        private Label label12;
-        private Label label10;
-        private Label label9;
-        private Label label8;
-        private MyButton bUpdateFormation;
+        private DataGridViewButtonColumn PayLoadCol;
     }
 }
