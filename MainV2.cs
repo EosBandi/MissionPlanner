@@ -3841,35 +3841,35 @@ namespace MissionPlanner
 
 
 
-            //MainV2.comPort.MAV.cs.messageHigh = "PortarComm disabled";
+            MainV2.comPort.MAV.cs.messageHigh = "PortarComm disabled";
 
-            if (supervisor)
-            {
-                log.Info("start protarcomm server thread");
+            //if (supervisor)
+            //{
+            //    log.Info("start protarcomm server thread");
 
-                protarcommthread = new Thread(protarComm.ServerThread)
-                {
-                    IsBackground = true,
-                    Name = "protar supervisor server"
+            //    protarcommthread = new Thread(protarComm.ServerThread)
+            //    {
+            //        IsBackground = true,
+            //        Name = "protar supervisor server"
 
-                };
-                protarcommthread.Start();
-                protarComm.isRunning = true;
-            }
-            else
-            {
-                log.Info("start protarcomm client thread");
-                protarComm.myNodeID = (byte)nodeID.plane1;
+            //    };
+            //    protarcommthread.Start();
+            //    protarComm.isRunning = true;
+            //}
+            //else
+            //{
+            //    log.Info("start protarcomm client thread");
+            //    protarComm.myNodeID = (byte)nodeID.plane1;
 
-                protarcommthread = new Thread(protarComm.ClientThread)
-                {
-                    IsBackground = true,
-                    Name = "protar supervisor client"
+            //    protarcommthread = new Thread(protarComm.ClientThread)
+            //    {
+            //        IsBackground = true,
+            //        Name = "protar supervisor client"
 
-                };
-                protarcommthread.Start();
-                protarComm.isRunning = true;
-            }
+            //    };
+            //    protarcommthread.Start();
+            //    protarComm.isRunning = true;
+            //}
 
 
             setAnnunciatorInitialState();
@@ -4836,7 +4836,7 @@ namespace MissionPlanner
                 }
             }
 
-            protarComm.outQueue[1].Enqueue(protarComm.createPacket(packetID.payloadSetup, setup));
+            //protarComm.outQueue[1].Enqueue(protarComm.createPacket(packetID.payloadSetup, setup));
 
         }
 
