@@ -355,6 +355,14 @@
     <None Update="Drivers\cubeorangeplus.cat">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+<<<<<<< HEAD
+=======
+    <None Include="MissionPlanner.GCSViews.ConfigurationView.ConfigGPSOrder+GPSCAN.datasource" />
+    <None Include="MissionPlanner.GCSViews.ConfigurationView.ConfigHWCompass2+CompassDeviceInfo.datasource" />
+    <None Include="NoFly\eunfz.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+>>>>>>> 0ad2660dd (Implementation of Geoawareness based on eunfz data)
     <None Include="plugins\example10-canlogfile.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -970,6 +978,7 @@
     <None Update="m3u\networklink.kml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+<<<<<<< HEAD
     <None Update="NoFly\Areas-Lisboa.kmz">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -983,6 +992,14 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Scripts\datetime.py">
+=======
+    <None Include="NoFly\Areas-Lisboa.kmz" />
+    <None Include="NoFly\Drone No Fly Zones.kmz" />
+    <None Include="NoFly\Regulamento-RPA-ver-5.0.kmz" />
+    <None Include="NoFly\SouthAfricaNoRPASOutlined.kmz" />
+    <None Include="Properties\app.manifest" />
+    <None Include="Scripts\datetime.py">
+>>>>>>> 0ad2660dd (Implementation of Geoawareness based on eunfz data)
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Scripts\example1.py">

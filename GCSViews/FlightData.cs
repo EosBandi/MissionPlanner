@@ -32,6 +32,7 @@ using ZedGraph;
 using LogAnalyzer = MissionPlanner.Utilities.LogAnalyzer;
 using TableLayoutPanelCellPosition = System.Windows.Forms.TableLayoutPanelCellPosition;
 using UnauthorizedAccessException = System.UnauthorizedAccessException;
+//using System.Windows.Interop;
 
 // written by michael oborne
 
@@ -3318,6 +3319,8 @@ namespace MissionPlanner.GCSViews
 
             DateTime waypoints = DateTime.Now.AddSeconds(0);
 
+            DateTime nfzlast = DateTime.Now.AddSeconds(0);
+
             DateTime updatescreen = DateTime.Now;
 
             DateTime transponderUpdate = DateTime.Now;
@@ -3669,6 +3672,91 @@ namespace MissionPlanner.GCSViews
                             list19.Add(time, (list19item.GetValue(MainV2.comPort.MAV.cs, null).ConvertToDouble()));
                         if (list20item != null)
                             list20.Add(time, (list20item.GetValue(MainV2.comPort.MAV.cs, null).ConvertToDouble()));
+                    }
+
+                    // update nfz warnings
+                    if (nfzlast.AddSeconds(Settings.Instance.GetDouble("nfz_updateseconds", 5)) < DateTime.Now)
+                    {
+                        nfzlast = DateTime.Now;
+
+                        bool showOnlyClose = Settings.Instance.GetBoolean("nfz_showonlyclose", true);
+                        float warningdistance = Settings.Instance.GetInt32("nfz_warningdistance",2000);
+
+                        GMapOverlay nfzOverlay = gMapControl1.Overlays.FirstOrDefault(v => v.Id == "NoFlyZones");
+
+                        if (nfzOverlay != null)
+                        {
+                            DateTime n = DateTime.Now;
+                            //Go trough all polygons
+                            foreach (var poly in nfzOverlay.Polygons)
+                            {
+                                var a = poly.GetDistance(new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng));
+                                if (a < 99999)
+                                {
+                                    if (a <= warningdistance)
+                                    {
+                                        Console.WriteLine("Distance = " + a.ToString());
+                                        poly.Fill = new SolidBrush(Color.FromArgb(128, Color.Red));
+                                        if (a == 0)
+                                        {
+                                            string msg = "You are in NFZ " + poly.Name;
+                                            MainV2.comPort.MAV.cs.messageHigh = msg;
+                                            MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));
+                                        }
+                                        else
+                                        {
+                                            string msg = "You are " + a.ToString("F0") + "m from " + poly.Name;
+                                            MainV2.comPort.MAV.cs.messageHigh = msg;
+                                            MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        poly.Fill = new SolidBrush(Color.FromArgb(30, Color.Blue));
+                                    }
+
+                                    if (showOnlyClose) poly.IsVisible = true;
+
+                                }
+                                else
+                                {
+                                    poly.Fill = new SolidBrush(Color.FromArgb(30, Color.Blue));
+                                    if (showOnlyClose) poly.IsVisible = false;
+                                }
+
+                            }
+                            //Also go through all markers (round nfz's)
+                            foreach (GMapMarkerAirport marker in nfzOverlay.Markers)
+                            {
+
+                                //marker center 
+                                PointLatLngAlt center = marker.Position;
+                                float radius = marker.wprad;
+
+                                var a = center.GetDistance2(new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng));
+                                if (a < radius + warningdistance)
+                                {
+                                    marker.FillColor = Color.FromArgb(128, Color.Red);
+                                    if (a < radius)
+                                    {
+                                        string msg = "You are in a NFZ " + ((Utilities.nfz.Feature)marker.Tag).Name;
+                                        MainV2.comPort.MAV.cs.messageHigh = msg;
+                                        MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));    
+                                    }
+                                    else
+                                    {
+                                        string msg = "You are " + (a - radius).ToString("F0") + "m from " + ((Utilities.nfz.Feature)marker.Tag).Name;
+                                        MainV2.comPort.MAV.cs.messageHigh = msg;
+                                        MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));
+                                    }
+                                }
+                                else
+                                {
+                                    marker.FillColor = Color.FromArgb(25, Color.Red);
+                                }
+                            }
+                            //Console.WriteLine("Time to calc : " + DateTime.Now.Subtract(n).Milliseconds);
+                        }
                     }
 
                     // update map - 0.3sec if connected , 2 sec if not connected

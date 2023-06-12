@@ -5,6 +5,7 @@ using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing.Text;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 
@@ -17,5 +18,19 @@ namespace GMap.NET.WindowsForms
         {
             return (Bitmap)Image.FromStream(new MemoryStream(input));
         }
+
+        public static IEnumerable<T> CloseTheLoop<T>(this IEnumerable<T> list)
+        {
+            foreach (var item in list)
+            {
+                yield return item;
+            }
+
+            if (!list.First().Equals(list.Last()))
+                yield return list.First();
+        }
     }
+
+
+
 }

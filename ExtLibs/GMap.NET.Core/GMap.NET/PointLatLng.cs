@@ -111,7 +111,53 @@ namespace GMap.NET
          this.Lat -= lat;
       }
 
-      public override int GetHashCode()
+        public const double rad2deg = (180 / Math.PI);
+        public const double deg2rad = (1.0 / rad2deg);
+
+        public double GetBearing(PointLatLng p2)
+        {
+            var latitude1 = deg2rad * (this.Lat);
+            var latitude2 = deg2rad * (p2.Lat);
+            var longitudeDifference = deg2rad * (p2.Lng - this.Lng);
+
+            var y = Math.Sin(longitudeDifference) * Math.Cos(latitude2);
+            var x = Math.Cos(latitude1) * Math.Sin(latitude2) - Math.Sin(latitude1) * Math.Cos(latitude2) * Math.Cos(longitudeDifference);
+
+            return (rad2deg * (Math.Atan2(y, x)) + 360) % 360;
+        }
+
+        public double GetAngle(PointLatLng point, double heading)
+        {
+            double angle = GetBearing(point) - heading;
+            if (angle < -180.0)
+            {
+                angle += 360.0;
+            }
+            if (angle > 180.0)
+            {
+                angle -= 360.0;
+            }
+            return angle;
+        }
+
+        public double GetDistance2(PointLatLng p2)
+        {
+            //http://www.movable-type.co.uk/scripts/latlong.html
+            var R = 6371.0; // 6371 km
+            var dLat = (p2.Lat - Lat) * deg2rad;
+            var dLon = (p2.Lng - Lng) * deg2rad;
+            var lat1 = Lat * deg2rad;
+            var lat2 = p2.Lat * deg2rad;
+
+            var a = Math.Sin(dLat / 2.0) * Math.Sin(dLat / 2.0) +
+                    Math.Sin(dLon / 2.0) * Math.Sin(dLon / 2.0) * Math.Cos(lat1) * Math.Cos(lat2);
+            var c = 2.0 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1.0 - a));
+            var d = R * c * 1000.0; // M
+
+            return d;
+        }
+
+        public override int GetHashCode()
       {
          return (this.Lng.GetHashCode() ^ this.Lat.GetHashCode());
       }

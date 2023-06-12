@@ -14,6 +14,8 @@ namespace MissionPlanner.Maps
     {
         public Pen Pen = new Pen(Brushes.White, 2);
 
+        public Color FillColor {  get; set; }   
+
         public Color Color
         {
             get { return Pen.Color; }
@@ -43,6 +45,7 @@ namespace MissionPlanner.Maps
             : base(p)
         {
             Pen.DashStyle = DashStyle.Dash;
+            FillColor = Color.FromArgb(25, Color.Red);
 
             // the US + south America
             if (p.Lng < -25)
@@ -97,7 +100,7 @@ namespace MissionPlanner.Maps
             {
                 //g.DrawArc(Pen, new System.Drawing.Rectangle(x, y, widtharc, heightarc), 0, 360);
 
-                g.FillPie(new SolidBrush(Color.FromArgb(25, Color.Red)), x, y, widtharc, heightarc, 0, 360);
+                g.FillPie(new SolidBrush(FillColor), x, y, widtharc, heightarc, 0, 360);
             }
         }
     }
