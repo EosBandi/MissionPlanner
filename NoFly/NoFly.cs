@@ -201,7 +201,7 @@ namespace MissionPlanner.NoFly
             catch
             {
             }
-
+            kmlpolygonsoverlay.Id = "NoFlyZones";
             if (NoFlyEvent != null)
                 NoFlyEvent(null, new NoFlyEventArgs(kmlpolygonsoverlay));
         }

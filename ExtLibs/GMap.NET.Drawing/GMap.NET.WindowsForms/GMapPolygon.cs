@@ -7,7 +7,7 @@
    using GMap.NET;
    //using System.Windows.Forms;
    using System;
-    using System.Linq;
+   using System.Linq;
 
     /// <summary>
     /// GMap.NET polygon
@@ -253,7 +253,7 @@
 
       public readonly List<GPoint> LocalPoints = new List<GPoint>();
 
-      static GMapPolygon()
+        static GMapPolygon()
       {
 #if !PocketPC
           DefaultStroke.LineJoin = LineJoin.Round;
@@ -299,20 +299,106 @@
             j = i;
          }
          return result;
-      }
+        }
+
+        /// <summary>
+        /// Get the distance of a point from the polygon boudary,
+        /// </summary>
+        /// <param name = "p" ></ param >
+        /// < returns > The distance of p in meters, zero if point inside the polygon,99999 if distance not calculable</returns>
+        public float GetDistance(PointLatLng p)
+        {
+            float disttotal = 99999;
+        
+            //We need at least three points to have a 2 dimensional polygon
+            if (Points.Count < 3)
+                return disttotal;
+
+            if (IsInside(p))
+            {
+                return 0;
+            }
+
+            //Update Bounds if it not yet calculated
+            if (Bounds.Lat == 0 && Bounds.Lng == 0)
+            {
+                var minx = Points.Min(a => a.Lng);
+                var maxx = Points.Max(a => a.Lng);
+                var miny = Points.Min(a => a.Lat);
+                var maxy = Points.Max(a => a.Lat);
+                Bounds = RectLatLng.FromLTRB(minx, maxy, maxx, miny);
+            }
+
+            //Extend Bounds by 10 percent
+            var lng_sign = (Bounds.Left - Bounds.Right);
+            var lat_sign = (Bounds.Top - Bounds.Bottom);
+
+            var lng_add = Math.Sign(lng_sign) * 0.1; //0.1 is around 11Km.
+            var lat_add = Math.Sign(lat_sign) * 0.1;
+
+
+            var lt = new PointLatLng(Bounds.Top + lat_add, Bounds.Left + lng_add);
+            var lb = new PointLatLng(Bounds.Bottom - lat_add, Bounds.Left + lng_add);
+            var rt = new PointLatLng(Bounds.Top + lat_add, Bounds.Right - lng_add);
+            var rb = new PointLatLng(Bounds.Bottom - lat_add, Bounds.Right - lng_add);
+
+
+            if (!(lt.Lat > p.Lat && rb.Lat < p.Lat && lt.Lng < p.Lng && rb.Lng > p.Lng))
+                return disttotal;
+
+            PointLatLng lineStartLatLng = new PointLatLng();
+            // check all segments
+            foreach (var polygonPoint in Points.CloseTheLoop())
+            {
+                if (lineStartLatLng.IsEmpty)
+                {
+                    lineStartLatLng = new PointLatLng(polygonPoint.Lat, polygonPoint.Lng);
+                    continue;
+                }
+
+                // crosstrack distance
+                var lineEndLatLng = new PointLatLng(polygonPoint.Lat, polygonPoint.Lng);
+                var lineDist = lineStartLatLng.GetDistance2(lineEndLatLng);
+                var distToLocation = lineStartLatLng.GetDistance2(p);
+                var bearToLocation = lineStartLatLng.GetBearing(p);
+                var lineBear = lineStartLatLng.GetBearing(lineEndLatLng);
+
+                var angle = bearToLocation - lineBear;
+                if (angle < 0)
+                    angle += 360;
+
+                var alongline = Math.Cos(angle * PointLatLng.deg2rad) * distToLocation;
+
+                // check to see if our point is still within the line length
+                if (alongline < 0 || alongline > lineDist)
+                {
+                    lineStartLatLng = lineEndLatLng;
+                    continue;
+                }
+
+                var dXt2 = Math.Sin(angle * PointLatLng.deg2rad) * distToLocation;
+
+                disttotal = (float)Math.Min(disttotal, Math.Abs(dXt2));
+
+                lineStartLatLng = lineEndLatLng;
+            }
+            return disttotal;
+        }
+
+
 
 #if !PocketPC
-      #region ISerializable Members
+        #region ISerializable Members
 
-      /// <summary>
-      /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize the target object.
-      /// </summary>
-      /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> to populate with data.</param>
-      /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext"/>) for this serialization.</param>
-      /// <exception cref="T:System.Security.SecurityException">
-      /// The caller does not have the required permission.
-      /// </exception>
-      public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        /// <summary>
+        /// Populates a <see cref="T:System.Runtime.Serialization.SerializationInfo"/> with the data needed to serialize the target object.
+        /// </summary>
+        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo"/> to populate with data.</param>
+        /// <param name="context">The destination (see <see cref="T:System.Runtime.Serialization.StreamingContext"/>) for this serialization.</param>
+        /// <exception cref="T:System.Security.SecurityException">
+        /// The caller does not have the required permission.
+        /// </exception>
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
       {
          base.GetObjectData(info, context);
 

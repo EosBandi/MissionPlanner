@@ -115,18 +115,19 @@
 
                 Nfz nfzinfo;
 
-                if (new FileInfo(filecache).LastWriteTimeUtc.AddHours(12) < DateTime.UtcNow || !File.Exists(filecache))
-                {
-                    nfzinfo = await url.GetJsonAsync<Nfz>();
-                    try
-                    {
-                        File.WriteAllText(filecache, nfzinfo.ToJSON());
-                    }
-                    catch
-                    {
-                    }
-                }
-                else
+                //Temporary removed since we don't have url to load from 
+                //if (new FileInfo(filecache).LastWriteTimeUtc.AddHours(12) < DateTime.UtcNow || !File.Exists(filecache))
+                //{
+                //    nfzinfo = await url.GetJsonAsync<Nfz>();
+                //    try
+                //    {
+                //        File.WriteAllText(filecache, nfzinfo.ToJSON());
+                //    }
+                //    catch
+                //    {
+                //    }
+                //}
+                //else
                     nfzinfo = JsonConvert.DeserializeObject<Nfz>(File.ReadAllText(filecache));
 
 
