@@ -24,6 +24,7 @@ namespace MissionPlanner.Utilities
         private byte compid;
 
         public bool DataAvailable { get; set; } = false;
+        public bool DrawingInProgress { get; set; } = false;
 
         public Proximity(MAVState mavInt, byte sysid, byte compid) 
         {
@@ -47,6 +48,7 @@ namespace MissionPlanner.Utilities
 
         private bool messageReceived(MAVLinkMessage arg)
         {
+            if (DrawingInProgress) return true;
             //accept any compid, but filter sysid
             if (arg.sysid != _parent.sysid)
                 return true;
@@ -60,7 +62,7 @@ namespace MissionPlanner.Utilities
 
                 if (dist.current_distance <= dist.min_distance)
                     return true;
-
+ 
                 _dS.Add(dist.id, (MAV_SENSOR_ORIENTATION)dist.orientation, dist.current_distance, DateTime.Now, 3);
 
                 DataAvailable = true;
@@ -165,16 +167,19 @@ namespace MissionPlanner.Utilities
             
             public void Add(uint id, double angle, double size, double distance, DateTime received, double age = 1)
             {
-                var existing = _dists.Where((a) => { return a.SensorId == id && a.Angle == angle; });
-
-                foreach (var item in existing.ToList())
+                lock (this)
                 {
-                    _dists.Remove(item);
+                    var existing = _dists.Where((a) => { return a.SensorId == id && a.Angle == angle; });
+
+                    foreach (var item in existing.ToList())
+                    {
+                        _dists.Remove(item);
+                    }
+
+                    _dists.Add(new data(id, angle, size, distance, received, age));
+
+                    expire();
                 }
-
-                _dists.Add(new data(id, angle, size, distance, received, age));
-
-                expire();
             }
 
             /// <summary>
@@ -230,7 +235,7 @@ namespace MissionPlanner.Utilities
                 {
                     for (int a = 0; a < _dists.Count; a++)
                     {
-                        var expireat = _dists[a].ExpireTime;
+                        var expireat = _dists[a]?.ExpireTime;
 
                         if (expireat < DateTime.Now)
                         {
