@@ -202,9 +202,28 @@
         {
             [JsonProperty("permanent")]
             public string Permanent { get; set; }
-        }
 
-        public partial class Geometry
+            [JsonProperty("startDateTime")]
+            public string StartDateTime { get; set; }
+
+            [JsonProperty("endDateTime")]
+            public string EndDateTime { get; set; }
+
+            [JsonProperty("schedule")]
+            public Schedule[] Schedule { get; set; }
+        }
+    public partial class Schedule
+    {
+        [JsonProperty("day")]
+        public string[] Day { get; set; }
+
+        [JsonProperty("startTime")]
+        public string StartTime { get; set; }
+
+        [JsonProperty("endTime")]
+        public string endTime { get; set; }
+    }
+    public partial class Geometry
         {
             [JsonProperty("uomDimensions")]
             public string UomDimensions { get; set; }

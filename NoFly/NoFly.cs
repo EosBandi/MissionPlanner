@@ -4,6 +4,7 @@ using GMap.NET.WindowsForms;
 using Ionic.Zip;
 using MissionPlanner.Maps;
 using MissionPlanner.Utilities;
+using MissionPlanner.Utilities.nfz;
 using SharpKml.Dom;
 using System;
 using System.Collections.Generic;
@@ -35,6 +36,18 @@ namespace MissionPlanner.NoFly
 
         public static void Scan()
         {
+            //Delete overlay
+            if (kmlpolygonsoverlay.Polygons.Count > 0 || kmlpolygonsoverlay.Routes.Count > 0)
+            {
+                kmlpolygonsoverlay.Polygons.Clear();
+                kmlpolygonsoverlay.Routes.Clear();
+                kmlpolygonsoverlay.Markers.Clear();
+            }
+
+            //Clean up events
+            UpdateNoFlyZoneEvent = null;
+
+
             if (!Settings.Instance.GetBoolean("ShowNoFly", true))
                 return;
 
@@ -151,27 +164,74 @@ namespace MissionPlanner.NoFly
                                     if (!close)
                                         continue;
 
-                                    GMapPolygon nfzpolygon = new GMapPolygon(coordinates, feat.Name);
-
-                                    nfzpolygon.Tag = item;
-
+                                    GMapPolygonNFZ nfzpolygon = new GMapPolygonNFZ(coordinates, feat.Name);
+                                    nfzpolygon.Tag = feat;
                                     nfzpolygon.Stroke.Color = Color.Purple;
-
                                     nfzpolygon.Fill = new SolidBrush(Color.FromArgb(30, Color.Blue));
-
                                     nfzpolygon.IsHitTestVisible = true;
-                                    /*
-                                    nfzpolygon.ToolTipMode = MarkerTooltipMode.OnMouseOver;
-                                    nfzpolygon.ToolTipText = feat.Name + "\r\n" + feat.Message;
-                                    */
-                                    if (kmlpolygonsoverlay.Control.IsMouseOverPolygon) { 
 
+                                    //Add scheduling to the NFZ
+                                    if (feat.Applicability != null)
+                                    {
+                                        foreach (var app in feat.Applicability)
+                                        {
+                                            if (app.StartDateTime != null && app.EndDateTime != null)
+                                            {
+                                                nfzpolygon.startDateTime = DateTime.Parse(app.StartDateTime, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                                                nfzpolygon.endDateTime = DateTime.Parse(app.EndDateTime, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                                            }
+                                            if (app.Schedule != null)
+                                            {
+                                                nfzpolygon.Schedules = new List<nfzSchedule>();
+                                                foreach (var sched in app.Schedule)
+                                                {
+                                                    nfzSchedule newsched = new nfzSchedule();
+
+                                                    foreach (var day in sched.Day)
+                                                    {
+                                                        if (Enum.IsDefined(typeof(nfzDay), day))
+                                                            newsched.day |= (byte)(1 << (int)Enum.Parse(typeof(nfzDay), day));
+                                                    }
+                                                    newsched.startTime = DateTime.Parse(sched.StartTime, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                                                    newsched.stopTime = DateTime.Parse(sched.endTime, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                                                    nfzpolygon.Schedules.Add(newsched);
+
+                                                }
+                                            }
+                                        }
                                     }
+
+                                    //nfzpolygon.ToolTipMode = MarkerTooltipMode.OnMouseOver;
+                                    //nfzpolygon.ToolTipText = feat.Name + "\r\n" + feat.Message;
+
+                                    //Add boundary
+
+                                    //List<PointLatLng> points = new List<PointLatLng>();
+                                    
+                                    //PointLatLng p1 = new PointLatLng( nfzpolygon.ExtendedBounds.Top, nfzpolygon.ExtendedBounds.Left);
+                                    //PointLatLng p2 = new PointLatLng( nfzpolygon.ExtendedBounds.Top, nfzpolygon.ExtendedBounds.Right);
+                                    //PointLatLng p3 = new PointLatLng( nfzpolygon.ExtendedBounds.Bottom, nfzpolygon.ExtendedBounds.Right);
+                                    //PointLatLng p4 = new PointLatLng( nfzpolygon.ExtendedBounds.Bottom, nfzpolygon.ExtendedBounds.Left);
+                                    //points.Add(p1);
+                                    //points.Add(p2);
+                                    //points.Add(p3);
+                                    //points.Add(p4);
+
+                                    //GMapPolygonNFZ g = new GMapPolygonNFZ(points, feat.Name + "boundary");
+                                    //g.IsVisible = true;
+                                    //g.Fill = new SolidBrush(Color.FromArgb(10, Color.Yellow));
+
+
+                                    //if (kmlpolygonsoverlay.Control.IsMouseOverPolygon) { 
+
+                                    //}
                                     MainV2.instance.BeginInvoke(new Action(() =>
                                     {
                                         if (kmlpolygonsoverlay.Polygons.Any(a => a.Name == feat.Name))
                                             return;
                                         kmlpolygonsoverlay.Polygons.Add(nfzpolygon);
+                                        //kmlpolygonsoverlay.Polygons.Add(g);
+
                                     }));
                                 }
                                 else if (item.HorizontalProjection?.Type == "Circle")
@@ -182,12 +242,46 @@ namespace MissionPlanner.NoFly
                                     if (!close)
                                         continue;
 
-                                    GMapMarkerAirport nfzcircle = new GMapMarkerAirport(coordinates);
+                                    GMapMarkerNFZCircle nfzcircle = new GMapMarkerNFZCircle(coordinates);
                                     nfzcircle.wprad = (int)(item.HorizontalProjection.Radius ?? 0);
                                     nfzcircle.Tag = feat;
                                     nfzcircle.IsHitTestVisible = true;
                                     nfzcircle.ToolTipMode = MarkerTooltipMode.OnMouseOver;
                                     nfzcircle.ToolTipText = feat.Name +"\r\n"+ feat.Message;
+
+
+                                    //Add scheduling to the NFZ
+                                    if (feat.Applicability != null)
+                                    {
+                                        foreach (var app in feat.Applicability)
+                                        {
+                                            if (app.StartDateTime != null && app.EndDateTime != null)
+                                            {
+                                                nfzcircle.startDateTime = DateTime.Parse(app.StartDateTime, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                                                nfzcircle.endDateTime = DateTime.Parse(app.EndDateTime, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                                            }
+                                            if (app.Schedule != null)
+                                            {
+                                                nfzcircle.Schedules = new List<nfzSchedule>();
+                                                foreach (var sched in app.Schedule)
+                                                {
+                                                    nfzSchedule newsched = new nfzSchedule();
+
+                                                    foreach (var day in sched.Day)
+                                                    {
+                                                        if (Enum.IsDefined(typeof(nfzDay), day))
+                                                            newsched.day |= (byte)(1 << (int)Enum.Parse(typeof(nfzDay), day));
+                                                    }
+                                                    newsched.startTime = DateTime.Parse(sched.StartTime, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                                                    newsched.stopTime = DateTime.Parse(sched.endTime, null, System.Globalization.DateTimeStyles.RoundtripKind);
+                                                    nfzcircle.Schedules.Add(newsched);
+
+                                                }
+                                            }
+                                        }
+                                    }
+
+
 
                                     MainV2.instance.BeginInvoke(new Action(() =>
                                     {
@@ -209,7 +303,7 @@ namespace MissionPlanner.NoFly
                 NoFlyEvent(null, new NoFlyEventArgs(kmlpolygonsoverlay));
         }
 
-        static PointLatLngAlt lastUpdateLocation = PointLatLngAlt.Zero;
+        public static PointLatLngAlt lastUpdateLocation = PointLatLngAlt.Zero;
         public static void UpdateNoFlyZone(object sender, PointLatLngAlt plla)
         {
             if (plla.GetDistance(lastUpdateLocation) > 100)

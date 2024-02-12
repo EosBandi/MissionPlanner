@@ -32,6 +32,9 @@ using ZedGraph;
 using LogAnalyzer = MissionPlanner.Utilities.LogAnalyzer;
 using TableLayoutPanelCellPosition = System.Windows.Forms.TableLayoutPanelCellPosition;
 using UnauthorizedAccessException = System.UnauthorizedAccessException;
+using MissionPlanner.Utilities.nfz;
+using System.Runtime.InteropServices;
+using System.Xml.Schema;
 //using System.Windows.Interop;
 
 // written by michael oborne
@@ -3680,7 +3683,7 @@ namespace MissionPlanner.GCSViews
                         nfzlast = DateTime.Now;
 
                         bool showOnlyClose = Settings.Instance.GetBoolean("nfz_showonlyclose", true);
-                        float warningdistance = Settings.Instance.GetInt32("nfz_warningdistance",2000);
+                        float warningdistance = Settings.Instance.GetInt32("nfz_warningdistance",500);
 
                         GMapOverlay nfzOverlay = gMapControl1.Overlays.FirstOrDefault(v => v.Id == "NoFlyZones");
 
@@ -3688,23 +3691,40 @@ namespace MissionPlanner.GCSViews
                         {
                             DateTime n = DateTime.Now;
                             //Go trough all polygons
-                            foreach (var poly in nfzOverlay.Polygons)
+                            foreach (GMapPolygonNFZ poly in nfzOverlay.Polygons)
                             {
+                                if (poly.Name.Contains("boundary")) continue;
+
                                 var a = poly.GetDistance(new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng));
+                                Console.WriteLine("Zone " + poly.Name + "  Distance = " + a);
+
                                 if (a < 99999)
                                 {
-                                    if (a <= warningdistance)
+                                    if (!poly.isActive())
+                                    {
+                                        poly.Fill = new SolidBrush(Color.FromArgb(20, Color.Green));
+                                        poly.Stroke = new Pen(Color.FromArgb(170, Color.Green),2);
+                                        poly.IsVisible = true;
+                                        continue;
+                                    }
+
+
+
+                                    if (a <= warningdistance && poly.isActive())
                                     {
                                         Console.WriteLine("Distance = " + a.ToString());
-                                        poly.Fill = new SolidBrush(Color.FromArgb(128, Color.Red));
                                         if (a == 0)
                                         {
+                                            poly.Fill = new SolidBrush(Color.FromArgb(40, Color.Red));
+                                            poly.Stroke = new Pen(Color.FromArgb(170, Color.Red), 2);
                                             string msg = "You are in NFZ " + poly.Name;
                                             MainV2.comPort.MAV.cs.messageHigh = msg;
                                             MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));
                                         }
                                         else
                                         {
+                                            poly.Fill = new SolidBrush(Color.FromArgb(32, Color.Orange));
+                                            poly.Stroke = new Pen(Color.FromArgb(170, Color.Red), 2);
                                             string msg = "You are " + a.ToString("F0") + "m from " + poly.Name;
                                             MainV2.comPort.MAV.cs.messageHigh = msg;
                                             MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));
@@ -3713,6 +3733,7 @@ namespace MissionPlanner.GCSViews
                                     else
                                     {
                                         poly.Fill = new SolidBrush(Color.FromArgb(30, Color.Blue));
+                                        poly.Stroke = new Pen(Color.FromArgb(170, Color.Blue), 2);
                                     }
 
                                     if (showOnlyClose) poly.IsVisible = true;
@@ -3721,30 +3742,43 @@ namespace MissionPlanner.GCSViews
                                 else
                                 {
                                     poly.Fill = new SolidBrush(Color.FromArgb(30, Color.Blue));
+                                    poly.Stroke = new Pen(Color.FromArgb(170, Color.Blue), 2);
                                     if (showOnlyClose) poly.IsVisible = false;
                                 }
 
                             }
                             //Also go through all markers (round nfz's)
-                            foreach (GMapMarkerAirport marker in nfzOverlay.Markers)
+                            foreach (GMapMarkerNFZCircle marker in nfzOverlay.Markers)
                             {
 
                                 //marker center 
                                 PointLatLngAlt center = marker.Position;
                                 float radius = marker.wprad;
 
-                                var a = center.GetDistance2(new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng));
-                                if (a < radius + warningdistance)
+                                if (!marker.isActive())
                                 {
-                                    marker.FillColor = Color.FromArgb(128, Color.Red);
+                                    marker.FillColor = Color.FromArgb(20, Color.Green);
+                                    marker.Pen = new Pen(Color.FromArgb(170, Color.Green), 2);
+                                    continue;
+                                }
+
+
+                                var a = center.GetDistance2(new PointLatLng(MainV2.comPort.MAV.cs.lat, MainV2.comPort.MAV.cs.lng));
+                                if (a < radius + warningdistance && marker.isActive())
+                                {
+
                                     if (a < radius)
                                     {
+                                        marker.FillColor = Color.FromArgb(40, Color.Red);
+                                        marker.Pen = new Pen(Color.FromArgb(170, Color.Red), 2);
                                         string msg = "You are in a NFZ " + ((Utilities.nfz.Feature)marker.Tag).Name;
                                         MainV2.comPort.MAV.cs.messageHigh = msg;
                                         MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));    
                                     }
                                     else
                                     {
+                                        marker.FillColor = Color.FromArgb(32, Color.Orange);
+                                        marker.Pen = new Pen(Color.FromArgb(170, Color.Red), 2);
                                         string msg = "You are " + (a - radius).ToString("F0") + "m from " + ((Utilities.nfz.Feature)marker.Tag).Name;
                                         MainV2.comPort.MAV.cs.messageHigh = msg;
                                         MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));
@@ -3752,7 +3786,8 @@ namespace MissionPlanner.GCSViews
                                 }
                                 else
                                 {
-                                    marker.FillColor = Color.FromArgb(25, Color.Red);
+                                    marker.FillColor = Color.FromArgb(30, Color.Blue);
+                                    marker.Pen = new Pen(Color.FromArgb(170, Color.Blue), 2);
                                 }
                             }
                             //Console.WriteLine("Time to calc : " + DateTime.Now.Subtract(n).Milliseconds);
@@ -6734,5 +6769,120 @@ namespace MissionPlanner.GCSViews
             // Pass `this` to keep the pop-out always on top
             form.Show(this);
         }
+
+        private void refreshEUNFZToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ThreadPool.QueueUserWorkItem((_) =>
+            {
+                try
+                {
+
+                    NoFly.NoFly.Scan();
+                    NoFly.NoFly.lastUpdateLocation = PointLatLngAlt.Zero;
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                }
+            });
+        }
+
+        private void nFZInfoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (MouseDownStart.Lat == 0.0 || MouseDownStart.Lng == 0.0)
+            {
+                CustomMessageBox.Show("Bad Lat/Long");
+                return;
+            }
+
+            PointLatLng p = new PointLatLng(MouseDownStart.Lat, MouseDownStart.Lng);
+
+            string nfzinfo = "";
+
+            GMapOverlay nfzOverlay = gMapControl1.Overlays.FirstOrDefault(v => v.Id == "NoFlyZones");
+            if (nfzOverlay != null)
+            {
+                foreach (GMapPolygonNFZ poly in nfzOverlay.Polygons)
+                {
+                    if (poly.Name.Contains("boundary")) continue;
+
+                    var a = poly.GetDistance(p);
+                    if (a < 99999)
+                    {
+                        if (poly.IsInside(p))
+                        {
+                            nfzinfo = nfzinfo + getNfzInfo((Utilities.nfz.Feature)poly.Tag);
+                        }
+                    }
+                }
+                //Also go through all markers (round nfz's)
+                foreach (GMapMarkerAirport marker in nfzOverlay.Markers)
+                {
+
+                    //marker center 
+                    PointLatLngAlt center = marker.Position;
+                    float radius = marker.wprad;
+
+                    var d = center.GetDistance2(p);
+
+                        if (d < radius)
+                        {
+                            nfzinfo = nfzinfo + getNfzInfo((Utilities.nfz.Feature)marker.Tag);
+                        }
+                }
+
+                if (nfzinfo == "") nfzinfo = "No NFZ at the cursor location\n";
+
+
+                CustomMessageBox.Show(nfzinfo, "NoFly Zone Info");
+            }
+        }
+
+        private string getNfzInfo(Utilities.nfz.Feature feat)
+        {
+            string nfzinfo = "";
+
+            try
+            {
+                nfzinfo = nfzinfo + "Name : " + feat.Name + "\nType : " + feat.Type + "\nRestriction : " + feat.Restriction + "\n";
+                nfzinfo = nfzinfo + "Altitude : " + feat.Geometry[0].LowerLimit + " " + feat.Geometry[0].UomDimensions + " " + feat.Geometry[0].LowerVerticalReference + " - ";
+                nfzinfo = nfzinfo + feat.Geometry[0].UpperLimit + " " + feat.Geometry[0].UomDimensions + " " + feat.Geometry[0].UpperVerticalReference + "\n";
+
+                if (feat.Applicability?.Length > 0)
+                {
+                    if (feat.Applicability[0].StartDateTime != null) nfzinfo = nfzinfo + "Start Date : " + feat.Applicability[0].StartDateTime + "\n";
+                    if (feat.Applicability[0].EndDateTime != null) nfzinfo = nfzinfo + "End Date : " + feat.Applicability[0].EndDateTime + "\n";
+                    if (feat.Applicability[0].Schedule != null)
+                    {
+                        nfzinfo = nfzinfo + "Schedule : \n";
+                        string schinf = "";
+                        foreach (var sch in feat.Applicability[0].Schedule)
+                        {
+                            foreach (var d in sch.Day)
+                            {
+                                schinf = schinf + d + " ";
+                            }
+                            schinf = schinf + " " + sch.StartTime + " - " + sch.endTime + "\n";
+                            nfzinfo = nfzinfo + schinf;
+                            schinf = "";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                nfzinfo = "No information\n";
+            }
+            nfzinfo = nfzinfo + "----------------\n";
+            return nfzinfo;
+        }
+
+
+
     }
+
+
+
+
 }
+
