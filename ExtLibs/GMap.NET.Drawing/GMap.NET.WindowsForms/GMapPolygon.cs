@@ -140,7 +140,7 @@
             var miny = Points.Min(a => a.Lat);
             var maxy = Points.Max(a => a.Lat);
 
-             Bounds = RectLatLng.FromLTRB(minx, maxy, maxx, miny);
+            Bounds = RectLatLng.FromLTRB(minx, maxy, maxx, miny);
 
               List<Point> pnts = new List<Point>();
               var last = Point.Empty;
@@ -265,124 +265,41 @@
          : base(points, name)
       {
          LocalPoints.Capacity = Points.Count;
-      }
 
-      /// <summary>
-      /// checks if point is inside the polygon,
-      /// info.: http://greatmaps.codeplex.com/discussions/279437#post700449
-      /// </summary>
-      /// <param name="p"></param>
-      /// <returns></returns>
-      public bool IsInside(PointLatLng p)
-      {
-         int count = Points.Count;
-
-         if(count < 3)
-         {
-            return false;
-         }
-
-         bool result = false;
-
-         for(int i = 0, j = count - 1; i < count; i++)
-         {
-            var p1 = Points[i];
-            var p2 = Points[j];
-
-            if(p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
-            {
-               if(p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) < p.Lng)
-               {
-                  result = !result;
-               }
-            }
-            j = i;
-         }
-         return result;
         }
 
         /// <summary>
-        /// Get the distance of a point from the polygon boudary,
+        /// checks if point is inside the polygon,
+        /// info.: http://greatmaps.codeplex.com/discussions/279437#post700449
         /// </summary>
-        /// <param name = "p" ></ param >
-        /// < returns > The distance of p in meters, zero if point inside the polygon,99999 if distance not calculable</returns>
-        public float GetDistance(PointLatLng p)
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public bool IsInside(PointLatLng p)
         {
-            float disttotal = 99999;
-        
-            //We need at least three points to have a 2 dimensional polygon
-            if (Points.Count < 3)
-                return disttotal;
+            int count = Points.Count;
 
-            if (IsInside(p))
+            if (count < 3)
             {
-                return 0;
+                return false;
             }
 
-            //Update Bounds if it not yet calculated
-            if (Bounds.Lat == 0 && Bounds.Lng == 0)
+            bool result = false;
+
+            for (int i = 0, j = count - 1; i < count; i++)
             {
-                var minx = Points.Min(a => a.Lng);
-                var maxx = Points.Max(a => a.Lng);
-                var miny = Points.Min(a => a.Lat);
-                var maxy = Points.Max(a => a.Lat);
-                Bounds = RectLatLng.FromLTRB(minx, maxy, maxx, miny);
-            }
+                var p1 = Points[i];
+                var p2 = Points[j];
 
-            //Extend Bounds by 10 percent
-            var lng_sign = (Bounds.Left - Bounds.Right);
-            var lat_sign = (Bounds.Top - Bounds.Bottom);
-
-            var lng_add = Math.Sign(lng_sign) * 0.1; //0.1 is around 11Km.
-            var lat_add = Math.Sign(lat_sign) * 0.1;
-
-
-            var lt = new PointLatLng(Bounds.Top + lat_add, Bounds.Left + lng_add);
-            var lb = new PointLatLng(Bounds.Bottom - lat_add, Bounds.Left + lng_add);
-            var rt = new PointLatLng(Bounds.Top + lat_add, Bounds.Right - lng_add);
-            var rb = new PointLatLng(Bounds.Bottom - lat_add, Bounds.Right - lng_add);
-
-
-            if (!(lt.Lat > p.Lat && rb.Lat < p.Lat && lt.Lng < p.Lng && rb.Lng > p.Lng))
-                return disttotal;
-
-            PointLatLng lineStartLatLng = new PointLatLng();
-            // check all segments
-            foreach (var polygonPoint in Points.CloseTheLoop())
-            {
-                if (lineStartLatLng.IsEmpty)
+                if (p1.Lat < p.Lat && p2.Lat >= p.Lat || p2.Lat < p.Lat && p1.Lat >= p.Lat)
                 {
-                    lineStartLatLng = new PointLatLng(polygonPoint.Lat, polygonPoint.Lng);
-                    continue;
+                    if (p1.Lng + (p.Lat - p1.Lat) / (p2.Lat - p1.Lat) * (p2.Lng - p1.Lng) < p.Lng)
+                    {
+                        result = !result;
+                    }
                 }
-
-                // crosstrack distance
-                var lineEndLatLng = new PointLatLng(polygonPoint.Lat, polygonPoint.Lng);
-                var lineDist = lineStartLatLng.GetDistance2(lineEndLatLng);
-                var distToLocation = lineStartLatLng.GetDistance2(p);
-                var bearToLocation = lineStartLatLng.GetBearing(p);
-                var lineBear = lineStartLatLng.GetBearing(lineEndLatLng);
-
-                var angle = bearToLocation - lineBear;
-                if (angle < 0)
-                    angle += 360;
-
-                var alongline = Math.Cos(angle * PointLatLng.deg2rad) * distToLocation;
-
-                // check to see if our point is still within the line length
-                if (alongline < 0 || alongline > lineDist)
-                {
-                    lineStartLatLng = lineEndLatLng;
-                    continue;
-                }
-
-                var dXt2 = Math.Sin(angle * PointLatLng.deg2rad) * distToLocation;
-
-                disttotal = (float)Math.Min(disttotal, Math.Abs(dXt2));
-
-                lineStartLatLng = lineEndLatLng;
+                j = i;
             }
-            return disttotal;
+            return result;
         }
 
 
