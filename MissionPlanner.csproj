@@ -349,11 +349,10 @@
     <None Update="Drivers\amd64\WdfCoInstaller01009.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Drivers\amd64\winusbcoinstaller2.dll">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Drivers\cubeorangeplus.cat">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="MissionPlanner.GCSViews.ConfigurationView.ConfigGPSOrder+GPSCAN.datasource" />
+    <None Include="MissionPlanner.GCSViews.ConfigurationView.ConfigHWCompass2+CompassDeviceInfo.datasource" />
+    <None Include="NoFly\eunfz.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="plugins\example10-canlogfile.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -970,22 +969,20 @@
     <None Update="m3u\networklink.kml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="NoFly\Areas-Lisboa.kmz">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="NoFly\Areas-Lisboa.kmz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="NoFly\Drone No Fly Zones.kmz">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="NoFly\Drone No Fly Zones.kmz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="NoFly\eunfz.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="NoFly\Regulamento-RPA-ver-5.0.kmz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="NoFly\Regulamento-RPA-ver-5.0.kmz">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Include="NoFly\SouthAfricaNoRPASOutlined.kmz">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="NoFly\SouthAfricaNoRPASOutlined.kmz">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Scripts\datetime.py">
+    <None Include="Properties\app.manifest" />
+    <None Include="Scripts\datetime.py">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Scripts\example1.py">

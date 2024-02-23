@@ -51,9 +51,6 @@ namespace MissionPlanner.NoFly
             if (!Settings.Instance.GetBoolean("ShowNoFly", true))
                 return;
 
-            if (!Directory.Exists(directory))
-                return;
-
             var files = Directory.GetFiles(directory, "*.kmz");
 
             foreach (var file in files)

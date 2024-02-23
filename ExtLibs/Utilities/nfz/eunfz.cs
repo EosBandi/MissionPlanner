@@ -20,7 +20,8 @@
         {
             get
             {
-                return Settings.Instance.GetBoolean("eunfzforceshow");
+                return true;
+                //return Settings.Instance.GetBoolean("eunfzforceshow");
             }
             set 
             { 
@@ -33,7 +34,8 @@
         {
             get
             {
-                return Settings.Instance.GetBoolean("eunfzshow", true);
+                return true;
+                //return Settings.Instance.GetBoolean("eunfzshow", true);
             }
             set
             {
@@ -45,7 +47,8 @@
         {
             get
             {
-                return Settings.Instance.GetBoolean("eunfzshowask", false);
+                return true;
+                //return Settings.Instance.GetBoolean("eunfzshowask", false);
             }
             set
             {
@@ -89,51 +92,11 @@
 
         public static async System.Threading.Tasks.Task<Nfz> LoadNFZ()
         {
-            var result = await "https://www.cloudflare.com/cdn-cgi/trace".GetStringAsync();
-
-            log.Debug(result);
-
-            if (countrys.Any(a=>result.Contains("loc="+a)) && show || forceshow)
-            {
-                string url = "";
-
-                if (ConfirmNoFly != null && asked == false)
-                {
-                    asked = true;
-                    if (ConfirmNoFly.Invoke())
-                    {
-                        // user has chosen to show it
-                        show = true;
-                        forceshow = true;
-                    }
-                    else 
-                    {
-                        show = false;
-                        return null;
-                    }
-                }
-
+                show = true;
+                forceshow = true;
                 Nfz nfzinfo;
-
-                //Temporary removed since we don't have url to load from 
-                //if (new FileInfo(filecache).LastWriteTimeUtc.AddHours(12) < DateTime.UtcNow || !File.Exists(filecache))
-                //{
-                //    nfzinfo = await url.GetJsonAsync<Nfz>();
-                //    try
-                //    {
-                //        File.WriteAllText(filecache, nfzinfo.ToJSON());
-                //    }
-                //    catch
-                //    {
-                //    }
-                //}
-                //else
-                    nfzinfo = JsonConvert.DeserializeObject<Nfz>(File.ReadAllText(filecache));
-
-
+                nfzinfo = JsonConvert.DeserializeObject<Nfz>(File.ReadAllText(filecache));
                 return nfzinfo;
-            }
-            return null;
         }
     }
 

@@ -35,6 +35,7 @@ using UnauthorizedAccessException = System.UnauthorizedAccessException;
 using MissionPlanner.Utilities.nfz;
 using System.Runtime.InteropServices;
 using System.Xml.Schema;
+using static IronPython.Modules._ast;
 //using System.Windows.Interop;
 
 // written by michael oborne
@@ -64,6 +65,7 @@ namespace MissionPlanner.GCSViews
         internal string selectedscript = "";
 
         private static readonly ILog log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog alertLog = LogManager.GetLogger("Alerts");
         AviWriter aviwriter;
         private bool CameraOverlap;
         GMapMarker center = new GMarkerGoogle(new PointLatLng(0.0, 0.0), GMarkerGoogleType.none);
@@ -140,6 +142,15 @@ namespace MissionPlanner.GCSViews
         GMapMarker marker;
 
         int messagecount;
+
+        // Track the link quality to show message box for dropped connection
+        int lastlinkqualitygcs = 0;
+
+        // Track if we shown an NFZ warning after connect when vehivle is in NFZ
+        bool nfzWarningShown = false;
+
+        //Track gps availibility for geofence warning
+        bool geoAvailable = false;
 
         //whether or not the output console has already started
         bool outputwindowstarted;
@@ -3677,13 +3688,41 @@ namespace MissionPlanner.GCSViews
                             list20.Add(time, (list20item.GetValue(MainV2.comPort.MAV.cs, null).ConvertToDouble()));
                     }
 
+                    //check for overspeed
+                    if (MainV2.comPort.MAV.param.ContainsKey("LOIT_SPEED"))
+                    {
+                        var gs = Math.Round(MainV2.comPort.MAV.cs.groundspeed);
+
+                        if ( gs > MainV2.comPort.MAV.param["LOIT_SPEED"].Value/100)
+                        {
+                            MainV2.comPort.MAV.cs.messageHigh = "Overspeed! (" + MainV2.comPort.MAV.cs.groundspeed.ToString("F1") + " > " + (MainV2.comPort.MAV.param["LOIT_SPEED"].Value / 100).ToString() + ")";
+                        }
+                    }
+
+
+                    //Check for gps availibility and notify about geaowareness status
+                    bool has_fix = MainV2.comPort.MAV.cs.gpsstatus >= 3 || MainV2.comPort.MAV.cs.gpsstatus2 >= 3;
+
+                    if (!has_fix)
+                    {
+                        geoAvailable = false;
+                        MainV2.comPort.MAV.cs.messageHigh = "Geoawareness not available!";
+                    }
+                    if (has_fix && !geoAvailable)
+                    {
+                        geoAvailable = true;
+                        MainV2.comPort.MAV.cs.messageHigh = "Geoawareness available!";
+                    }
+
                     // update nfz warnings
-                    if (nfzlast.AddSeconds(Settings.Instance.GetDouble("nfz_updateseconds", 5)) < DateTime.Now)
+                    List<(int distance, string zone)> nfzWarningText = new List<(int,string)>();
+
+                    if (nfzlast.AddSeconds(Settings.Instance.GetDouble("nfz_updateseconds_blackquare", 1)) < DateTime.Now)
                     {
                         nfzlast = DateTime.Now;
 
                         bool showOnlyClose = Settings.Instance.GetBoolean("nfz_showonlyclose", true);
-                        float warningdistance = Settings.Instance.GetInt32("nfz_warningdistance",500);
+                        float warningdistance = Settings.Instance.GetInt32("nfz_warningdistance_blackquare",200);
 
                         GMapOverlay nfzOverlay = gMapControl1.Overlays.FirstOrDefault(v => v.Id == "NoFlyZones");
 
@@ -3717,17 +3756,13 @@ namespace MissionPlanner.GCSViews
                                         {
                                             poly.Fill = new SolidBrush(Color.FromArgb(40, Color.Red));
                                             poly.Stroke = new Pen(Color.FromArgb(170, Color.Red), 2);
-                                            string msg = "You are in NFZ " + poly.Name;
-                                            MainV2.comPort.MAV.cs.messageHigh = msg;
-                                            MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));
+                                            nfzWarningText.Add((0,"You are inside NFZ " + poly.Name));
                                         }
                                         else
                                         {
                                             poly.Fill = new SolidBrush(Color.FromArgb(32, Color.Orange));
                                             poly.Stroke = new Pen(Color.FromArgb(170, Color.Red), 2);
-                                            string msg = "You are " + a.ToString("F0") + "m from " + poly.Name;
-                                            MainV2.comPort.MAV.cs.messageHigh = msg;
-                                            MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));
+                                            nfzWarningText.Add(((int)a,"You are " + a.ToString("F0") + "m from NFZ " + poly.Name));
                                         }
                                     }
                                     else
@@ -3771,17 +3806,12 @@ namespace MissionPlanner.GCSViews
                                     {
                                         marker.FillColor = Color.FromArgb(40, Color.Red);
                                         marker.Pen = new Pen(Color.FromArgb(170, Color.Red), 2);
-                                        string msg = "You are in a NFZ " + ((Utilities.nfz.Feature)marker.Tag).Name;
-                                        MainV2.comPort.MAV.cs.messageHigh = msg;
-                                        MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));    
+                                        nfzWarningText.Add((0,"You are inside NFZ " + ((Utilities.nfz.Feature)marker.Tag).Name));
                                     }
                                     else
                                     {
                                         marker.FillColor = Color.FromArgb(32, Color.Orange);
-                                        marker.Pen = new Pen(Color.FromArgb(170, Color.Red), 2);
-                                        string msg = "You are " + (a - radius).ToString("F0") + "m from " + ((Utilities.nfz.Feature)marker.Tag).Name;
-                                        MainV2.comPort.MAV.cs.messageHigh = msg;
-                                        MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, msg));
+                                        nfzWarningText.Add(((int)a,"You are " + (a - radius).ToString("F0") + "m from NFZ " + ((Utilities.nfz.Feature)marker.Tag).Name));
                                     }
                                 }
                                 else
@@ -3790,8 +3820,63 @@ namespace MissionPlanner.GCSViews
                                     marker.Pen = new Pen(Color.FromArgb(170, Color.Blue), 2);
                                 }
                             }
-                            //Console.WriteLine("Time to calc : " + DateTime.Now.Subtract(n).Milliseconds);
                         }
+
+                        if (nfzWarningText.Count > 0)
+                        {
+                            // order the items in nfzWarningText based on item1
+                            nfzWarningText = nfzWarningText.OrderBy(a => a.distance).ToList();
+                            //count elements where item1 equals 0
+                            int insideCount = nfzWarningText.Count(a => a.distance == 0);
+
+                            // if insideCount is greater than 0, we are inside a NFZ, no need to display distance, only zones that we are inside
+                            if (insideCount > 0)
+                            {
+                                //We are inside, so show only zones where item1 equals 0
+                                int c = 0;
+                                foreach (var item in nfzWarningText.Where(a => a.distance == 0))
+                                {
+                                    MainV2.comPort.MAV.cs.messageHigh = item.zone;
+                                    MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, item.zone));
+
+                                    if (c > 0) alertLog.Info("gps time:" + MainV2.comPort.MAV.cs.gpstime.ToString() + " loc:" + MainV2.comPort.MAV.cs.lat.ToString() + "," + MainV2.comPort.MAV.cs.lng.ToString() + " User Notification:" + item.zone);
+                                    c++;
+                                }
+
+                            }
+                            else
+                            {
+                                //Put the closest NFZ to the HUD
+                                MainV2.comPort.MAV.cs.messageHigh = nfzWarningText.First().zone;
+                                //and add everyting else to the messages list
+                                int c = 0;
+                                foreach (var item in nfzWarningText)
+                                {
+                                    MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, item.zone));
+                                    if (c > 0) alertLog.Info("gps time:" + MainV2.comPort.MAV.cs.gpstime.ToString() + " loc:" + MainV2.comPort.MAV.cs.lat.ToString() + "," + MainV2.comPort.MAV.cs.lng.ToString() + " User Notification:" + item.zone);
+                                    c++;
+                                }
+                            }
+                        }
+
+                        if (nfzWarningText.Count > 0 && MainV2.comPort.MAV.cs.connected && !MainV2.comPort.MAV.cs.armed && !nfzWarningShown)
+                        {
+                            string msg = "";
+                            foreach (var item in nfzWarningText)
+                            {
+                                msg += item.zone;
+                            }
+
+                            new Thread(() => { CustomMessageBox.Show(msg,"Restricted Flight Zone Warning!"); }).Start();
+                            nfzWarningShown = true;
+                        }
+
+                        //also check for disconnected state and clear warning shown flag
+                        if (!MainV2.comPort.MAV.cs.connected)
+                        {
+                            nfzWarningShown = false;
+                        }
+
                     }
 
                     // update map - 0.3sec if connected , 2 sec if not connected
@@ -4378,7 +4463,28 @@ namespace MissionPlanner.GCSViews
                     BeginInvoke((Action) updateTransponder);
                     transponderUpdate = DateTime.Now;
                 }
+
+
+                // ----------- Check for zero link quality and show disconnect warning
+
+                if (MainV2.comPort.MAV.cs.linkqualitygcs == 0 && lastlinkqualitygcs != 0)
+                {
+                    MainV2.comPort.MAV.cs.messageHigh = "Link Lost";
+                    MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, "GCS Link Lost"));
+                    new Thread(() => { MessageBox.Show("Link Lost"); }).Start();
+                    //CustomMessageBox.Show("Link Lost", "Link Lost");
+                }
+                lastlinkqualitygcs = MainV2.comPort.MAV.cs.linkqualitygcs;
+
+
             }
+
+
+            
+
+
+
+
 
             Console.WriteLine("FD Main loop exit");
         }
