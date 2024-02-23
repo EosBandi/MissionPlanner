@@ -190,7 +190,7 @@ namespace MissionPlanner.Maps
                 if (s.day == 0)
                     continue;
 
-                if ((s.day & (1 << dayOfWeek)) != 0)
+                if ((s.day & (1 << (dayOfWeek-1))) != 0)
                 {
                     if (time.TimeOfDay >= s.startTime.TimeOfDay && time.TimeOfDay <= s.stopTime.TimeOfDay)
                         return true;
