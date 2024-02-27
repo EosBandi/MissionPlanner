@@ -3649,9 +3649,19 @@ main()
                     }
                     else
                     {
+                        dataGridView1.Visible = false;
                         dataGridView1.VirtualMode = true;
                         dataGridView1.ColumnCount = colcount;
+                        for(int u=0;u < dataGridView1.ColumnCount; u++)
+                        {
+                            dataGridView1.Columns[u].Visible = false;
+                        }
                         dataGridView1.RowCount = logdata.Count;
+                        for (int u = 0; u < dataGridView1.ColumnCount; u++)
+                        {
+                            dataGridView1.Columns[u].Visible = true;
+                        }
+                        dataGridView1.Visible = true;
                         log.Info("datagrid size set " + (GC.GetTotalMemory(false) / 1024.0 / 1024.0));
                     }
 
@@ -3763,8 +3773,8 @@ main()
             foreach (var msg in logdata.GetEnumeratorType("PARM"))
             {
                 double value = double.Parse(msg["Value"], CultureInfo.InvariantCulture);
-                decimal tmp;
-                decimal? default_value = has_defaults && decimal.TryParse(msg["Default"], out tmp) ? (decimal?)tmp : null;
+                double tmp;
+                double? default_value = has_defaults && double.TryParse(msg["Default"], out tmp) ? (double?)tmp : null;
                 MAVLink.MAVLinkParam sourceItem = new MAVLink.MAVLinkParam(msg["Name"], value, MAVLink.MAV_PARAM_TYPE.REAL32, default_value);
 
                 // Lookup the next item in the target list
