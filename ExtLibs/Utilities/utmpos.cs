@@ -55,6 +55,12 @@ namespace MissionPlanner.Utilities
             return a.ToLLA();
         }
 
+        public void setXY(double X, double Y)
+        {
+            this.x = X;
+            this.y = Y;
+        }
+
         public PointLatLngAlt ToLLA2()
         {
             GeoUtility.GeoSystem.UTM utm = new GeoUtility.GeoSystem.UTM(Math.Abs(zone), x, y, zone < 0 ? GeoUtility.GeoSystem.Base.Geocentric.Hemisphere.South : GeoUtility.GeoSystem.Base.Geocentric.Hemisphere.North);

@@ -5256,4 +5256,7 @@
   <PropertyGroup>
     <PostBuildEvent>copy "$(ProjectDir)ExtLibs\System.IO.Compression.dll" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>"$(DevEnvDir)devenv"  /Build $(configuration) /project "$(SolutionDir)ExtLibs\MissionPlanner.SprayGrid.csproj"</PreBuildEvent>
+  </PropertyGroup>
 </Project>

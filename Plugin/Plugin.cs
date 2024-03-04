@@ -215,9 +215,9 @@ namespace MissionPlanner.Plugin
         /// <param name="y"></param>
         /// <param name="z"></param>
         public int AddWPtoList(MAVLink.MAV_CMD cmd, double p1, double p2, double p3, double p4, double x, double y,
-            double z, object tag = null)
+            double z, object tag = null, string SprayMarker = "")
         {
-            return MainV2.instance.FlightPlanner.AddCommand(cmd, p1, p2, p3, p4, x, y, z, tag);
+            return MainV2.instance.FlightPlanner.AddCommand(cmd, p1, p2, p3, p4, x, y, z, tag, SprayMarker);
         }
 
         public void InsertWP(int idx, MAVLink.MAV_CMD cmd, double p1, double p2, double p3, double p4, double x,
@@ -230,7 +230,7 @@ namespace MissionPlanner.Plugin
         public int AddWPtoList(MAVLink.MAV_CMD cmd, double p1, double p2, double p3, double p4, double x, double y,
             double z)
         {
-            return AddWPtoList(cmd, p1, p2, p3, p4, x, y, z, null);
+            return AddWPtoList(cmd, p1, p2, p3, p4, x, y, z, null, null);
         }
 
         public void InsertWP(int idx, MAVLink.MAV_CMD cmd, double p1, double p2, double p3, double p4, double x,

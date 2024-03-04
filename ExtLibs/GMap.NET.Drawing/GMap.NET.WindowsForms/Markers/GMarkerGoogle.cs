@@ -74,7 +74,7 @@ namespace GMap.NET.WindowsForms.Markers
       static Image shadow_small;
       static Image pushpin_shadow;
 
-      public readonly GMarkerGoogleType Type;
+      public GMarkerGoogleType Type;
 
       public GMarkerGoogle(PointLatLng p, GMarkerGoogleType type)
          : base(p)
@@ -200,6 +200,22 @@ namespace GMap.NET.WindowsForms.Markers
          Size = new System.Drawing.Size(Bitmap.Width, Bitmap.Height);
          Offset = new Point(-Size.Width / 2, -Size.Height);
       }
+
+
+        public void changeIcon(GMarkerGoogleType type)
+        {
+            if (Bitmap != null)
+            {
+                if (!iconCache.ContainsValue(Bitmap))
+                {
+                    Bitmap.Dispose();
+                    Bitmap = null;
+                }
+            }
+            this.Type = type;
+            LoadBitmap();
+        }
+
 
       static readonly Dictionary<string, Image> iconCache = new Dictionary<string, Image>();
 

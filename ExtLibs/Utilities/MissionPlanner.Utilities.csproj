@@ -36,6 +36,7 @@
     </PackageReference>
     <PackageReference Include="Asyncify" Version="0.9.7" />
     <PackageReference Include="BitMiracle.LibTiff.NET" Version="2.4.584.1" />
+    <PackageReference Include="Clipper2" Version="1.3.0" />
     <PackageReference Include="csmatio" Version="1.0.20" />
     <PackageReference Include="DotNetZip" Version="1.16.0" />
     <PackageReference Include="ExifLibNet" Version="2.1.3" />

@@ -135,6 +135,8 @@ namespace MissionPlanner.GCSViews
         public GMapPolygon wppolygon;
         private GMapMarker CurrentMidLine;
 
+        private MAVLink.MAV_MISSION_TYPE lastEditorMode = MAVLink.MAV_MISSION_TYPE.MISSION;
+        private List<Locationwp> editedFencePoints = new List<Locationwp>();
 
         public void Init()
         {
@@ -533,11 +535,11 @@ namespace MissionPlanner.GCSViews
         }
 
         public int AddCommand(MAVLink.MAV_CMD cmd, double p1, double p2, double p3, double p4, double x, double y,
-            double z, object tag = null)
+            double z, object tag = null, string SprayMarker = "")
         {
             selectedrow = Commands.Rows.Add();
 
-            FillCommand(this.selectedrow, cmd, p1, p2, p3, p4, x, y, z, tag);
+            FillCommand(this.selectedrow, cmd, p1, p2, p3, p4, x, y, z, tag, SprayMarker);
 
             writeKML();
 
@@ -1404,6 +1406,45 @@ namespace MissionPlanner.GCSViews
                             Strings.ERROR);
                     }
 
+                    //Update the SprayFunction as vell
+                    
+
+
+                    //Check points and change overlayType if needed
+                    //Tag is the waypoint number
+                    for (int i = 0; i<wpOverlay.overlay.Markers.Count; i++)
+                    {
+                        if (wpOverlay.overlay.Markers[i] is GMapMarkerWP && wpOverlay.overlay.Markers[i].Tag != null)
+                        {
+                            int wpNumber;
+                            if (int.TryParse(wpOverlay.overlay.Markers[i].Tag.ToString(), out wpNumber))
+                            {
+                                if (wpNumber > 0)
+                                {
+                                    if (wpNumber < commandlist.Count+1)
+                                    {
+                                        var marker = Commands.Rows[wpNumber-1].Cells[SprayMarker.Index].Value;
+                                        if (marker != null)
+                                        {
+                                            GMapMarkerWP newwp = wpOverlay.overlay.Markers[i] as GMapMarkerWP;
+
+                                            if (marker.ToString() != "E" && marker.ToString()!= "S")
+                                            {
+                                                newwp.changeIcon(GMarkerGoogleType.yellow);
+                                            }
+
+                                            if (marker.ToString() == "E")
+                                            {
+                                                newwp.changeIcon(GMarkerGoogleType.red);
+                                            }
+                                            wpOverlay.overlay.Markers[i] = newwp;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
                     MainMap.HoldInvalidation = true;
 
                     var existing = MainMap.Overlays.Where(a => a.Id == wpOverlay.overlay.Id).ToList();
@@ -1439,11 +1480,23 @@ namespace MissionPlanner.GCSViews
                     pointlist = wpOverlay.pointlist;
 
                     {
-                        foreach (var pointLatLngAlt in pointlist.PrevNowNext())
+                        //Sanitize pointlist
+                        List<PointLatLngAlt> editedFencePoints = new List<PointLatLngAlt>();
+                        foreach (var p in pointlist)
+                        {
+                            if (p != null)
+                            {
+                                editedFencePoints.Add(new PointLatLngAlt(p.Lat, p.Lng, p.Alt,p.Tag));
+                            }
+                        }
+
+                        PointLatLngAlt lastvalid = new PointLatLngAlt();
+                        foreach (var pointLatLngAlt in editedFencePoints.PrevNowNext())
                         {
                             var prev = pointLatLngAlt.Item1;
                             var now = pointLatLngAlt.Item2;
                             var next = pointLatLngAlt.Item3;
+
 
                             if (now == null || next == null)
                                 continue;
@@ -1454,6 +1507,7 @@ namespace MissionPlanner.GCSViews
                             var pnt = new GMapMarkerPlus(mid);
                             pnt.Tag = new midline() { now = now, next = next };
                             wpOverlay.overlay.Markers.Add(pnt);
+
                         }
                     }
 
@@ -1463,9 +1517,18 @@ namespace MissionPlanner.GCSViews
                         fenceoverlay.overlay.Id = "fence";
                         try
                         {
-                            fenceoverlay.CreateOverlay(PointLatLngAlt.Zero,
-                                MainV2.comPort.MAV.fencepoints.Values.Select(a => (Locationwp)a).ToList(), 0, 0,
-                                CurrentState.multiplieralt);
+                            if (MainV2.comPort.MAV.cs.connected)
+                            {
+                                fenceoverlay.CreateOverlay(PointLatLngAlt.Zero,
+                                    MainV2.comPort.MAV.fencepoints.Values.Select(a => (Locationwp)a).ToList(), 0, 0,
+                                    CurrentState.multiplieralt);
+                            }
+                            else
+                            {
+                                fenceoverlay.CreateOverlay(PointLatLngAlt.Zero,
+                                    editedFencePoints, 0, 0,
+                                    CurrentState.multiplieralt);
+                            }
                         }
                         catch
                         {
@@ -2132,6 +2195,13 @@ namespace MissionPlanner.GCSViews
 
         public void Cmb_missiontype_SelectedIndexChanged(object sender, EventArgs e)
         {
+            //If we were editing fences, save the points to keep it in editor
+            if (lastEditorMode == MAVLink.MAV_MISSION_TYPE.FENCE)
+            {
+                editedFencePoints.Clear();
+                editedFencePoints = GetCommandList();
+            }
+
             // switch the mavcmd list and init
             Activate();
 
@@ -2153,7 +2223,14 @@ namespace MissionPlanner.GCSViews
             else if ((MAVLink.MAV_MISSION_TYPE)cmb_missiontype.SelectedValue == MAVLink.MAV_MISSION_TYPE.FENCE)
             {
                 BUT_Add.Visible = false;
-                processToScreen(MainV2.comPort.MAV.fencepoints.Select(a => (Locationwp)a.Value).ToList());
+                if (MainV2.comPort.MAV.cs.connected)
+                {
+                    processToScreen(MainV2.comPort.MAV.fencepoints.Select(a => (Locationwp)a.Value).ToList());
+                }
+                else
+                {
+                    processToScreen(editedFencePoints);
+                }
 
                 Common.MessageShowAgain("FlightPlan Fence", "Please use the Polygon drawing tool to draw " +
                                                             "Inclusion and Exclusion areas (round circle to the left)," +
@@ -2167,6 +2244,7 @@ namespace MissionPlanner.GCSViews
             }
 
             writeKML();
+            lastEditorMode = (MAVLink.MAV_MISSION_TYPE)cmb_missiontype.SelectedValue;
         }
 
         private void comboBoxMapType_SelectedValueChanged(object sender, EventArgs e)
@@ -2176,10 +2254,10 @@ namespace MissionPlanner.GCSViews
 
                 if ((GMapProvider)comboBoxMapType.SelectedItem == MapboxUser.Instance)
                 {
+                    var url = Settings.Instance["MapBoxURL", ""];
                     // startup
                     if (MainMap.MapProvider == GMapProviders.EmptyProvider)
                     {
-                        var url = Settings.Instance["MapBoxURL", ""];
                         var match = Regex.Matches(url, @"\/styles\/[^\/]+\/([^\/]+)\/([^\/\.]+).*access_token=([^#&=]+)");
                         if (match != null)
                         {
@@ -2196,7 +2274,6 @@ namespace MissionPlanner.GCSViews
                     }
                     else
                     {
-                        var url = Settings.Instance["MapBoxURL", ""];
                         InputBox.Show("Enter MapBox Share URL", "Enter MapBox Share URL", ref url);
                         var match = Regex.Matches(url, @"\/styles\/[^\/]+\/([^\/]+)\/([^\/\.]+).*access_token=([^#&=]+)");
                         if (match != null)
@@ -2212,11 +2289,11 @@ namespace MissionPlanner.GCSViews
                             return;
                         }
                     }
-                    MainMap.MapProvider = (GMapProvider)comboBoxMapType.SelectedItem;
-                    if (FlightData.mymap != null)
-                        FlightData.mymap.MapProvider = (GMapProvider)comboBoxMapType.SelectedItem;
-                    Settings.Instance["MapType"] = comboBoxMapType.Text;
                 }
+                MainMap.MapProvider = (GMapProvider)comboBoxMapType.SelectedItem;
+                if (FlightData.mymap != null)
+                    FlightData.mymap.MapProvider = (GMapProvider)comboBoxMapType.SelectedItem;
+                Settings.Instance["MapType"] = comboBoxMapType.Text;
             }
             catch (Exception ex)
             {
@@ -3077,7 +3154,7 @@ namespace MissionPlanner.GCSViews
                 temp.p4 = (float)(double.Parse(Commands.Rows[a].Cells[Param4.Index].Value.ToString()));
 
                 temp.Tag = Commands.Rows[a].Cells[TagData.Index].Value;
-
+                temp.SprayMarker = (string)Commands.Rows[a].Cells[SprayMarker.Index].Value;
                 temp.frame = (byte)(int)Commands.Rows[a].Cells[Frame.Index].Value;
 
                 return temp;
@@ -3348,11 +3425,13 @@ namespace MissionPlanner.GCSViews
 
         private void FillCommand(int rowIndex, MAVLink.MAV_CMD cmd, double p1, double p2, double p3, double p4,
             double x,
-            double y, double z, object tag = null)
+            double y, double z, object tag = null, string SprayMarkerData = "")
         {
             Commands.Rows[rowIndex].Cells[Command.Index].Value = cmd.ToString();
             Commands.Rows[rowIndex].Cells[TagData.Index].Tag = tag;
             Commands.Rows[rowIndex].Cells[TagData.Index].Value = tag;
+            Commands.Rows[rowIndex].Cells[SprayMarker.Index].Value = SprayMarkerData;
+
 
             ChangeColumnHeader(cmd.ToString());
 
@@ -4917,6 +4996,7 @@ namespace MissionPlanner.GCSViews
                 line.Cells[Alt.Index].Value =
                     float.Parse(line.Cells[Alt.Index].Value.ToString()) * multiplyer + altchange;
             }
+            writeKML();
         }
 
         private void obj_KeyDown(object sender, KeyEventArgs e)
@@ -5718,7 +5798,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
         {
             using (SaveFileDialog fd = new SaveFileDialog())
             {
-                fd.Filter = "Mission|*.waypoints;*.txt|Mission JSON|*.mission";
+                fd.Filter = "Mission|*.waypoints;*.txt|QGC Plane JSON|*.plan";
                 fd.DefaultExt = ".waypoints";
                 fd.InitialDirectory = Settings.Instance["WPFileDirectory"] ?? "";
                 fd.FileName = wpfilename;
@@ -5729,7 +5809,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                     Settings.Instance["WPFileDirectory"] = Path.GetDirectoryName(file);
                     try
                     {
-                        if (file.EndsWith(".mission"))
+                        if (file.EndsWith(".plan"))
                         {
                             var list = GetCommandList();
                             Locationwp home = new Locationwp();
@@ -5747,8 +5827,20 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
                             list.Insert(0, home);
 
+                            List<Locationwp> fencelist = new List<Locationwp>();  
+                            if (MainV2.comPort.MAV.cs.connected)
+                            {
+                                fencelist = MainV2.comPort.MAV.fencepoints.Values.Select(a => (Locationwp)a).ToList();
+                            }
+                            else
+                            {
+                                fencelist = editedFencePoints.Select(a => (Locationwp)a).ToList();
+                            }
+
+
+
                             var format =
-                                MissionFile.ConvertFromLocationwps(list, (byte)(altmode)CMB_altmode.SelectedValue);
+                                MissionFile.ConvertFromLocationwps(list, fencelist, (byte)(altmode)CMB_altmode.SelectedValue);
 
                             MissionFile.WriteFile(file, format);
                             return;
@@ -8101,6 +8193,11 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             }
 
             setgradanddistandaz(wpOverlay.pointlist, home);
+        }
+
+        private void comboBoxMapType_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

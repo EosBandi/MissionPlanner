@@ -1365,6 +1365,12 @@ namespace MissionPlanner
             _connectionControl.CMB_serialport.Items.Add("UDP");
             _connectionControl.CMB_serialport.Items.Add("UDPCl");
             _connectionControl.CMB_serialport.Items.Add("WS");
+
+            // Get predefined drone names from settings and add them to the list
+
+
+
+
         }
 
         private void MenuFlightData_Click(object sender, EventArgs e)

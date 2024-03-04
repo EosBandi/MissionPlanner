@@ -197,6 +197,7 @@ namespace MissionPlanner.Utilities
         private ushort _seq;
         public byte frame;
         public object Tag;
+        public string SprayMarker;
 
         public ushort id;				// command id
         public float p1;				// param 1

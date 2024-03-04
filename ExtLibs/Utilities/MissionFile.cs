@@ -6,8 +6,10 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Text;
+using GeoAPI.Geometries;
 using log4net;
 using Newtonsoft.Json;
+using static MissionPlanner.Utilities.LTM;
 
 namespace MissionPlanner.Utilities
 {
@@ -238,7 +240,7 @@ namespace MissionPlanner.Utilities
             public int version { get; set; }
         }
 
-        public static RootObject ConvertFromLocationwps(List<Locationwp> list, byte frame = (byte)MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT)
+        public static RootObject ConvertFromLocationwps(List<Locationwp> list, List<Locationwp> fencelist, byte frame = (byte)MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT)
         {
             RootObject temp = new RootObject()
             {
@@ -265,9 +267,11 @@ namespace MissionPlanner.Utilities
                     }
 
                     var temploc = ConvertFromLocationwp(item);
+                    temploc.doJumpId = a+1;
 
                     // set frame type
                     temploc.frame = frame;
+                    temploc.type = "SimpleItem";
 
                     temp.mission.items.Add(temploc);
 
@@ -280,6 +284,70 @@ namespace MissionPlanner.Utilities
                     a++;
                 }
             }
+
+            //add fence items
+            if (fencelist.Count > 0)
+            {
+                GeoFence geoFence = new GeoFence();
+                geoFence.version = 2;
+                geoFence.circles = new List<Circle>();
+                geoFence.polygons = new List<Polygon>();
+
+                Polygon fencePolygon = new Polygon();
+                List<List<double>> points = new List<List<double>>();
+
+                foreach (var item in fencelist)
+                {
+                    if ((MAVLink.MAV_CMD)item.id == MAVLink.MAV_CMD.FENCE_CIRCLE_EXCLUSION)
+                    {
+                        geoFence.circles.Add(new Circle { circle = new Circle2 { center = new List<double> { item.lat, item.lng }, radius = item.p1 }, inclusion = false, version = 1 });
+
+                    }
+                    if ((MAVLink.MAV_CMD)item.id == MAVLink.MAV_CMD.FENCE_CIRCLE_INCLUSION)
+                    {
+                        geoFence.circles.Add(new Circle { circle = new Circle2 { center = new List<double> { item.lat, item.lng }, radius = item.p1 }, inclusion = true, version = 1 });
+                    }
+
+                    //Start of a new polygon
+                    if ((MAVLink.MAV_CMD)item.id == MAVLink.MAV_CMD.FENCE_POLYGON_VERTEX_EXCLUSION && item.alt == 0)
+                    {
+                        //Assuming it is a new polygon
+                        if (points.Count > 0)
+                        {
+                            fencePolygon.polygon = points.Select(innerList => new List<double>(innerList)).ToList();
+                            fencePolygon.inclusion = false;
+                            fencePolygon.version = 1;
+                            geoFence.polygons.Add(fencePolygon);
+                            fencePolygon = new Polygon();
+                            points.Clear();
+                        }
+                        List<double> coord = new List<double> { item.lat, item.lng };
+                        points.Add(coord);
+                    }
+
+                    if ((MAVLink.MAV_CMD)item.id == MAVLink.MAV_CMD.FENCE_POLYGON_VERTEX_EXCLUSION && item.alt > 0)
+                    {
+                        List<double> coord = new List<double> { item.lat, item.lng };
+                        points.Add(coord);
+                    }
+                }
+                //Add the last polygon
+                if (points.Count > 0)
+                {
+                    fencePolygon.polygon = points.Select(innerList => new List<double>(innerList)).ToList();
+                    fencePolygon.inclusion = false;
+                    fencePolygon.version = 1;
+                    geoFence.polygons.Add(fencePolygon);
+                }
+                temp.geoFence = geoFence;
+            }
+
+            temp.fileType = "Plan";
+
+            //add an empty rallypoint list
+            temp.rallyPoints = new RallyPoints();
+            temp.rallyPoints.points = new List<List<double>>();
+            temp.rallyPoints.version = 1;
 
             return temp;
         }

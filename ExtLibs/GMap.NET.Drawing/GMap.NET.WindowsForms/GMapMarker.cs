@@ -64,6 +64,8 @@ namespace GMap.NET.WindowsForms
 
       public object Tag;
 
+      public string SprayFunction;
+
       Point offset;
       public Point Offset
       {

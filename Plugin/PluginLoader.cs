@@ -104,7 +104,10 @@ namespace MissionPlanner.Plugin
                 file.ToLower().Contains("missionplanner.grid.dll") ||
                 file.ToLower().Contains("usbserialforandroid")
                 )
+            {
                 return;
+
+            }
 
             //Check if it is disabled (moved out from the previous IF, to make it loggable)
             if (DisabledPluginNames.Contains(Path.GetFileName(file).ToLower()))
@@ -128,12 +131,15 @@ namespace MissionPlanner.Plugin
             try
             {
                 asm = Assembly.LoadFile(file);
-                log.Info("Plugin Load " + file);
+                log.Info("Plugin Loaded " + file);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                // unable to load
-                return;
+                log.InfoFormat("----------------------------");
+                log.InfoFormat("Exception loading {0}", file);
+                log.InfoFormat(e.Message);
+                log.InfoFormat("----_-----------------------");
+                    return;
             }
 
             InitPlugin(asm, file);
@@ -302,6 +308,7 @@ namespace MissionPlanner.Plugin
             });
 
             String[] files = Directory.GetFiles(path, "*.dll");
+            log.Info("plugin path: " + path);   
             foreach (var s in files)
                 Load(Path.Combine(Environment.CurrentDirectory, s));
 
