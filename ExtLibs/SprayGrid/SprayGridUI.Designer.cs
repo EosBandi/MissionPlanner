@@ -69,19 +69,21 @@
             this.NUM_angle = new System.Windows.Forms.NumericUpDown();
             this.NUM_altitude = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
-            this.BUT_Accept = new MissionPlanner.Controls.MyButton();
             this.label1 = new System.Windows.Forms.Label();
             this.CMB_startfrom = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.NUM_Distance = new System.Windows.Forms.NumericUpDown();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
-            this.myButton1 = new MissionPlanner.Controls.MyButton();
             this.chk_grid = new System.Windows.Forms.CheckBox();
             this.chk_markers = new System.Windows.Forms.CheckBox();
             this.chk_boundary = new System.Windows.Forms.CheckBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.NUM_Shift = new System.Windows.Forms.NumericUpDown();
             this.map = new MissionPlanner.Controls.myGMAP();
+            this.myButton1 = new MissionPlanner.Controls.MyButton();
+            this.BUT_Accept = new MissionPlanner.Controls.MyButton();
+            this.label11 = new System.Windows.Forms.Label();
             this.groupBox5.SuspendLayout();
             this.groupBox6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_LaneSeparation)).BeginInit();
@@ -99,6 +101,7 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_Shift)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox5
@@ -444,14 +447,6 @@
             resources.ApplyResources(this.label6, "label6");
             this.label6.Name = "label6";
             // 
-            // BUT_Accept
-            // 
-            resources.ApplyResources(this.BUT_Accept, "BUT_Accept");
-            this.BUT_Accept.Name = "BUT_Accept";
-            this.BUT_Accept.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
-            this.BUT_Accept.UseVisualStyleBackColor = true;
-            this.BUT_Accept.Click += new System.EventHandler(this.BUT_Accept_Click2);
-            // 
             // label1
             // 
             resources.ApplyResources(this.label1, "label1");
@@ -494,20 +489,14 @@
             // groupBox4
             // 
             resources.ApplyResources(this.groupBox4, "groupBox4");
+            this.groupBox4.Controls.Add(this.label11);
+            this.groupBox4.Controls.Add(this.NUM_Shift);
             this.groupBox4.Controls.Add(this.myButton1);
             this.groupBox4.Controls.Add(this.chk_grid);
             this.groupBox4.Controls.Add(this.chk_markers);
             this.groupBox4.Controls.Add(this.chk_boundary);
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.TabStop = false;
-            // 
-            // myButton1
-            // 
-            resources.ApplyResources(this.myButton1, "myButton1");
-            this.myButton1.Name = "myButton1";
-            this.myButton1.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
-            this.myButton1.UseVisualStyleBackColor = true;
-            this.myButton1.Click += new System.EventHandler(this.myButton1_Click);
             // 
             // chk_grid
             // 
@@ -556,6 +545,28 @@
             this.splitContainer1.Panel2.Controls.Add(this.groupBox4);
             this.splitContainer1.Panel2.Controls.Add(this.groupBox6);
             // 
+            // NUM_Shift
+            // 
+            this.NUM_Shift.DecimalPlaces = 1;
+            this.NUM_Shift.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            resources.ApplyResources(this.NUM_Shift, "NUM_Shift");
+            this.NUM_Shift.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.NUM_Shift.Minimum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            -2147483648});
+            this.NUM_Shift.Name = "NUM_Shift";
+            this.NUM_Shift.ValueChanged += new System.EventHandler(this.domainUpDown1_ValueChanged);
+            // 
             // map
             // 
             this.map.Bearing = 0F;
@@ -579,6 +590,27 @@
             this.map.SelectedAreaFillColor = System.Drawing.Color.FromArgb(((int)(((byte)(33)))), ((int)(((byte)(65)))), ((int)(((byte)(105)))), ((int)(((byte)(225)))));
             this.map.ShowTileGridLines = false;
             this.map.Zoom = 3D;
+            // 
+            // myButton1
+            // 
+            resources.ApplyResources(this.myButton1, "myButton1");
+            this.myButton1.Name = "myButton1";
+            this.myButton1.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.myButton1.UseVisualStyleBackColor = true;
+            this.myButton1.Click += new System.EventHandler(this.myButton1_Click);
+            // 
+            // BUT_Accept
+            // 
+            resources.ApplyResources(this.BUT_Accept, "BUT_Accept");
+            this.BUT_Accept.Name = "BUT_Accept";
+            this.BUT_Accept.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.BUT_Accept.UseVisualStyleBackColor = true;
+            this.BUT_Accept.Click += new System.EventHandler(this.BUT_Accept_Click2);
+            // 
+            // label11
+            // 
+            resources.ApplyResources(this.label11, "label11");
+            this.label11.Name = "label11";
             // 
             // SprayGridUI
             // 
@@ -608,6 +640,7 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_Shift)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -667,5 +700,7 @@
         private System.Windows.Forms.CheckBox CHK_extendedpoint;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.NumericUpDown NUM_LaneSeparation;
+        private System.Windows.Forms.NumericUpDown NUM_Shift;
+        private System.Windows.Forms.Label label11;
     }
 }

@@ -420,7 +420,7 @@ namespace MissionPlanner.SprayGrid
             grid = Utilities.Grid.CreateSprayGrid(list, (double)NUM_altitude.Value, (double)NUM_Distance.Value,
                 (double)NUM_angle.Value,
                 (Utilities.Grid.StartPosition)Enum.Parse(typeof(Utilities.Grid.StartPosition), CMB_startfrom.Text), (float)NUM_LaneSeparation.Value,
-                plugin.Host.cs.PlannedHomeLocation, obstacles, CHK_extendedpoint.Checked);
+                plugin.Host.cs.PlannedHomeLocation, obstacles, (double)NUM_Shift.Value, CHK_extendedpoint.Checked);
 
             List<PointLatLng> list2 = new List<PointLatLng>();
 

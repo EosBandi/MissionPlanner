@@ -1359,6 +1359,57 @@
   <data name="groupBox4.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Bottom, Left, Right</value>
   </data>
+  <data name="label11.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label11.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="label11.Location" type="System.Drawing.Point, System.Drawing">
+    <value>117, 20</value>
+  </data>
+  <data name="label11.Size" type="System.Drawing.Size, System.Drawing">
+    <value>48, 13</value>
+  </data>
+  <data name="label11.TabIndex" type="System.Int32, mscorlib">
+    <value>82</value>
+  </data>
+  <data name="label11.Text" xml:space="preserve">
+    <value>Grid shift</value>
+  </data>
+  <data name="&gt;&gt;label11.Name" xml:space="preserve">
+    <value>label11</value>
+  </data>
+  <data name="&gt;&gt;label11.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label11.Parent" xml:space="preserve">
+    <value>groupBox4</value>
+  </data>
+  <data name="&gt;&gt;label11.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="NUM_Shift.Location" type="System.Drawing.Point, System.Drawing">
+    <value>171, 17</value>
+  </data>
+  <data name="NUM_Shift.Size" type="System.Drawing.Size, System.Drawing">
+    <value>62, 20</value>
+  </data>
+  <data name="NUM_Shift.TabIndex" type="System.Int32, mscorlib">
+    <value>82</value>
+  </data>
+  <data name="&gt;&gt;NUM_Shift.Name" xml:space="preserve">
+    <value>NUM_Shift</value>
+  </data>
+  <data name="&gt;&gt;NUM_Shift.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;NUM_Shift.Parent" xml:space="preserve">
+    <value>groupBox4</value>
+  </data>
+  <data name="&gt;&gt;NUM_Shift.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
   <data name="myButton1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
@@ -1384,7 +1435,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;myButton1.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>2</value>
   </data>
   <data name="chk_grid.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1414,7 +1465,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;chk_grid.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>3</value>
   </data>
   <data name="chk_markers.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1444,7 +1495,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;chk_markers.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>4</value>
   </data>
   <data name="chk_boundary.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -1474,7 +1525,7 @@
     <value>groupBox4</value>
   </data>
   <data name="&gt;&gt;chk_boundary.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>5</value>
   </data>
   <data name="groupBox4.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 462</value>

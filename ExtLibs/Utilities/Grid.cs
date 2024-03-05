@@ -1033,7 +1033,7 @@ namespace MissionPlanner.Utilities
         public static List<PointLatLngAlt> CreateSprayGrid(List<PointLatLngAlt> polygon,
                     double altitude, double distance, double angle,
                     StartPosition startpos,
-                    float minLaneSeparation, PointLatLngAlt HomeLocation, List<List<PointLatLngAlt>> obstacles,
+                    float minLaneSeparation, PointLatLngAlt HomeLocation, List<List<PointLatLngAlt>> obstacles, double shift,
                     bool useextendedendpoint = true)
         {
             //DoDebug();
@@ -1112,6 +1112,9 @@ namespace MissionPlanner.Utilities
             // set start point to left hand side
             x = xb1;
             y = yb1;
+
+            //Shift the start point by "shift" meters
+            newPointAngleDistance(ref x, ref y, angle+90, shift);   
 
             // draw the outergrid, this is a grid that cover the entire area of the rectangle plus more.
             while (lines < ((areaDiagonalSize + distance * 2) / distance))
