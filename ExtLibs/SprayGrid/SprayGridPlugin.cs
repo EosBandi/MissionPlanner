@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using GMap.NET;
 using GMap.NET.WindowsForms;
 using MissionPlanner.Controls;
+using MissionPlanner.Maps;
 
 namespace MissionPlanner.SprayGrid
 {
@@ -13,6 +15,7 @@ namespace MissionPlanner.SprayGrid
         public static MissionPlanner.Plugin.PluginHost Host2;
 
         ToolStripMenuItem but;
+        ToolStripMenuItem but2;
         MyButton customButton;
 
         public override string Name
@@ -56,6 +59,23 @@ namespace MissionPlanner.SprayGrid
                 }
             }
 
+            but2 = new ToolStripMenuItem("Refresh map tiles");
+            but2.Click += but2_Click;
+
+            ToolStripItemCollection col2 = Host.FPMenuMap.Items;
+            index = col2.Count;
+            foreach (ToolStripItem item in col2)
+            {
+                if (item.Name.Equals("mapToolToolStripMenuItem"))
+                {
+                    index = col2.IndexOf(item);
+                    ((ToolStripMenuItem)item).DropDownItems.Add(but2);
+                    hit = true;
+                    break;
+                }
+            }
+
+
             if (hit == false)
                 col.Add(but);
             MainV2.instance.Invoke((Action)
@@ -90,6 +110,14 @@ namespace MissionPlanner.SprayGrid
                 CustomMessageBox.Show("Please define a polygon.", "Error");
             }
         }
+
+        void but2_Click(object sender, EventArgs e)
+        {
+
+           GMapControl mapcontrol = Host2.FPGMapControl;
+           var removed = ((PureImageCache)MyImageCache.Instance).DeleteOlderThan(DateTime.Now, mapcontrol.MapProvider.DbId);
+           CustomMessageBox.Show("Removed " + removed + " images");
+       }
 
         public override bool Exit()
         {

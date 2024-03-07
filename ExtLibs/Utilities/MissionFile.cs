@@ -284,15 +284,13 @@ namespace MissionPlanner.Utilities
                     a++;
                 }
             }
-
+            GeoFence geoFence = new GeoFence();
+            geoFence.version = 2;
+            geoFence.circles = new List<Circle>();
+            geoFence.polygons = new List<Polygon>();
             //add fence items
             if (fencelist.Count > 0)
             {
-                GeoFence geoFence = new GeoFence();
-                geoFence.version = 2;
-                geoFence.circles = new List<Circle>();
-                geoFence.polygons = new List<Polygon>();
-
                 Polygon fencePolygon = new Polygon();
                 List<List<double>> points = new List<List<double>>();
 
@@ -339,9 +337,9 @@ namespace MissionPlanner.Utilities
                     fencePolygon.version = 1;
                     geoFence.polygons.Add(fencePolygon);
                 }
-                temp.geoFence = geoFence;
+               
             }
-
+            temp.geoFence = geoFence;
             temp.fileType = "Plan";
 
             //add an empty rallypoint list
