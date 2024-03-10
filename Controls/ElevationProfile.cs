@@ -1,28 +1,27 @@
-﻿using System;
+﻿using Accord.Imaging.Filters;
+using MissionPlanner.GCSViews;
+using MissionPlanner.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Xml;
-using GMap.NET.MapProviders;
-using MissionPlanner.GCSViews;
-using MissionPlanner.Utilities;
-using NetTopologySuite.Algorithm;
-using OpenTK.Graphics.OpenGL;
-using Org.BouncyCastle.Crypto.Engines;
 using ZedGraph; // GE xml alt reader
 
 namespace MissionPlanner.Controls
 {
     public partial class ElevationProfile : Form
     {
-        List<PointLatLngAlt> gelocs = new List<PointLatLngAlt>();
+        //List<PointLatLngAlt> gelocs = new List<PointLatLngAlt>();
         List<PointLatLngAlt> srtmlocs = new List<PointLatLngAlt>();
         List<PointLatLngAlt> planlocs = new List<PointLatLngAlt>();
-        PointPairList list1 = new PointPairList();
-        PointPairList list2 = new PointPairList();
-        PointPairList list3 = new PointPairList();
+        PointPairList flightPlanPoints = new PointPairList();
+        PointPairList flightPlanCheckedPoints = new PointPairList();
+        PointPairList relativeToHomeElevation = new PointPairList();
+        PointPairList differenceList = new PointPairList(); 
 
-        PointPairList list4terrain = new PointPairList();
+        List<PointLatLngAlt> problemlocs = new List<PointLatLngAlt>();
+
+        //PointPairList list4terrain = new PointPairList();
         int distance = 0;
         double homealt = 0;
         FlightPlanner.altmode altmode = FlightPlanner.altmode.Relative;
@@ -50,6 +49,32 @@ namespace MissionPlanner.Controls
                 return;
             }
 
+            if (altmode != FlightPlanner.altmode.Relative)
+            {
+                CustomMessageBox.Show("Current version uses relative alt mode only", Strings.ERROR);
+                return;
+            }
+
+            if (locs.Count <= 1)
+            {
+                CustomMessageBox.Show("There is only a home point. Nothing to show!", Strings.ERROR);
+                return;
+            }
+
+
+            srtm.altresponce alt = srtm.getAltitude(locs[0].Lat, locs[0].Lng);
+
+            if (alt.currenttype == srtm.tiletype.valid)
+            {
+                this.homealt = alt.alt;
+            }
+            else
+            {
+                CustomMessageBox.Show("Home altitude not found", Strings.ERROR);
+                return;
+            }
+
+
             // get total distance
             distance = 0;
             PointLatLngAlt lastloc = null;
@@ -65,17 +90,13 @@ namespace MissionPlanner.Controls
                 lastloc = loc;
             }
 
-            this.homealt = homealt;
-
             Form frm = Common.LoadingBox("Loading", "using alt data");
-
-            //gelocs = getGEAltPath(planlocs);
 
             srtmlocs = getSRTMAltPathArea(planlocs);
 
             frm.Close();
 
-            MissionPlanner.Utilities.Tracking.AddPage(this.GetType().ToString(), this.Text);
+            //MissionPlanner.Utilities.Tracking.AddPage(this.GetType().ToString(), this.Text);
         }
 
         private void ElevationProfile_Load(object sender, EventArgs e)
@@ -85,23 +106,7 @@ namespace MissionPlanner.Controls
                 this.Close();
                 return;
             }
-            // GE plot
-            /*
-            double a = 0;
-            double increment = (distance / (float)(gelocs.Count - 1));
 
-            foreach (PointLatLngAlt geloc in gelocs)
-            {
-                if (geloc == null)
-                    continue;
-
-                list2.Add(a * CurrentState.multiplierdist, Convert.ToInt32(geloc.Alt * CurrentState.multiplieralt));
-
-                Console.WriteLine("GE " + geloc.Lng + "," + geloc.Lat + "," + geloc.Alt);
-
-                a += increment;
-            }
-            */
             // Planner Plot
             double a = 0;
             int count = 0;
@@ -116,22 +121,9 @@ namespace MissionPlanner.Controls
                     a += planloc.GetDistance(lastloc);
                 }
 
-                // deal with at mode
-                if (altmode == FlightPlanner.altmode.Terrain)
+                if (altmode == FlightPlanner.altmode.Relative)
                 {
-                    list1 = list4terrain;
-                    break;
-                }
-                else if (altmode == FlightPlanner.altmode.Relative)
-                {
-                    // already includes the home alt
-                    list1.Add(a * CurrentState.multiplierdist, (planloc.Alt * CurrentState.multiplieralt), 0, planloc.Tag);
-                }
-                else
-                {
-                    // abs
-                    // already absolute
-                    list1.Add(a * CurrentState.multiplierdist, (planloc.Alt * CurrentState.multiplieralt), 0, planloc.Tag);
+                    flightPlanPoints.Add(a * CurrentState.multiplierdist, ((planloc.Alt-homealt) * CurrentState.multiplieralt), 0, planloc.Tag);
                 }
 
                 lastloc = planloc;
@@ -162,18 +154,16 @@ namespace MissionPlanner.Controls
             result = srtm.getAltitude(lat, lng);
             result.currenttype = srtm.tiletype.invalid;
 
-            double km1 = 0.008983; // One km in degrees
-            //Perhaps it sould go outside
-            double lngstep = km1 * Math.Cos(MathHelper.deg2rad * lat) / 1000 / 100 * 20;  //20cm in longitude degrees
-            double latstep = km1 / 1000 / 100 * 20; // 20 cm in latitude degrees
-
-
+            PointLatLngAlt pnt = new PointLatLngAlt(lat, lng, 0, "");
+            //StreamWriter sw = new StreamWriter("e:\\points.csv",false);
+            //sw.WriteLine("Lat, Lng");
             foreach (PointF point in displacement_points)
             {
-                double latpoint = lat + point.Y * latstep;
-                double lngpoint = lng + point.X * lngstep;
 
-                srtm.altresponce alt = srtm.getAltitude(latpoint, lngpoint);
+                PointLatLngAlt pointToCheck = pnt.gps_offset(point.X*0.2, -point.Y*0.2);
+                //sw.WriteLine(pointToCheck.Lat + "," + pointToCheck.Lng);
+
+                srtm.altresponce alt = srtm.getAltitude(pointToCheck.Lat, pointToCheck.Lng);
 
                 if (alt.currenttype == srtm.tiletype.valid)
                 {
@@ -190,6 +180,7 @@ namespace MissionPlanner.Controls
                     }
                 }
             }
+            //sw.Close();
             return result;
         }
 
@@ -198,12 +189,11 @@ namespace MissionPlanner.Controls
         //Center is zero, units is 20cm.
         List<PointF> getVehicleAreaDisplacementPoints(double heading)
         {
-
             double width = 20; // 20 units of 0.2m = 4m
 
             //Sanity check, legth and width should be even numbers
             //The vehicle width is perpendicular to the heading
-            double alpha = (heading + 90) % 360;
+            double alpha = (heading) % 360;
 
             double alpha_radians = alpha * Math.PI / 180;
             double half_length = width / 2;
@@ -266,8 +256,8 @@ namespace MissionPlanner.Controls
                     continue;
                 }
 
-                double heading = last.GetBearing(loc); // Neds to add 90 degree 
-                heading = (heading + 90) % 360;
+                double heading = last.GetBearing(loc);
+                //heading = (heading + 90) % 360;
                 //generate the displacement points
                 displacement = getVehicleAreaDisplacementPoints(heading);
 
@@ -275,7 +265,7 @@ namespace MissionPlanner.Controls
                 double dist = last.GetDistance(loc);
 
 
-                int points = (int)(dist * 4) + 1;
+                int points = (int)(dist * 2.5) + 1;
 
                 double deltalat = (last.Lat - loc.Lat);
                 double deltalng = (last.Lng - loc.Lng);
@@ -287,11 +277,14 @@ namespace MissionPlanner.Controls
 
                 PointLatLngAlt lastpnt = last;
 
-                for (int a = 0; a <= points; a++)
+                //Go through between the twp points in distance/4+1 steps which is 25cm
+                for (int a = 0; a <= points; a++)                   
                 {
-                    double lat = last.Lat - steplat * a;
-                    double lng = last.Lng - steplng * a;
-                    double alt = last.Alt - stepalt * a;
+                    double lat = last.Lat - steplat * a;        //location new position
+                    double lng = last.Lng - steplng * a;        
+                    double alt = last.Alt - stepalt * a;        //vehicle center estimated altitude of a given point, extrapolated from the two points
+
+
 
                     //var newpoint = new PointLatLngAlt(lat, lng, srtm.getAltitude(lat, lng).alt, "");
                     var newpoint = new PointLatLngAlt(lat, lng, getMaxAltinArea(lat, lng, displacement).alt, "");
@@ -300,17 +293,21 @@ namespace MissionPlanner.Controls
 
                     disttotal += subdist;
 
-                    // srtm alts
-                    list3.Add(disttotal * CurrentState.multiplierdist, newpoint.Alt * CurrentState.multiplieralt);
+                    // relative to home alt
+                    relativeToHomeElevation.Add(disttotal, newpoint.Alt-homealt);
 
-                    // terrain alt
-                    list4terrain.Add(disttotal * CurrentState.multiplierdist, (newpoint.Alt + alt) * CurrentState.multiplieralt);
+                    // Flight plane points
+                    flightPlanCheckedPoints.Add(disttotal, alt - homealt);
+
+                    double difference = (alt - homealt) - (newpoint.Alt - homealt);
+                    //difference between the two
+                    differenceList.Add(disttotal, difference);
 
                     lastpnt = newpoint;
                 }
 
                 //answer.Add(new PointLatLngAlt(loc.Lat, loc.Lng, srtm.getAltitude(loc.Lat, loc.Lng).alt, ""));
-                answer.Add(new PointLatLngAlt(loc.Lat, loc.Lng, getMaxAltinArea(loc.Lat, loc.Lng, displacement).alt, ""));
+                //answer.Add(new PointLatLngAlt(loc.Lat, loc.Lng, getMaxAltinArea(loc.Lat, loc.Lng, displacement).alt, ""));
 
                 last = loc;
             }
@@ -318,144 +315,147 @@ namespace MissionPlanner.Controls
         }
 
 
-        List<PointLatLngAlt> getSRTMAltPath(List<PointLatLngAlt> list)
-        {
-            List<PointLatLngAlt> answer = new List<PointLatLngAlt>();
+        //List<PointLatLngAlt> getSRTMAltPath(List<PointLatLngAlt> list)
+        //{
+        //    List<PointLatLngAlt> answer = new List<PointLatLngAlt>();
 
-            PointLatLngAlt last = null;
+        //    PointLatLngAlt last = null;
 
-            double disttotal = 0;
+        //    double disttotal = 0;
 
-            foreach (PointLatLngAlt loc in list)
-            {
-                if (loc == null)
-                    continue;
+        //    foreach (PointLatLngAlt loc in list)
+        //    {
+        //        if (loc == null)
+        //            continue;
 
-                if (last == null)
-                {
-                    last = loc;
-                    if (altmode == FlightPlanner.altmode.Terrain)
-                        loc.Alt -= srtm.getAltitude(loc.Lat, loc.Lng).alt;
-                    continue;
-                }
+        //        if (last == null)
+        //        {
+        //            last = loc;
+        //            if (altmode == FlightPlanner.altmode.Terrain)
+        //                loc.Alt -= srtm.getAltitude(loc.Lat, loc.Lng).alt;
+        //            continue;
+        //        }
 
-                double dist = last.GetDistance(loc);
+        //        double dist = last.GetDistance(loc);
 
-                if (altmode == FlightPlanner.altmode.Terrain)
-                    loc.Alt -= srtm.getAltitude(loc.Lat, loc.Lng).alt;
+        //        if (altmode == FlightPlanner.altmode.Terrain)
+        //            loc.Alt -= srtm.getAltitude(loc.Lat, loc.Lng).alt;
 
-                int points = (int)(dist * 4) + 1;
+        //        int points = (int)(dist * 4) + 1;
 
-                double deltalat = (last.Lat - loc.Lat);
-                double deltalng = (last.Lng - loc.Lng);
-                double deltaalt = last.Alt - loc.Alt;
+        //        double deltalat = (last.Lat - loc.Lat);
+        //        double deltalng = (last.Lng - loc.Lng);
+        //        double deltaalt = last.Alt - loc.Alt;
 
-                double steplat = deltalat / points;
-                double steplng = deltalng / points;
-                double stepalt = deltaalt / points;
+        //        double steplat = deltalat / points;
+        //        double steplng = deltalng / points;
+        //        double stepalt = deltaalt / points;
 
-                PointLatLngAlt lastpnt = last;
+        //        PointLatLngAlt lastpnt = last;
 
-                for (int a = 0; a <= points; a++)
-                {
-                    double lat = last.Lat - steplat * a;
-                    double lng = last.Lng - steplng * a;
-                    double alt = last.Alt - stepalt * a;
+        //        for (int a = 0; a <= points; a++)
+        //        {
+        //            double lat = last.Lat - steplat * a;
+        //            double lng = last.Lng - steplng * a;
+        //            double alt = last.Alt - stepalt * a;
 
-                    var newpoint = new PointLatLngAlt(lat, lng, srtm.getAltitude(lat, lng).alt, "");
+        //            var newpoint = new PointLatLngAlt(lat, lng, srtm.getAltitude(lat, lng).alt, "");
 
-                    double subdist = lastpnt.GetDistance(newpoint);
+        //            double subdist = lastpnt.GetDistance(newpoint);
 
-                    disttotal += subdist;
+        //            disttotal += subdist;
 
-                    // srtm alts
-                    list3.Add(disttotal * CurrentState.multiplierdist, newpoint.Alt * CurrentState.multiplieralt);
+        //            // srtm alts
+        //            replativeToHomeElevation.Add(disttotal * CurrentState.multiplierdist, newpoint.Alt * CurrentState.multiplieralt);
 
-                    // terrain alt
-                    list4terrain.Add(disttotal * CurrentState.multiplierdist, (newpoint.Alt + alt) * CurrentState.multiplieralt);
+        //            // terrain alt
+        //            list4terrain.Add(disttotal * CurrentState.multiplierdist, (newpoint.Alt + alt) * CurrentState.multiplieralt);
 
-                    lastpnt = newpoint;
-                }
+        //            lastpnt = newpoint;
+        //        }
 
-                answer.Add(new PointLatLngAlt(loc.Lat, loc.Lng, srtm.getAltitude(loc.Lat, loc.Lng).alt, ""));
+        //        answer.Add(new PointLatLngAlt(loc.Lat, loc.Lng, srtm.getAltitude(loc.Lat, loc.Lng).alt, ""));
 
-                last = loc;
-            }
-            return answer;
-        }
+        //        last = loc;
+        //    }
+        //    return answer;
+        //}
 
-        List<PointLatLngAlt> getGEAltPath(List<PointLatLngAlt> list)
-        {
-            double alt = 0;
-            double lat = 0;
-            double lng = 0;
+        //List<PointLatLngAlt> getGEAltPath(List<PointLatLngAlt> list)
+        //{
+        //    double alt = 0;
+        //    double lat = 0;
+        //    double lng = 0;
 
-            int pos = 0;
+        //    int pos = 0;
 
-            List<PointLatLngAlt> answer = new List<PointLatLngAlt>();
+        //    List<PointLatLngAlt> answer = new List<PointLatLngAlt>();
 
-            //http://code.google.com/apis/maps/documentation/elevation/
-            //http://maps.google.com/maps/api/elevation/xml
-            string coords = "";
+        //    //http://code.google.com/apis/maps/documentation/elevation/
+        //    //http://maps.google.com/maps/api/elevation/xml
+        //    string coords = "";
 
-            foreach (PointLatLngAlt loc in list)
-            {
-                if (loc == null)
-                    continue;
+        //    foreach (PointLatLngAlt loc in list)
+        //    {
+        //        if (loc == null)
+        //            continue;
 
-                coords = coords + loc.Lat.ToString(new System.Globalization.CultureInfo("en-US")) + "," +
-                         loc.Lng.ToString(new System.Globalization.CultureInfo("en-US")) + "|";
-            }
-            coords = coords.Remove(coords.Length - 1);
+        //        coords = coords + loc.Lat.ToString(new System.Globalization.CultureInfo("en-US")) + "," +
+        //                 loc.Lng.ToString(new System.Globalization.CultureInfo("en-US")) + "|";
+        //    }
+        //    coords = coords.Remove(coords.Length - 1);
 
-            if (list.Count < 2 || coords.Length > (2048 - 256))
-            {
-                CustomMessageBox.Show("Too many/few WP's or to Big a Distance " + (distance / 1000) + "km", Strings.ERROR);
-                return answer;
-            }
+        //    if (list.Count < 2 || coords.Length > (2048 - 256))
+        //    {
+        //        CustomMessageBox.Show("Too many/few WP's or to Big a Distance " + (distance / 1000) + "km", Strings.ERROR);
+        //        return answer;
+        //    }
 
-            try
-            {
-                using (
-                    XmlTextReader xmlreader =
-                        new XmlTextReader("https://maps.google.com/maps/api/elevation/xml?path=" + coords + "&samples=" +
-                                          (distance / 100).ToString(new System.Globalization.CultureInfo("en-US")) +
-                                          "&sensor=false&key=" + GoogleMapProvider.APIKey))
-                {
-                    while (xmlreader.Read())
-                    {
-                        xmlreader.MoveToElement();
-                        switch (xmlreader.Name)
-                        {
-                            case "elevation":
-                                alt = double.Parse(xmlreader.ReadString(), new System.Globalization.CultureInfo("en-US"));
-                                Console.WriteLine("DO it " + lat + " " + lng + " " + alt);
-                                PointLatLngAlt loc = new PointLatLngAlt(lat, lng, alt, "");
-                                answer.Add(loc);
-                                pos++;
-                                break;
-                            case "lat":
-                                lat = double.Parse(xmlreader.ReadString(), new System.Globalization.CultureInfo("en-US"));
-                                break;
-                            case "lng":
-                                lng = double.Parse(xmlreader.ReadString(), new System.Globalization.CultureInfo("en-US"));
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-            }
-            catch
-            {
-                CustomMessageBox.Show("Error getting GE data", Strings.ERROR);
-            }
+        //    try
+        //    {
+        //        using (
+        //            XmlTextReader xmlreader =
+        //                new XmlTextReader("https://maps.google.com/maps/api/elevation/xml?path=" + coords + "&samples=" +
+        //                                  (distance / 100).ToString(new System.Globalization.CultureInfo("en-US")) +
+        //                                  "&sensor=false&key=" + GoogleMapProvider.APIKey))
+        //        {
+        //            while (xmlreader.Read())
+        //            {
+        //                xmlreader.MoveToElement();
+        //                switch (xmlreader.Name)
+        //                {
+        //                    case "elevation":
+        //                        alt = double.Parse(xmlreader.ReadString(), new System.Globalization.CultureInfo("en-US"));
+        //                        Console.WriteLine("DO it " + lat + " " + lng + " " + alt);
+        //                        PointLatLngAlt loc = new PointLatLngAlt(lat, lng, alt, "");
+        //                        answer.Add(loc);
+        //                        pos++;
+        //                        break;
+        //                    case "lat":
+        //                        lat = double.Parse(xmlreader.ReadString(), new System.Globalization.CultureInfo("en-US"));
+        //                        break;
+        //                    case "lng":
+        //                        lng = double.Parse(xmlreader.ReadString(), new System.Globalization.CultureInfo("en-US"));
+        //                        break;
+        //                    default:
+        //                        break;
+        //                }
+        //            }
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        CustomMessageBox.Show("Error getting GE data", Strings.ERROR);
+        //    }
 
-            return answer;
-        }
+        //    return answer;
+        //}
 
         public void CreateChart(ZedGraphControl zgc)
         {
+            zgc.IsShowCursorValues = true;
+
+
             GraphPane myPane = zgc.GraphPane;
 
             // Set the titles and axis labels
@@ -465,11 +465,11 @@ namespace MissionPlanner.Controls
 
             LineItem myCurve;
 
-            myCurve = myPane.AddCurve("Planned Path", list1, Color.Red, SymbolType.None);
-            //myCurve = myPane.AddCurve("Google", list2, Color.Green, SymbolType.None);
-            myCurve = myPane.AddCurve("DEM", list3, Color.Blue, SymbolType.None);
+            myCurve = myPane.AddCurve("Planned Path", flightPlanCheckedPoints, Color.Red, SymbolType.None);
+            myCurve = myPane.AddCurve("Difference", differenceList, Color.Green, SymbolType.None);
+            myCurve = myPane.AddCurve("DEM", relativeToHomeElevation, Color.Blue, SymbolType.None);
 
-            foreach (PointPair pp in list1)
+            foreach (PointPair pp in flightPlanPoints)
             {
                 // Add a another text item to to point out a graph feature
                 TextObj text = new TextObj((string)pp.Tag, pp.X, pp.Y);
@@ -516,6 +516,11 @@ namespace MissionPlanner.Controls
             catch
             {
             }
+        }
+
+        private void zg1_Load(object sender, EventArgs e)
+        {
+
         }
     }
 }

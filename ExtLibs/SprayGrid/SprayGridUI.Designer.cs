@@ -30,6 +30,9 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SprayGridUI));
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.CHK_enableAltTracking = new System.Windows.Forms.CheckBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.NUM_trackingAltError = new System.Windows.Forms.NumericUpDown();
             this.tb_TimeSegments = new System.Windows.Forms.TextBox();
             this.lbl_litersPerHA = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
@@ -74,17 +77,19 @@
             this.label2 = new System.Windows.Forms.Label();
             this.NUM_Distance = new System.Windows.Forms.NumericUpDown();
             this.groupBox4 = new System.Windows.Forms.GroupBox();
+            this.label11 = new System.Windows.Forms.Label();
+            this.NUM_Shift = new System.Windows.Forms.NumericUpDown();
             this.chk_grid = new System.Windows.Forms.CheckBox();
             this.chk_markers = new System.Windows.Forms.CheckBox();
             this.chk_boundary = new System.Windows.Forms.CheckBox();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
-            this.NUM_Shift = new System.Windows.Forms.NumericUpDown();
+            this.CHK_expandObstacles = new System.Windows.Forms.CheckBox();
             this.map = new MissionPlanner.Controls.myGMAP();
             this.myButton1 = new MissionPlanner.Controls.MyButton();
             this.BUT_Accept = new MissionPlanner.Controls.MyButton();
-            this.label11 = new System.Windows.Forms.Label();
             this.groupBox5.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).BeginInit();
             this.groupBox6.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_LaneSeparation)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Segments)).BeginInit();
@@ -96,17 +101,21 @@
             ((System.ComponentModel.ISupportInitialize)(this.NUM_altitude)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Distance)).BeginInit();
             this.groupBox4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_Shift)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NUM_Shift)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox5
             // 
             resources.ApplyResources(this.groupBox5, "groupBox5");
+            this.groupBox5.Controls.Add(this.CHK_enableAltTracking);
+            this.groupBox5.Controls.Add(this.label12);
+            this.groupBox5.Controls.Add(this.CHK_extendedpoint);
+            this.groupBox5.Controls.Add(this.NUM_trackingAltError);
             this.groupBox5.Controls.Add(this.tb_TimeSegments);
             this.groupBox5.Controls.Add(this.lbl_litersPerHA);
             this.groupBox5.Controls.Add(this.label13);
@@ -124,6 +133,40 @@
             this.groupBox5.Controls.Add(this.label22);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.TabStop = false;
+            // 
+            // CHK_enableAltTracking
+            // 
+            resources.ApplyResources(this.CHK_enableAltTracking, "CHK_enableAltTracking");
+            this.CHK_enableAltTracking.Checked = true;
+            this.CHK_enableAltTracking.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CHK_enableAltTracking.Name = "CHK_enableAltTracking";
+            this.CHK_enableAltTracking.UseVisualStyleBackColor = true;
+            // 
+            // label12
+            // 
+            resources.ApplyResources(this.label12, "label12");
+            this.label12.Name = "label12";
+            // 
+            // NUM_trackingAltError
+            // 
+            this.NUM_trackingAltError.DecimalPlaces = 1;
+            resources.ApplyResources(this.NUM_trackingAltError, "NUM_trackingAltError");
+            this.NUM_trackingAltError.Maximum = new decimal(new int[] {
+            10,
+            0,
+            0,
+            0});
+            this.NUM_trackingAltError.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            65536});
+            this.NUM_trackingAltError.Name = "NUM_trackingAltError";
+            this.NUM_trackingAltError.Value = new decimal(new int[] {
+            1,
+            0,
+            0,
+            0});
             // 
             // tb_TimeSegments
             // 
@@ -204,9 +247,9 @@
             // groupBox6
             // 
             resources.ApplyResources(this.groupBox6, "groupBox6");
+            this.groupBox6.Controls.Add(this.CHK_expandObstacles);
             this.groupBox6.Controls.Add(this.label10);
             this.groupBox6.Controls.Add(this.NUM_LaneSeparation);
-            this.groupBox6.Controls.Add(this.CHK_extendedpoint);
             this.groupBox6.Controls.Add(this.CHK_Headlock);
             this.groupBox6.Controls.Add(this.NUM_Segments);
             this.groupBox6.Controls.Add(this.labelSegments);
@@ -498,6 +541,33 @@
             this.groupBox4.Name = "groupBox4";
             this.groupBox4.TabStop = false;
             // 
+            // label11
+            // 
+            resources.ApplyResources(this.label11, "label11");
+            this.label11.Name = "label11";
+            // 
+            // NUM_Shift
+            // 
+            this.NUM_Shift.DecimalPlaces = 1;
+            this.NUM_Shift.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            resources.ApplyResources(this.NUM_Shift, "NUM_Shift");
+            this.NUM_Shift.Maximum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            0});
+            this.NUM_Shift.Minimum = new decimal(new int[] {
+            20,
+            0,
+            0,
+            -2147483648});
+            this.NUM_Shift.Name = "NUM_Shift";
+            this.NUM_Shift.ValueChanged += new System.EventHandler(this.domainUpDown1_ValueChanged);
+            // 
             // chk_grid
             // 
             resources.ApplyResources(this.chk_grid, "chk_grid");
@@ -545,27 +615,14 @@
             this.splitContainer1.Panel2.Controls.Add(this.groupBox4);
             this.splitContainer1.Panel2.Controls.Add(this.groupBox6);
             // 
-            // NUM_Shift
+            // CHK_expandObstacles
             // 
-            this.NUM_Shift.DecimalPlaces = 1;
-            this.NUM_Shift.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            resources.ApplyResources(this.NUM_Shift, "NUM_Shift");
-            this.NUM_Shift.Maximum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            0});
-            this.NUM_Shift.Minimum = new decimal(new int[] {
-            20,
-            0,
-            0,
-            -2147483648});
-            this.NUM_Shift.Name = "NUM_Shift";
-            this.NUM_Shift.ValueChanged += new System.EventHandler(this.domainUpDown1_ValueChanged);
+            resources.ApplyResources(this.CHK_expandObstacles, "CHK_expandObstacles");
+            this.CHK_expandObstacles.Checked = true;
+            this.CHK_expandObstacles.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.CHK_expandObstacles.Name = "CHK_expandObstacles";
+            this.CHK_expandObstacles.UseVisualStyleBackColor = true;
+            this.CHK_expandObstacles.CheckedChanged += new System.EventHandler(this.domainUpDown1_ValueChanged);
             // 
             // map
             // 
@@ -607,11 +664,6 @@
             this.BUT_Accept.UseVisualStyleBackColor = true;
             this.BUT_Accept.Click += new System.EventHandler(this.BUT_Accept_Click2);
             // 
-            // label11
-            // 
-            resources.ApplyResources(this.label11, "label11");
-            this.label11.Name = "label11";
-            // 
             // SprayGridUI
             // 
             resources.ApplyResources(this, "$this");
@@ -622,6 +674,7 @@
             this.Resize += new System.EventHandler(this.SprayGridUI_Resize);
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).EndInit();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_LaneSeparation)).EndInit();
@@ -635,12 +688,12 @@
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Distance)).EndInit();
             this.groupBox4.ResumeLayout(false);
             this.groupBox4.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_Shift)).EndInit();
             this.panel1.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.NUM_Shift)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -702,5 +755,9 @@
         private System.Windows.Forms.NumericUpDown NUM_LaneSeparation;
         private System.Windows.Forms.NumericUpDown NUM_Shift;
         private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.CheckBox CHK_enableAltTracking;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.NumericUpDown NUM_trackingAltError;
+        private System.Windows.Forms.CheckBox CHK_expandObstacles;
     }
 }

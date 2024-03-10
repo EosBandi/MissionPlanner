@@ -121,11 +121,122 @@
   <data name="groupBox5.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
   </data>
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="CHK_enableAltTracking.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="CHK_enableAltTracking.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="CHK_enableAltTracking.Location" type="System.Drawing.Point, System.Drawing">
+    <value>895, 17</value>
+  </data>
+  <data name="CHK_enableAltTracking.Size" type="System.Drawing.Size, System.Drawing">
+    <value>146, 17</value>
+  </data>
+  <data name="CHK_enableAltTracking.TabIndex" type="System.Int32, mscorlib">
+    <value>82</value>
+  </data>
+  <data name="CHK_enableAltTracking.Text" xml:space="preserve">
+    <value>Enable Alt tracking points</value>
+  </data>
+  <data name="&gt;&gt;CHK_enableAltTracking.Name" xml:space="preserve">
+    <value>CHK_enableAltTracking</value>
+  </data>
+  <data name="&gt;&gt;CHK_enableAltTracking.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;CHK_enableAltTracking.Parent" xml:space="preserve">
+    <value>groupBox5</value>
+  </data>
+  <data name="&gt;&gt;CHK_enableAltTracking.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="label12.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label12.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="label12.Location" type="System.Drawing.Point, System.Drawing">
+    <value>896, 38</value>
+  </data>
+  <data name="label12.Size" type="System.Drawing.Size, System.Drawing">
+    <value>143, 13</value>
+  </data>
+  <data name="label12.TabIndex" type="System.Int32, mscorlib">
+    <value>82</value>
+  </data>
+  <data name="label12.Text" xml:space="preserve">
+    <value>SRTM tracking tolerance (m)</value>
+  </data>
+  <data name="&gt;&gt;label12.Name" xml:space="preserve">
+    <value>label12</value>
+  </data>
+  <data name="&gt;&gt;label12.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label12.Parent" xml:space="preserve">
+    <value>groupBox5</value>
+  </data>
+  <data name="&gt;&gt;label12.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="CHK_extendedpoint.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="CHK_extendedpoint.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="CHK_extendedpoint.Location" type="System.Drawing.Point, System.Drawing">
+    <value>895, 67</value>
+  </data>
+  <data name="CHK_extendedpoint.Size" type="System.Drawing.Size, System.Drawing">
+    <value>114, 17</value>
+  </data>
+  <data name="CHK_extendedpoint.TabIndex" type="System.Int32, mscorlib">
+    <value>79</value>
+  </data>
+  <data name="CHK_extendedpoint.Text" xml:space="preserve">
+    <value>Path optimalization</value>
+  </data>
+  <data name="&gt;&gt;CHK_extendedpoint.Name" xml:space="preserve">
+    <value>CHK_extendedpoint</value>
+  </data>
+  <data name="&gt;&gt;CHK_extendedpoint.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;CHK_extendedpoint.Parent" xml:space="preserve">
+    <value>groupBox5</value>
+  </data>
+  <data name="&gt;&gt;CHK_extendedpoint.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="NUM_trackingAltError.Location" type="System.Drawing.Point, System.Drawing">
+    <value>1060, 38</value>
+  </data>
+  <data name="NUM_trackingAltError.Size" type="System.Drawing.Size, System.Drawing">
+    <value>62, 20</value>
+  </data>
+  <data name="NUM_trackingAltError.TabIndex" type="System.Int32, mscorlib">
+    <value>82</value>
+  </data>
+  <data name="&gt;&gt;NUM_trackingAltError.Name" xml:space="preserve">
+    <value>NUM_trackingAltError</value>
+  </data>
+  <data name="&gt;&gt;NUM_trackingAltError.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;NUM_trackingAltError.Parent" xml:space="preserve">
+    <value>groupBox5</value>
+  </data>
+  <data name="&gt;&gt;NUM_trackingAltError.ZOrder" xml:space="preserve">
+    <value>3</value>
+  </data>
   <data name="tb_TimeSegments.Location" type="System.Drawing.Point, System.Drawing">
     <value>473, 17</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="tb_TimeSegments.Multiline" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -148,7 +259,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;tb_TimeSegments.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>4</value>
   </data>
   <data name="lbl_litersPerHA.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -178,7 +289,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_litersPerHA.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>5</value>
   </data>
   <data name="label13.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -208,7 +319,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label13.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>6</value>
   </data>
   <data name="lbl_plannedSpeed.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -238,7 +349,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_plannedSpeed.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>7</value>
   </data>
   <data name="lbl_flighttime.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -268,7 +379,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_flighttime.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>8</value>
   </data>
   <data name="label16.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -298,7 +409,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label16.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>9</value>
   </data>
   <data name="label17.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -328,7 +439,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label17.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>10</value>
   </data>
   <data name="lbl_distbetweenlines.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -358,7 +469,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_distbetweenlines.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>11</value>
   </data>
   <data name="label25.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -388,7 +499,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label25.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>12</value>
   </data>
   <data name="lbl_strips.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -418,7 +529,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_strips.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>13</value>
   </data>
   <data name="label33.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -448,7 +559,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label33.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>14</value>
   </data>
   <data name="lbl_distance.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -478,7 +589,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_distance.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>15</value>
   </data>
   <data name="lbl_area.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -508,7 +619,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_area.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>16</value>
   </data>
   <data name="label23.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -538,7 +649,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label23.ZOrder" xml:space="preserve">
-    <value>13</value>
+    <value>17</value>
   </data>
   <data name="label22.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -568,7 +679,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label22.ZOrder" xml:space="preserve">
-    <value>14</value>
+    <value>18</value>
   </data>
   <data name="groupBox5.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 0</value>
@@ -600,6 +711,36 @@
   <data name="groupBox6.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Left, Right</value>
   </data>
+  <data name="CHK_expandObstacles.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="CHK_expandObstacles.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="CHK_expandObstacles.Location" type="System.Drawing.Point, System.Drawing">
+    <value>10, 375</value>
+  </data>
+  <data name="CHK_expandObstacles.Size" type="System.Drawing.Size, System.Drawing">
+    <value>195, 17</value>
+  </data>
+  <data name="CHK_expandObstacles.TabIndex" type="System.Int32, mscorlib">
+    <value>82</value>
+  </data>
+  <data name="CHK_expandObstacles.Text" xml:space="preserve">
+    <value>Expand obstacles with half spraybar</value>
+  </data>
+  <data name="&gt;&gt;CHK_expandObstacles.Name" xml:space="preserve">
+    <value>CHK_expandObstacles</value>
+  </data>
+  <data name="&gt;&gt;CHK_expandObstacles.Type" xml:space="preserve">
+    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;CHK_expandObstacles.Parent" xml:space="preserve">
+    <value>groupBox6</value>
+  </data>
+  <data name="&gt;&gt;CHK_expandObstacles.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
   <data name="label10.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
   </data>
@@ -628,7 +769,7 @@
     <value>groupBox6</value>
   </data>
   <data name="&gt;&gt;label10.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>1</value>
   </data>
   <data name="NUM_LaneSeparation.Location" type="System.Drawing.Point, System.Drawing">
     <value>171, 398</value>
@@ -649,36 +790,6 @@
     <value>groupBox6</value>
   </data>
   <data name="&gt;&gt;NUM_LaneSeparation.ZOrder" xml:space="preserve">
-    <value>1</value>
-  </data>
-  <data name="CHK_extendedpoint.AutoSize" type="System.Boolean, mscorlib">
-    <value>True</value>
-  </data>
-  <data name="CHK_extendedpoint.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
-    <value>NoControl</value>
-  </data>
-  <data name="CHK_extendedpoint.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 374</value>
-  </data>
-  <data name="CHK_extendedpoint.Size" type="System.Drawing.Size, System.Drawing">
-    <value>114, 17</value>
-  </data>
-  <data name="CHK_extendedpoint.TabIndex" type="System.Int32, mscorlib">
-    <value>79</value>
-  </data>
-  <data name="CHK_extendedpoint.Text" xml:space="preserve">
-    <value>Path optimalization</value>
-  </data>
-  <data name="&gt;&gt;CHK_extendedpoint.Name" xml:space="preserve">
-    <value>CHK_extendedpoint</value>
-  </data>
-  <data name="&gt;&gt;CHK_extendedpoint.Type" xml:space="preserve">
-    <value>System.Windows.Forms.CheckBox, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;CHK_extendedpoint.Parent" xml:space="preserve">
-    <value>groupBox6</value>
-  </data>
-  <data name="&gt;&gt;CHK_extendedpoint.ZOrder" xml:space="preserve">
     <value>2</value>
   </data>
   <data name="CHK_Headlock.AutoSize" type="System.Boolean, mscorlib">
@@ -1528,7 +1639,7 @@
     <value>5</value>
   </data>
   <data name="groupBox4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 462</value>
+    <value>3, 455</value>
   </data>
   <data name="groupBox4.Size" type="System.Drawing.Size, System.Drawing">
     <value>246, 105</value>
@@ -1555,7 +1666,7 @@
     <value>Bottom, Left, Right</value>
   </data>
   <data name="panel1.Location" type="System.Drawing.Point, System.Drawing">
-    <value>1, 578</value>
+    <value>1, 571</value>
   </data>
   <data name="panel1.Size" type="System.Drawing.Size, System.Drawing">
     <value>1141, 97</value>
@@ -1591,7 +1702,7 @@
     <value>0, 0</value>
   </data>
   <data name="map.Size" type="System.Drawing.Size, System.Drawing">
-    <value>885, 570</value>
+    <value>885, 563</value>
   </data>
   <data name="map.TabIndex" type="System.Int32, mscorlib">
     <value>0</value>
@@ -1633,7 +1744,7 @@
     <value>1</value>
   </data>
   <data name="splitContainer1.Size" type="System.Drawing.Size, System.Drawing">
-    <value>1141, 570</value>
+    <value>1141, 563</value>
   </data>
   <data name="splitContainer1.SplitterDistance" type="System.Int32, mscorlib">
     <value>885</value>
@@ -1657,7 +1768,10 @@
     <value>True</value>
   </metadata>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
-    <value>1143, 674</value>
+    <value>1143, 667</value>
+  </data>
+  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="$this.Text" xml:space="preserve">
     <value>Grid</value>

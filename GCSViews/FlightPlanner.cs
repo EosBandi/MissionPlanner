@@ -3298,6 +3298,24 @@ namespace MissionPlanner.GCSViews
         public void elevationGraphToolStripMenuItem_Click(object sender, EventArgs e)
         {
             writeKML();
+
+            List<PointLatLngAlt> points = new List<PointLatLngAlt>();
+            foreach (var item in pointlist)
+            {
+                if (item is null)
+                    continue;
+
+                double relAlt = 0;
+                if (item.Tag != "H" )
+                {
+                    int index = int.Parse(item.Tag.ToString())-1;
+                    relAlt = Commands.Rows[index].Cells[Alt.Index].Value == null
+                        ? item.Alt
+                        : double.Parse(Commands.Rows[index].Cells[Alt.Index].Value.ToString());
+                }
+                points.Add(new PointLatLngAlt(item.Lat, item.Lng, relAlt));
+            }
+
             double homealt = MainV2.comPort.MAV.cs.HomeAlt;
             Form temp = new ElevationProfile(pointlist, homealt,
                 (altmode)Enum.Parse(typeof(altmode), CMB_altmode.Text));

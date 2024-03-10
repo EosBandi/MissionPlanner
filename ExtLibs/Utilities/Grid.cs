@@ -1033,7 +1033,7 @@ namespace MissionPlanner.Utilities
         public static List<PointLatLngAlt> CreateSprayGrid(List<PointLatLngAlt> polygon,
                     double altitude, double distance, double angle,
                     StartPosition startpos,
-                    float minLaneSeparation, PointLatLngAlt HomeLocation, List<List<PointLatLngAlt>> obstacles, double shift,
+                    float minLaneSeparation, PointLatLngAlt HomeLocation, List<List<PointLatLngAlt>> obstacles, double shift, double barwidth,
                     bool useextendedendpoint = true)
         {
             //DoDebug();
@@ -1203,8 +1203,9 @@ namespace MissionPlanner.Utilities
 
                         if (obstacleVertexListUTM[0] != obstacleVertexListUTM[obstacleVertexListUTM.Count - 1])
                             obstacleVertexListUTM.Add(obstacleVertexListUTM[0]); // make a full loop
-
-                        inflateVertex(obstacleVertexListUTM, 2);
+                       
+                        if (barwidth > 0)
+                            inflateVertex(obstacleVertexListUTM, barwidth/2);
                     }
                     else
                     {

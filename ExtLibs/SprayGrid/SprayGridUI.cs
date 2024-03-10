@@ -142,7 +142,10 @@ namespace MissionPlanner.SprayGrid
             loadsetting("SprayGrid_lanesep", NUM_LaneSeparation);
             loadsetting("SprayGrid_addtakeoff", CHK_addTakeoffAndLanding);
             loadsetting("SprayGrid_headlock", CHK_Headlock);
- 
+            loadsetting("SprayGrid_alttrackingenabled", CHK_enableAltTracking);
+            loadsetting("SprayGrid_alttrackerror", NUM_trackingAltError);
+            loadsetting("SprayGrid_expandobstacles", CHK_expandObstacles);
+
         }
         void loadsetting(string key, Control item)
         {
@@ -176,8 +179,9 @@ namespace MissionPlanner.SprayGrid
             plugin.Host.config["SprayGrid_lanesep"] =  NUM_LaneSeparation.Value.ToString();
             plugin.Host.config["SprayGrid_addtakeoff"] =  CHK_addTakeoffAndLanding.Checked.ToString();
             plugin.Host.config["SprayGrid_headlock"] =  CHK_Headlock.Checked.ToString();
-
-
+            plugin.Host.config["SprayGrid_alttrackingenabled"] = CHK_enableAltTracking.Checked.ToString();
+            plugin.Host.config["SprayGrid_alttrackerror"] = NUM_trackingAltError.Value.ToString();
+            plugin.Host.config["SprayGrid_expandobstacles"] = CHK_expandObstacles.Checked.ToString();
         }
         private void map_OnMarkerLeave(GMapMarker item)
         {
@@ -417,10 +421,16 @@ namespace MissionPlanner.SprayGrid
                 Console.WriteLine(x);
             }
 
+            double barwidth = (double)NUM_SprayBarWidth.Value; 
+            if (!CHK_expandObstacles.Checked)
+            {
+                barwidth = 0;
+            }
+
             grid = Utilities.Grid.CreateSprayGrid(list, (double)NUM_altitude.Value, (double)NUM_Distance.Value,
                 (double)NUM_angle.Value,
                 (Utilities.Grid.StartPosition)Enum.Parse(typeof(Utilities.Grid.StartPosition), CMB_startfrom.Text), (float)NUM_LaneSeparation.Value,
-                plugin.Host.cs.PlannedHomeLocation, obstacles, (double)NUM_Shift.Value, CHK_extendedpoint.Checked);
+                plugin.Host.cs.PlannedHomeLocation, obstacles, (double)NUM_Shift.Value,barwidth, CHK_extendedpoint.Checked);
 
             List<PointLatLng> list2 = new List<PointLatLng>();
 
@@ -830,18 +840,117 @@ namespace MissionPlanner.SprayGrid
         }
         private void BUT_Accept_Click2(object sender, EventArgs e)
         {
+            Boolean verifyHeightState = MainV2.instance.FlightPlanner.CHK_verifyheight.Checked;
+
+            if (CHK_enableAltTracking.Checked == true)
+            {
+                //Do grid altitude based on srtm
+                List<PointF> displacementMap = new List<PointF>();
+                displacementMap = getVehicleAreaDisplacementPoints((double)NUM_angle.Value,(double)NUM_SprayBarWidth.Value);
+
+                double homealt = 0;
+                srtm.altresponce altsrtm = srtm.getAltitude(MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng);
+                if (altsrtm.currenttype == srtm.tiletype.valid)
+                {
+                    homealt = altsrtm.alt;
+                }
+                else
+                {
+                    homealt = MainV2.comPort.MAV.cs.PlannedHomeLocation.Alt;
+                }
+
+                foreach (var p in grid)
+                {
+                    altsrtm = getMaxAltinArea(p.Lat, p.Lng, displacementMap);
+                    if (altsrtm.currenttype == srtm.tiletype.valid)
+                    {
+                        p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value;
+                    }
+                    else
+                    {
+                        p.Alt = (double)NUM_altitude.Value;
+                    }
+                }
+
+                List<PointLatLngAlt> newGrid = new List<PointLatLngAlt>();
+
+                //expand grid with altitude issue point
+                PointLatLngAlt last = null;
+                double targetRelativeAlt = (double)NUM_altitude.Value;
+
+                foreach (PointLatLngAlt loc in grid)
+                {
+                    if (loc == null)
+                        continue;
+
+                    //Removed terrain following, we use relative altitudes
+                    //Ignore the first point We don't have a heading
+                    if (last == null)
+                    {
+                        newGrid.Add(loc);
+                        last = loc;
+                        continue;
+                    }
+
+                    double dist = last.GetDistance(loc);
+
+                    int points = (int)(dist * 2.5) + 1;
+
+                    double deltalat = (last.Lat - loc.Lat);
+                    double deltalng = (last.Lng - loc.Lng);
+                    double steplat = deltalat / points;
+                    double steplng = deltalng / points;
+
+
+
+                    double deltaalt = last.Alt - loc.Alt;
+                    double stepalt = deltaalt / points;
+
+                    double lastalt = last.Alt;
+                    int lasta = 0;
+
+                    //Go through between the two points in distance/4+1 steps which is 25cm
+                    for (int a = 0; a <= points; a++)
+                    {
+                        double lat = last.Lat - steplat * a;        //location new position
+                        double lng = last.Lng - steplng * a;
+
+                        double extrapolatedRelativeAlt = lastalt - stepalt * (a - lasta);        //vehicle center estimated altitude of a given point, extrapolated from the two points 
+
+                        double actualTerrainAlt = getMaxAltinArea(lat, lng, displacementMap).alt;
+
+                        double terrainToHome = actualTerrainAlt - homealt;
+
+                        double altAboveTerrain = extrapolatedRelativeAlt - terrainToHome;
+
+                        PointLatLngAlt newpoint = new PointLatLngAlt(lat, lng, terrainToHome + targetRelativeAlt, "");
+
+                        if (Math.Abs(altAboveTerrain - targetRelativeAlt) > (double)NUM_trackingAltError.Value)
+                        {
+                            newGrid.Add(newpoint);
+                            lastalt = newpoint.Alt;
+                            deltaalt = lastalt - loc.Alt;
+                            int remaining = points - a;
+                            stepalt = deltaalt / (remaining);
+                            lasta = a;
+                        }
+                    }
+                    newGrid.Add(loc);
+                    last = loc;
+                }
+
+                grid = newGrid;
+            }
 
             int split_segment = 0;
             int split_time = 0;
-
             int splitValue = 0;
 
 
             if (grid != null && grid.Count > 0)
             {
 
-                //Set the Check altitude if not set
-                MainV2.instance.FlightPlanner.CHK_verifyheight.Checked = true;
+                MainV2.instance.FlightPlanner.CHK_verifyheight.Checked = false;
                 MainV2.instance.FlightPlanner.CMB_altmode.SelectedIndex = (int)CMB_AltReference.SelectedIndex;  //We are using the same source, so indexes will match
                 MainV2.instance.FlightPlanner.quickadd = true;
 
@@ -1041,8 +1150,8 @@ namespace MissionPlanner.SprayGrid
                 savesettings();
 
                 MainV2.instance.FlightPlanner.quickadd = false;
-
                 MainV2.instance.FlightPlanner.writeKML();
+                MainV2.instance.FlightPlanner.CHK_verifyheight.Checked = verifyHeightState;
 
                 this.Close();
             }
@@ -1103,6 +1212,91 @@ namespace MissionPlanner.SprayGrid
         {
             domainUpDown1_ValueChanged(sender, e);
         }
+
+
+
+        List<PointF> getVehicleAreaDisplacementPoints(double heading, double barwidth)
+        {
+            double width = barwidth / 0.2; // 20 units of 0.2m = 4m
+
+            //Sanity check, legth and width should be even numbers
+            //The vehicle width is perpendicular to the heading
+            double alpha = (heading) % 360;
+
+            double alpha_radians = alpha * Math.PI / 180;
+            double half_length = width / 2;
+            double cos_alpha = Math.Cos(alpha_radians); // dx
+            double sin_alpha = Math.Sin(alpha_radians); // dy
+
+            double startX = (-half_length * cos_alpha);
+            double startY = (-half_length * sin_alpha);
+            double endX = (half_length * cos_alpha);
+            double endY = (half_length * sin_alpha);
+
+            double shiftx = -sin_alpha;
+            double shifty = cos_alpha;
+
+            List<PointF> points = new List<PointF>();
+
+            double dx = endX - startX;
+            double dy = endY - startY;
+
+            double steps = barwidth / 0.2; // 20 units of 0.2m = 4m
+
+            // Calculate the increment in x and y for each step
+            double xIncrement = dx / steps;
+            double yIncrement = dy / steps;
+
+            // Add the points on the line to the list
+            // The shift is one step 20cm to forward and backward So 60cm length 4 meters width.
+
+            for (int i = 0; i <= steps; i++)
+            {
+                double x = startX + i * xIncrement;
+                double y = startY + i * yIncrement;
+                points.Add(new PointF((float)x, (float)y));
+                points.Add(new PointF((float)(x - shiftx), (float)(y - shifty)));
+                points.Add(new PointF((float)(x + shiftx), (float)(y + shifty)));
+            }
+            return points;
+        }
+
+        srtm.altresponce getMaxAltinArea(double lat, double lng, List<PointF> displacement_points)
+        {
+            srtm.altresponce result = new srtm.altresponce();
+            result = srtm.getAltitude(lat, lng);
+            result.currenttype = srtm.tiletype.invalid;
+
+            PointLatLngAlt pnt = new PointLatLngAlt(lat, lng, 0, "");
+            //StreamWriter sw = new StreamWriter("e:\\points.csv",false);
+            //sw.WriteLine("Lat, Lng");
+            foreach (PointF point in displacement_points)
+            {
+
+                PointLatLngAlt pointToCheck = pnt.gps_offset(point.X * 0.2, -point.Y * 0.2);
+                //sw.WriteLine(pointToCheck.Lat + "," + pointToCheck.Lng);
+
+                srtm.altresponce alt = srtm.getAltitude(pointToCheck.Lat, pointToCheck.Lng);
+
+                if (alt.currenttype == srtm.tiletype.valid)
+                {
+                    if (result.currenttype == srtm.tiletype.invalid)
+                    {
+                        result = alt;
+                    }
+                    else
+                    {
+                        if (alt.alt > result.alt)
+                        {
+                            result = alt;
+                        }
+                    }
+                }
+            }
+            //sw.Close();
+            return result;
+        }
+
     }
 }
 
