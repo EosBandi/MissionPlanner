@@ -136,13 +136,11 @@ namespace MissionPlanner.GCSViews
         private GMapMarker CurrentMidLine;
 
         private MAVLink.MAV_MISSION_TYPE lastEditorMode = MAVLink.MAV_MISSION_TYPE.MISSION;
-        private List<Locationwp> editedFencePoints = new List<Locationwp>();
+        public List<Locationwp> editedFencePoints = new List<Locationwp>();
 
         public void Init()
         {
             instance = this;
-
-
 
             // config map
             MainMap.CacheLocation = Settings.GetDataDirectory() +
@@ -2223,6 +2221,7 @@ namespace MissionPlanner.GCSViews
             else if ((MAVLink.MAV_MISSION_TYPE)cmb_missiontype.SelectedValue == MAVLink.MAV_MISSION_TYPE.FENCE)
             {
                 BUT_Add.Visible = false;
+
                 if (MainV2.comPort.MAV.cs.connected)
                 {
                     processToScreen(MainV2.comPort.MAV.fencepoints.Select(a => (Locationwp)a.Value).ToList());
