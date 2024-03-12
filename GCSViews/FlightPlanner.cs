@@ -6774,7 +6774,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                     for (int a = 0; a < Commands.Rows.Count; a++)
                     {
                         // If the frame is Relative, add the height difference to the altitude
-                        if ((altmode)Commands[Frame.Index, a].Value == altmode.Relative)
+                        if ((altmode)Commands[Frame.Index, a].Value == altmode.Relative && (string)Commands[Command.Index,a].Value == MAVLink.MAV_CMD.WAYPOINT.ToString())
                         {
                             double alt;
                             if (double.TryParse(Commands[Alt.Index, a].Value.ToString(), out alt))

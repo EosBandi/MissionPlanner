@@ -1193,7 +1193,7 @@ namespace MissionPlanner.SprayGrid
             //    plugin.Host.AddWPtoList(MAVLink.MAV_CMD.CONDITION_YAW, Convert.ToInt32(TXT_headinghold.Text), 0, 0, 0, 0, 0, 0, gridobject);
             //}
 
-            double p4 = 100;
+            double p4 = 0;
             if (tag == "S") p4 = 1;
             if(tag == "E") p4 = 2;
 
