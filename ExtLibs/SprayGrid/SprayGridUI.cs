@@ -761,7 +761,7 @@ namespace MissionPlanner.SprayGrid
 
                 if (CHK_addTakeoffAndLanding.Checked)
                 {
-                    plugin.Host.AddWPtoList(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat, (double)NUM_TakeoffAlt.Value));
+                    plugin.Host.AddWPtoList(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat, (double)NUM_TakeoffAlt.Value);
                 }
 
                 //Add start point
@@ -1193,13 +1193,17 @@ namespace MissionPlanner.SprayGrid
             //    plugin.Host.AddWPtoList(MAVLink.MAV_CMD.CONDITION_YAW, Convert.ToInt32(TXT_headinghold.Text), 0, 0, 0, 0, 0, 0, gridobject);
             //}
 
+            double p4 = 100;
+            if (tag == "S") p4 = 1;
+            if(tag == "E") p4 = 2;
+
             if (NUM_DelayAtWP.Value > 0)
             {
-                plugin.Host.AddWPtoList(MAVLink.MAV_CMD.WAYPOINT, (double)NUM_DelayAtWP.Value, 0, 0, 0, Lng, Lat, Alt * CurrentState.multiplierdist, null, tag);
+                plugin.Host.AddWPtoList(MAVLink.MAV_CMD.WAYPOINT, (double)NUM_DelayAtWP.Value, 0, 0, p4, Lng, Lat, Alt * CurrentState.multiplierdist, null);
             }
             else
             {
-                 plugin.Host.AddWPtoList(MAVLink.MAV_CMD.WAYPOINT, 0, 0, 0, 0, Lng, Lat, Alt * CurrentState.multiplierdist, null,tag);
+                 plugin.Host.AddWPtoList(MAVLink.MAV_CMD.WAYPOINT, 0, 0, 0, p4, Lng, Lat, Alt * CurrentState.multiplierdist, null);
             }
         }
         private void NUM_Segments_ValueChanged(object sender, EventArgs e)

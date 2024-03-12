@@ -533,11 +533,11 @@ namespace MissionPlanner.GCSViews
         }
 
         public int AddCommand(MAVLink.MAV_CMD cmd, double p1, double p2, double p3, double p4, double x, double y,
-            double z, object tag = null, string SprayMarker = "")
+            double z, object tag = null)
         {
             selectedrow = Commands.Rows.Add();
 
-            FillCommand(this.selectedrow, cmd, p1, p2, p3, p4, x, y, z, tag, SprayMarker);
+            FillCommand(this.selectedrow, cmd, p1, p2, p3, p4, x, y, z, tag);
 
             writeKML();
 
@@ -1421,17 +1421,17 @@ namespace MissionPlanner.GCSViews
                                 {
                                     if (wpNumber < commandlist.Count+1)
                                     {
-                                        var marker = Commands.Rows[wpNumber-1].Cells[SprayMarker.Index].Value;
+                                        var marker = Commands.Rows[wpNumber-1].Cells[Param4.Index].Value;
                                         if (marker != null)
                                         {
                                             GMapMarkerWP newwp = wpOverlay.overlay.Markers[i] as GMapMarkerWP;
 
-                                            if (marker.ToString() != "E" && marker.ToString()!= "S")
+                                            if (marker.ConvertToDouble() == 0)
                                             {
                                                 newwp.changeIcon(GMarkerGoogleType.yellow);
                                             }
 
-                                            if (marker.ToString() == "E")
+                                            if (marker.ConvertToDouble() == 2)
                                             {
                                                 newwp.changeIcon(GMarkerGoogleType.red);
                                             }
@@ -3153,7 +3153,6 @@ namespace MissionPlanner.GCSViews
                 temp.p4 = (float)(double.Parse(Commands.Rows[a].Cells[Param4.Index].Value.ToString()));
 
                 temp.Tag = Commands.Rows[a].Cells[TagData.Index].Value;
-                temp.SprayMarker = (string)Commands.Rows[a].Cells[SprayMarker.Index].Value;
                 temp.frame = (byte)(int)Commands.Rows[a].Cells[Frame.Index].Value;
 
                 return temp;
@@ -3442,12 +3441,11 @@ namespace MissionPlanner.GCSViews
 
         private void FillCommand(int rowIndex, MAVLink.MAV_CMD cmd, double p1, double p2, double p3, double p4,
             double x,
-            double y, double z, object tag = null, string SprayMarkerData = "")
+            double y, double z, object tag = null)
         {
             Commands.Rows[rowIndex].Cells[Command.Index].Value = cmd.ToString();
             Commands.Rows[rowIndex].Cells[TagData.Index].Tag = tag;
             Commands.Rows[rowIndex].Cells[TagData.Index].Value = tag;
-            Commands.Rows[rowIndex].Cells[SprayMarker.Index].Value = SprayMarkerData;
 
 
             ChangeColumnHeader(cmd.ToString());
@@ -3463,6 +3461,8 @@ namespace MissionPlanner.GCSViews
             {
                 // add delay if supplied
                 Commands.Rows[rowIndex].Cells[Param1.Index].Value = p1;
+                // add spray start/stop marking if supplied
+Commands.Rows[rowIndex].Cells[Param4.Index].Value = p4;
 
                 setfromMap(y, x, z, Math.Round(p1, 1));
             }
