@@ -248,6 +248,7 @@ namespace MissionPlanner.Utilities
                 version = 1,
                 mission = new Mission()
             };
+            temp.mission.vehicleType = 2;
             temp.mission.items = new List<Item>();
 
             if (list.Count > 0)
