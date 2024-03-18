@@ -89,7 +89,7 @@ namespace MissionPlanner.Maps
             return ret;
         }
 
-        public static string CustomURL = "https://api.mapbox.com/styles/v1/{4}/{3}/tiles/256/{2}/{0}/{1}?access_token={5}";
+        public static string CustomURL = "https://api.mapbox.com/styles/v1/{4}/{3}/tiles/256/{2}/{0}/{1}?access_token={5}&fresh=true";
 
         public object UserName = Settings.Instance["MapBoxUserName", ""];
         public object StyleId = Settings.Instance["MapBoxStyleID", ""];
