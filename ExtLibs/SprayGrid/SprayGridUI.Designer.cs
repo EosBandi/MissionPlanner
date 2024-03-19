@@ -54,6 +54,8 @@
             this.label12 = new System.Windows.Forms.Label();
             this.NUM_trackingAltError = new System.Windows.Forms.NumericUpDown();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.label15 = new System.Windows.Forms.Label();
+            this.NUM_TakeoffAlt = new System.Windows.Forms.NumericUpDown();
             this.label14 = new System.Windows.Forms.Label();
             this.CHK_expandObstacles = new System.Windows.Forms.CheckBox();
             this.label11 = new System.Windows.Forms.Label();
@@ -88,11 +90,10 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.map = new MissionPlanner.Controls.myGMAP();
-            this.NUM_TakeoffAlt = new System.Windows.Forms.NumericUpDown();
-            this.label15 = new System.Windows.Forms.Label();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).BeginInit();
             this.groupBox6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_TakeoffAlt)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Shift)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_LaneSeparation)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Segments)).BeginInit();
@@ -108,7 +109,6 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NUM_TakeoffAlt)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox5
@@ -293,9 +293,9 @@
             // 
             resources.ApplyResources(this.groupBox6, "groupBox6");
             this.groupBox6.Controls.Add(this.label15);
-            this.groupBox6.Controls.Add(this.NUM_TakeoffAlt);
             this.groupBox6.Controls.Add(this.label14);
             this.groupBox6.Controls.Add(this.CHK_expandObstacles);
+            this.groupBox6.Controls.Add(this.NUM_TakeoffAlt);
             this.groupBox6.Controls.Add(this.label11);
             this.groupBox6.Controls.Add(this.label10);
             this.groupBox6.Controls.Add(this.NUM_Shift);
@@ -330,6 +330,31 @@
             this.groupBox6.Controls.Add(this.NUM_Distance);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.TabStop = false;
+            // 
+            // label15
+            // 
+            resources.ApplyResources(this.label15, "label15");
+            this.label15.Name = "label15";
+            // 
+            // NUM_TakeoffAlt
+            // 
+            resources.ApplyResources(this.NUM_TakeoffAlt, "NUM_TakeoffAlt");
+            this.NUM_TakeoffAlt.Maximum = new decimal(new int[] {
+            300,
+            0,
+            0,
+            0});
+            this.NUM_TakeoffAlt.Minimum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.NUM_TakeoffAlt.Name = "NUM_TakeoffAlt";
+            this.NUM_TakeoffAlt.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
             // 
             // label14
             // 
@@ -665,31 +690,6 @@
             this.map.ShowTileGridLines = false;
             this.map.Zoom = 3D;
             // 
-            // NUM_TakeoffAlt
-            // 
-            resources.ApplyResources(this.NUM_TakeoffAlt, "NUM_TakeoffAlt");
-            this.NUM_TakeoffAlt.Maximum = new decimal(new int[] {
-            300,
-            0,
-            0,
-            0});
-            this.NUM_TakeoffAlt.Minimum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.NUM_TakeoffAlt.Name = "NUM_TakeoffAlt";
-            this.NUM_TakeoffAlt.Value = new decimal(new int[] {
-            30,
-            0,
-            0,
-            0});
-            // 
-            // label15
-            // 
-            resources.ApplyResources(this.label15, "label15");
-            this.label15.Name = "label15";
-            // 
             // SprayGridUI
             // 
             resources.ApplyResources(this, "$this");
@@ -703,6 +703,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).EndInit();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_TakeoffAlt)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Shift)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_LaneSeparation)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Segments)).EndInit();
@@ -718,7 +719,6 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.NUM_TakeoffAlt)).EndInit();
             this.ResumeLayout(false);
 
         }

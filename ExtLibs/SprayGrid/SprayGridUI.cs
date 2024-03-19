@@ -863,8 +863,12 @@ namespace MissionPlanner.SprayGrid
         }
         private void BUT_Accept_Click2(object sender, EventArgs e)
         {
-            verifyHeightState = MainV2.instance.FlightPlanner.CHK_verifyheight.Checked;
+            //verifyHeightState = MainV2.instance.FlightPlanner.CHK_verifyheight.Checked;
+            verifyHeightState = true; //Force verify height
+            MainV2.instance.FlightPlanner.TXT_DefaultAlt.Text = NUM_altitude.Value.ToString();
 
+
+            //Do the ALT tracking calculation
             if (CHK_enableAltTracking.Checked == true)
             {
                 //Do grid altitude based on srtm
@@ -924,8 +928,6 @@ namespace MissionPlanner.SprayGrid
                     double steplat = deltalat / points;
                     double steplng = deltalng / points;
 
-
-
                     double deltaalt = last.Alt - loc.Alt;
                     double stepalt = deltaalt / points;
 
@@ -962,7 +964,56 @@ namespace MissionPlanner.SprayGrid
                     last = loc;
                 }
 
+                //Check interim alt points to see if they really needed
+                //Go throght the grid and get prev, current and next point
+
+                List<PointLatLngAlt> pointstoremove = new List<PointLatLngAlt>();
+
+                bool notDoneYet = true;
+                while (notDoneYet)
+                {
+                    notDoneYet = false;
+                    PointLatLngAlt pointToRemove = new PointLatLngAlt();
+
+                    foreach (var p in newGrid)
+                    {
+                        int index = newGrid.IndexOf(p);
+                        if (index > 0 && index < newGrid.Count - 1)
+                        {
+                            PointLatLngAlt prev = newGrid[index - 1];
+                            PointLatLngAlt next = newGrid[index + 1];
+
+                            if (p.Tag == "S" || p.Tag == "E")
+                                continue;
+
+                            // Assume that x1 and y1 is the zero point
+                            double x2 = prev.GetDistance(next);
+                            double xc = prev.GetDistance(p);
+                            double y2 = prev.Alt - next.Alt;
+                            double yc = prev.Alt - p.Alt;
+
+                            double m = y2 / x2;
+                            double c = y2 - m * x2;
+                            double y_prime = m * xc + c;
+                            double d = Math.Abs(y_prime - yc);
+
+                            if (d < (double)NUM_trackingAltError.Value)
+                            {
+                                pointToRemove = p;
+                                notDoneYet = true;
+                            }
+                            if (notDoneYet)
+                                break;
+                        }
+                    }
+                    if (notDoneYet)
+                    {
+                        newGrid.Remove(pointToRemove);
+                    }
+                }
+
                 grid = newGrid;
+
             }
 
             int split_segment = 0;

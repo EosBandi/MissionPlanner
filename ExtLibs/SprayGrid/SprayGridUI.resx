@@ -751,7 +751,7 @@
     <value>NoControl</value>
   </data>
   <data name="CHK_enableAltTracking.Location" type="System.Drawing.Point, System.Drawing">
-    <value>13, 346</value>
+    <value>12, 376</value>
   </data>
   <data name="CHK_enableAltTracking.Size" type="System.Drawing.Size, System.Drawing">
     <value>146, 17</value>
@@ -781,7 +781,7 @@
     <value>NoControl</value>
   </data>
   <data name="label12.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 371</value>
+    <value>9, 401</value>
   </data>
   <data name="label12.Size" type="System.Drawing.Size, System.Drawing">
     <value>143, 13</value>
@@ -805,7 +805,7 @@
     <value>8</value>
   </data>
   <data name="NUM_trackingAltError.Location" type="System.Drawing.Point, System.Drawing">
-    <value>171, 369</value>
+    <value>170, 399</value>
   </data>
   <data name="NUM_trackingAltError.Size" type="System.Drawing.Size, System.Drawing">
     <value>62, 20</value>
@@ -835,7 +835,7 @@
     <value>NoControl</value>
   </data>
   <data name="label15.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 472</value>
+    <value>11, 140</value>
   </data>
   <data name="label15.Size" type="System.Drawing.Size, System.Drawing">
     <value>76, 13</value>
@@ -857,27 +857,6 @@
   </data>
   <data name="&gt;&gt;label15.ZOrder" xml:space="preserve">
     <value>0</value>
-  </data>
-  <data name="NUM_TakeoffAlt.Location" type="System.Drawing.Point, System.Drawing">
-    <value>171, 465</value>
-  </data>
-  <data name="NUM_TakeoffAlt.Size" type="System.Drawing.Size, System.Drawing">
-    <value>62, 20</value>
-  </data>
-  <data name="NUM_TakeoffAlt.TabIndex" type="System.Int32, mscorlib">
-    <value>84</value>
-  </data>
-  <data name="&gt;&gt;NUM_TakeoffAlt.Name" xml:space="preserve">
-    <value>NUM_TakeoffAlt</value>
-  </data>
-  <data name="&gt;&gt;NUM_TakeoffAlt.Type" xml:space="preserve">
-    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
-  <data name="&gt;&gt;NUM_TakeoffAlt.Parent" xml:space="preserve">
-    <value>groupBox6</value>
-  </data>
-  <data name="&gt;&gt;NUM_TakeoffAlt.ZOrder" xml:space="preserve">
-    <value>1</value>
   </data>
   <data name="label14.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
@@ -904,7 +883,7 @@
     <value>groupBox6</value>
   </data>
   <data name="&gt;&gt;label14.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>1</value>
   </data>
   <data name="CHK_expandObstacles.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -913,7 +892,7 @@
     <value>NoControl</value>
   </data>
   <data name="CHK_expandObstacles.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 424</value>
+    <value>9, 454</value>
   </data>
   <data name="CHK_expandObstacles.Size" type="System.Drawing.Size, System.Drawing">
     <value>195, 17</value>
@@ -934,6 +913,27 @@
     <value>groupBox6</value>
   </data>
   <data name="&gt;&gt;CHK_expandObstacles.ZOrder" xml:space="preserve">
+    <value>2</value>
+  </data>
+  <data name="NUM_TakeoffAlt.Location" type="System.Drawing.Point, System.Drawing">
+    <value>170, 138</value>
+  </data>
+  <data name="NUM_TakeoffAlt.Size" type="System.Drawing.Size, System.Drawing">
+    <value>62, 20</value>
+  </data>
+  <data name="NUM_TakeoffAlt.TabIndex" type="System.Int32, mscorlib">
+    <value>84</value>
+  </data>
+  <data name="&gt;&gt;NUM_TakeoffAlt.Name" xml:space="preserve">
+    <value>NUM_TakeoffAlt</value>
+  </data>
+  <data name="&gt;&gt;NUM_TakeoffAlt.Type" xml:space="preserve">
+    <value>System.Windows.Forms.NumericUpDown, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;NUM_TakeoffAlt.Parent" xml:space="preserve">
+    <value>groupBox6</value>
+  </data>
+  <data name="&gt;&gt;NUM_TakeoffAlt.ZOrder" xml:space="preserve">
     <value>3</value>
   </data>
   <data name="label11.AutoSize" type="System.Boolean, mscorlib">
@@ -943,7 +943,7 @@
     <value>NoControl</value>
   </data>
   <data name="label11.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 400</value>
+    <value>9, 430</value>
   </data>
   <data name="label11.Size" type="System.Drawing.Size, System.Drawing">
     <value>48, 13</value>
@@ -973,7 +973,7 @@
     <value>NoControl</value>
   </data>
   <data name="label10.Location" type="System.Drawing.Point, System.Drawing">
-    <value>3, 493</value>
+    <value>2, 503</value>
   </data>
   <data name="label10.Size" type="System.Drawing.Size, System.Drawing">
     <value>85, 13</value>
@@ -997,7 +997,7 @@
     <value>5</value>
   </data>
   <data name="NUM_Shift.Location" type="System.Drawing.Point, System.Drawing">
-    <value>171, 398</value>
+    <value>170, 428</value>
   </data>
   <data name="NUM_Shift.Size" type="System.Drawing.Size, System.Drawing">
     <value>62, 20</value>
@@ -1018,7 +1018,7 @@
     <value>6</value>
   </data>
   <data name="NUM_LaneSeparation.Location" type="System.Drawing.Point, System.Drawing">
-    <value>171, 491</value>
+    <value>170, 501</value>
   </data>
   <data name="NUM_LaneSeparation.Size" type="System.Drawing.Size, System.Drawing">
     <value>62, 20</value>
@@ -1045,7 +1045,7 @@
     <value>NoControl</value>
   </data>
   <data name="CHK_Headlock.Location" type="System.Drawing.Point, System.Drawing">
-    <value>140, 447</value>
+    <value>139, 477</value>
   </data>
   <data name="CHK_Headlock.Size" type="System.Drawing.Size, System.Drawing">
     <value>93, 17</value>
@@ -1072,7 +1072,7 @@
     <value>10</value>
   </data>
   <data name="NUM_Segments.Location" type="System.Drawing.Point, System.Drawing">
-    <value>171, 315</value>
+    <value>170, 345</value>
   </data>
   <data name="NUM_Segments.Size" type="System.Drawing.Size, System.Drawing">
     <value>62, 20</value>
@@ -1099,7 +1099,7 @@
     <value>NoControl</value>
   </data>
   <data name="labelSegments.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 319</value>
+    <value>9, 349</value>
   </data>
   <data name="labelSegments.Size" type="System.Drawing.Size, System.Drawing">
     <value>76, 13</value>
@@ -1123,7 +1123,7 @@
     <value>13</value>
   </data>
   <data name="CMB_split.Location" type="System.Drawing.Point, System.Drawing">
-    <value>130, 284</value>
+    <value>129, 314</value>
   </data>
   <data name="CMB_split.Size" type="System.Drawing.Size, System.Drawing">
     <value>103, 21</value>
@@ -1150,7 +1150,7 @@
     <value>NoControl</value>
   </data>
   <data name="label9.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 288</value>
+    <value>9, 318</value>
   </data>
   <data name="label9.Size" type="System.Drawing.Size, System.Drawing">
     <value>42, 13</value>
@@ -1180,7 +1180,7 @@
     <value>NoControl</value>
   </data>
   <data name="CHK_addTakeoffAndLanding.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 447</value>
+    <value>9, 477</value>
   </data>
   <data name="CHK_addTakeoffAndLanding.Size" type="System.Drawing.Size, System.Drawing">
     <value>118, 17</value>
@@ -1204,7 +1204,7 @@
     <value>16</value>
   </data>
   <data name="NUM_DelayAtWP.Location" type="System.Drawing.Point, System.Drawing">
-    <value>171, 254</value>
+    <value>170, 284</value>
   </data>
   <data name="NUM_DelayAtWP.Size" type="System.Drawing.Size, System.Drawing">
     <value>62, 20</value>
@@ -1231,7 +1231,7 @@
     <value>NoControl</value>
   </data>
   <data name="label8.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 258</value>
+    <value>9, 288</value>
   </data>
   <data name="label8.Size" type="System.Drawing.Size, System.Drawing">
     <value>81, 13</value>
@@ -1255,7 +1255,7 @@
     <value>18</value>
   </data>
   <data name="NUM_SprayBarWidth.Location" type="System.Drawing.Point, System.Drawing">
-    <value>171, 225</value>
+    <value>170, 255</value>
   </data>
   <data name="NUM_SprayBarWidth.Size" type="System.Drawing.Size, System.Drawing">
     <value>62, 20</value>
@@ -1282,7 +1282,7 @@
     <value>NoControl</value>
   </data>
   <data name="label7.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 229</value>
+    <value>9, 259</value>
   </data>
   <data name="label7.Size" type="System.Drawing.Size, System.Drawing">
     <value>95, 13</value>
@@ -1306,7 +1306,7 @@
     <value>20</value>
   </data>
   <data name="CMB_AltReference.Location" type="System.Drawing.Point, System.Drawing">
-    <value>130, 165</value>
+    <value>129, 195</value>
   </data>
   <data name="CMB_AltReference.Size" type="System.Drawing.Size, System.Drawing">
     <value>103, 21</value>
@@ -1333,7 +1333,7 @@
     <value>NoControl</value>
   </data>
   <data name="label5.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 169</value>
+    <value>9, 199</value>
   </data>
   <data name="label5.Size" type="System.Drawing.Size, System.Drawing">
     <value>84, 13</value>
@@ -1465,7 +1465,7 @@
     <value>NoControl</value>
   </data>
   <data name="label4.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 140</value>
+    <value>9, 170</value>
   </data>
   <data name="label4.Size" type="System.Drawing.Size, System.Drawing">
     <value>61, 13</value>
@@ -1489,7 +1489,7 @@
     <value>27</value>
   </data>
   <data name="NUM_angle.Location" type="System.Drawing.Point, System.Drawing">
-    <value>171, 136</value>
+    <value>170, 166</value>
   </data>
   <data name="NUM_angle.Size" type="System.Drawing.Size, System.Drawing">
     <value>62, 20</value>
@@ -1537,7 +1537,7 @@
     <value>NoControl</value>
   </data>
   <data name="label6.Location" type="System.Drawing.Point, System.Drawing">
-    <value>10, 199</value>
+    <value>9, 229</value>
   </data>
   <data name="label6.Size" type="System.Drawing.Size, System.Drawing">
     <value>52, 13</value>
@@ -1618,7 +1618,7 @@
     <value>32</value>
   </data>
   <data name="CMB_startfrom.Location" type="System.Drawing.Point, System.Drawing">
-    <value>130, 195</value>
+    <value>129, 225</value>
   </data>
   <data name="CMB_startfrom.Size" type="System.Drawing.Size, System.Drawing">
     <value>103, 21</value>
