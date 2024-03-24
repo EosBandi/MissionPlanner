@@ -3402,329 +3402,329 @@ namespace MissionPlanner
                 }
             });
 
-            log.Info("start AutoConnect");
-            AutoConnect.NewMavlinkConnection += (sender, serial) =>
-            {
-                try
-                {
-                    log.Info("AutoConnect.NewMavlinkConnection " + serial.PortName);
-                    MainV2.instance.BeginInvoke((Action) delegate
-                    {
-                        if (MainV2.comPort.BaseStream.IsOpen)
-                        {
-                            var mav = new MAVLinkInterface();
-                            mav.BaseStream = serial;
-                            MainV2.instance.doConnect(mav, "preset", serial.PortName);
+            //log.Info("start AutoConnect");
+            //AutoConnect.NewMavlinkConnection += (sender, serial) =>
+            //{
+            //    try
+            //    {
+            //        log.Info("AutoConnect.NewMavlinkConnection " + serial.PortName);
+            //        MainV2.instance.BeginInvoke((Action) delegate
+            //        {
+            //            if (MainV2.comPort.BaseStream.IsOpen)
+            //            {
+            //                var mav = new MAVLinkInterface();
+            //                mav.BaseStream = serial;
+            //                MainV2.instance.doConnect(mav, "preset", serial.PortName);
 
-                            MainV2.Comports.Add(mav);
+            //                MainV2.Comports.Add(mav);
 
-                            try
-                            {
-                                Comports = Comports.Distinct().ToList();
-                            }
-                            catch { }
-                        }
-                        else
-                        {
-                            MainV2.comPort.BaseStream = serial;
-                            MainV2.instance.doConnect(MainV2.comPort, "preset", serial.PortName);
-                        }
-                    });
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex);
-                }
-            };
-            AutoConnect.NewVideoStream += (sender, gststring) =>
-            {
-                MainV2.instance.BeginInvoke((Action)delegate
-                {
-                    try
-                    {
-                        log.Info("AutoConnect.NewVideoStream " + gststring);
-                        GStreamer.gstlaunch = GStreamer.LookForGstreamer();
+            //                try
+            //                {
+            //                    Comports = Comports.Distinct().ToList();
+            //                }
+            //                catch { }
+            //            }
+            //            else
+            //            {
+            //                MainV2.comPort.BaseStream = serial;
+            //                MainV2.instance.doConnect(MainV2.comPort, "preset", serial.PortName);
+            //            }
+            //        });
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        log.Error(ex);
+            //    }
+            //};
+            //AutoConnect.NewVideoStream += (sender, gststring) =>
+            //{
+            //    MainV2.instance.BeginInvoke((Action)delegate
+            //    {
+            //        try
+            //        {
+            //            log.Info("AutoConnect.NewVideoStream " + gststring);
+            //            GStreamer.gstlaunch = GStreamer.LookForGstreamer();
 
-                        if (!GStreamer.gstlaunchexists)
-                        {
-                            if (CustomMessageBox.Show(
-                                    "A video stream has been detected, but gstreamer has not been configured/installed.\nDo you want to install/config it now?",
-                                    "GStreamer", System.Windows.Forms.MessageBoxButtons.YesNo) ==
-                                (int)System.Windows.Forms.DialogResult.Yes)
-                            {
-                                GStreamerUI.DownloadGStreamer();
-                                if (!GStreamer.gstlaunchexists)
-                                {
-                                    return;
-                                }
-                            }
-                            else
-                            {
-                                return;
-                            }
-                        }
+            //            if (!GStreamer.gstlaunchexists)
+            //            {
+            //                if (CustomMessageBox.Show(
+            //                        "A video stream has been detected, but gstreamer has not been configured/installed.\nDo you want to install/config it now?",
+            //                        "GStreamer", System.Windows.Forms.MessageBoxButtons.YesNo) ==
+            //                    (int)System.Windows.Forms.DialogResult.Yes)
+            //                {
+            //                    GStreamerUI.DownloadGStreamer();
+            //                    if (!GStreamer.gstlaunchexists)
+            //                    {
+            //                        return;
+            //                    }
+            //                }
+            //                else
+            //                {
+            //                    return;
+            //                }
+            //            }
 
-                        GStreamer.StartA(gststring);
-                    }
-                    catch (Exception ex)
-                    {
-                        log.Error(ex);
-                    }
-                });
-            };
-            AutoConnect.Start();
+            //            GStreamer.StartA(gststring);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            log.Error(ex);
+            //        }
+            //    });
+            //};
+            //AutoConnect.Start();
 
             // debound based on url
             List<string> videourlseen = new List<string>();
             // prevent spaming the ui
             SemaphoreSlim videodetect = new SemaphoreSlim(1);
 
-            CameraProtocol.OnRTSPDetected += (sender, s) =>
-            {
-                if (isHerelink)
-                {
-                    return;
-                }
+            //CameraProtocol.OnRTSPDetected += (sender, s) =>
+            //{
+            //    if (isHerelink)
+            //    {
+            //        return;
+            //    }
 
-                MainV2.instance.BeginInvoke((Action)delegate
-                {
-                    try
-                    {
-                        if (!videourlseen.Contains(s) && videodetect.Wait(0))
-                        {
-                            videourlseen.Add(s);
-                            if (CustomMessageBox.Show(
-                                    "A video stream has been detected, Do you want to connect to it? " + s,
-                                    "Mavlink Camera", System.Windows.Forms.MessageBoxButtons.YesNo) ==
-                                (int)System.Windows.Forms.DialogResult.Yes)
-                            {
-                                AutoConnect.RaiseNewVideoStream(sender,
-                                    String.Format(
-                                        "rtspsrc location={0} latency=41 udp-reconnect=1 timeout=0 do-retransmission=false ! application/x-rtp ! decodebin3 ! queue leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false",
-                                        s));
-                            }
+            //    MainV2.instance.BeginInvoke((Action)delegate
+            //    {
+            //        try
+            //        {
+            //            if (!videourlseen.Contains(s) && videodetect.Wait(0))
+            //            {
+            //                videourlseen.Add(s);
+            //                if (CustomMessageBox.Show(
+            //                        "A video stream has been detected, Do you want to connect to it? " + s,
+            //                        "Mavlink Camera", System.Windows.Forms.MessageBoxButtons.YesNo) ==
+            //                    (int)System.Windows.Forms.DialogResult.Yes)
+            //                {
+            //                    AutoConnect.RaiseNewVideoStream(sender,
+            //                        String.Format(
+            //                            "rtspsrc location={0} latency=41 udp-reconnect=1 timeout=0 do-retransmission=false ! application/x-rtp ! decodebin3 ! queue leaky=2 ! videoconvert ! video/x-raw,format=BGRA ! appsink name=outsink sync=false",
+            //                            s));
+            //                }
 
-                            videodetect.Release();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        log.Error(ex);
-                    }
-                });
-            };
+            //                videodetect.Release();
+            //            }
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            log.Error(ex);
+            //        }
+            //    });
+            //};
 
 
-            BinaryLog.onFlightMode += (firmware, modeno) =>
-            {
-                try
-                {
-                    if (firmware == "")
-                        return null;
+            //BinaryLog.onFlightMode += (firmware, modeno) =>
+            //{
+            //    try
+            //    {
+            //        if (firmware == "")
+            //            return null;
 
-                    var modes = ArduPilot.Common.getModesList((Firmwares) Enum.Parse(typeof(Firmwares), firmware));
-                    string currentmode = null;
+            //        var modes = ArduPilot.Common.getModesList((Firmwares) Enum.Parse(typeof(Firmwares), firmware));
+            //        string currentmode = null;
 
-                    foreach (var mode in modes)
-                    {
-                        if (mode.Key == modeno)
-                        {
-                            currentmode = mode.Value;
-                            break;
-                        }
-                    }
+            //        foreach (var mode in modes)
+            //        {
+            //            if (mode.Key == modeno)
+            //            {
+            //                currentmode = mode.Value;
+            //                break;
+            //            }
+            //        }
 
-                    return currentmode;
-                }
-                catch
-                {
-                    return null;
-                }
-            };
+            //        return currentmode;
+            //    }
+            //    catch
+            //    {
+            //        return null;
+            //    }
+            //};
 
-            GStreamer.onNewImage += (sender, image) =>
-            {
-                try
-                {
-                    if (image == null)
-                    {
-                        GCSViews.FlightData.myhud.bgimage = null;
-                        return;
-                    }
+            //GStreamer.onNewImage += (sender, image) =>
+            //{
+            //    try
+            //    {
+            //        if (image == null)
+            //        {
+            //            GCSViews.FlightData.myhud.bgimage = null;
+            //            return;
+            //        }
 
-                    var old = GCSViews.FlightData.myhud.bgimage;
-                    GCSViews.FlightData.myhud.bgimage = new Bitmap(image.Width, image.Height, 4 * image.Width,
-                        PixelFormat.Format32bppPArgb,
-                        image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888)
-                            .Scan0);
-                    if (old != null)
-                        old.Dispose();
-                }
-                catch
-                {
-                }
-            };
+            //        var old = GCSViews.FlightData.myhud.bgimage;
+            //        GCSViews.FlightData.myhud.bgimage = new Bitmap(image.Width, image.Height, 4 * image.Width,
+            //            PixelFormat.Format32bppPArgb,
+            //            image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888)
+            //                .Scan0);
+            //        if (old != null)
+            //            old.Dispose();
+            //    }
+            //    catch
+            //    {
+            //    }
+            //};
 
-            vlcrender.onNewImage += (sender, image) =>
-            {
-                try
-                {
-                    if (image == null)
-                    {
-                        GCSViews.FlightData.myhud.bgimage = null;
-                        return;
-                    }
+            //vlcrender.onNewImage += (sender, image) =>
+            //{
+            //    try
+            //    {
+            //        if (image == null)
+            //        {
+            //            GCSViews.FlightData.myhud.bgimage = null;
+            //            return;
+            //        }
 
-                    var old = GCSViews.FlightData.myhud.bgimage;
-                    GCSViews.FlightData.myhud.bgimage = new Bitmap(image.Width,
-                        image.Height,
-                        4 * image.Width,
-                        PixelFormat.Format32bppPArgb,
-                        image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888).Scan0);
-                    if (old != null)
-                        old.Dispose();
-                }
-                catch
-                {
-                }
-            };
+            //        var old = GCSViews.FlightData.myhud.bgimage;
+            //        GCSViews.FlightData.myhud.bgimage = new Bitmap(image.Width,
+            //            image.Height,
+            //            4 * image.Width,
+            //            PixelFormat.Format32bppPArgb,
+            //            image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888).Scan0);
+            //        if (old != null)
+            //            old.Dispose();
+            //    }
+            //    catch
+            //    {
+            //    }
+            //};
 
-            CaptureMJPEG.onNewImage += (sender, image) =>
-            {
-                try
-                {
-                    if (image == null)
-                    {
-                        GCSViews.FlightData.myhud.bgimage = null;
-                        return;
-                    }
+            //CaptureMJPEG.onNewImage += (sender, image) =>
+            //{
+            //    try
+            //    {
+            //        if (image == null)
+            //        {
+            //            GCSViews.FlightData.myhud.bgimage = null;
+            //            return;
+            //        }
 
-                    var old = GCSViews.FlightData.myhud.bgimage;
-                    GCSViews.FlightData.myhud.bgimage = new Bitmap(image.Width, image.Height, 4 * image.Width,
-                        PixelFormat.Format32bppPArgb,
-                        image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888).Scan0);
-                    if (old != null)
-                        old.Dispose();
-                }
-                catch
-                {
-                }
-            };
+            //        var old = GCSViews.FlightData.myhud.bgimage;
+            //        GCSViews.FlightData.myhud.bgimage = new Bitmap(image.Width, image.Height, 4 * image.Width,
+            //            PixelFormat.Format32bppPArgb,
+            //            image.LockBits(Rectangle.Empty, null, SKColorType.Bgra8888).Scan0);
+            //        if (old != null)
+            //            old.Dispose();
+            //    }
+            //    catch
+            //    {
+            //    }
+            //};
 
-            try
-            {
-                object locker = new object();
-                List<string> seen = new List<string>();
+            //try
+            //{
+            //    object locker = new object();
+            //    List<string> seen = new List<string>();
 
-                ZeroConf.StartUDPMavlink += (zeroconfHost) =>
-                {
-                    try
-                    {
-                        var ip = zeroconfHost.IPAddress;
-                        var service = zeroconfHost.Services.Where(a => a.Key == "_mavlink._udp.local.");
-                        var port = service.First().Value.Port;
+            //    ZeroConf.StartUDPMavlink += (zeroconfHost) =>
+            //    {
+            //        try
+            //        {
+            //            var ip = zeroconfHost.IPAddress;
+            //            var service = zeroconfHost.Services.Where(a => a.Key == "_mavlink._udp.local.");
+            //            var port = service.First().Value.Port;
 
-                        lock (locker)
-                        {
-                            if (Comports.Any((a) =>
-                                {
-                                    return a.BaseStream.PortName == "UDPCl" + port.ToString() && a.BaseStream.IsOpen;
-                                }
-                            ))
-                                return;
+            //            lock (locker)
+            //            {
+            //                if (Comports.Any((a) =>
+            //                    {
+            //                        return a.BaseStream.PortName == "UDPCl" + port.ToString() && a.BaseStream.IsOpen;
+            //                    }
+            //                ))
+            //                    return;
 
-                            if (seen.Contains(zeroconfHost.Id))
-                                return;
+            //                if (seen.Contains(zeroconfHost.Id))
+            //                    return;
 
-                            if (CustomMessageBox.Show(
-                                    "A Mavlink stream has been detected, " + zeroconfHost.DisplayName + "(" +
-                                    zeroconfHost.Id + "). Would you like to connect to it?",
-                                    "Mavlink", System.Windows.Forms.MessageBoxButtons.YesNo) ==
-                                (int) System.Windows.Forms.DialogResult.Yes)
-                            {
-                                var mav = new MAVLinkInterface();
+            //                if (CustomMessageBox.Show(
+            //                        "A Mavlink stream has been detected, " + zeroconfHost.DisplayName + "(" +
+            //                        zeroconfHost.Id + "). Would you like to connect to it?",
+            //                        "Mavlink", System.Windows.Forms.MessageBoxButtons.YesNo) ==
+            //                    (int) System.Windows.Forms.DialogResult.Yes)
+            //                {
+            //                    var mav = new MAVLinkInterface();
 
-                                if(!comPort.BaseStream.IsOpen)
-                                    mav = comPort;
+            //                    if(!comPort.BaseStream.IsOpen)
+            //                        mav = comPort;
 
-                                var udc = new UdpSerialConnect();
-                                udc.Port = port.ToString();
-                                udc.client = new UdpClient(ip, port);
-                                udc.IsOpen = true;
-                                udc.hostEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
-                                mav.BaseStream = udc;
+            //                    var udc = new UdpSerialConnect();
+            //                    udc.Port = port.ToString();
+            //                    udc.client = new UdpClient(ip, port);
+            //                    udc.IsOpen = true;
+            //                    udc.hostEndPoint = new IPEndPoint(IPAddress.Parse(ip), port);
+            //                    mav.BaseStream = udc;
 
-                                MainV2.instance.Invoke((Action) delegate
-                                {
-                                    MainV2.instance.doConnect(mav, "preset", port.ToString());
+            //                    MainV2.instance.Invoke((Action) delegate
+            //                    {
+            //                        MainV2.instance.doConnect(mav, "preset", port.ToString());
 
-                                    MainV2.Comports.Add(mav);
+            //                        MainV2.Comports.Add(mav);
 
-                                    try
-                                    {
-                                        Comports = Comports.Distinct().ToList();
-                                    }
-                                    catch { }
+            //                        try
+            //                        {
+            //                            Comports = Comports.Distinct().ToList();
+            //                        }
+            //                        catch { }
 
-                                    MainV2._connectionControl.UpdateSysIDS();
-                                });
+            //                        MainV2._connectionControl.UpdateSysIDS();
+            //                    });
 
-                            }
+            //                }
 
-                            // add to seen list, so we skip on next refresh
-                            seen.Add(zeroconfHost.Id);
-                        }
-                    }
-                    catch (Exception)
-                    {
+            //                // add to seen list, so we skip on next refresh
+            //                seen.Add(zeroconfHost.Id);
+            //            }
+            //        }
+            //        catch (Exception)
+            //        {
 
-                    }
-                };
+            //        }
+            //    };
 
-                ZeroConf.ProbeForMavlink();
+            //    ZeroConf.ProbeForMavlink();
 
-                ZeroConf.ProbeForRTSP();
-            }
-            catch
-            {
-            }
+            //    ZeroConf.ProbeForRTSP();
+            //}
+            //catch
+            //{
+            //}
 
-            CommsSerialScan.doConnect += port =>
-            {
-                if (MainV2.instance.InvokeRequired)
-                {
-                    log.Info("CommsSerialScan.doConnect invoke");
-                    MainV2.instance.BeginInvoke(
-                        (Action) delegate()
-                        {
-                            MAVLinkInterface mav = new MAVLinkInterface();
-                            mav.BaseStream = port;
-                            MainV2.instance.doConnect(mav, "preset", "0");
-                            MainV2.Comports.Add(mav);
+            //CommsSerialScan.doConnect += port =>
+            //{
+            //    if (MainV2.instance.InvokeRequired)
+            //    {
+            //        log.Info("CommsSerialScan.doConnect invoke");
+            //        MainV2.instance.BeginInvoke(
+            //            (Action) delegate()
+            //            {
+            //                MAVLinkInterface mav = new MAVLinkInterface();
+            //                mav.BaseStream = port;
+            //                MainV2.instance.doConnect(mav, "preset", "0");
+            //                MainV2.Comports.Add(mav);
 
-                            try
-                            {
-                                Comports = Comports.Distinct().ToList();
-                            }
-                            catch { }
-                        });
-                }
-                else
-                {
+            //                try
+            //                {
+            //                    Comports = Comports.Distinct().ToList();
+            //                }
+            //                catch { }
+            //            });
+            //    }
+            //    else
+            //    {
 
-                    log.Info("CommsSerialScan.doConnect NO invoke");
-                    MAVLinkInterface mav = new MAVLinkInterface();
-                    mav.BaseStream = port;
-                    MainV2.instance.doConnect(mav, "preset", "0");
-                    MainV2.Comports.Add(mav);
+            //        log.Info("CommsSerialScan.doConnect NO invoke");
+            //        MAVLinkInterface mav = new MAVLinkInterface();
+            //        mav.BaseStream = port;
+            //        MainV2.instance.doConnect(mav, "preset", "0");
+            //        MainV2.Comports.Add(mav);
 
-                    try
-                    {
-                        Comports = Comports.Distinct().ToList();
-                    }
-                    catch { }
-                }
-            };
+            //        try
+            //        {
+            //            Comports = Comports.Distinct().ToList();
+            //        }
+            //        catch { }
+            //    }
+            //};
 
             this.ResumeLayout();
 
@@ -3752,24 +3752,24 @@ namespace MissionPlanner
                 System.Configuration.ConfigurationManager.AppSettings["BetaUpdateLocationVersion"] = "";
             }
 
-            try
-            {
-                // single update check per day - in a seperate thread
-                if (Settings.Instance["update_check"] != DateTime.Now.ToShortDateString())
-                {
-                    System.Threading.ThreadPool.QueueUserWorkItem(checkupdate);
-                    Settings.Instance["update_check"] = DateTime.Now.ToShortDateString();
-                }
-                else if (Settings.Instance.GetBoolean("beta_updates") == true)
-                {
-                    MissionPlanner.Utilities.Update.dobeta = true;
-                    System.Threading.ThreadPool.QueueUserWorkItem(checkupdate);
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error("Update check failed", ex);
-            }
+            //try
+            //{
+            //    // single update check per day - in a seperate thread
+            //    if (Settings.Instance["update_check"] != DateTime.Now.ToShortDateString())
+            //    {
+            //        System.Threading.ThreadPool.QueueUserWorkItem(checkupdate);
+            //        Settings.Instance["update_check"] = DateTime.Now.ToShortDateString();
+            //    }
+            //    else if (Settings.Instance.GetBoolean("beta_updates") == true)
+            //    {
+            //        MissionPlanner.Utilities.Update.dobeta = true;
+            //        System.Threading.ThreadPool.QueueUserWorkItem(checkupdate);
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    log.Error("Update check failed", ex);
+            //}
 
             // play a tlog that was passed to the program/ load a bin log passed
             if (Program.args.Length > 0)
