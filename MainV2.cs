@@ -3055,8 +3055,8 @@ namespace MissionPlanner
                         }
                     }
 
-                    // send a hb every seconds from gcs to ap
-                    if (heatbeatSend.Second != DateTime.Now.Second)
+                    //Check ellasped time in seconds sincelast heartbeat
+                    if ( (DateTime.Now - heatbeatSend).TotalSeconds > 3)
                     {
                         MAVLink.mavlink_heartbeat_t htb = new MAVLink.mavlink_heartbeat_t()
                         {
@@ -3071,22 +3071,22 @@ namespace MissionPlanner
                             if (!port.BaseStream.IsOpen)
                                 continue;
 
-                            // poll for params at heartbeat interval - primary mav on this port only
-                            if (!port.giveComport)
-                            {
-                                try
-                                {
-                                    // poll only when not armed
-                                    if (!port.MAV.cs.armed && DateTime.Now > connecttime.AddSeconds(60))
-                                    {
-                                        port.getParamPoll();
-                                        port.getParamPoll();
-                                    }
-                                }
-                                catch
-                                {
-                                }
-                            }
+                            //// poll for params at heartbeat interval - primary mav on this port only
+                            //if (!port.giveComport)
+                            //{
+                            //    try
+                            //    {
+                            //        // poll only when not armed
+                            //        if (!port.MAV.cs.armed && DateTime.Now > connecttime.AddSeconds(60))
+                            //        {
+                            //            port.getParamPoll();
+                            //            port.getParamPoll();
+                            //        }
+                            //    }
+                            //    catch
+                            //    {
+                            //    }
+                            //}
 
                             // there are 3 hb types we can send, mavlink1, mavlink2 signed and unsigned
                             bool sentsigned = false;

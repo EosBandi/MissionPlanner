@@ -676,46 +676,7 @@ namespace MissionPlanner
 
                 while (true)
                 {
-                    //if (PRsender.doWorkArgs.CancelRequested)
-                    //{
-                    //    PRsender.doWorkArgs.CancelAcknowledged = true;
-                    //    countDown.Stop();
-                    //    if (BaseStream.IsOpen)
-                    //        BaseStream.Close();
-                    //    giveComport = false;
-                    //    return;
-                    //}
-
                     log.Info(DateTime.Now.Millisecond + " Start connect loop ");
-
-//                    if (DateTime.Now > deadline)
-//                    {
-//                        //if (Progress != null)
-//                        //    Progress(-1, "No Heartbeat Packets");
-//                        countDown.Stop();
-//                        this.Close();
-
-//                        if (hbseen)
-//                        {
-//                            PRsender.doWorkArgs.ErrorMessage = Strings.Only1Hb;
-//                            throw new Exception(Strings.Only1HbD);
-//                        }
-//                        else
-//                        {
-//                            PRsender.doWorkArgs.ErrorMessage = "No Heartbeat Packets Received";
-//                            throw new Exception(@"Can not establish a connection
-
-//Please check the following
-//1. You have firmware loaded
-//2. You have the correct serial port selected
-//3. PX4 - You have the microsd card installed
-//4. Try a diffrent usb port
-
-//No Mavlink Heartbeat Packets where read from this port - Verify Baud Rate and setup
-//Mission Planner waits for 2 valid heartbeat packets before connecting");
-//                        }
-//                    }
-
 
                     Thread.Sleep(1);
 
@@ -723,13 +684,7 @@ namespace MissionPlanner
 
                     if (buffer.Length > 0)
                     {
-                        //mavlink_heartbeat_t hb = buffer.ToStructure<mavlink_heartbeat_t>();
-
-                        //// no GCS's and no broadcast compid's (ping adsb)
-                        //if (hb.type != (byte) MAV_TYPE.GCS && buffer.compid != 0)
-                        //{
-                            hbhistory.Add(buffer);
-                        //}
+                        hbhistory.Add(buffer);
                     }
 
                     if (hbhistory.Count > 0)
@@ -752,13 +707,9 @@ namespace MissionPlanner
                             var msg = mostseen.First();
 
                             // preference compid of 1, failover to anything that we have seen 4 times
-                            if (seentimes >= 2 && msg.compid == 1 || seentimes >= 4)
+                            if (seentimes >= 2)
                             {
                                 //SetupMavConnect(msg, (mavlink_heartbeat_t) msg.data);
-
-
-
-
 
                                 sysidcurrent = msg.sysid;
                                 compidcurrent = msg.compid;
@@ -772,7 +723,6 @@ namespace MissionPlanner
                             break;
                     }
                 }
-
                 countDown.Stop();
 
                 char[] temp = ("Mission Planner " + getAppVersion() + "\0").ToCharArray();
@@ -835,7 +785,6 @@ namespace MissionPlanner
                 throw;
             }
 
-            //frmProgressReporter.Close();
             giveComport = false;
             frmProgressReporter.UpdateProgressAndStatus(100, Strings.Done);
             log.Info("Done open " + MAV.sysid + " " + MAV.compid);
