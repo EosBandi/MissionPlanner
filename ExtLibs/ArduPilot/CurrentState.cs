@@ -3945,36 +3945,36 @@ namespace MissionPlanner
                             dowindcalc();
                     }
 
-                    // re-request streams
-                    if (!(lastdata.AddSeconds(8) > DateTime.Now) && mavinterface.BaseStream != null &&
-                        mavinterface.BaseStream.IsOpen)
-                    {
-                        try
-                        {
-                            mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.EXTENDED_STATUS, MAV.cs.ratestatus,
-                                MAV.sysid, MAV.compid); // mode
-                            mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.POSITION, MAV.cs.rateposition,
-                                MAV.sysid, MAV.compid); // request gps
-                            mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.EXTRA1, MAV.cs.rateattitude,
-                                MAV.sysid, MAV.compid); // request attitude
-                            mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.EXTRA2, MAV.cs.rateattitude,
-                                MAV.sysid, MAV.compid); // request vfr
-                            mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.EXTRA3, MAV.cs.ratesensors,
-                                MAV.sysid,
-                                MAV.compid); // request extra stuff - tridge
-                            mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.RAW_SENSORS, MAV.cs.ratesensors,
-                                MAV.sysid, MAV.compid); // request raw sensor
-                            mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.RC_CHANNELS, MAV.cs.raterc,
-                                MAV.sysid,
-                                MAV.compid); // request rc info
-                        }
-                        catch
-                        {
-                            log.Error("Failed to request rates");
-                        }
+                    //// re-request streams
+                    //if (!(lastdata.AddSeconds(8) > DateTime.Now) && mavinterface.BaseStream != null &&
+                    //    mavinterface.BaseStream.IsOpen)
+                    //{
+                    //    try
+                    //    {
+                    //        mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.EXTENDED_STATUS, MAV.cs.ratestatus,
+                    //            MAV.sysid, MAV.compid); // mode
+                    //        mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.POSITION, MAV.cs.rateposition,
+                    //            MAV.sysid, MAV.compid); // request gps
+                    //        mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.EXTRA1, MAV.cs.rateattitude,
+                    //            MAV.sysid, MAV.compid); // request attitude
+                    //        mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.EXTRA2, MAV.cs.rateattitude,
+                    //            MAV.sysid, MAV.compid); // request vfr
+                    //        mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.EXTRA3, MAV.cs.ratesensors,
+                    //            MAV.sysid,
+                    //            MAV.compid); // request extra stuff - tridge
+                    //        mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.RAW_SENSORS, MAV.cs.ratesensors,
+                    //            MAV.sysid, MAV.compid); // request raw sensor
+                    //        mavinterface.requestDatastream(MAVLink.MAV_DATA_STREAM.RC_CHANNELS, MAV.cs.raterc,
+                    //            MAV.sysid,
+                    //            MAV.compid); // request rc info
+                    //    }
+                    //    catch
+                    //    {
+                    //        log.Error("Failed to request rates");
+                    //    }
 
-                        lastdata = DateTime.Now.AddSeconds(30); // prevent flooding
-                    }
+                    //    lastdata = DateTime.Now.AddSeconds(30); // prevent flooding
+                    //}
                 }
 
                 try

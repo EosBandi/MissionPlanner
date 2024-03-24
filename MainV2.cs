@@ -1698,199 +1698,199 @@ namespace MissionPlanner
                     return;
                 }
 
-                //158	MAV_COMP_ID_PERIPHERAL	Generic autopilot peripheral component ID. Meant for devices that do not implement the parameter microservice.
-                if (getparams && comPort.MAV.compid != (byte)MAVLink.MAV_COMPONENT.MAV_COMP_ID_PERIPHERAL)
-                {
-                    if (UseCachedParams && File.Exists(comPort.MAV.ParamCachePath) &&
-                        new FileInfo(comPort.MAV.ParamCachePath).LastWriteTime > DateTime.Now.AddHours(-1))
-                    {
-                        File.ReadAllText(comPort.MAV.ParamCachePath).FromJSON<MAVLink.MAVLinkParamList>()
-                            .ForEach(a => comPort.MAV.param.Add(a));
-                        comPort.MAV.param.TotalReported = comPort.MAV.param.TotalReceived;
-                    }
-                    else
-                    {
-                        if (Settings.Instance.GetBoolean("Params_BG", false))
-                        {
-                            Task.Run(() =>
-                            {
-                                try
-                                {
-                                    comPort.getParamListMavftp(comPort.MAV.sysid, comPort.MAV.compid);
-                                }
-                                catch
-                                {
+                ////158	MAV_COMP_ID_PERIPHERAL	Generic autopilot peripheral component ID. Meant for devices that do not implement the parameter microservice.
+                //if (getparams && comPort.MAV.compid != (byte)MAVLink.MAV_COMPONENT.MAV_COMP_ID_PERIPHERAL)
+                //{
+                //    if (UseCachedParams && File.Exists(comPort.MAV.ParamCachePath) &&
+                //        new FileInfo(comPort.MAV.ParamCachePath).LastWriteTime > DateTime.Now.AddHours(-1))
+                //    {
+                //        File.ReadAllText(comPort.MAV.ParamCachePath).FromJSON<MAVLink.MAVLinkParamList>()
+                //            .ForEach(a => comPort.MAV.param.Add(a));
+                //        comPort.MAV.param.TotalReported = comPort.MAV.param.TotalReceived;
+                //    }
+                //    else
+                //    {
+                //        if (Settings.Instance.GetBoolean("Params_BG", false))
+                //        {
+                //            Task.Run(() =>
+                //            {
+                //                try
+                //                {
+                //                    comPort.getParamListMavftp(comPort.MAV.sysid, comPort.MAV.compid);
+                //                }
+                //                catch
+                //                {
 
-                                }
-                            });
-                        }
-                        else
-                        {
-                            comPort.getParamList();
-                        }
-                    }
-                }
+                //                }
+                //            });
+                //        }
+                //        else
+                //        {
+                //            comPort.getParamList();
+                //        }
+                //    }
+                //}
 
                 // check for newer firmware
-                if (showui)
-                    Task.Run(() =>
-                    {
-                        try
-                        {
-                            string[] fields1 = comPort.MAV.VersionString.Split(' ');
+                //if (showui)
+                //    Task.Run(() =>
+                //    {
+                //        try
+                //        {
+                //            string[] fields1 = comPort.MAV.VersionString.Split(' ');
 
-                            var softwares = APFirmware.GetReleaseNewest(APFirmware.RELEASE_TYPES.OFFICIAL);
+                //            var softwares = APFirmware.GetReleaseNewest(APFirmware.RELEASE_TYPES.OFFICIAL);
 
-                            foreach (var item in softwares)
-                            {
-                            // check primare firmware type. ie arudplane, arducopter
-                            if (fields1[0].ToLower().Contains(item.VehicleType.ToLower()))
-                                {
-                                    Version ver1 = VersionDetection.GetVersion(comPort.MAV.VersionString);
-                                    Version ver2 = item.MavFirmwareVersion;
+                //            foreach (var item in softwares)
+                //            {
+                //            // check primare firmware type. ie arudplane, arducopter
+                //            if (fields1[0].ToLower().Contains(item.VehicleType.ToLower()))
+                //                {
+                //                    Version ver1 = VersionDetection.GetVersion(comPort.MAV.VersionString);
+                //                    Version ver2 = item.MavFirmwareVersion;
 
-                                    if (ver2 > ver1)
-                                    {
-                                        Common.MessageShowAgain(Strings.NewFirmware + "-" + item.VehicleType + " " + ver2,
-                                            Strings.NewFirmwareA + item.VehicleType + " " + ver2 + Strings.Pleaseup +
-                                            "[link;https://discuss.ardupilot.org/tags/stable-release;Release Notes]");
-                                        break;
-                                    }
+                //                    if (ver2 > ver1)
+                //                    {
+                //                        Common.MessageShowAgain(Strings.NewFirmware + "-" + item.VehicleType + " " + ver2,
+                //                            Strings.NewFirmwareA + item.VehicleType + " " + ver2 + Strings.Pleaseup +
+                //                            "[link;https://discuss.ardupilot.org/tags/stable-release;Release Notes]");
+                //                        break;
+                //                    }
 
-                                // check the first hit only
-                                break;
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            log.Error(ex);
-                        }
-                    });
+                //                // check the first hit only
+                //                break;
+                //                }
+                //            }
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            log.Error(ex);
+                //        }
+                //    });
 
-                // check for newer firmware - can peripheral
-                if (showui)
-                    Task.Run(() =>
-                    {
-                        try
-                        {
-                            List<int> buses = new List<int> { 1, 2 };
-                            foreach (var bus in buses)
-                            {
-                                using (var port = new CommsInjection())
-                                {
-                                    var can = new DroneCAN.DroneCAN();
-                                    can.SourceNode = 127;
+                //// check for newer firmware - can peripheral
+                //if (showui)
+                //    Task.Run(() =>
+                //    {
+                //        try
+                //        {
+                //            List<int> buses = new List<int> { 1, 2 };
+                //            foreach (var bus in buses)
+                //            {
+                //                using (var port = new CommsInjection())
+                //                {
+                //                    var can = new DroneCAN.DroneCAN();
+                //                    can.SourceNode = 127;
 
-                                    port.ReadBufferUpdate += (o, i) => { };
-                                    port.WriteCallback += (o, bytes) =>
-                                    {
-                                        var lines = ASCIIEncoding.ASCII.GetString(bytes.ToArray())
-                                            .Split(new[] { '\r' }, StringSplitOptions.RemoveEmptyEntries);
+                //                    port.ReadBufferUpdate += (o, i) => { };
+                //                    port.WriteCallback += (o, bytes) =>
+                //                    {
+                //                        var lines = ASCIIEncoding.ASCII.GetString(bytes.ToArray())
+                //                            .Split(new[] { '\r' }, StringSplitOptions.RemoveEmptyEntries);
 
-                                        foreach (var line in lines)
-                                        {
-                                            can.ReadMessageSLCAN(line);
+                //                        foreach (var line in lines)
+                //                        {
+                //                            can.ReadMessageSLCAN(line);
 
-                                        }
+                //                        }
 
-                                    };
+                //                    };
 
-                                    // mavlink to slcan
-                                    var canref = MainV2.comPort.SubscribeToPacketType(MAVLink.MAVLINK_MSG_ID.CAN_FRAME, (m) =>
-                                    {
-                                        if (m.msgid == (uint)MAVLink.MAVLINK_MSG_ID.CAN_FRAME)
-                                        {
-                                            var canfd = false;
-                                            var pkt = (MAVLink.mavlink_can_frame_t)m.data;
-                                            var cf = new CANFrame(BitConverter.GetBytes(pkt.id));
-                                            var length = pkt.len;
-                                            var payload = new CANPayload(pkt.data);
+                //                    // mavlink to slcan
+                //                    var canref = MainV2.comPort.SubscribeToPacketType(MAVLink.MAVLINK_MSG_ID.CAN_FRAME, (m) =>
+                //                    {
+                //                        if (m.msgid == (uint)MAVLink.MAVLINK_MSG_ID.CAN_FRAME)
+                //                        {
+                //                            var canfd = false;
+                //                            var pkt = (MAVLink.mavlink_can_frame_t)m.data;
+                //                            var cf = new CANFrame(BitConverter.GetBytes(pkt.id));
+                //                            var length = pkt.len;
+                //                            var payload = new CANPayload(pkt.data);
 
-                                            var ans2 = String.Format("{0}{1}{2}{3}\r", canfd ? 'B' : 'T', cf.ToHex(), length.ToString("X")
-                                                , payload.ToHex(DroneCAN.DroneCAN.dlcToDataLength(length)));
+                //                            var ans2 = String.Format("{0}{1}{2}{3}\r", canfd ? 'B' : 'T', cf.ToHex(), length.ToString("X")
+                //                                , payload.ToHex(DroneCAN.DroneCAN.dlcToDataLength(length)));
 
-                                            port.AppendBuffer(ASCIIEncoding.ASCII.GetBytes(ans2));
-                                        }
-                                        else if (m.msgid == (uint)MAVLink.MAVLINK_MSG_ID.CANFD_FRAME)
-                                        {
-                                            var canfd = true;
-                                            var pkt = (MAVLink.mavlink_canfd_frame_t)m.data;
-                                            var cf = new CANFrame(BitConverter.GetBytes(pkt.id));
-                                            var length = pkt.len;
-                                            var payload = new CANPayload(pkt.data);
+                //                            port.AppendBuffer(ASCIIEncoding.ASCII.GetBytes(ans2));
+                //                        }
+                //                        else if (m.msgid == (uint)MAVLink.MAVLINK_MSG_ID.CANFD_FRAME)
+                //                        {
+                //                            var canfd = true;
+                //                            var pkt = (MAVLink.mavlink_canfd_frame_t)m.data;
+                //                            var cf = new CANFrame(BitConverter.GetBytes(pkt.id));
+                //                            var length = pkt.len;
+                //                            var payload = new CANPayload(pkt.data);
 
-                                            var ans2 = String.Format("{0}{1}{2}{3}\r", canfd ? 'B' : 'T', cf.ToHex(), length.ToString("X")
-                                                , payload.ToHex(DroneCAN.DroneCAN.dlcToDataLength(length)));
+                //                            var ans2 = String.Format("{0}{1}{2}{3}\r", canfd ? 'B' : 'T', cf.ToHex(), length.ToString("X")
+                //                                , payload.ToHex(DroneCAN.DroneCAN.dlcToDataLength(length)));
 
-                                            port.AppendBuffer(ASCIIEncoding.ASCII.GetBytes(ans2));
-                                        }
+                //                            port.AppendBuffer(ASCIIEncoding.ASCII.GetBytes(ans2));
+                //                        }
 
-                                        return true;
-                                    }, (byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, true);
+                //                        return true;
+                //                    }, (byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent, true);
 
-                                    can.NodeAdded += (id, status) =>
-                                    {
-                                        Console.WriteLine(id + " Node status seen - request Node Info");
-                                        // get node info
-                                        DroneCAN.DroneCAN.uavcan_protocol_GetNodeInfo_req gnireq = new DroneCAN.DroneCAN.uavcan_protocol_GetNodeInfo_req() { };
+                //                    can.NodeAdded += (id, status) =>
+                //                    {
+                //                        Console.WriteLine(id + " Node status seen - request Node Info");
+                //                        // get node info
+                //                        DroneCAN.DroneCAN.uavcan_protocol_GetNodeInfo_req gnireq = new DroneCAN.DroneCAN.uavcan_protocol_GetNodeInfo_req() { };
 
-                                        var slcan = can.PackageMessageSLCAN((byte)id, 30, 0, gnireq);
+                //                        var slcan = can.PackageMessageSLCAN((byte)id, 30, 0, gnireq);
 
-                                        can.WriteToStreamSLCAN(slcan);
-                                    };
+                //                        can.WriteToStreamSLCAN(slcan);
+                //                    };
                                                        
-                                    // be invisible
-                                    can.NodeStatus = false;
-                                    can.StartSLCAN(port.BaseStream);
+                //                    // be invisible
+                //                    can.NodeStatus = false;
+                //                    can.StartSLCAN(port.BaseStream);
 
-                                    //start on bus
-                                    var ans = MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent,
-                                     (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.CAN_FORWARD, bus, 0, 0, 0, 0, 0, 0,
-                                     false);                                    
+                //                    //start on bus
+                //                    var ans = MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent,
+                //                     (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.CAN_FORWARD, bus, 0, 0, 0, 0, 0, 0,
+                //                     false);                                    
 
-                                    Thread.Sleep(5000);
+                //                    Thread.Sleep(5000);
 
-                                    // stop
-                                    MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent,
-                                     (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.CAN_FORWARD, 0, 0, 0, 0, 0, 0, 0,
-                                     false);
+                //                    // stop
+                //                    MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent,
+                //                     (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.CAN_FORWARD, 0, 0, 0, 0, 0, 0, 0,
+                //                     false);
 
-                                    foreach (var node in can.NodeInfo)
-                                    {
-                                        var devicename = can.GetNodeName((byte)node.Key);
-                                        var githash = can.NodeInfo[node.Key].software_version.vcs_commit.ToString("X");
-                                        //Version and githash
+                //                    foreach (var node in can.NodeInfo)
+                //                    {
+                //                        var devicename = can.GetNodeName((byte)node.Key);
+                //                        var githash = can.NodeInfo[node.Key].software_version.vcs_commit.ToString("X");
+                //                        //Version and githash
 
-                                        log.Info(node.ToJSON());
+                //                        log.Info(node.ToJSON());
 
-                                        var option = APFirmware.Manifest.Firmware.Where(a =>
-                                            a.MavFirmwareVersionType == APFirmware.RELEASE_TYPES.OFFICIAL.ToString() &&
-                                            a.VehicleType == "AP_Periph" &&
-                                            a.Format == "bin" &&
-                                            a.MavType == "CAN_PERIPHERAL" &&
-                                            a.MavFirmwareVersionMajor >= node.Value.software_version.major &&
-                                            a.MavFirmwareVersionMinor >= node.Value.software_version.minor &&
-                                            node.Value.software_version.major != 0 &&
-                                            node.Value.software_version.minor != 0 &&
-                                            devicename.EndsWith(a.Platform) &&
-                                            !a.GitSha.StartsWith(githash, StringComparison.InvariantCultureIgnoreCase)
-                                        ).FirstOrDefault();
-                                        if (option != default(APFirmware.FirmwareInfo))
-                                        {
-                                            Common.MessageShowAgain("New firmware", "New firmware for " + devicename + " " + option.MavFirmwareVersion + " " + option.GitSha + "\nUpdate via the dronecan screen");
-                                        }
-                                    }
+                //                        var option = APFirmware.Manifest.Firmware.Where(a =>
+                //                            a.MavFirmwareVersionType == APFirmware.RELEASE_TYPES.OFFICIAL.ToString() &&
+                //                            a.VehicleType == "AP_Periph" &&
+                //                            a.Format == "bin" &&
+                //                            a.MavType == "CAN_PERIPHERAL" &&
+                //                            a.MavFirmwareVersionMajor >= node.Value.software_version.major &&
+                //                            a.MavFirmwareVersionMinor >= node.Value.software_version.minor &&
+                //                            node.Value.software_version.major != 0 &&
+                //                            node.Value.software_version.minor != 0 &&
+                //                            devicename.EndsWith(a.Platform) &&
+                //                            !a.GitSha.StartsWith(githash, StringComparison.InvariantCultureIgnoreCase)
+                //                        ).FirstOrDefault();
+                //                        if (option != default(APFirmware.FirmwareInfo))
+                //                        {
+                //                            Common.MessageShowAgain("New firmware", "New firmware for " + devicename + " " + option.MavFirmwareVersion + " " + option.GitSha + "\nUpdate via the dronecan screen");
+                //                        }
+                //                    }
 
-                                    MainV2.comPort.UnSubscribeToPacketType(canref);
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            log.Error(ex);
-                        }
-                    });
+                //                    MainV2.comPort.UnSubscribeToPacketType(canref);
+                //                }
+                //            }
+                //        }
+                //        catch (Exception ex)
+                //        {
+                //            log.Error(ex);
+                //        }
+                //    });
 
                 this.BeginInvokeIfRequired(() =>
                 {
@@ -1948,13 +1948,13 @@ namespace MissionPlanner
                                 }
                             }
 
-                            if (comPort.MAV.param.ContainsKey("RALLY_LIMIT_KM") &&
-                                (maxdist / 1000.0) > (float)comPort.MAV.param["RALLY_LIMIT_KM"])
-                            {
-                                CustomMessageBox.Show(Strings.Warningrallypointdistance + " " +
-                                                      (maxdist / 1000.0).ToString("0.00") + " > " +
-                                                      (float)comPort.MAV.param["RALLY_LIMIT_KM"]);
-                            }
+                            //if (comPort.MAV.param.ContainsKey("RALLY_LIMIT_KM") &&
+                            //    (maxdist / 1000.0) > (float)comPort.MAV.param["RALLY_LIMIT_KM"])
+                            //{
+                            //    CustomMessageBox.Show(Strings.Warningrallypointdistance + " " +
+                            //                          (maxdist / 1000.0).ToString("0.00") + " > " +
+                            //                          (float)comPort.MAV.param["RALLY_LIMIT_KM"]);
+                            //}
                         }
                         catch (Exception ex)
                         {

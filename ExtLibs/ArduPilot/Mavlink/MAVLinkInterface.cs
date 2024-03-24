@@ -629,13 +629,6 @@ namespace MissionPlanner
 
             frmProgressReporter.UpdateProgressAndStatus(-1, Strings.MavlinkConnecting);
 
-            if (BaseStream is SerialPort)
-            {
-                // allow settings to settle - previous dtr
-                log.Debug("SerialPort Sleep 1");
-                Thread.Sleep(1000);
-            }
-
             Terrain?.UnSub();
             Terrain = new TerrainFollow(this);
 
@@ -649,26 +642,18 @@ namespace MissionPlanner
                 {
                     log.Info("Open port with " + BaseStream.PortName + " " + BaseStream.BaudRate);
 
-                    if (BaseStream is UdpSerial)
-                    {
-                        PRsender.doWorkArgs.CancelRequestChanged += (o, e) =>
-                        {
-                            ((UdpSerial) BaseStream).CancelConnect = true;
-                            ((ProgressWorkerEventArgs) o)
-                                .CancelAcknowledged = true;
-                        };
-                    }
+                    //if (BaseStream is UdpSerial)
+                    //{
+                    //    PRsender.doWorkArgs.CancelRequestChanged += (o, e) =>
+                    //    {
+                    //        ((UdpSerial) BaseStream).CancelConnect = true;
+                    //        ((ProgressWorkerEventArgs) o)
+                    //            .CancelAcknowledged = true;
+                    //    };
+                    //}
 
                     BaseStream.Open();
-
                     BaseStream.DiscardInBuffer();
-
-                    // other boards seem to have issues if there is no delay? posible bootloader timeout issue
-                    if (BaseStream is SerialPort)
-                    {
-                        log.Debug("SerialPort Sleep 2");
-                        Thread.Sleep(1000);
-                    }
                 }
 
                 List<MAVLinkMessage> hbhistory = new List<MAVLinkMessage>();
@@ -691,85 +676,66 @@ namespace MissionPlanner
 
                 while (true)
                 {
-                    if (PRsender.doWorkArgs.CancelRequested)
-                    {
-                        PRsender.doWorkArgs.CancelAcknowledged = true;
-                        countDown.Stop();
-                        if (BaseStream.IsOpen)
-                            BaseStream.Close();
-                        giveComport = false;
-                        return;
-                    }
+                    //if (PRsender.doWorkArgs.CancelRequested)
+                    //{
+                    //    PRsender.doWorkArgs.CancelAcknowledged = true;
+                    //    countDown.Stop();
+                    //    if (BaseStream.IsOpen)
+                    //        BaseStream.Close();
+                    //    giveComport = false;
+                    //    return;
+                    //}
 
                     log.Info(DateTime.Now.Millisecond + " Start connect loop ");
 
-                    if (DateTime.Now > deadline)
-                    {
-                        //if (Progress != null)
-                        //    Progress(-1, "No Heartbeat Packets");
-                        countDown.Stop();
-                        this.Close();
+//                    if (DateTime.Now > deadline)
+//                    {
+//                        //if (Progress != null)
+//                        //    Progress(-1, "No Heartbeat Packets");
+//                        countDown.Stop();
+//                        this.Close();
 
-                        if (hbseen)
-                        {
-                            PRsender.doWorkArgs.ErrorMessage = Strings.Only1Hb;
-                            throw new Exception(Strings.Only1HbD);
-                        }
-                        else
-                        {
-                            PRsender.doWorkArgs.ErrorMessage = "No Heartbeat Packets Received";
-                            throw new Exception(@"Can not establish a connection
+//                        if (hbseen)
+//                        {
+//                            PRsender.doWorkArgs.ErrorMessage = Strings.Only1Hb;
+//                            throw new Exception(Strings.Only1HbD);
+//                        }
+//                        else
+//                        {
+//                            PRsender.doWorkArgs.ErrorMessage = "No Heartbeat Packets Received";
+//                            throw new Exception(@"Can not establish a connection
 
-Please check the following
-1. You have firmware loaded
-2. You have the correct serial port selected
-3. PX4 - You have the microsd card installed
-4. Try a diffrent usb port
+//Please check the following
+//1. You have firmware loaded
+//2. You have the correct serial port selected
+//3. PX4 - You have the microsd card installed
+//4. Try a diffrent usb port
 
-No Mavlink Heartbeat Packets where read from this port - Verify Baud Rate and setup
-Mission Planner waits for 2 valid heartbeat packets before connecting");
-                        }
-                    }
+//No Mavlink Heartbeat Packets where read from this port - Verify Baud Rate and setup
+//Mission Planner waits for 2 valid heartbeat packets before connecting");
+//                        }
+//                    }
+
 
                     Thread.Sleep(1);
 
                     var buffer = getHeartBeat();
+
                     if (buffer.Length > 0)
                     {
-                        mavlink_heartbeat_t hb = buffer.ToStructure<mavlink_heartbeat_t>();
+                        //mavlink_heartbeat_t hb = buffer.ToStructure<mavlink_heartbeat_t>();
 
-                        // no GCS's and no broadcast compid's (ping adsb)
-                        if (hb.type != (byte) MAV_TYPE.GCS && buffer.compid != 0)
-                        {
+                        //// no GCS's and no broadcast compid's (ping adsb)
+                        //if (hb.type != (byte) MAV_TYPE.GCS && buffer.compid != 0)
+                        //{
                             hbhistory.Add(buffer);
-                        }
+                        //}
                     }
 
                     if (hbhistory.Count > 0)
                         hbseen = true;
 
                     count++;
-
-                    // if we get no data, try enableing rts/cts
-                    if (buffer.Length == 0 && BaseStream is SerialPort && start.AddSeconds(20) < DateTime.Now)
-                    {
-                        try
-                        {
-                            log.Debug("about to set RTS to " + !BaseStream.RtsEnable);
-                            BaseStream.RtsEnable = !BaseStream.RtsEnable;
-                        }
-                        catch
-                        {
-                        }
-                    }
-
-                    // SLCAN check
-                    if (Regex.IsMatch(plaintxtline, @"\rT[0-9A-Z]{9,32}$", RegexOptions.Multiline))
-                    {
-                        PRsender.doWorkArgs.ErrorMessage =
-                            "This appears to be a CAN port, please use the DroneCAN screen";
-                        throw new Exception(@"This appears to be a CAN port, please use the DroneCAN screen");
-                    }
 
                     // check we have hb's
                     if (hbhistory.Count > 0)
@@ -788,7 +754,12 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                             // preference compid of 1, failover to anything that we have seen 4 times
                             if (seentimes >= 2 && msg.compid == 1 || seentimes >= 4)
                             {
-                                SetupMavConnect(msg, (mavlink_heartbeat_t) msg.data);
+                                //SetupMavConnect(msg, (mavlink_heartbeat_t) msg.data);
+
+
+
+
+
                                 sysidcurrent = msg.sysid;
                                 compidcurrent = msg.compid;
                                 log.Info($"HB Selection {sysidcurrent}-{compidcurrent} seen {seentimes}");
@@ -831,21 +802,21 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                 doCommand((byte) sysidcurrent, (byte) compidcurrent, MAV_CMD.DO_SEND_BANNER, 0, 0, 0, 0, 0, 0, 0,
                     false);
 
-                if (getparams)
-                {
-                    frmProgressReporter.UpdateProgressAndStatus(0,
-                        "Getting Params.. (sysid " + MAV.sysid + " compid " + MAV.compid + ") ");
+                //if (getparams)
+                //{
+                //    frmProgressReporter.UpdateProgressAndStatus(0,
+                //        "Getting Params.. (sysid " + MAV.sysid + " compid " + MAV.compid + ") ");
 
-                    getParamListMavftp(MAV.sysid, MAV.compid);
-                }
+                //    getParamListMavftp(MAV.sysid, MAV.compid);
+                //}
 
-                if (frmProgressReporter.doWorkArgs.CancelAcknowledged == true)
-                {
-                    giveComport = false;
-                    if (BaseStream.IsOpen)
-                        BaseStream.Close();
-                    return;
-                }
+                //if (frmProgressReporter.doWorkArgs.CancelAcknowledged == true)
+                //{
+                //    giveComport = false;
+                //    if (BaseStream.IsOpen)
+                //        BaseStream.Close();
+                //    return;
+                //}
             }
             catch (Exception e)
             {
@@ -2948,6 +2919,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
 
         public void requestDatastream(MAV_DATA_STREAM id, int hzrate, int sysid = -1, int compid = -1)
         {
+            return;
             if (sysid == -1)
                 sysid = sysidcurrent;
 
@@ -3129,11 +3101,13 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
         [Obsolete]
         private void getDatastream(MAV_DATA_STREAM id, int hzrate)
         {
+            return;
             getDatastream(MAV.sysid, MAV.compid, id, hzrate);
         }
 
         private void getDatastream(byte sysid, byte compid, MAV_DATA_STREAM id, int hzrate)
         {
+            return;
             if (hzrate == -1)
                 return;
 
