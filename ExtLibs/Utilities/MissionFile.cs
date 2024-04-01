@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.Serialization;
 using System.Text;
 using GeoAPI.Geometries;
@@ -129,6 +130,42 @@ namespace MissionPlanner.Utilities
 
             return cmds;
         }
+        public static List<Locationwp> ConvertToFenceItems(RootObject format)
+        {
+            List<Locationwp> cmds = new List<Locationwp>();
+
+            //go through the fence items and look for circles
+            foreach (var circle in format.geoFence.circles)
+            {
+                Locationwp temp = new Locationwp();
+                temp.lat = circle.circle.center[0];
+                temp.lng = circle.circle.center[1];
+                temp.p1 = (float)circle.circle.radius;
+                temp.id = circle.inclusion ? (ushort)MAVLink.MAV_CMD.FENCE_CIRCLE_INCLUSION : (ushort)MAVLink.MAV_CMD.FENCE_CIRCLE_EXCLUSION;
+                temp.alt = 0;
+                temp.frame = (byte)MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT;
+                cmds.Add(temp);
+            }
+
+            //go through the fence items and look for polygons
+            foreach (var polygon in format.geoFence.polygons)
+            {
+                int pointcount = 0;
+                foreach (var point in polygon.polygon)
+                {
+                    Locationwp temp = new Locationwp();
+                    temp.lat = point[0];
+                    temp.lng = point[1];
+                    temp.alt = pointcount++;
+                    temp.p1 = polygon.polygon.Count;
+                    temp.frame = (byte)MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT;
+                    temp.id = polygon.inclusion ? (ushort)MAVLink.MAV_CMD.FENCE_POLYGON_VERTEX_INCLUSION : (ushort)MAVLink.MAV_CMD.FENCE_POLYGON_VERTEX_EXCLUSION;
+                    cmds.Add(temp);
+                }
+            }
+            return cmds;
+        }
+
 
         public static Locationwp ConvertFromMissionItem(List<double> missionItem)
         {
@@ -300,11 +337,7 @@ namespace MissionPlanner.Utilities
                     if ((MAVLink.MAV_CMD)item.id == MAVLink.MAV_CMD.FENCE_CIRCLE_EXCLUSION)
                     {
                         geoFence.circles.Add(new Circle { circle = new Circle2 { center = new List<double> { item.lat, item.lng }, radius = item.p1 }, inclusion = false, version = 1 });
-
-                    }
-                    if ((MAVLink.MAV_CMD)item.id == MAVLink.MAV_CMD.FENCE_CIRCLE_INCLUSION)
-                    {
-                        geoFence.circles.Add(new Circle { circle = new Circle2 { center = new List<double> { item.lat, item.lng }, radius = item.p1 }, inclusion = true, version = 1 });
+                        continue;
                     }
 
                     //Start of a new polygon
@@ -322,12 +355,14 @@ namespace MissionPlanner.Utilities
                         }
                         List<double> coord = new List<double> { item.lat, item.lng };
                         points.Add(coord);
+                        continue;
                     }
 
                     if ((MAVLink.MAV_CMD)item.id == MAVLink.MAV_CMD.FENCE_POLYGON_VERTEX_EXCLUSION && item.alt > 0)
                     {
                         List<double> coord = new List<double> { item.lat, item.lng };
                         points.Add(coord);
+                        continue;
                     }
                 }
                 //Add the last polygon

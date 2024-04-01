@@ -138,6 +138,7 @@ namespace MissionPlanner.GCSViews
 
         private MAVLink.MAV_MISSION_TYPE lastEditorMode = MAVLink.MAV_MISSION_TYPE.MISSION;
         public List<Locationwp> editedFencePoints = new List<Locationwp>();
+        public List<Locationwp> editedMissionPoints = new List<Locationwp>();
 
         public void Init()
         {
@@ -1324,7 +1325,7 @@ namespace MissionPlanner.GCSViews
                     try
                     {
                         log.Info("Process " + cmds.Count);
-                        processToScreen(cmds);
+                        processToScreen(cmds,false);
                     }
                     catch (Exception exx)
                     {
@@ -1894,9 +1895,17 @@ namespace MissionPlanner.GCSViews
 
                             var cmds = MissionFile.ConvertToLocationwps(format);
 
-                            processToScreen(cmds);
-
+                            //Get the fences from the plan file as well.
+                            processToScreen(cmds,false);
                             writeKML();
+                            //Select Fences
+                            cmds.Clear();
+                            cmds = MissionFile.ConvertToFenceItems(format);
+                            cmb_missiontype.SelectedItem = MAVLink.MAV_MISSION_TYPE.FENCE;
+                            processToScreen(cmds,false);
+                            writeKML();
+                            //select mission
+                            cmb_missiontype.SelectedItem = MAVLink.MAV_MISSION_TYPE.MISSION;
 
                             MainMap.ZoomAndCenterMarkers("WPOverlay");
                         }
@@ -2203,6 +2212,13 @@ namespace MissionPlanner.GCSViews
                 editedFencePoints = GetCommandList();
             }
 
+            if (lastEditorMode == MAVLink.MAV_MISSION_TYPE.MISSION)
+            { 
+               //If we were editing a mission, save the points to keep it in editor
+               editedMissionPoints.Clear();
+               editedMissionPoints = GetCommandList();}
+
+
             // switch the mavcmd list and init
             Activate();
 
@@ -2218,7 +2234,7 @@ namespace MissionPlanner.GCSViews
             if ((MAVLink.MAV_MISSION_TYPE)cmb_missiontype.SelectedValue == MAVLink.MAV_MISSION_TYPE.RALLY)
             {
                 BUT_Add.Visible = false;
-                processToScreen(MainV2.comPort.MAV.rallypoints.Select(a => (Locationwp)a.Value).ToList());
+                processToScreen(MainV2.comPort.MAV.rallypoints.Select(a => (Locationwp)a.Value).ToList(), false);
 
             }
             else if ((MAVLink.MAV_MISSION_TYPE)cmb_missiontype.SelectedValue == MAVLink.MAV_MISSION_TYPE.FENCE)
@@ -2227,11 +2243,11 @@ namespace MissionPlanner.GCSViews
 
                 if (MainV2.comPort.MAV.cs.connected)
                 {
-                    processToScreen(MainV2.comPort.MAV.fencepoints.Select(a => (Locationwp)a.Value).ToList());
+                    processToScreen(MainV2.comPort.MAV.fencepoints.Select(a => (Locationwp)a.Value).ToList(), false);
                 }
                 else
                 {
-                    processToScreen(editedFencePoints);
+                    processToScreen(editedFencePoints, false);
                 }
 
                 Common.MessageShowAgain("FlightPlan Fence", "Please use the Polygon drawing tool to draw " +
@@ -2242,7 +2258,16 @@ namespace MissionPlanner.GCSViews
             else
             {
                 BUT_Add.Visible = true;
-                processToScreen(MainV2.comPort.MAV.wps.Select(a => (Locationwp)a.Value).ToList());
+
+                if (MainV2.comPort.MAV.cs.connected)
+                {
+                    processToScreen(MainV2.comPort.MAV.wps.Select(a => (Locationwp)a.Value).ToList(), false);
+                }
+                else
+                {
+                    processToScreen(editedMissionPoints, false, false);
+                }
+
             }
 
             writeKML();
@@ -5282,7 +5307,7 @@ namespace MissionPlanner.GCSViews
         /// <summary>
         /// Processes a loaded EEPROM to the map and datagrid
         /// </summary>
-        private void processToScreen(List<Locationwp> cmds, bool append = false)
+        private void processToScreen(List<Locationwp> cmds, bool append, bool dohomeandalt = true)
         {
             quickadd = true;
 
@@ -5395,7 +5420,7 @@ namespace MissionPlanner.GCSViews
                 return (MAVLink.MAV_MISSION_TYPE)cmb_missiontype.SelectedValue;
             });
 
-            if (!append && type == MAVLink.MAV_MISSION_TYPE.MISSION)
+            if (!append && type == MAVLink.MAV_MISSION_TYPE.MISSION && dohomeandalt)
             {
                 try
                 {
@@ -5453,16 +5478,19 @@ namespace MissionPlanner.GCSViews
                         double lat, lng;
                         if (double.TryParse(row.Cells[Param3.Index].Value.ToString(), out p3))
                         {
-                            //We have a valid AGL
-                            //Need check if we verify height or not
-                            double.TryParse(row.Cells[Lat.Index].Value.ToString(), out lat);
-                            double.TryParse(row.Cells[Lon.Index].Value.ToString(), out lng);
+                            if (p3 > 0.1)
+                            {
+                                //We have a valid AGL
+                                //Need check if we verify height or not
+                                double.TryParse(row.Cells[Lat.Index].Value.ToString(), out lat);
+                                double.TryParse(row.Cells[Lon.Index].Value.ToString(), out lng);
 
-                            double alt = (srtm.getAltitude(lat, lng).alt - srtm.getAltitude(
-                                                   MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat,
-                                                   MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng).alt) + p3 * CurrentState.multiplieralt;
-                            string a = TXT_homealt.Text;
-                            row.Cells[Alt.Index].Value = alt;
+                                double alt = (srtm.getAltitude(lat, lng).alt - srtm.getAltitude(
+                                                       MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat,
+                                                       MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng).alt) + p3 * CurrentState.multiplieralt;
+                                string a = TXT_homealt.Text;
+                                row.Cells[Alt.Index].Value = alt;
+                            }
                         }
                     }
                     previous_homealt = TXT_homealt.Text;
@@ -5860,6 +5888,9 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                     {
                         if (file.EndsWith(".plan"))
                         {
+                            //Switch back to MISSION view
+                            cmb_missiontype.SelectedItem = MAVLink.MAV_MISSION_TYPE.MISSION;
+
                             var list = GetCommandList();
                             Locationwp home = new Locationwp();
                             try
