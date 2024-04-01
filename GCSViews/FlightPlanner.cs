@@ -1363,6 +1363,7 @@ namespace MissionPlanner.GCSViews
                 return;
             
             updateRowNumbers();
+            updateStartStop();
 
             PointLatLngAlt home = new PointLatLngAlt();
             if (TXT_homealt.Text != "" && TXT_homelat.Text != "" && TXT_homelng.Text != "")
@@ -8246,6 +8247,35 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
         private void comboBoxMapType_SelectedIndexChanged(object sender, EventArgs e)
         {
 
+        }
+
+        private void updateStartStop()
+        {
+            for (int i = 0; i < Commands.Rows.Count; i++)
+            {
+                if (Commands.Rows[i].Cells[Command.Index].Value.ToString() == "WAYPOINT")
+                {
+                    //Get next command
+                    if (i< Commands.Rows.Count - 1)
+                    { 
+                        if (Commands.Rows[i+1].Cells[Command.Index].Value.ToString() == "DO_SEND_SCRIPT_MESSAGE")
+                        {
+                            if (Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "0")
+                            {
+                                Commands.Rows[i].Cells[Param4.Index].Value = 2;
+                            }
+                            else if (Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "3")
+                            {
+                                Commands.Rows[i].Cells[Param4.Index].Value = 1;
+                            }
+                        }
+                        else
+                        {
+                            Commands.Rows[i].Cells[Param4.Index].Value = 0;
+                        }
+                    }
+                }
+            }
         }
     }
 }
