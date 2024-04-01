@@ -797,6 +797,15 @@ namespace MissionPlanner.SprayGrid
 
         private void BUT_Accept_Click2(object sender, EventArgs e)
         {
+
+            if (CustomMessageBox.Show(
+                        "Do you want to save the grid before convert it to flight plan?",
+                        "Save Grid", MessageBoxButtons.YesNo) == (int)DialogResult.Yes)
+            {
+                SaveGrid();
+            }
+
+
             double homealt = 0;
             //verifyHeightState = MainV2.instance.FlightPlanner.CHK_verifyheight.Checked;
             verifyHeightState = true; //Force verify height
