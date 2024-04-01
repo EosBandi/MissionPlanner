@@ -51,6 +51,7 @@ using Point = System.Drawing.Point;
 using Resources = MissionPlanner.Properties.Resources;
 using Newtonsoft.Json;
 using MissionPlanner.ArduPilot.Mavlink;
+using static IronPython.Modules._ast;
 
 namespace MissionPlanner.GCSViews
 {
@@ -1201,6 +1202,7 @@ namespace MissionPlanner.GCSViews
                                     MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat,
                                     MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng).alt) * CurrentState.multiplieralt;
                     }
+
                 }
 
                 cell.Value = alt.ToString("0.00");
@@ -1359,7 +1361,7 @@ namespace MissionPlanner.GCSViews
 
             if (Disposing)
                 return;
-
+            
             updateRowNumbers();
 
             PointLatLngAlt home = new PointLatLngAlt();
@@ -3462,8 +3464,9 @@ namespace MissionPlanner.GCSViews
                 // add delay if supplied
                 Commands.Rows[rowIndex].Cells[Param1.Index].Value = p1;
                 // add spray start/stop marking if supplied
-Commands.Rows[rowIndex].Cells[Param4.Index].Value = p4;
-
+                Commands.Rows[rowIndex].Cells[Param4.Index].Value = p4;
+                // add AGL altitude target is supplied
+                Commands.Rows[rowIndex].Cells[Param3.Index].Value = p3;
                 setfromMap(y, x, z, Math.Round(p1, 1));
             }
             else if (cmd == MAVLink.MAV_CMD.LOITER_UNLIM)
@@ -5376,6 +5379,7 @@ Commands.Rows[rowIndex].Cells[Param4.Index].Value = p4;
                 cell = Commands.Rows[i].Cells[Param4.Index] as DataGridViewTextBoxCell;
                 cell.Value = temp.p4;
 
+
                 // convert to utm/other
                 convertFromGeographic(temp.lat, temp.lng);
             }
@@ -5437,7 +5441,34 @@ Commands.Rows[rowIndex].Cells[Param4.Index].Value = p4;
                     log.Info("remove home from list");
                     Commands.Rows.Remove(Commands.Rows[0]); // remove home row
                 }
+
+                //Check altitudes based on p3 and new home altitude
+                for (i = 0; i < Commands.RowCount; i++)
+                {
+                    DataGridViewRow row = Commands.Rows[i];
+                    if (row.Cells[Command.Index].Value.ToString() == "WAYPOINT" && (altmode)row.Cells[Frame.Index].Value == altmode.Relative)
+                    {
+                        double p3;
+                        double lat, lng;
+                        if (double.TryParse(row.Cells[Param3.Index].Value.ToString(), out p3))
+                        {
+                            //We have a valid AGL
+                            //Need check if we verify height or not
+                            double.TryParse(row.Cells[Lat.Index].Value.ToString(), out lat);
+                            double.TryParse(row.Cells[Lon.Index].Value.ToString(), out lng);
+
+                            double alt = (srtm.getAltitude(lat, lng).alt - srtm.getAltitude(
+                                                   MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat,
+                                                   MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng).alt) + p3 * CurrentState.multiplieralt;
+                            string a = TXT_homealt.Text;
+                            row.Cells[Alt.Index].Value = alt;
+                        }
+                    }
+                    previous_homealt = TXT_homealt.Text;
+                }
             }
+
+ 
 
             quickadd = false;
 
@@ -6749,9 +6780,6 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
         private string previous_homealt = "";
         public void TXT_homealt_TextChanged(object sender, EventArgs e)
         {
-            if (suppress_textchanged)
-                return;
-
             sethome = false;
             try
             {
@@ -6761,6 +6789,9 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             {
                 log.Error(ex);
             }
+
+            if (suppress_textchanged)
+                return;
 
             if (CHK_verifyheight.Checked && Commands.Rows.Count > 0 && previous_homealt != TXT_homealt.Text)
             {
@@ -6776,12 +6807,12 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                         // If the frame is Relative, add the height difference to the altitude
                         if ((altmode)Commands[Frame.Index, a].Value == altmode.Relative && (string)Commands[Command.Index,a].Value == MAVLink.MAV_CMD.WAYPOINT.ToString())
                         {
-                            double alt;
-                            if (double.TryParse(Commands[Alt.Index, a].Value.ToString(), out alt))
-                            {
-                                alt += prev - next;
-                                Commands[Alt.Index, a].Value = alt.ToString("0.00");
-                            }
+                                double alt;
+                                if (double.TryParse(Commands[Alt.Index, a].Value.ToString(), out alt))
+                                {
+                                    alt += prev - next;
+                                    Commands[Alt.Index, a].Value = alt.ToString("0.00");
+                                }
                         }
                     }
                 }

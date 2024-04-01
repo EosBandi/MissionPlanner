@@ -95,7 +95,7 @@ namespace MissionPlanner.SprayGrid
         bool isMouseDown = false;
         bool isMouseDraging = false;
         static public Object thisLock = new Object();
-        
+
         bool loading = false;
         bool verifyHeightState = false;
 
@@ -110,7 +110,7 @@ namespace MissionPlanner.SprayGrid
 
             map.MapProvider = plugin.Host.FDMapType;
 
-            layerpolygons = new GMapOverlay( "polygons");
+            layerpolygons = new GMapOverlay("polygons");
             map.Overlays.Add(layerpolygons);
 
             colorRoutes = new GMapOverlay("colorRoutes");
@@ -141,7 +141,7 @@ namespace MissionPlanner.SprayGrid
             var area = calcpolygonarea(plugin.Host.FPDrawnPolygon.Points);
             if (area > 10000)
             {
-                NUM_Distance.Value = (int) Math.Sqrt(area) / 10;
+                NUM_Distance.Value = (int)Math.Sqrt(area) / 10;
             }
             // Angle is the angle of the longest side
             //NUM_angle.Value = (decimal)((getAngleOfLongestSide(list) + 360) % 360);
@@ -172,7 +172,7 @@ namespace MissionPlanner.SprayGrid
         {
 
             loadsetting("SprayGrid_linedistance", NUM_Distance);
-            loadsetting("SprayGrid_litersperha", NUM_LitPerHa); 
+            loadsetting("SprayGrid_litersperha", NUM_LitPerHa);
             loadsetting("SprayGrid_flyspeed", NUM_UpDownFlySpeed);
             loadsetting("SprayGrid_alt", NUM_altitude);
             loadsetting("SprayGrid_barsize", NUM_SprayBarWidth);
@@ -212,11 +212,11 @@ namespace MissionPlanner.SprayGrid
             plugin.Host.config["SprayGrid_alt"] = NUM_altitude.Value.ToString();
             plugin.Host.config["SprayGrid_linedistance"] = NUM_Distance.Value.ToString();
             plugin.Host.config["SprayGrid_litersperha"] = NUM_LitPerHa.Value.ToString();
-            plugin.Host.config["SprayGrid_flyspeed"]  = NUM_UpDownFlySpeed.Value.ToString();
+            plugin.Host.config["SprayGrid_flyspeed"] = NUM_UpDownFlySpeed.Value.ToString();
             plugin.Host.config["SprayGrid_barsize"] = NUM_SprayBarWidth.Value.ToString();
-            plugin.Host.config["SprayGrid_lanesep"] =  NUM_LaneSeparation.Value.ToString();
-            plugin.Host.config["SprayGrid_addtakeoff"] =  CHK_addTakeoffAndLanding.Checked.ToString();
-            plugin.Host.config["SprayGrid_headlock"] =  CHK_Headlock.Checked.ToString();
+            plugin.Host.config["SprayGrid_lanesep"] = NUM_LaneSeparation.Value.ToString();
+            plugin.Host.config["SprayGrid_addtakeoff"] = CHK_addTakeoffAndLanding.Checked.ToString();
+            plugin.Host.config["SprayGrid_headlock"] = CHK_Headlock.Checked.ToString();
             plugin.Host.config["SprayGrid_alttrackingenabled"] = CHK_enableAltTracking.Checked.ToString();
             plugin.Host.config["SprayGrid_alttrackerror"] = NUM_trackingAltError.Value.ToString();
             plugin.Host.config["SprayGrid_expandobstacles"] = CHK_expandObstacles.Checked.ToString();
@@ -363,12 +363,12 @@ namespace MissionPlanner.SprayGrid
             PointLatLngAlt last = list[list.Count - 1];
             foreach (var item in list)
             {
-                 if (item.GetDistance(last) > maxdist) 
-                 {
-                     angle = item.GetBearing(last);
-                     maxdist = item.GetDistance(last);
-                 }
-                 last = item;
+                if (item.GetDistance(last) > maxdist)
+                {
+                    angle = item.GetBearing(last);
+                    maxdist = item.GetDistance(last);
+                }
+                last = item;
             }
 
             return (angle + 360) % 360;
@@ -456,7 +456,7 @@ namespace MissionPlanner.SprayGrid
             if (list.Count < 3)
                 return;
 
-            double barwidth = (double)NUM_SprayBarWidth.Value; 
+            double barwidth = (double)NUM_SprayBarWidth.Value;
             if (!CHK_expandObstacles.Checked)
             {
                 barwidth = 0;
@@ -465,7 +465,7 @@ namespace MissionPlanner.SprayGrid
             grid = Utilities.Grid.CreateSprayGrid(list, (double)NUM_altitude.Value, (double)NUM_Distance.Value,
                 (double)NUM_angle.Value,
                 (Utilities.Grid.StartPosition)Enum.Parse(typeof(Utilities.Grid.StartPosition), CMB_startfrom.Text), (float)NUM_LaneSeparation.Value,
-                plugin.Host.cs.PlannedHomeLocation, obstacles, (double)NUM_Shift.Value,barwidth, CHK_extendedpoint.Checked);
+                plugin.Host.cs.PlannedHomeLocation, obstacles, (double)NUM_Shift.Value, barwidth, CHK_extendedpoint.Checked);
 
             List<PointLatLng> list2 = new List<PointLatLng>();
 
@@ -594,7 +594,7 @@ namespace MissionPlanner.SprayGrid
             int color = 0;
             int itemnumber = -1;
             PointLatLng firstpoint = grid[0];
-            foreach(var p in grid)
+            foreach (var p in grid)
             {
                 itemnumber++;
                 if (itemnumber == 0)
@@ -623,7 +623,7 @@ namespace MissionPlanner.SprayGrid
                     };
                     colorRoutes.Polygons.Add(poly);
                 }
-                
+
                 firstpoint = secondpoint;
             }
             if (chk_grid.Checked)
@@ -648,7 +648,7 @@ namespace MissionPlanner.SprayGrid
             lbl_strips.Text = ((int)(strips / 2)).ToString();
             lbl_distbetweenlines.Text = NUM_Distance.Value.ToString("0.##") + " m";
             lbl_flighttime.Text = secondsToNice(distance * 1000 / (double)NUM_UpDownFlySpeed.Value);
-            lbl_litersPerHA.Text = NUM_LitPerHa.Value.ToString("0.##") +  " L";
+            lbl_litersPerHA.Text = NUM_LitPerHa.Value.ToString("0.##") + " L";
             lbl_plannedSpeed.Text = NUM_UpDownFlySpeed.Value.ToString("0.##") + " m/s";
 
             tb_TimeSegments.Text = "";
@@ -744,87 +744,11 @@ namespace MissionPlanner.SprayGrid
             if (polygon[0] == polygon[polygon.Count - 1])
                 polygon.RemoveAt(polygon.Count - 1); // unmake a full loop
 
-            return Math.Abs( answer);
+            return Math.Abs(answer);
         }
         private void No_split_process()
         {
-            if (grid != null && grid.Count > 0)
-            {
-                MainV2.instance.FlightPlanner.quickadd = true;
 
-                PointLatLngAlt lastpnt = PointLatLngAlt.Zero;
-
-                //Add first command to set sprayer
-
-                plugin.Host.AddWPtoList((MAVLink.MAV_CMD)217, 1, (double)NUM_LitPerHa.Value, (double)NUM_Distance.Value , (double)NUM_UpDownFlySpeed.Value , 0, 0, 0);
-
-
-                if (CHK_addTakeoffAndLanding.Checked)
-                {
-                    plugin.Host.AddWPtoList(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat, (double)NUM_TakeoffAlt.Value);
-                }
-
-                //Add start point
-                plugin.Host.AddWPtoList(MAVLink.MAV_CMD.DO_CHANGE_SPEED, 1,
-                    (int)((float)NUM_UpDownFlySpeed.Value / CurrentState.multiplierspeed), 0, 0, 0, 0, 0,
-                    null);
-
-                if (CHK_Headlock.Checked)
-                {
-                    plugin.Host.AddWPtoList(MAVLink.MAV_CMD.CONDITION_YAW, (double)NUM_angle.Value, 0, 0, 0, 0, 0, 0, null);
-                }
-                int index = 0;
-
-                grid.ForEach(plla =>
-                {
-                    if (!(plla.Lat == lastpnt.Lat && plla.Lng == lastpnt.Lng && plla.Alt == lastpnt.Alt))
-
-                    {
-                        AddWP(plla.Lng, plla.Lat, plla.Alt, plla.Tag);
-
-                        double distanceToNext = 0; 
-
-                        if (index < grid.Count - 1)
-                        {
-                            distanceToNext = Math.Round(plla.GetDistance(grid[index + 1]),1);
-                        }
-                        if (plla.Tag == "S")
-                        {
-                            plugin.Host.AddWPtoList((MAVLink.MAV_CMD)217, 2, 3, distanceToNext, 0, 0, 0, 0);
-                        }
-
-                        if (plla.Tag == "E")
-                        {
-                            plugin.Host.AddWPtoList((MAVLink.MAV_CMD)217, 2, 0, 0, 0, 0, 0, 0);
-                        }
-                        index++;
-                    }
-
-                    lastpnt = plla;
-                });
-
-
-                //if speed is set, set it back to WPNAV
-                if (NUM_UpDownFlySpeed.Value != 0)
-                {
-                    if (MainV2.comPort.MAV.param["WPNAV_SPEED"] != null)
-                    {
-                        double speed = MainV2.comPort.MAV.param["WPNAV_SPEED"].Value;
-                        speed = speed / 100;
-                        plugin.Host.AddWPtoList(MAVLink.MAV_CMD.DO_CHANGE_SPEED, 0, speed, 0, 0, 0, 0, 0);
-                    }
-                }
-
-                if (CHK_addTakeoffAndLanding.Checked)
-                {
-                    plugin.Host.AddWPtoList(MAVLink.MAV_CMD.RETURN_TO_LAUNCH, 0, 0, 0, 0, 0, 0, 0);
-                }
-
-            }
-            else
-            {
-                CustomMessageBox.Show("Bad Grid", "Error");
-            }
         }
         private void SprayGridUI_Resize(object sender, EventArgs e)
         {
@@ -838,8 +762,8 @@ namespace MissionPlanner.SprayGrid
         {
             switch ((splitby)CMB_split.SelectedIndex)
             {
-                case splitby.None: 
-                    NUM_Segments .Visible = false;
+                case splitby.None:
+                    NUM_Segments.Visible = false;
                     labelSegments.Visible = false;
                     break;
                 case splitby.Time:
@@ -861,22 +785,33 @@ namespace MissionPlanner.SprayGrid
 
 
         }
+
+        private srtm.altresponce getVehicleSRTMAlt(double lat, double lng, List<PointF> displacementMap)
+        {
+            srtm.altresponce altsrtm = new srtm.altresponce();
+            altsrtm = getMaxAltinArea(lat, lng, displacementMap);
+            return altsrtm;
+
+        }
+
+
         private void BUT_Accept_Click2(object sender, EventArgs e)
         {
+            double homealt = 0;
             //verifyHeightState = MainV2.instance.FlightPlanner.CHK_verifyheight.Checked;
             verifyHeightState = true; //Force verify height
             MainV2.instance.FlightPlanner.TXT_DefaultAlt.Text = NUM_altitude.Value.ToString();
+            List<PointF> displacementMap = new List<PointF>();
+            displacementMap = getVehicleAreaDisplacementPoints((double)NUM_angle.Value, (double)NUM_SprayBarWidth.Value);
 
 
             //Do the ALT tracking calculation
             if (CHK_enableAltTracking.Checked == true)
             {
                 //Do grid altitude based on srtm
-                List<PointF> displacementMap = new List<PointF>();
-                displacementMap = getVehicleAreaDisplacementPoints((double)NUM_angle.Value,(double)NUM_SprayBarWidth.Value);
 
-                double homealt = 0;
                 srtm.altresponce altsrtm = srtm.getAltitude(MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng);
+
                 if (altsrtm.currenttype == srtm.tiletype.valid)
                 {
                     homealt = altsrtm.alt;
@@ -888,15 +823,8 @@ namespace MissionPlanner.SprayGrid
 
                 foreach (var p in grid)
                 {
-                    altsrtm = getMaxAltinArea(p.Lat, p.Lng, displacementMap);
-                    if (altsrtm.currenttype == srtm.tiletype.valid)
-                    {
-                        p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value;
-                    }
-                    else
-                    {
-                        p.Alt = (double)NUM_altitude.Value;
-                    }
+                    altsrtm = getVehicleSRTMAlt(p.Lat, p.Lng, displacementMap);
+                    p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value;
                 }
 
                 List<PointLatLngAlt> newGrid = new List<PointLatLngAlt>();
@@ -1033,8 +961,87 @@ namespace MissionPlanner.SprayGrid
 
                 if (CMB_split.SelectedIndex == (int)splitby.None)
                 {
-                    //call original and exit
-                    No_split_process();
+                    //Start of No_Split process
+                    if (grid != null && grid.Count > 0)
+                    {
+                        MainV2.instance.FlightPlanner.quickadd = true;
+
+                        PointLatLngAlt lastpnt = PointLatLngAlt.Zero;
+
+                        //Add first command to set sprayer
+
+                        plugin.Host.AddWPtoList((MAVLink.MAV_CMD)217, 1, (double)NUM_LitPerHa.Value, (double)NUM_Distance.Value, (double)NUM_UpDownFlySpeed.Value, 0, 0, 0);
+
+
+                        if (CHK_addTakeoffAndLanding.Checked)
+                        {
+                            plugin.Host.AddWPtoList(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat, (double)NUM_TakeoffAlt.Value);
+                        }
+
+                        //Add start point
+                        plugin.Host.AddWPtoList(MAVLink.MAV_CMD.DO_CHANGE_SPEED, 1,
+                            (int)((float)NUM_UpDownFlySpeed.Value / CurrentState.multiplierspeed), 0, 0, 0, 0, 0,
+                            null);
+
+                        if (CHK_Headlock.Checked)
+                        {
+                            plugin.Host.AddWPtoList(MAVLink.MAV_CMD.CONDITION_YAW, (double)NUM_angle.Value, 0, 0, 0, 0, 0, 0, null);
+                        }
+                        int index = 0;
+
+                        grid.ForEach(plla =>
+                        {
+                            if (!(plla.Lat == lastpnt.Lat && plla.Lng == lastpnt.Lng && plla.Alt == lastpnt.Alt))
+
+                            {
+                                AddWP(plla.Lng, plla.Lat, plla.Alt, plla.Tag, homealt, srtm.getAltitude(plla.Lat, plla.Lng).alt);
+
+                                double distanceToNext = 0;
+
+                                if (index < grid.Count - 1)
+                                {
+                                    distanceToNext = Math.Round(plla.GetDistance(grid[index + 1]), 1);
+                                }
+                                if (plla.Tag == "S")
+                                {
+                                    plugin.Host.AddWPtoList((MAVLink.MAV_CMD)217, 2, 3, distanceToNext, 0, 0, 0, 0);
+                                }
+
+                                if (plla.Tag == "E")
+                                {
+                                    plugin.Host.AddWPtoList((MAVLink.MAV_CMD)217, 2, 0, 0, 0, 0, 0, 0);
+                                }
+                                index++;
+                            }
+
+                            lastpnt = plla;
+                        });
+
+
+                        //if speed is set, set it back to WPNAV
+                        if (NUM_UpDownFlySpeed.Value != 0)
+                        {
+                            if (MainV2.comPort.MAV.param["WPNAV_SPEED"] != null)
+                            {
+                                double speed = MainV2.comPort.MAV.param["WPNAV_SPEED"].Value;
+                                speed = speed / 100;
+                                plugin.Host.AddWPtoList(MAVLink.MAV_CMD.DO_CHANGE_SPEED, 0, speed, 0, 0, 0, 0, 0);
+                            }
+                        }
+
+                        if (CHK_addTakeoffAndLanding.Checked)
+                        {
+                            plugin.Host.AddWPtoList(MAVLink.MAV_CMD.RETURN_TO_LAUNCH, 0, 0, 0, 0, 0, 0, 0);
+                        }
+
+                    }
+                    else
+                    {
+                        CustomMessageBox.Show("Bad Grid", "Error");
+                    }
+
+
+                    //End of No_split_process
                 }
                 else
                 {
@@ -1149,7 +1156,7 @@ namespace MissionPlanner.SprayGrid
                                     {
                                         if (plla.Lat != lastplla.Lat || plla.Lng != lastplla.Lng ||
                                             plla.Alt != lastplla.Alt)
-                                            AddWP(plla.Lng, plla.Lat, plla.Alt, plla.Tag);
+                                            AddWP(plla.Lng, plla.Lat, plla.Alt, plla.Tag, homealt, srtm.getAltitude(plla.Lat, plla.Lng).alt);
                                     }
 
                                     double distanceToNext = 0;
@@ -1170,7 +1177,7 @@ namespace MissionPlanner.SprayGrid
                             }
                             else
                             {
-                                AddWP(plla.Lng, plla.Lat, plla.Alt, plla.Tag);
+                                AddWP(plla.Lng, plla.Lat, plla.Alt, plla.Tag, homealt, srtm.getAltitude(plla.Lat, plla.Lng).alt);
                                 double distanceToNext = 0;
                                 if (i < grid.Count - 1)
                                 {
@@ -1237,7 +1244,7 @@ namespace MissionPlanner.SprayGrid
                 CustomMessageBox.Show("Bad Grid", "Error");
             }
         }
-        private void AddWP(double Lng, double Lat, double Alt, string tag)
+        private void AddWP(double Lng, double Lat, double Alt, string tag, double HomeAlt, double pointAlt)
         {
             //if (CHK_copter_headinghold.Checked)
             //{
@@ -1245,16 +1252,32 @@ namespace MissionPlanner.SprayGrid
             //}
 
             double p4 = 0;
-            if (tag == "S") p4 = 1;
-            if(tag == "E") p4 = 2;
+            double p3 = 0;
 
-            if (NUM_DelayAtWP.Value > 0)
+            if (tag == "S") p4 = 1;
+            if (tag == "E") p4 = 2;
+
+            if (HomeAlt is double.NaN)
             {
-                plugin.Host.AddWPtoList(MAVLink.MAV_CMD.WAYPOINT, (double)NUM_DelayAtWP.Value, 0, 0, p4, Lng, Lat, Alt * CurrentState.multiplierdist, null);
+                p3 = Alt;
             }
             else
             {
-                 plugin.Host.AddWPtoList(MAVLink.MAV_CMD.WAYPOINT, 0, 0, 0, p4, Lng, Lat, Alt * CurrentState.multiplierdist, null);
+                //  p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value;
+                //We have a valid home altitude, so calculate back the relative altitude at the given point (Alt tracking)
+                p3 = Alt - (pointAlt - HomeAlt);
+
+            }
+
+
+
+            if (NUM_DelayAtWP.Value > 0)
+            {
+                plugin.Host.AddWPtoList(MAVLink.MAV_CMD.WAYPOINT, (double)NUM_DelayAtWP.Value, 0, p3, p4, Lng, Lat, Alt * CurrentState.multiplierdist, null);
+            }
+            else
+            {
+                plugin.Host.AddWPtoList(MAVLink.MAV_CMD.WAYPOINT, 0, 0, p3, p4, Lng, Lat, Alt * CurrentState.multiplierdist, null);
             }
         }
         private void NUM_Segments_ValueChanged(object sender, EventArgs e)
@@ -1415,7 +1438,7 @@ namespace MissionPlanner.SprayGrid
 
 
         void loadGridData(GridData data)
-        { 
+        {
             NUM_Distance.Value = (decimal)data.distance;
             NUM_LitPerHa.Value = (decimal)data.litersperha;
             NUM_UpDownFlySpeed.Value = (decimal)data.flyspeed;
