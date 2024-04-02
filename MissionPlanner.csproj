@@ -101,6 +101,9 @@
     <EmbeddedResource Include="Controls\FollowMe.uk.resx">
       <DependentUpon>FollowMe.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MapBoxURLSelector.resx">
+      <DependentUpon>MapBoxURLSelector.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\MavCommandSelection.uk.resx">
       <DependentUpon>MavCommandSelection.cs</DependentUpon>
     </EmbeddedResource>
@@ -702,6 +705,12 @@
     </Compile>
     <Compile Include="Controls\DigitalSkyUI.Designer.cs">
       <DependentUpon>DigitalSkyUI.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\MapBoxURLSelector.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Controls\MapBoxURLSelector.Designer.cs">
+      <DependentUpon>MapBoxURLSelector.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\MavCommandSelection.cs">
       <SubType>Form</SubType>

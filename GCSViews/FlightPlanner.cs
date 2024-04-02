@@ -2301,14 +2301,15 @@ namespace MissionPlanner.GCSViews
                     }
                     else
                     {
-                        InputBox.Show("Enter MapBox Share URL", "Enter MapBox Share URL", ref url);
+                        MapBoxURLSelector mapBoxUrlSelector = new MapBoxURLSelector();
+                        mapBoxUrlSelector.ShowDialog();
+                        url = Settings.Instance["MapBoxURL", ""];
                         var match = Regex.Matches(url, @"\/styles\/[^\/]+\/([^\/]+)\/([^\/\.]+).*access_token=([^#&=]+)");
                         if (match != null)
                         {
                             MapboxUser.Instance.UserName = match[0].Groups[1].Value;
                             MapboxUser.Instance.StyleId = match[0].Groups[2].Value;
                             MapboxUser.Instance.MapKey = match[0].Groups[3].Value;
-                            Settings.Instance["MapBoxURL"] = url;
                         }
                         else
                         {
@@ -8307,6 +8308,14 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                     }
                 }
             }
+        }
+
+        private void myButton1_Click(object sender, EventArgs e)
+        {
+            //Open a mapBoxurl selector window
+            MapBoxURLSelector mapBoxUrlSelector = new MapBoxURLSelector();
+            mapBoxUrlSelector.ShowDialog();
+
         }
     }
 }
