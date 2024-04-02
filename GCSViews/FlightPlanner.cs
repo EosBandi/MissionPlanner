@@ -5037,11 +5037,31 @@ namespace MissionPlanner.GCSViews
                 return;
             }
 
-
-            foreach (DataGridViewRow line in Commands.Rows)
+            var dr = CustomMessageBox.Show("Do you want to change the AGL altitude of all waypoints ?", "Change AGL",
+                MessageBoxButtons.YesNo);
+            if (dr == (int)DialogResult.Yes)
             {
-                line.Cells[Alt.Index].Value =
-                    float.Parse(line.Cells[Alt.Index].Value.ToString()) * multiplyer + altchange;
+                foreach (DataGridViewRow line in Commands.Rows)
+                {
+                    if (line.Cells[Command.Index].Value.ToString() == MAVLink.MAV_CMD.WAYPOINT.ToString())
+                    {
+                        line.Cells[Param3.Index].Value =
+                            float.Parse(line.Cells[Param3.Index].Value.ToString()) * multiplyer + altchange;
+                    }
+                }
+                doHomeAltRecalc();
+            }
+            else
+            {
+                foreach (DataGridViewRow line in Commands.Rows)
+                {
+                    if (line.Cells[Command.Index].Value.ToString() == MAVLink.MAV_CMD.WAYPOINT.ToString())
+                    {
+                        line.Cells[Alt.Index].Value =
+                            float.Parse(line.Cells[Alt.Index].Value.ToString()) * multiplyer + altchange;
+                    }
+                }
+
             }
             writeKML();
         }
@@ -5518,6 +5538,7 @@ namespace MissionPlanner.GCSViews
                                                    MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat,
                                                    MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng).alt) + p3 * CurrentState.multiplieralt;
                             string a = TXT_homealt.Text;
+                            alt = Math.Round(alt, 2);
                             row.Cells[Alt.Index].Value = alt;
                         }
                     }

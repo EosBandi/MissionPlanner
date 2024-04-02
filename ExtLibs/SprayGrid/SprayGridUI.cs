@@ -1277,8 +1277,9 @@ namespace MissionPlanner.SprayGrid
                 p3 = Alt - (pointAlt - HomeAlt);
 
             }
-
-
+            
+            //Add rounding
+            p3 = Math.Round(p3, 2);
 
             if (NUM_DelayAtWP.Value > 0)
             {
