@@ -5431,10 +5431,10 @@ namespace MissionPlanner.GCSViews
                     {
                         if (cellhome.Value.ToString() != TXT_homelat.Text && cellhome.Value.ToString() != "0")
                         {
-                            var dr = CustomMessageBox.Show("Reset Home to loaded coords", "Reset Home Coords",
+                            var cr = CustomMessageBox.Show("Reset Home to loaded coords", "Reset Home Coords",
                                 MessageBoxButtons.YesNo);
 
-                            if (dr == (int)DialogResult.Yes)
+                            if (cr == (int)DialogResult.Yes)
                             {
                                 // Soleon: all home txt handlers touch the altitude now, so this is moved up here
                                 suppress_textchanged = true;
@@ -5470,35 +5470,24 @@ namespace MissionPlanner.GCSViews
                 }
 
                 //Check altitudes based on p3 and new home altitude
-                for (i = 0; i < Commands.RowCount; i++)
+                var dr = CustomMessageBox.Show("Recalculate relative altitudes based on the new home?", "Recalculate Home",
+                                MessageBoxButtons.YesNo);
+                if (dr == (int)DialogResult.Yes)
                 {
-                    DataGridViewRow row = Commands.Rows[i];
-                    if (row.Cells[Command.Index].Value.ToString() == "WAYPOINT" && (altmode)row.Cells[Frame.Index].Value == altmode.Relative)
-                    {
-                        double p3;
-                        double lat, lng;
-                        if (double.TryParse(row.Cells[Param3.Index].Value.ToString(), out p3))
-                        {
-                            if (p3 > 0.1)
-                            {
-                                //We have a valid AGL
-                                //Need check if we verify height or not
-                                double.TryParse(row.Cells[Lat.Index].Value.ToString(), out lat);
-                                double.TryParse(row.Cells[Lon.Index].Value.ToString(), out lng);
-
-                                double alt = (srtm.getAltitude(lat, lng).alt - srtm.getAltitude(
-                                                       MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat,
-                                                       MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng).alt) + p3 * CurrentState.multiplieralt;
-                                string a = TXT_homealt.Text;
-                                row.Cells[Alt.Index].Value = alt;
-                            }
-                        }
-                    }
-                    previous_homealt = TXT_homealt.Text;
+                    doHomeAltRecalc();
+                }
+            }
+            if (append && type == MAVLink.MAV_MISSION_TYPE.MISSION && dohomeandalt)
+            {
+                var dr = CustomMessageBox.Show("Recalculate relative altitudes based on the new home?", "Recalculate Home",
+                                MessageBoxButtons.YesNo);
+                if (dr == (int)DialogResult.Yes)
+                {
+                    doHomeAltRecalc();
                 }
             }
 
- 
+
 
             quickadd = false;
 
@@ -5506,6 +5495,38 @@ namespace MissionPlanner.GCSViews
 
             MainMap_OnMapZoomChanged();
         }
+
+        private void doHomeAltRecalc()
+        {
+            for (int i = 0; i < Commands.RowCount; i++)
+            {
+                DataGridViewRow row = Commands.Rows[i];
+                if (row.Cells[Command.Index].Value.ToString() == "WAYPOINT" && (altmode)row.Cells[Frame.Index].Value == altmode.Relative)
+                {
+                    double p3;
+                    double lat, lng;
+                    if (double.TryParse(row.Cells[Param3.Index].Value.ToString(), out p3))
+                    {
+                        if (p3 > 0.1)
+                        {
+                            //We have a valid AGL
+                            //Need check if we verify height or not
+                            double.TryParse(row.Cells[Lat.Index].Value.ToString(), out lat);
+                            double.TryParse(row.Cells[Lon.Index].Value.ToString(), out lng);
+
+                            double alt = (srtm.getAltitude(lat, lng).alt - srtm.getAltitude(
+                                                   MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat,
+                                                   MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng).alt) + p3 * CurrentState.multiplieralt;
+                            string a = TXT_homealt.Text;
+                            row.Cells[Alt.Index].Value = alt;
+                        }
+                    }
+                }
+                previous_homealt = TXT_homealt.Text;
+            }
+
+        }
+
 
         private Dictionary<string, string[]> readCMDXML()
         {
@@ -8316,6 +8337,17 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             MapBoxURLSelector mapBoxUrlSelector = new MapBoxURLSelector();
             mapBoxUrlSelector.ShowDialog();
 
+        }
+
+        private void myButton2_Click(object sender, EventArgs e)
+        {
+            var dr = CustomMessageBox.Show("Recalculate relative altitudes based on the new home?", "Recalculate Home",
+                MessageBoxButtons.YesNo);
+            if (dr == (int)DialogResult.Yes)
+            {
+                doHomeAltRecalc();
+            }
+            writeKML();
         }
     }
 }
