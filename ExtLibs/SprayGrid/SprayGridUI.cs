@@ -984,7 +984,7 @@ namespace MissionPlanner.SprayGrid
 
                         if (CHK_addTakeoffAndLanding.Checked)
                         {
-                            plugin.Host.AddWPtoList(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat, (double)NUM_TakeoffAlt.Value);
+                            plugin.Host.AddWPtoList(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, (double)NUM_TakeoffAlt.Value);
                         }
 
                         //Add start point
@@ -1125,7 +1125,7 @@ namespace MissionPlanner.SprayGrid
 
                         if (CHK_addTakeoffAndLanding.Checked)
                         {
-                            plugin.Host.AddWPtoList(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat, (double)NUM_TakeoffAlt.Value);
+                            plugin.Host.AddWPtoList(MAVLink.MAV_CMD.TAKEOFF, 0, 0, 0, 0, 0, 0, (double)NUM_TakeoffAlt.Value);
 
                         }
 
