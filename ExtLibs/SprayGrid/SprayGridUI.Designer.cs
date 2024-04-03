@@ -55,9 +55,9 @@
             this.NUM_trackingAltError = new System.Windows.Forms.NumericUpDown();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.NUM_TakeoffAlt = new System.Windows.Forms.NumericUpDown();
             this.label14 = new System.Windows.Forms.Label();
             this.CHK_expandObstacles = new System.Windows.Forms.CheckBox();
+            this.NUM_TakeoffAlt = new System.Windows.Forms.NumericUpDown();
             this.label11 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.NUM_Shift = new System.Windows.Forms.NumericUpDown();
@@ -336,26 +336,6 @@
             resources.ApplyResources(this.label15, "label15");
             this.label15.Name = "label15";
             // 
-            // NUM_TakeoffAlt
-            // 
-            resources.ApplyResources(this.NUM_TakeoffAlt, "NUM_TakeoffAlt");
-            this.NUM_TakeoffAlt.Maximum = new decimal(new int[] {
-            300,
-            0,
-            0,
-            0});
-            this.NUM_TakeoffAlt.Minimum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.NUM_TakeoffAlt.Name = "NUM_TakeoffAlt";
-            this.NUM_TakeoffAlt.Value = new decimal(new int[] {
-            30,
-            0,
-            0,
-            0});
-            // 
             // label14
             // 
             resources.ApplyResources(this.label14, "label14");
@@ -369,6 +349,26 @@
             this.CHK_expandObstacles.Name = "CHK_expandObstacles";
             this.CHK_expandObstacles.UseVisualStyleBackColor = true;
             this.CHK_expandObstacles.CheckedChanged += new System.EventHandler(this.recalculateGrid);
+            // 
+            // NUM_TakeoffAlt
+            // 
+            resources.ApplyResources(this.NUM_TakeoffAlt, "NUM_TakeoffAlt");
+            this.NUM_TakeoffAlt.Maximum = new decimal(new int[] {
+            300,
+            0,
+            0,
+            0});
+            this.NUM_TakeoffAlt.Minimum = new decimal(new int[] {
+            2,
+            0,
+            0,
+            0});
+            this.NUM_TakeoffAlt.Name = "NUM_TakeoffAlt";
+            this.NUM_TakeoffAlt.Value = new decimal(new int[] {
+            30,
+            0,
+            0,
+            0});
             // 
             // label11
             // 
@@ -571,19 +571,14 @@
             // NUM_altitude
             // 
             this.NUM_altitude.DecimalPlaces = 2;
-            this.NUM_altitude.Increment = new decimal(new int[] {
-            10,
-            0,
-            0,
-            0});
             resources.ApplyResources(this.NUM_altitude, "NUM_altitude");
             this.NUM_altitude.Maximum = new decimal(new int[] {
-            9999,
+            1000,
             0,
             0,
             0});
             this.NUM_altitude.Minimum = new decimal(new int[] {
-            5,
+            1,
             0,
             0,
             0});
@@ -628,6 +623,11 @@
             // NUM_Distance
             // 
             this.NUM_Distance.DecimalPlaces = 2;
+            this.NUM_Distance.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
             resources.ApplyResources(this.NUM_Distance, "NUM_Distance");
             this.NUM_Distance.Maximum = new decimal(new int[] {
             99999,
