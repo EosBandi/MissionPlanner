@@ -1357,6 +1357,11 @@ namespace MissionPlanner.Utilities
             // find closest line point to startpos
             linelatlng closest = findClosestLine(startposutm, grid, 0 /*Lane separation does not apply to starting point*/, angle);
 
+            if (startpos == StartPosition.Point)
+            {
+                closest = findClosestLine(new utmpos(StartPointLatLngAlt), grid, 0 /*Lane separation does not apply to starting point*/, angle);
+            }
+
             utmpos lastpnt;
 
             // get the closes point from the line we picked

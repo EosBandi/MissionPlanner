@@ -1308,7 +1308,7 @@ namespace MissionPlanner.SprayGrid
             if (CMB_startfrom.Text == Utilities.Grid.StartPosition.Point.ToString())
             {
                 int pnt = 1;
-                MissionPlanner.Controls.InputBox.Show("Enter point #", "Please enter a boundary point number", ref pnt);
+                MissionPlanner.Controls.InputBox.Show("Enter point #", "Please enter point number to start from", ref pnt);
 
                 if (list.Count > pnt)
                     Utilities.Grid.StartPointLatLngAlt = list[pnt - 1];
