@@ -183,6 +183,7 @@ namespace MissionPlanner.SprayGrid
             loadsetting("SprayGrid_alttrackerror", NUM_trackingAltError);
             loadsetting("SprayGrid_expandobstacles", CHK_expandObstacles);
             loadsetting("SprayGrid_takeoffalt", NUM_TakeoffAlt);
+            CMB_startfrom.SelectedIndex = (int)Utilities.Grid.StartPosition.Home;
 
         }
         void loadsetting(string key, Control item)
@@ -1310,8 +1311,8 @@ namespace MissionPlanner.SprayGrid
                 int pnt = 1;
                 MissionPlanner.Controls.InputBox.Show("Enter point #", "Please enter point number to start from", ref pnt);
 
-                if (list.Count > pnt)
-                    Utilities.Grid.StartPointLatLngAlt = list[pnt - 1];
+                if (grid.Count > pnt)
+                    Utilities.Grid.StartPointLatLngAlt = grid[pnt - 1];
             }
 
             recalculateGrid(sender, e);

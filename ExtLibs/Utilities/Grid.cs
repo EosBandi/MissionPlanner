@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using MissionPlanner.Utilities;
 using Clipper2Lib;
 using Microsoft.CodeAnalysis.Diagnostics;
+using DotSpatial.Projections;
 
 namespace MissionPlanner.Utilities
 {
@@ -1351,27 +1352,49 @@ namespace MissionPlanner.Utilities
                     break;
             }
 
-            // find the closes polygon point based from our startpos selection
-            startposutm = findClosestPoint(startposutm, vertexListUTM);
 
-            // find closest line point to startpos
-            linelatlng closest = findClosestLine(startposutm, grid, 0 /*Lane separation does not apply to starting point*/, angle);
+            linelatlng closest;
+            utmpos lastpnt;
 
             if (startpos == StartPosition.Point)
             {
-                closest = findClosestLine(new utmpos(StartPointLatLngAlt), grid, 0 /*Lane separation does not apply to starting point*/, angle);
-            }
+                //closest = findClosestLine(new utmpos(StartPointLatLngAlt), grid, 0 /*Lane separation does not apply to starting point*/, angle);
+                //Always start from this point whatever it takes
+                closest = grid[0];
+                lastpnt = new utmpos(StartPointLatLngAlt);
+                //find line in the grid  which has the point lastpnt
+                foreach (linelatlng line in grid)
+                {
+                    if (line.p1.GetDistance(lastpnt) < 0.1)
+                    {
+                        closest = line;
+                        break;
+                    }
+                    if (line.p2.GetDistance(lastpnt) < 0.1)
+                    {
+                        closest = line;
+                        break;
+                    }
+                }
 
-            utmpos lastpnt;
+                   // closest = findClosestLine(lastpnt, grid, 0 /*Lane separation does not apply to starting point*/, angle);
 
-            // get the closes point from the line we picked
-            if (closest.p1.GetDistance(startposutm) < closest.p2.GetDistance(startposutm))
-            {
-                lastpnt = closest.p1;
             }
             else
             {
-                lastpnt = closest.p2;
+                // find the closes polygon point based from our startpos selection
+                startposutm = findClosestPoint(startposutm, vertexListUTM);
+                // find closest line point to startpos
+                closest = findClosestLine(startposutm, grid, 0 /*Lane separation does not apply to starting point*/, angle);
+                // get the closes point from the line we picked
+                if (closest.p1.GetDistance(startposutm) < closest.p2.GetDistance(startposutm))
+                {
+                    lastpnt = closest.p1;
+                }
+                else
+                {
+                    lastpnt = closest.p2;
+                }
             }
 
             // S =  start
@@ -1431,8 +1454,6 @@ namespace MissionPlanner.Utilities
                         closest = findClosestLine(closest.p1, grid, minLaneSeparationINMeters, angle);
                 }
             }
-
-
 
             //Check if we are above an obstacle
             //TODO add to use more obstacles
