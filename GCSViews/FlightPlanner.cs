@@ -52,6 +52,13 @@ using Resources = MissionPlanner.Properties.Resources;
 using Newtonsoft.Json;
 using MissionPlanner.ArduPilot.Mavlink;
 using static IronPython.Modules._ast;
+using System.Runtime.CompilerServices;
+using Core.Geometry;
+using ICSharpCode.SharpZipLib.Core;
+using ICSharpCode.SharpZipLib.Zip;
+using KMLib.Geometry;
+using KMLib;
+using KMLib.Feature;
 
 namespace MissionPlanner.GCSViews
 {
@@ -4344,7 +4351,7 @@ namespace MissionPlanner.GCSViews
                             string tempdir = "";
                             if (file.ToLower().EndsWith("kmz"))
                             {
-                                ZipFile input = new ZipFile(file);
+                                Ionic.Zip.ZipFile input = new Ionic.Zip.ZipFile(file);
 
                                 tempdir = Path.GetTempPath() + Path.DirectorySeparatorChar + Path.GetRandomFileName();
                                 input.ExtractAll(tempdir, ExtractExistingFileAction.OverwriteSilently);
@@ -4617,7 +4624,7 @@ namespace MissionPlanner.GCSViews
                         string tempdir = "";
                         if (file.ToLower().EndsWith("kmz"))
                         {
-                            ZipFile input = new ZipFile(file);
+                            Ionic.Zip.ZipFile input = new Ionic.Zip.ZipFile(file);
 
                             tempdir = Path.GetTempPath() + Path.DirectorySeparatorChar + Path.GetRandomFileName();
                             input.ExtractAll(tempdir, ExtractExistingFileAction.OverwriteSilently);
@@ -5251,12 +5258,12 @@ namespace MissionPlanner.GCSViews
 
         private void processKML(Element Element)
         {
-            Document doc = Element as Document;
-            Placemark pm = Element as Placemark;
-            Folder folder = Element as Folder;
-            Polygon polygon = Element as Polygon;
-            LineString ls = Element as LineString;
-            MultipleGeometry geom = Element as MultipleGeometry;
+            SharpKml.Dom.Document doc = Element as SharpKml.Dom.Document;
+            SharpKml.Dom.Placemark pm = Element as SharpKml.Dom.Placemark;
+            SharpKml.Dom.Folder folder = Element as SharpKml.Dom.Folder;
+            SharpKml.Dom.Polygon polygon = Element as SharpKml.Dom.Polygon;
+            SharpKml.Dom.LineString ls = Element as SharpKml.Dom.LineString;
+            SharpKml.Dom.MultipleGeometry geom = Element as SharpKml.Dom.MultipleGeometry;
 
             if (doc != null)
             {
@@ -5325,11 +5332,11 @@ namespace MissionPlanner.GCSViews
                 log.Error(ex);
             }
 
-            Document doc = element as Document;
-            Placemark pm = element as Placemark;
-            Folder folder = element as Folder;
-            Polygon polygon = element as Polygon;
-            LineString ls = element as LineString;
+            SharpKml.Dom.Document doc = element as SharpKml.Dom.Document;
+            SharpKml.Dom.Placemark pm = element as SharpKml.Dom.Placemark;
+            SharpKml.Dom.Folder folder = element as SharpKml.Dom.Folder;
+            SharpKml.Dom.Polygon polygon = element as SharpKml.Dom.Polygon;
+            SharpKml.Dom.LineString ls = element as SharpKml.Dom.LineString;
 
             if (doc != null)
             {
@@ -5961,7 +5968,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
         {
             using (SaveFileDialog fd = new SaveFileDialog())
             {
-                fd.Filter = "Mission|*.waypoints;*.txt|QGC Plane JSON|*.plan";
+                fd.Filter = "Mission|*.waypoints;*.txt|QGC Plane JSON|*.plan|Google KML|*.kml";
                 fd.DefaultExt = ".waypoints";
                 fd.InitialDirectory = Settings.Instance["WPFileDirectory"] ?? "";
                 fd.FileName = wpfilename;
@@ -6011,6 +6018,15 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                             MissionFile.WriteFile(file, format);
                             return;
                         }
+
+
+                        if (file.EndsWith(".kml"))
+                        {
+                            WriteMissionAsKML(file);
+                            return;
+                        }
+
+
 
                         StreamWriter sw = new StreamWriter(file);
                         sw.WriteLine("QGC WPL 110");
@@ -8413,5 +8429,190 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             }
             writeKML();
         }
+        public static Color HexStringToColor(string hexColor)
+        {
+            string hc = (hexColor);
+            if (hc.Length != 8)
+            {
+                // you can choose whether to throw an exception
+                //throw new ArgumentException("hexColor is not exactly 6 digits.");
+                return Color.Empty;
+            }
+            string a = hc.Substring(0, 2);
+            string r = hc.Substring(6, 2);
+            string g = hc.Substring(4, 2);
+            string b = hc.Substring(2, 2);
+            Color color = Color.Empty;
+            try
+            {
+                int ai
+                    = Int32.Parse(a, System.Globalization.NumberStyles.HexNumber);
+                int ri
+                    = Int32.Parse(r, System.Globalization.NumberStyles.HexNumber);
+                int gi
+                    = Int32.Parse(g, System.Globalization.NumberStyles.HexNumber);
+                int bi
+                    = Int32.Parse(b, System.Globalization.NumberStyles.HexNumber);
+                color = Color.FromArgb(ai, ri, gi, bi);
+            }
+            catch
+            {
+                // you can choose whether to throw an exception
+                //throw new ArgumentException("Conversion failed.");
+                return Color.Empty;
+            }
+            return color;
+        }
+
+        public void WriteMissionAsKML(string filename)
+        {
+
+            var type = (MAVLink.MAV_MISSION_TYPE)Invoke((Func<MAVLink.MAV_MISSION_TYPE>)delegate
+            {
+                return (MAVLink.MAV_MISSION_TYPE)cmb_missiontype.SelectedValue;
+            });
+
+            //Only save Missions
+            if (type != MAVLink.MAV_MISSION_TYPE.MISSION) return;
+
+
+
+
+
+
+            Color[] colours =
+            {
+                Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo,
+                Color.Violet, Color.Pink
+            };
+
+            KMLib.AltitudeMode altmode = KMLib.AltitudeMode.absolute;
+
+            KMLRoot kml = new KMLRoot();
+            KMLib.Feature.Folder fldr = new KMLib.Feature.Folder("Mission");
+
+            KMLib.Style style = new KMLib.Style();
+            style.Id = "yellowLineGreenPoly";
+            style.Add(new KMLib.LineStyle(HexStringToColor("7f00ffff"), 4));
+
+            KMLib.Style style1 = new KMLib.Style();
+            style1.Id = "spray";
+            style1.Add(new KMLib.LineStyle(HexStringToColor("4c0000ff"), 0));
+            style1.Add(new KMLib.PolyStyle() { Color = HexStringToColor("4c0000ff") });
+
+            PolyStyle pstyle = new PolyStyle();
+            pstyle.Color = HexStringToColor("7f00ff00");
+            style.Add(pstyle);
+
+            kml.Document.AddStyle(style);
+            kml.Document.AddStyle(style1);
+
+            int stylecode = 0xff;
+            int g = -1;
+
+            KMLib.Feature.Folder waypoints = new KMLib.Feature.Folder();
+            waypoints.name = "Waypoints";
+            fldr.Add(waypoints);
+
+
+            KMLib.LineString lswp = new KMLib.LineString();
+            lswp.AltitudeMode = KMLib.AltitudeMode.absolute;
+            lswp.Extrude = true;
+
+
+
+            Locationwp home = new Locationwp();
+            try
+            {
+                home.frame = (byte)MAVLink.MAV_FRAME.GLOBAL;
+                home.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+                home.lat = (double.Parse(TXT_homelat.Text));
+                home.lng = (double.Parse(TXT_homelng.Text));
+                home.alt = (float.Parse(TXT_homealt.Text) / CurrentState.multiplierdist); // use saved home
+            }
+            catch
+            {
+                CustomMessageBox.Show("Your home location is invalid", Strings.ERROR);
+                return;
+            }
+
+
+
+            Coordinates coordswp = new Coordinates();
+            int lastwp = 0;
+            int i = 0;
+            foreach (DataGridViewRow line in Commands.Rows)
+            {
+                var cmd = getCmdID(line.Cells[Command.Index].Value.ToString());
+
+                var wpno = i;
+                i++;
+
+                if (wpno < lastwp)
+                {
+                    lswp.coordinates = coordswp;
+
+                    KMLib.Feature.Placemark pmwp = new KMLib.Feature.Placemark();
+
+                    pmwp.name = "Waypoints ";
+                    pmwp.LineString = lswp;
+
+                    if (coordswp.Count > 0)
+                        waypoints.Add(pmwp);
+
+                    lswp = new KMLib.LineString();
+                    lswp.AltitudeMode = KMLib.AltitudeMode.absolute;
+                    lswp.Extrude = false;
+
+                    coordswp = new Coordinates();
+                }
+
+                lastwp = wpno;
+
+                double lat = double.Parse(line.Cells[Lat.Index].Value.ToString());
+                double lng = double.Parse(line.Cells[Lon.Index].Value.ToString());
+                double alt = double.Parse(line.Cells[Alt.Index].Value.ToString()); // This supposed to be relative altitiude
+
+                double realalt = 0;
+                altmode frame = (altmode)Commands[Frame.Index, i-1].Value;
+                if (frame == FlightPlanner.altmode.Relative)
+                {
+                   realalt = home.alt + alt;
+                }
+                else        //TODO: add terrain reference
+                {
+                   realalt = alt;
+                }
+
+                if (wpno == 0)
+                    alt = 0;
+
+                if (lat == 0 && lng == 0)
+                    continue;
+
+                coordswp.Add(new Point3D(lng, lat, realalt));
+            }
+
+
+            lswp.coordinates = coordswp;
+
+            KMLib.Feature.Placemark pmwp2 = new KMLib.Feature.Placemark();
+
+            pmwp2.name = "Waypoints";
+            //pm.styleUrl = "#yellowLineGreenPoly";
+            pmwp2.LineString = lswp;
+
+            if (coordswp.Count > 0)
+                waypoints.Add(pmwp2);
+            kml.Document.Add(fldr);
+            kml.Save(filename);
+
+            // create kmz - aka zip file
+
+        }
+
+
+
+
     }
 }
