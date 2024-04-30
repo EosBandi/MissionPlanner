@@ -635,6 +635,34 @@ namespace MissionPlanner.GCSViews
             frmProgressReporter.Dispose();
         }
 
+
+        //Check if there are any wp (16) with zero,zero coordinates
+        //If yes it write our a messsages and returns false
+        public bool missionSanityChecks()
+        {
+            for (int a = 0; a < Commands.Rows.Count - 0; a++)
+            {
+
+                if (Commands.Rows[a].Cells[Command.Index].Value.ToString().Contains("WAYPOINT"))
+                {
+                    //check if lat and lon are both zero
+                    if (double.Parse(Commands[Lat.Index, a].Value.ToString()) == 0 &&
+                                               double.Parse(Commands[Lon.Index, a].Value.ToString()) == 0)
+                    {
+                        CustomMessageBox.Show("WP#" + (a + 1) + " has zero coordinates");
+                        return false;
+
+                    }
+                }
+
+            }
+                return true;
+        }
+
+
+
+
+
         /// <summary>
         /// Writes the mission from the datagrid and values to the EEPROM
         /// </summary>
@@ -642,6 +670,13 @@ namespace MissionPlanner.GCSViews
         /// <param name="e"></param>
         public void BUT_write_Click(object sender, EventArgs e)
         {
+
+            if (!missionSanityChecks())
+            {
+                return;
+            }
+
+
             if ((altmode)CMB_altmode.SelectedValue == altmode.Absolute)
             {
                 if ((int)DialogResult.No ==
@@ -1362,7 +1397,7 @@ namespace MissionPlanner.GCSViews
 
             if (Disposing)
                 return;
-            
+
             updateRowNumbers();
             updateStartStop();
 
@@ -1409,7 +1444,7 @@ namespace MissionPlanner.GCSViews
                     }
 
                     //Update the SprayFunction as vell
-                    
+
 
 
                     //Check points and change overlayType if needed
@@ -1927,11 +1962,19 @@ namespace MissionPlanner.GCSViews
 
         public void BUT_saveWPFile_Click(object sender, EventArgs e)
         {
+            if (!missionSanityChecks()  )
+                return;
+
             SaveFile_Click(null, null);
         }
 
         public void but_writewpfast_Click(object sender, EventArgs e)
         {
+
+            if (!missionSanityChecks())
+                return;
+
+
             if ((altmode)CMB_altmode.SelectedValue == altmode.Absolute)
             {
                 if ((int)DialogResult.No ==
@@ -2213,7 +2256,7 @@ namespace MissionPlanner.GCSViews
             }
 
             if (lastEditorMode == MAVLink.MAV_MISSION_TYPE.MISSION)
-            { 
+            {
                //If we were editing a mission, save the points to keep it in editor
                editedMissionPoints.Clear();
                editedMissionPoints = GetCommandList();}
@@ -5950,7 +5993,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
                             list.Insert(0, home);
 
-                            List<Locationwp> fencelist = new List<Locationwp>();  
+                            List<Locationwp> fencelist = new List<Locationwp>();
                             if (MainV2.comPort.MAV.cs.connected)
                             {
                                 fencelist = MainV2.comPort.MAV.fencepoints.Values.Select(a => (Locationwp)a).ToList();
@@ -8331,7 +8374,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 {
                     //Get next command
                     if (i< Commands.Rows.Count - 1)
-                    { 
+                    {
                         if (Commands.Rows[i+1].Cells[Command.Index].Value.ToString() == "DO_SEND_SCRIPT_MESSAGE")
                         {
                             if (Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "0")
