@@ -53,7 +53,7 @@ namespace MissionPlanner.Controls
                 urlList = JsonConvert.DeserializeObject<List<(string name, string url)>>(Settings.Instance["MapBoxURLList"].ToString());
             }
         }
-        
+
         void setlisttoSettings()
         {
             Settings.Instance["MapBoxURLList"] = JsonConvert.SerializeObject(urlList);
@@ -80,7 +80,7 @@ namespace MissionPlanner.Controls
             string url = listView1.SelectedItems[0].SubItems[1].Text;
 
             var match = Regex.Matches(url, @"\/styles\/[^\/]+\/([^\/]+)\/([^\/\.]+).*access_token=([^#&=]+)");
-            if (match is null)
+            if (match?.Count == null)
             {
                 CustomMessageBox.Show("Invalid URL!", Strings.ERROR);
                 return;
@@ -104,7 +104,7 @@ namespace MissionPlanner.Controls
             string url = listView1.SelectedItems[0].SubItems[1].Text;
 
             var match = Regex.Matches(url, @"\/styles\/[^\/]+\/([^\/]+)\/([^\/\.]+).*access_token=([^#&=]+)");
-            if (match is null)
+            if (match?.Count == 0)
             {
                 CustomMessageBox.Show("Invalid URL!", Strings.ERROR);
                 return;
@@ -124,7 +124,7 @@ namespace MissionPlanner.Controls
             InputBox.Show("Enter MapBox map NAME", "Enter MapBox map NAME", ref name);
 
             var match = Regex.Matches(url, @"\/styles\/[^\/]+\/([^\/]+)\/([^\/\.]+).*access_token=([^#&=]+)");
-            if (match is null)
+            if (match?.Count == 0)
             {
                 CustomMessageBox.Show("Invalid URL!", Strings.ERROR);
                 return;
@@ -152,6 +152,37 @@ namespace MissionPlanner.Controls
             setlisttoSettings();
             Settings.Instance.Save();
 
+        }
+
+        private void editToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (listView1.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Right click on a line to use it", "No line selected");
+                return;
+            }
+
+            string name = listView1.SelectedItems[0].SubItems[0].Text;
+            string oldname = name;
+            string url = listView1.SelectedItems[0].SubItems[1].Text;
+            InputBox.Show("Enter MapBox Share URL", "Enter MapBox Share URL", ref url);
+            InputBox.Show("Enter MapBox map NAME", "Enter MapBox map NAME", ref name);
+            var match = Regex.Matches(url, @"\/styles\/[^\/]+\/([^\/]+)\/([^\/\.]+).*access_token=([^#&=]+)");
+            if (match?.Count == 0)
+            {
+                CustomMessageBox.Show("Invalid URL!", Strings.ERROR);
+                return;
+            }
+            // update the item in the list
+            urlList.RemoveAll(x => x.name == oldname);
+            urlList.Add((name, url));
+            updateListView();
+            Settings.Instance["MapBoxURL"] = url;
+            Settings.Instance["MapBoxName"] = name;
+            setlisttoSettings();
+            Settings.Instance.Save();
+            this.DialogResult = DialogResult.OK;
+            this.Close();
         }
     }
 }
