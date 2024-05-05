@@ -59,6 +59,8 @@ using ICSharpCode.SharpZipLib.Zip;
 using KMLib.Geometry;
 using KMLib;
 using KMLib.Feature;
+using MissionPlanner.HIL;
+using solo;
 
 namespace MissionPlanner.GCSViews
 {
@@ -2428,6 +2430,48 @@ namespace MissionPlanner.GCSViews
 
         public void Commands_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
+
+            //We modified the P3 value of a waypoint, refresh the AGL and the alt
+            if (e.ColumnIndex == Param3.Index && Commands.Rows[e.RowIndex].Cells[Command.Index].Value.ToString() == "WAYPOINT")
+            {
+
+                //check if we have a valied coordinates
+                var lat = double.Parse(Commands.Rows[e.RowIndex].Cells[Lat.Index].Value.ToString());
+                var lng = double.Parse(Commands.Rows[e.RowIndex].Cells[Lon.Index].Value.ToString());
+                if (lat == 0 || lng == 0)
+                {
+                    CustomMessageBox.Show("Invalid Lat/Long, please fix", Strings.ERROR);
+                    return;
+                }
+
+                var srtmAlt = srtm.getAltitude(lat, lng).alt;
+
+
+                try
+                {
+                    double agl = double.Parse(Commands.Rows[e.RowIndex].Cells[Param3.Index].Value.ToString());
+                    double alt = 0;
+                    double homealt = (float.Parse(TXT_homealt.Text) / CurrentState.multiplierdist);
+
+                    if (currentaltmode == altmode.Relative)
+                    {
+                        alt = srtmAlt - homealt  + agl;
+                    }
+                    else
+                    {
+                        alt = agl;
+                    }
+
+                    Commands.Rows[e.RowIndex].Cells[Alt.Index].Value = Math.Round(alt,2);
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                    CustomMessageBox.Show("Invalid AGL, please fix", Strings.ERROR);
+                }
+            }
+
+
             // we have modified a utm coords
             if (e.ColumnIndex == coordZone.Index ||
                 e.ColumnIndex == coordNorthing.Index ||
