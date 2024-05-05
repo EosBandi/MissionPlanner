@@ -595,6 +595,7 @@ namespace MissionPlanner.SprayGrid
             //First point must be "S" and last point must be "E"
             int color = 0;
             int itemnumber = -1;
+            double workingDistance = 0; // Distance for S-E lines total
             PointLatLng firstpoint = grid[0];
             foreach (var p in grid)
             {
@@ -613,6 +614,7 @@ namespace MissionPlanner.SprayGrid
                         Stroke = new Pen(Color.Yellow, 4)
                     };
                     colorRoutes.Polygons.Add(poly);
+                    workingDistance += poly.Distance;
                 }
                 else
                 {
@@ -645,6 +647,7 @@ namespace MissionPlanner.SprayGrid
             //fullArea = fullArea - obstacleArea;
 
             double distance = wppoly.Distance;
+            lbl_SprayDistance.Text = workingDistance.ToString("0.##") + " km";
             lbl_area.Text = fullArea.ToString("#") + " m^2";
             lbl_distance.Text = distance.ToString("0.##") + " km";
             lbl_strips.Text = ((int)(strips / 2)).ToString();

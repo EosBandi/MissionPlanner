@@ -92,6 +92,8 @@
             this.cb_flip = new System.Windows.Forms.CheckBox();
             this.btn_LoadGrid = new MissionPlanner.Controls.MyButton();
             this.btN_SaveGrid = new MissionPlanner.Controls.MyButton();
+            this.label14 = new System.Windows.Forms.Label();
+            this.lbl_SprayDistance = new System.Windows.Forms.Label();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).BeginInit();
             this.groupBox6.SuspendLayout();
@@ -116,6 +118,8 @@
             // groupBox5
             // 
             resources.ApplyResources(this.groupBox5, "groupBox5");
+            this.groupBox5.Controls.Add(this.lbl_SprayDistance);
+            this.groupBox5.Controls.Add(this.label14);
             this.groupBox5.Controls.Add(this.myButton1);
             this.groupBox5.Controls.Add(this.CHK_extendedpoint);
             this.groupBox5.Controls.Add(this.chk_grid);
@@ -712,6 +716,16 @@
             this.btN_SaveGrid.UseVisualStyleBackColor = true;
             this.btN_SaveGrid.Click += new System.EventHandler(this.btN_SaveGrid_Click);
             // 
+            // label14
+            // 
+            resources.ApplyResources(this.label14, "label14");
+            this.label14.Name = "label14";
+            // 
+            // lbl_SprayDistance
+            // 
+            resources.ApplyResources(this.lbl_SprayDistance, "lbl_SprayDistance");
+            this.lbl_SprayDistance.Name = "lbl_SprayDistance";
+            // 
             // SprayGridUI
             // 
             resources.ApplyResources(this, "$this");
@@ -810,5 +824,7 @@
         private System.Windows.Forms.CheckBox cb_flip;
         private Controls.MyButton btN_SaveGrid;
         private Controls.MyButton btn_LoadGrid;
+        private System.Windows.Forms.Label lbl_SprayDistance;
+        private System.Windows.Forms.Label label14;
     }
 }

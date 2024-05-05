@@ -121,17 +121,77 @@
   <data name="groupBox5.Anchor" type="System.Windows.Forms.AnchorStyles, System.Windows.Forms">
     <value>Top, Bottom, Left, Right</value>
   </data>
-  <data name="myButton1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="lbl_SprayDistance.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="lbl_SprayDistance.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <assembly alias="System.Drawing" name="System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
+  <data name="lbl_SprayDistance.Location" type="System.Drawing.Point, System.Drawing">
+    <value>344, 74</value>
+  </data>
+  <data name="lbl_SprayDistance.Size" type="System.Drawing.Size, System.Drawing">
+    <value>55, 13</value>
+  </data>
+  <data name="lbl_SprayDistance.TabIndex" type="System.Int32, mscorlib">
+    <value>81</value>
+  </data>
+  <data name="lbl_SprayDistance.Text" xml:space="preserve">
+    <value>Distance: </value>
+  </data>
+  <data name="&gt;&gt;lbl_SprayDistance.Name" xml:space="preserve">
+    <value>lbl_SprayDistance</value>
+  </data>
+  <data name="&gt;&gt;lbl_SprayDistance.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;lbl_SprayDistance.Parent" xml:space="preserve">
+    <value>groupBox5</value>
+  </data>
+  <data name="&gt;&gt;lbl_SprayDistance.ZOrder" xml:space="preserve">
+    <value>0</value>
+  </data>
+  <data name="label14.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="label14.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="label14.Location" type="System.Drawing.Point, System.Drawing">
+    <value>231, 74</value>
+  </data>
+  <data name="label14.Size" type="System.Drawing.Size, System.Drawing">
+    <value>82, 13</value>
+  </data>
+  <data name="label14.TabIndex" type="System.Int32, mscorlib">
+    <value>80</value>
+  </data>
+  <data name="label14.Text" xml:space="preserve">
+    <value>Spray Distance:</value>
+  </data>
+  <data name="&gt;&gt;label14.Name" xml:space="preserve">
+    <value>label14</value>
+  </data>
+  <data name="&gt;&gt;label14.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;label14.Parent" xml:space="preserve">
+    <value>groupBox5</value>
+  </data>
+  <data name="&gt;&gt;label14.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="myButton1.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
   <data name="myButton1.Location" type="System.Drawing.Point, System.Drawing">
     <value>1047, 17</value>
   </data>
   <data name="myButton1.Size" type="System.Drawing.Size, System.Drawing">
     <value>75, 31</value>
   </data>
-  <assembly alias="mscorlib" name="mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
   <data name="myButton1.TabIndex" type="System.Int32, mscorlib">
     <value>79</value>
   </data>
@@ -148,7 +208,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;myButton1.ZOrder" xml:space="preserve">
-    <value>0</value>
+    <value>2</value>
   </data>
   <data name="CHK_extendedpoint.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -178,7 +238,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;CHK_extendedpoint.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>3</value>
   </data>
   <data name="chk_grid.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -208,7 +268,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;chk_grid.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>4</value>
   </data>
   <data name="chk_markers.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -238,7 +298,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;chk_markers.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>5</value>
   </data>
   <data name="tb_TimeSegments.Location" type="System.Drawing.Point, System.Drawing">
     <value>473, 17</value>
@@ -265,7 +325,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;tb_TimeSegments.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>6</value>
   </data>
   <data name="chk_boundary.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -295,7 +355,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;chk_boundary.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>7</value>
   </data>
   <data name="lbl_litersPerHA.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -325,7 +385,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_litersPerHA.ZOrder" xml:space="preserve">
-    <value>6</value>
+    <value>8</value>
   </data>
   <data name="label13.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -355,7 +415,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label13.ZOrder" xml:space="preserve">
-    <value>7</value>
+    <value>9</value>
   </data>
   <data name="lbl_plannedSpeed.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -385,7 +445,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_plannedSpeed.ZOrder" xml:space="preserve">
-    <value>8</value>
+    <value>10</value>
   </data>
   <data name="lbl_flighttime.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -415,7 +475,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_flighttime.ZOrder" xml:space="preserve">
-    <value>9</value>
+    <value>11</value>
   </data>
   <data name="label16.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -445,7 +505,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label16.ZOrder" xml:space="preserve">
-    <value>10</value>
+    <value>12</value>
   </data>
   <data name="label17.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -475,7 +535,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label17.ZOrder" xml:space="preserve">
-    <value>11</value>
+    <value>13</value>
   </data>
   <data name="lbl_distbetweenlines.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -505,7 +565,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_distbetweenlines.ZOrder" xml:space="preserve">
-    <value>12</value>
+    <value>14</value>
   </data>
   <data name="label25.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -535,7 +595,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label25.ZOrder" xml:space="preserve">
-    <value>13</value>
+    <value>15</value>
   </data>
   <data name="lbl_strips.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -565,7 +625,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_strips.ZOrder" xml:space="preserve">
-    <value>14</value>
+    <value>16</value>
   </data>
   <data name="label33.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -595,7 +655,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label33.ZOrder" xml:space="preserve">
-    <value>15</value>
+    <value>17</value>
   </data>
   <data name="lbl_distance.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -625,7 +685,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_distance.ZOrder" xml:space="preserve">
-    <value>16</value>
+    <value>18</value>
   </data>
   <data name="lbl_area.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -655,7 +715,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;lbl_area.ZOrder" xml:space="preserve">
-    <value>17</value>
+    <value>19</value>
   </data>
   <data name="label23.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -685,7 +745,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label23.ZOrder" xml:space="preserve">
-    <value>18</value>
+    <value>20</value>
   </data>
   <data name="label22.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -715,7 +775,7 @@
     <value>groupBox5</value>
   </data>
   <data name="&gt;&gt;label22.ZOrder" xml:space="preserve">
-    <value>19</value>
+    <value>21</value>
   </data>
   <data name="groupBox5.Location" type="System.Drawing.Point, System.Drawing">
     <value>3, 0</value>
