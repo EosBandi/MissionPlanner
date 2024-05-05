@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows.Forms;
+using DotSpatial.NTSExtension;
 using GeoAPI.CoordinateSystems;
 using GeoAPI.CoordinateSystems.Transformations;
 using GMap.NET;
@@ -1546,8 +1547,30 @@ namespace MissionPlanner.SprayGrid
             return base.ProcessCmdKey(ref msg, keyData);
         }
 
+        private void cb_flip_CheckedChanged(object sender, EventArgs e)
+        {
+            double angle = (double)NUM_angle.Value;
+            if (cb_flip.Checked)
+            {
+                angle = wrap360(angle + 180.0);
 
+            }
+            else
+            {
+                angle = wrap360(angle - 180.0);
+            }
 
+            NUM_angle.Value = (decimal)angle;
+            recalculateGrid(sender, e);
+        }
+
+        double wrap360(double noin)
+        {
+            noin = noin % 360;
+            if (noin < 0)
+                return noin + 360;
+            return noin;
+        }
 
     }
 }

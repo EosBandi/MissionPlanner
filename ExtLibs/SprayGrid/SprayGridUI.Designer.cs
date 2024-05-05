@@ -90,6 +90,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.map = new MissionPlanner.Controls.myGMAP();
+            this.cb_flip = new System.Windows.Forms.CheckBox();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).BeginInit();
             this.groupBox6.SuspendLayout();
@@ -292,6 +293,7 @@
             // groupBox6
             // 
             resources.ApplyResources(this.groupBox6, "groupBox6");
+            this.groupBox6.Controls.Add(this.cb_flip);
             this.groupBox6.Controls.Add(this.label15);
             this.groupBox6.Controls.Add(this.label14);
             this.groupBox6.Controls.Add(this.CHK_expandObstacles);
@@ -690,6 +692,13 @@
             this.map.ShowTileGridLines = false;
             this.map.Zoom = 3D;
             // 
+            // cb_flip
+            // 
+            resources.ApplyResources(this.cb_flip, "cb_flip");
+            this.cb_flip.Name = "cb_flip";
+            this.cb_flip.UseVisualStyleBackColor = true;
+            this.cb_flip.CheckedChanged += new System.EventHandler(this.cb_flip_CheckedChanged);
+            // 
             // SprayGridUI
             // 
             resources.ApplyResources(this, "$this");
@@ -786,5 +795,6 @@
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.NumericUpDown NUM_TakeoffAlt;
+        private System.Windows.Forms.CheckBox cb_flip;
     }
 }
