@@ -23,7 +23,7 @@
 
 						<iis:Certificate Id="rootcert" StoreLocation="localMachine" StoreName="root" Overwrite='yes' BinaryKey='signedcer' Request="no" Name='Michael Oborne' />
 					</Component>
-		<Component Id="Drivers" Guid="f7602346-2964-47df-8440-9bc3c479196c">
+		<Component Id="Drivers" Guid="d0349067-7273-4f78-aa37-04a0e4da7a43">
 			<File Id="arduino_cat" Source="../Drivers\arduino.cat" />
 			<File Id="arduino_inf" Source="../Drivers\arduino.inf" />
 			<File Id="chibios_cat" Source="../Drivers\chibios.cat" />
@@ -89,13 +89,13 @@
 			<File Id="yourconf_cnf" Source="../Drivers\yourconf.cnf" />
 		</Component>
 		<Directory Id="amd64" Name="amd64">
-			<Component Id="amd64" Guid="cf44973a-6fbc-41fb-817d-7ceaade1cf84">
+			<Component Id="amd64" Guid="4f84b9d7-7c1f-4e1f-b16f-f17764d71e7b">
 				<File Id="WdfCoInstaller01009_dll" Source="../Drivers\amd64\WdfCoInstaller01009.dll" />
 				<File Id="winusbcoinstaller2_dll" Source="../Drivers\amd64\winusbcoinstaller2.dll" />
 			</Component>
 		</Directory>
 		<Directory Id="x86" Name="x86">
-			<Component Id="x86" Guid="795a6a0e-0277-463b-9092-817b30abe90b">
+			<Component Id="x86" Guid="17c15d4f-18d7-496b-b61e-b6f4eeeaf07a">
 				<File Id="WdfCoInstaller01009_dll_1" Source="../Drivers\x86\WdfCoInstaller01009.dll" />
 				<File Id="winusbcoinstaller2_dll_1" Source="../Drivers\x86\winusbcoinstaller2.dll" />
 			</Component>
