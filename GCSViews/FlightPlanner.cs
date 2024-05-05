@@ -6594,6 +6594,24 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                             {
                                 Commands.Rows[int.Parse(lla.Tag) - 1].Cells[AGL.Index].Style.BackColor = Commands.BackgroundColor;
                             }
+
+                            //Check if the waypoint AGL value is zero
+                            if (Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Command.Index].Value.ToString() != "LAND")
+                            {
+                               double aglvalue = double.Parse(Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Param3.Index].Value.ToString());
+                                if (aglvalue == 0)
+                                {
+                                    Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Param3.Index].Style.BackColor = Color.Red;
+                                }
+                                else
+                                {
+                                    Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Param3.Index].Style.BackColor = Commands.BackgroundColor;
+
+                                }
+                            }
+
+
+
                         }
                     }
                 }
