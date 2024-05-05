@@ -68,6 +68,7 @@ namespace MissionPlanner.ArduPilot
                     command != (ushort) MAVLink.MAV_CMD.RETURN_TO_LAUNCH &&
                     command != (ushort) MAVLink.MAV_CMD.CONTINUE_AND_CHANGE_ALT &&
                     command != (ushort) MAVLink.MAV_CMD.DELAY &&
+                    command != (ushort) MAVLink.MAV_CMD.TAKEOFF &&
                     command != (ushort) MAVLink.MAV_CMD.GUIDED_ENABLE
                     || command == (ushort) MAVLink.MAV_CMD.DO_SET_ROI || command == (ushort)MAVLink.MAV_CMD.DO_LAND_START)
                 {
@@ -78,7 +79,7 @@ namespace MissionPlanner.ArduPilot
                     }
 
                     if (command == (ushort) MAVLink.MAV_CMD.DO_LAND_START && item.lat != 0 && item.lng != 0)
-                    {     
+                    {
                         pointlist.Add(new PointLatLngAlt(item.lat, item.lng,
                             item.alt + gethomealt((MAVLink.MAV_FRAME) item.frame, item.lat, item.lng),
                             (a + 1).ToString()));
@@ -91,11 +92,11 @@ namespace MissionPlanner.ArduPilot
                             RegenerateWPRoute(route, home, false);
                             route.Clear();
                         }
-                        
+
                         route.Add(pointlist[pointlist.Count - 1]);
                         addpolygonmarker((a + 1).ToString(), item.lng, item.lat,
                             item.alt * altunitmultiplier, null, wpradius);
-                    } 
+                    }
                     else if ((command == (ushort) MAVLink.MAV_CMD.LAND || command == (ushort) MAVLink.MAV_CMD.VTOL_LAND) && item.lat != 0 && item.lng != 0)
                     {
                         pointlist.Add(new PointLatLngAlt(item.lat, item.lng,
@@ -107,7 +108,7 @@ namespace MissionPlanner.ArduPilot
 
                         RegenerateWPRoute(route, home,  false);
                         route.Clear();
-                    } 
+                    }
                     else if (command == (ushort) MAVLink.MAV_CMD.DO_SET_ROI)
                     {
                         pointlist.Add(new PointLatLngAlt(item.lat, item.lng,
@@ -386,7 +387,7 @@ namespace MissionPlanner.ArduPilot
             try
             {
                 PointLatLng point = new PointLatLng(lat, lng);
-                GMapMarker m = null;                
+                GMapMarker m = null;
                 if(type == MAVLink.MAV_MISSION_TYPE.MISSION)
                 {
                     m = new GMapMarkerWP(point, tag);

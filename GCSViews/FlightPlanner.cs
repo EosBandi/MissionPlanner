@@ -7031,6 +7031,21 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 log.Error(ex);
             }
 
+            //Change Takeoff position as well
+            for (int a = 0; a < Commands.Rows.Count; a++)
+            {
+                //Update Takeoff position as well
+                if ((string)Commands[Command.Index, a].Value == MAVLink.MAV_CMD.TAKEOFF.ToString())
+                {
+                    // set takeoff position to the new home position
+                    Commands[Lat.Index, a].Value = MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat;
+                }
+
+            }
+
+
+
+
             writeKML();
         }
 
@@ -7048,6 +7063,20 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             {
                 log.Error(ex);
             }
+
+            //Change Takeoff position as well
+            for (int a = 0; a < Commands.Rows.Count; a++)
+            {
+                //Update Takeoff position as well
+                if ((string)Commands[Command.Index, a].Value == MAVLink.MAV_CMD.TAKEOFF.ToString())
+                {
+                    // set takeoff position to the new home position
+                    Commands[Lon.Index, a].Value = MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat;
+                }
+
+            }
+
+
 
             writeKML();
         }
