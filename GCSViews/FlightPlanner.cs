@@ -6532,18 +6532,24 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                         Commands.Rows[int.Parse(lla.Tag) - 1].Cells[AZ.Index].Value =
                             ((lla.GetBearing(last) + 180) % 360).ToString("0");
 
-                        // Calculate AGL
-                        double agl = CurrentState.toAltDisplayUnit(lla.Alt - srtm.getAltitude(lla.Lat, lla.Lng).alt);
-                        Commands.Rows[int.Parse(lla.Tag) - 1].Cells[AGL.Index].Value = agl.ToString("0.00");
 
-                        // Warn if AGL is less than the warning altitude
-                        if (agl < min_agl)
+                        // Dont do AGL calculation for TAKEOFF and LAND commands
+                        if (Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Command.Index].Value.ToString() != "LAND" &&
+                            Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Command.Index].Value.ToString() != "TAKEOFF")
                         {
-                            Commands.Rows[int.Parse(lla.Tag) - 1].Cells[AGL.Index].Style.BackColor = Color.Red;
-                        }
-                        else
-                        {
-                            Commands.Rows[int.Parse(lla.Tag) - 1].Cells[AGL.Index].Style.BackColor = Commands.BackgroundColor;
+                            // Calculate AGL for everything else that has a coordnate
+                            double agl = CurrentState.toAltDisplayUnit(lla.Alt - srtm.getAltitude(lla.Lat, lla.Lng).alt);
+                            Commands.Rows[int.Parse(lla.Tag) - 1].Cells[AGL.Index].Value = agl.ToString("0.00");
+
+                            // Warn if AGL is less than the warning altitude
+                            if (agl < min_agl)
+                            {
+                                Commands.Rows[int.Parse(lla.Tag) - 1].Cells[AGL.Index].Style.BackColor = Color.Red;
+                            }
+                            else
+                            {
+                                Commands.Rows[int.Parse(lla.Tag) - 1].Cells[AGL.Index].Style.BackColor = Commands.BackgroundColor;
+                            }
                         }
                     }
                 }
