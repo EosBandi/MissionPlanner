@@ -55,7 +55,6 @@
             this.NUM_trackingAltError = new System.Windows.Forms.NumericUpDown();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
             this.label15 = new System.Windows.Forms.Label();
-            this.label14 = new System.Windows.Forms.Label();
             this.CHK_expandObstacles = new System.Windows.Forms.CheckBox();
             this.NUM_TakeoffAlt = new System.Windows.Forms.NumericUpDown();
             this.label11 = new System.Windows.Forms.Label();
@@ -91,6 +90,8 @@
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.map = new MissionPlanner.Controls.myGMAP();
             this.cb_flip = new System.Windows.Forms.CheckBox();
+            this.btn_LoadGrid = new MissionPlanner.Controls.MyButton();
+            this.btN_SaveGrid = new MissionPlanner.Controls.MyButton();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).BeginInit();
             this.groupBox6.SuspendLayout();
@@ -293,9 +294,10 @@
             // groupBox6
             // 
             resources.ApplyResources(this.groupBox6, "groupBox6");
+            this.groupBox6.Controls.Add(this.btN_SaveGrid);
+            this.groupBox6.Controls.Add(this.btn_LoadGrid);
             this.groupBox6.Controls.Add(this.cb_flip);
             this.groupBox6.Controls.Add(this.label15);
-            this.groupBox6.Controls.Add(this.label14);
             this.groupBox6.Controls.Add(this.CHK_expandObstacles);
             this.groupBox6.Controls.Add(this.NUM_TakeoffAlt);
             this.groupBox6.Controls.Add(this.label11);
@@ -337,11 +339,6 @@
             // 
             resources.ApplyResources(this.label15, "label15");
             this.label15.Name = "label15";
-            // 
-            // label14
-            // 
-            resources.ApplyResources(this.label14, "label14");
-            this.label14.Name = "label14";
             // 
             // CHK_expandObstacles
             // 
@@ -699,6 +696,22 @@
             this.cb_flip.UseVisualStyleBackColor = true;
             this.cb_flip.CheckedChanged += new System.EventHandler(this.cb_flip_CheckedChanged);
             // 
+            // btn_LoadGrid
+            // 
+            resources.ApplyResources(this.btn_LoadGrid, "btn_LoadGrid");
+            this.btn_LoadGrid.Name = "btn_LoadGrid";
+            this.btn_LoadGrid.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.btn_LoadGrid.UseVisualStyleBackColor = true;
+            this.btn_LoadGrid.Click += new System.EventHandler(this.btn_LoadGrid_Click);
+            // 
+            // btN_SaveGrid
+            // 
+            resources.ApplyResources(this.btN_SaveGrid, "btN_SaveGrid");
+            this.btN_SaveGrid.Name = "btN_SaveGrid";
+            this.btN_SaveGrid.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.btN_SaveGrid.UseVisualStyleBackColor = true;
+            this.btN_SaveGrid.Click += new System.EventHandler(this.btN_SaveGrid_Click);
+            // 
             // SprayGridUI
             // 
             resources.ApplyResources(this, "$this");
@@ -792,9 +805,10 @@
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.NumericUpDown NUM_trackingAltError;
         private System.Windows.Forms.CheckBox CHK_expandObstacles;
-        private System.Windows.Forms.Label label14;
         private System.Windows.Forms.Label label15;
         private System.Windows.Forms.NumericUpDown NUM_TakeoffAlt;
         private System.Windows.Forms.CheckBox cb_flip;
+        private Controls.MyButton btN_SaveGrid;
+        private Controls.MyButton btn_LoadGrid;
     }
 }

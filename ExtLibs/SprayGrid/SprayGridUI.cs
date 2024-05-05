@@ -879,7 +879,7 @@ namespace MissionPlanner.SprayGrid
                         double lat = last.Lat - steplat * a;        //location new position
                         double lng = last.Lng - steplng * a;
 
-                        double extrapolatedRelativeAlt = lastalt - stepalt * (a - lasta);        //vehicle center estimated altitude of a given point, extrapolated from the two points 
+                        double extrapolatedRelativeAlt = lastalt - stepalt * (a - lasta);        //vehicle center estimated altitude of a given point, extrapolated from the two points
 
                         double actualTerrainAlt = getMaxAltinArea(lat, lng, displacementMap).alt;
 
@@ -1279,7 +1279,7 @@ namespace MissionPlanner.SprayGrid
                 p3 = Alt - (pointAlt - HomeAlt);
 
             }
-            
+
             //Add rounding
             p3 = Math.Round(p3, 2);
 
@@ -1572,6 +1572,15 @@ namespace MissionPlanner.SprayGrid
             return noin;
         }
 
+        private void btn_LoadGrid_Click(object sender, EventArgs e)
+        {
+            LoadGrid();
+        }
+
+        private void btN_SaveGrid_Click(object sender, EventArgs e)
+        {
+            SaveGrid();
+        }
     }
 }
 
