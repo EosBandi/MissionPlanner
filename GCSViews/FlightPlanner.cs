@@ -8588,21 +8588,35 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             KMLRoot kml = new KMLRoot();
             KMLib.Feature.Folder fldr = new KMLib.Feature.Folder("Mission");
 
-            KMLib.Style style = new KMLib.Style();
-            style.Id = "yellowLineGreenPoly";
-            style.Add(new KMLib.LineStyle(HexStringToColor("7f00ffff"), 4));
+            //KMLib.Style style = new KMLib.Style();
+            //style.Id = "yellowLineGreenPoly";
+            // style.Add(new KMLib.LineStyle(HexStringToColor("7f00ffff"), 4));
 
-            KMLib.Style style1 = new KMLib.Style();
-            style1.Id = "spray";
-            style1.Add(new KMLib.LineStyle(HexStringToColor("4c0000ff"), 0));
-            style1.Add(new KMLib.PolyStyle() { Color = HexStringToColor("4c0000ff") });
+            //KMLib.Style style1 = new KMLib.Style();
+            //style1.Id = "spray";
+            //style1.Add(new KMLib.LineStyle(HexStringToColor("4c0000ff"), 0));
+            //style1.Add(new KMLib.PolyStyle() { Color = HexStringToColor("4c0000ff") });
 
-            PolyStyle pstyle = new PolyStyle();
-            pstyle.Color = HexStringToColor("7f00ff00");
-            style.Add(pstyle);
+            //PolyStyle pstyle = new PolyStyle();
+            //pstyle.Color = HexStringToColor("7f00ff00");
+            //style.Add(pstyle);
 
-            kml.Document.AddStyle(style);
-            kml.Document.AddStyle(style1);
+            //kml.Document.AddStyle(style);
+            //kml.Document.AddStyle(style1);
+
+
+            KMLib.Style mainstyle = new KMLib.Style();
+            mainstyle.Id = "whiteLineRedPoly";
+
+            mainstyle.Add(new KMLib.LineStyle(HexStringToColor("ffffff00"), 2));
+
+            KMLib.PolyStyle polystyle = new KMLib.PolyStyle();
+            polystyle.Color = HexStringToColor("b85454ff");
+
+            mainstyle.Add(polystyle);
+
+
+            kml.Document.AddStyle(mainstyle);
 
             int stylecode = 0xff;
             int g = -1;
@@ -8659,7 +8673,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
                     lswp = new KMLib.LineString();
                     lswp.AltitudeMode = KMLib.AltitudeMode.absolute;
-                    lswp.Extrude = false;
+                    lswp.Extrude = true;
 
                     coordswp = new Coordinates();
                 }
@@ -8692,11 +8706,10 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
 
             lswp.coordinates = coordswp;
-
             KMLib.Feature.Placemark pmwp2 = new KMLib.Feature.Placemark();
 
             pmwp2.name = "Waypoints";
-            //pm.styleUrl = "#yellowLineGreenPoly";
+            pmwp2.styleUrl = "#whiteLineRedPoly";
             pmwp2.LineString = lswp;
 
             if (coordswp.Count > 0)
