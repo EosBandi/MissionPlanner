@@ -7089,7 +7089,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 if ((string)Commands[Command.Index, a].Value == MAVLink.MAV_CMD.TAKEOFF.ToString())
                 {
                     // set takeoff position to the new home position
-                    Commands[Lon.Index, a].Value = MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat;
+                    Commands[Lon.Index, a].Value = MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng;
                 }
 
             }
