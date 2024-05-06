@@ -8608,10 +8608,10 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             KMLib.Style mainstyle = new KMLib.Style();
             mainstyle.Id = "whiteLineRedPoly";
 
-            mainstyle.Add(new KMLib.LineStyle(HexStringToColor("ffffff00"), 2));
+            mainstyle.Add(new KMLib.LineStyle(HexStringToColor("ff3300ff"), 2));
 
             KMLib.PolyStyle polystyle = new KMLib.PolyStyle();
-            polystyle.Color = HexStringToColor("b85454ff");
+            polystyle.Color = HexStringToColor("cc0099ff");
 
             mainstyle.Add(polystyle);
 
