@@ -44,3 +44,5 @@ docs/
 *.key
 /.vscode
 /Plugins/bandibuttons.cs
+/Msi/drivers.wxs
+/Msi/drivers.wxs
