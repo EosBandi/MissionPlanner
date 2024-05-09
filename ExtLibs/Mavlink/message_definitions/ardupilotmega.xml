@@ -1873,6 +1873,16 @@
       <field type="uint16_t[4]" name="rpm" units="rpm">RPM (eRPM).</field>
       <field type="uint16_t[4]" name="count">count of telemetry packets received (wraps at 65535).</field>
     </message>
+    <message id="50080" name="SO_STATUS">
+      <description>Sprayer status custom message</description>
+      <field type="uint32_t" name="timestamp" units="ms">Timestamp.</field>
+      <field type="uint8_t" name="status" units="bitfield">Status byte,b0:Spray right, b1:Spray left,b2:ready,b3:pump erro,b4:nozzles error</field>
+      <field type="float" name="filllevel" units="l">Fill level liter</field>
+      <field type="float" name="flowliter" units="l/min">Flow rate liter/min</field>
+      <field type="float" name="flowha" units="l/ha">Flow rate liter/ha.</field>
+      <field type="float" name="distlines" units="m">Distance between lines.</field>
+      <field type="float" name="speed" units="m/s">Speed of the mission.</field>
+    </message>
   </messages>
 </mavlink>
 

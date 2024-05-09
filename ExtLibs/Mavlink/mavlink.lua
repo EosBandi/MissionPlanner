@@ -92,6 +92,7 @@ messageName = {
     [11042] = 'ESC_TELEMETRY_21_TO_24',
     [11043] = 'ESC_TELEMETRY_25_TO_28',
     [11044] = 'ESC_TELEMETRY_29_TO_32',
+    [50080] = 'SO_STATUS',
     [26900] = 'VIDEO_STREAM_INFORMATION99',
     [1] = 'SYS_STATUS',
     [2] = 'SYSTEM_TIME',
@@ -4850,6 +4851,14 @@ f.ESC_TELEMETRY_29_TO_32_count_0 = ProtoField.new("count[0] (uint16_t)", "mavlin
 f.ESC_TELEMETRY_29_TO_32_count_1 = ProtoField.new("count[1] (uint16_t)", "mavlink_proto.ESC_TELEMETRY_29_TO_32_count_1", ftypes.UINT16, nil)
 f.ESC_TELEMETRY_29_TO_32_count_2 = ProtoField.new("count[2] (uint16_t)", "mavlink_proto.ESC_TELEMETRY_29_TO_32_count_2", ftypes.UINT16, nil)
 f.ESC_TELEMETRY_29_TO_32_count_3 = ProtoField.new("count[3] (uint16_t)", "mavlink_proto.ESC_TELEMETRY_29_TO_32_count_3", ftypes.UINT16, nil)
+
+f.SO_STATUS_timestamp = ProtoField.new("timestamp (uint32_t)", "mavlink_proto.SO_STATUS_timestamp", ftypes.UINT32, nil)
+f.SO_STATUS_status = ProtoField.new("status (uint8_t)", "mavlink_proto.SO_STATUS_status", ftypes.UINT8, nil)
+f.SO_STATUS_filllevel = ProtoField.new("filllevel (float)", "mavlink_proto.SO_STATUS_filllevel", ftypes.FLOAT, nil)
+f.SO_STATUS_flowliter = ProtoField.new("flowliter (float)", "mavlink_proto.SO_STATUS_flowliter", ftypes.FLOAT, nil)
+f.SO_STATUS_flowha = ProtoField.new("flowha (float)", "mavlink_proto.SO_STATUS_flowha", ftypes.FLOAT, nil)
+f.SO_STATUS_distlines = ProtoField.new("distlines (float)", "mavlink_proto.SO_STATUS_distlines", ftypes.FLOAT, nil)
+f.SO_STATUS_speed = ProtoField.new("speed (float)", "mavlink_proto.SO_STATUS_speed", ftypes.FLOAT, nil)
 
 f.VIDEO_STREAM_INFORMATION99_camera_id = ProtoField.new("camera_id (uint8_t)", "mavlink_proto.VIDEO_STREAM_INFORMATION99_camera_id", ftypes.UINT8, nil)
 f.VIDEO_STREAM_INFORMATION99_status = ProtoField.new("status (uint8_t)", "mavlink_proto.VIDEO_STREAM_INFORMATION99_status", ftypes.UINT8, nil)
@@ -17027,6 +17036,38 @@ function payload_fns.payload_11044(buffer, tree, msgid, offset, limit, pinfo)
     tvbrange = padded(offset + 38, 2)
     value = tvbrange:le_uint()
     subtree = tree:add_le(f.ESC_TELEMETRY_29_TO_32_count_3, tvbrange, value)
+end
+-- dissect payload of message type SO_STATUS
+function payload_fns.payload_50080(buffer, tree, msgid, offset, limit, pinfo)
+    local padded, field_offset, value, subtree, tvbrange
+    if (offset + 25 > limit) then
+        padded = buffer(0, limit):bytes()
+        padded:set_size(offset + 25)
+        padded = padded:tvb("Untruncated payload")
+    else
+        padded = buffer
+    end
+    tvbrange = padded(offset + 0, 4)
+    value = tvbrange:le_uint()
+    subtree = tree:add_le(f.SO_STATUS_timestamp, tvbrange, value)
+    tvbrange = padded(offset + 24, 1)
+    value = tvbrange:le_uint()
+    subtree = tree:add_le(f.SO_STATUS_status, tvbrange, value)
+    tvbrange = padded(offset + 4, 4)
+    value = tvbrange:le_float()
+    subtree = tree:add_le(f.SO_STATUS_filllevel, tvbrange, value)
+    tvbrange = padded(offset + 8, 4)
+    value = tvbrange:le_float()
+    subtree = tree:add_le(f.SO_STATUS_flowliter, tvbrange, value)
+    tvbrange = padded(offset + 12, 4)
+    value = tvbrange:le_float()
+    subtree = tree:add_le(f.SO_STATUS_flowha, tvbrange, value)
+    tvbrange = padded(offset + 16, 4)
+    value = tvbrange:le_float()
+    subtree = tree:add_le(f.SO_STATUS_distlines, tvbrange, value)
+    tvbrange = padded(offset + 20, 4)
+    value = tvbrange:le_float()
+    subtree = tree:add_le(f.SO_STATUS_speed, tvbrange, value)
 end
 -- dissect payload of message type VIDEO_STREAM_INFORMATION99
 function payload_fns.payload_26900(buffer, tree, msgid, offset, limit, pinfo)
@@ -52233,9 +52274,9 @@ function mavlink_proto.dissector(buffer,pinfo,tree)
                 offset = offset + 1
             else 
                 -- handle truncated header
-                local hsize = buffer:len() - 2 - offset
-                subtree:add(f.rawheader, buffer(offset, hsize))
-                offset = offset + hsize
+                pinfo.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
+                pinfo.desegment_offset = offset
+                break
             end
         elseif (version == 0xfd) then
             if (buffer:len() - 2 - offset > 10) then
@@ -52267,9 +52308,9 @@ function mavlink_proto.dissector(buffer,pinfo,tree)
                 offset = offset + 3
             else 
                 -- handle truncated header
-                local hsize = buffer:len() - 2 - offset
-                subtree:add(f.rawheader, buffer(offset, hsize))
-                offset = offset + hsize
+                pinfo.desegment_len = DESEGMENT_ONE_MORE_SEGMENT
+                pinfo.desegment_offset = offset
+                break
             end
         end
 

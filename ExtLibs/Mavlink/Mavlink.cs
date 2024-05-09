@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 public partial class MAVLink
 {
-    public const string MAVLINK_BUILD_DATE = "Sat Jul 15 2023";
+    public const string MAVLINK_BUILD_DATE = "Thu May 09 2024";
     public const string MAVLINK_WIRE_PROTOCOL_VERSION = "2.0";
     public const int MAVLINK_MAX_PAYLOAD_LEN = 255;
 
@@ -324,6 +324,7 @@ public partial class MAVLink
         new message_info(50003, "HERELINK_TELEM", 62, 19, 19, typeof( mavlink_herelink_telem_t )),
         new message_info(50004, "CUBEPILOT_FIRMWARE_UPDATE_START", 240, 10, 10, typeof( mavlink_cubepilot_firmware_update_start_t )),
         new message_info(50005, "CUBEPILOT_FIRMWARE_UPDATE_RESP", 152, 6, 6, typeof( mavlink_cubepilot_firmware_update_resp_t )),
+        new message_info(50080, "SO_STATUS", 89, 25, 25, typeof( mavlink_so_status_t )),
         new message_info(26900, "VIDEO_STREAM_INFORMATION99", 222, 246, 246, typeof( mavlink_video_stream_information99_t )),
         new message_info(0, "HEARTBEAT", 50, 9, 9, typeof( mavlink_heartbeat_t )),
 
@@ -649,6 +650,7 @@ public partial class MAVLink
         HERELINK_TELEM = 50003,
         CUBEPILOT_FIRMWARE_UPDATE_START = 50004,
         CUBEPILOT_FIRMWARE_UPDATE_RESP = 50005,
+        SO_STATUS = 50080,
         VIDEO_STREAM_INFORMATION99 = 26900,
         HEARTBEAT = 0,
     }
@@ -12164,6 +12166,85 @@ public partial class MAVLink
         //[FieldOffset(40)]
         [MarshalAs(UnmanagedType.ByValArray,SizeConst=4)]
 		public byte[] temperature;
+    };
+
+    
+    /// extensions_start 0
+    [StructLayout(LayoutKind.Sequential,Pack=1,Size=25)]
+    ///<summary> Sprayer status custom message </summary>
+    public struct mavlink_so_status_t
+    {
+        /// packet ordered constructor
+        public mavlink_so_status_t(uint timestamp,float filllevel,float flowliter,float flowha,float distlines,float speed,byte status) 
+        {
+            this.timestamp = timestamp;
+            this.filllevel = filllevel;
+            this.flowliter = flowliter;
+            this.flowha = flowha;
+            this.distlines = distlines;
+            this.speed = speed;
+            this.status = status;
+            
+        }
+        
+        /// packet xml order
+        public static mavlink_so_status_t PopulateXMLOrder(uint timestamp,byte status,float filllevel,float flowliter,float flowha,float distlines,float speed) 
+        {
+            var msg = new mavlink_so_status_t();
+
+            msg.timestamp = timestamp;
+            msg.status = status;
+            msg.filllevel = filllevel;
+            msg.flowliter = flowliter;
+            msg.flowha = flowha;
+            msg.distlines = distlines;
+            msg.speed = speed;
+            
+            return msg;
+        }
+        
+
+        /// <summary>Timestamp.  [ms] </summary>
+        [Units("[ms]")]
+        [Description("Timestamp.")]
+        //[FieldOffset(0)]
+        public  uint timestamp;
+
+        /// <summary>Fill level liter  [l] </summary>
+        [Units("[l]")]
+        [Description("Fill level liter")]
+        //[FieldOffset(4)]
+        public  float filllevel;
+
+        /// <summary>Flow rate liter/min  [l/min] </summary>
+        [Units("[l/min]")]
+        [Description("Flow rate liter/min")]
+        //[FieldOffset(8)]
+        public  float flowliter;
+
+        /// <summary>Flow rate liter/ha.  [l/ha] </summary>
+        [Units("[l/ha]")]
+        [Description("Flow rate liter/ha.")]
+        //[FieldOffset(12)]
+        public  float flowha;
+
+        /// <summary>Distance between lines.  [m] </summary>
+        [Units("[m]")]
+        [Description("Distance between lines.")]
+        //[FieldOffset(16)]
+        public  float distlines;
+
+        /// <summary>Speed of the mission.  [m/s] </summary>
+        [Units("[m/s]")]
+        [Description("Speed of the mission.")]
+        //[FieldOffset(20)]
+        public  float speed;
+
+        /// <summary>Status byte,b0:Spray right, b1:Spray left,b2:ready,b3:pump erro,b4:nozzles error  [bitfield] </summary>
+        [Units("[bitfield]")]
+        [Description("Status byte,b0:Spray right, b1:Spray left,b2:ready,b3:pump erro,b4:nozzles error")]
+        //[FieldOffset(24)]
+        public  byte status;
     };
 
     [Obsolete]
