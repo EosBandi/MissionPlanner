@@ -308,7 +308,7 @@ namespace MissionPlanner
             get => (_alt - altoffsethome) * multiplieralt;
             set
             {
-                // check update rate, and ensure time hasnt gone backwards                
+                // check update rate, and ensure time hasnt gone backwards
                 _alt = value;
 
                 if ((datetime - lastalt).TotalSeconds >= 0.2 && oldalt != alt || lastalt > datetime)
@@ -2019,6 +2019,35 @@ namespace MissionPlanner
         public byte[] xpdr_flight_id { get; set; }
 
 
+
+        // Soleon SO_STATUS message fields
+
+        [GroupText("Soleon Status")]
+        [DisplayText("Fill Level (l)")]
+        public float soleon_fill_level { get; private set; }
+
+        [GroupText("Soleon Status")]
+        [DisplayText("Flow Rate (l/min)")]
+        public float soleon_flow_rate { get; private set; }
+
+        [GroupText("Soleon Status")]
+        [DisplayText("Flow Rate (l/ha)")]
+        public float soleon_flow_rate_ha { get; private set; }
+
+        [GroupText("Soleon Status")]
+        [DisplayText("Line Distance (m)")]
+        public float soleon_line_distance { get; private set; }
+
+        [GroupText("Soleon Status")]
+        [DisplayText("Mission Speed (m/s)")]
+        public float soleon_mission_speed { get; private set; }
+
+        [GroupText("Soleon Status")]
+        [DisplayText("Status byte")]
+        public byte soleon_status_byte { get; private set; }
+
+
+
         public object Clone()
         {
             return MemberwiseClone();
@@ -2029,13 +2058,27 @@ namespace MissionPlanner
             if (mavLinkMessage.sysid == parent.sysid && mavLinkMessage.compid == parent.compid
                 || mavLinkMessage.msgid == (uint)MAVLink.MAVLINK_MSG_ID.RADIO // propagate the RADIO/RADIO_STATUS message across all devices on this link
                 || mavLinkMessage.msgid == (uint)MAVLink.MAVLINK_MSG_ID.RADIO_STATUS
+                || mavLinkMessage.msgid == (uint)MAVLink.MAVLINK_MSG_ID.SO_STATUS  // propagate the SO_STATUS message across all devices on this link
                 || ( mavLinkMessage.sysid == parent.sysid                      // Propagate NAMED_VALUE_FLOAT messages across all components within the same device
-                     && mavLinkMessage.msgid == (uint)MAVLink.MAVLINK_MSG_ID.NAMED_VALUE_FLOAT 
+                     && mavLinkMessage.msgid == (uint)MAVLink.MAVLINK_MSG_ID.NAMED_VALUE_FLOAT
                      && Settings.Instance.GetBoolean("propagateNamedFloats", true)) )
-                     
+
             {
                 switch (mavLinkMessage.msgid)
                 {
+                    case (uint)MAVLink.MAVLINK_MSG_ID.SO_STATUS:
+                        {
+                            var so = mavLinkMessage.ToStructure<MAVLink.mavlink_so_status_t>();
+
+                            soleon_fill_level = so.filllevel;
+                            soleon_flow_rate = so.flowliter;
+                            soleon_flow_rate_ha = so.flowha;
+                            soleon_line_distance = so.distlines;
+                            soleon_mission_speed = so.speed;
+                            soleon_status_byte = so.status;
+                        }
+                        break;
+
                     case (uint)MAVLink.MAVLINK_MSG_ID.RC_CHANNELS_SCALED:
 
                         // hil mavlink 0.9
@@ -3558,7 +3601,7 @@ namespace MissionPlanner
                             float value = named_float.value;
                             var field = custom_field_names.FirstOrDefault(x => x.Value == name).Key;
 
-                            //todo: if field is null then check if we have a free customfield and add the named_value 
+                            //todo: if field is null then check if we have a free customfield and add the named_value
                             if (field == null)
                             {
                                 short i;
@@ -3994,7 +4037,7 @@ namespace MissionPlanner
         public void dowindcalc()
         {
             //Wind Fixed gain Observer
-            //Ryan Beall 
+            //Ryan Beall
             //8FEB10
 
             var Kw = 0.010; // 0.01 // 0.10
