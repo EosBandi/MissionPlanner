@@ -1,4 +1,12 @@
-﻿*Mission Planner 1.3.80 - 20-03-2023
+STOP SPAMMING THE MISSION PLANNER repository
+Please learn how to use git correctly, you are wasting our time 
+and risk to get blocked from the repo
+
+
+
+
+
+*Mission Planner 1.3.80 - 20-03-2023
 MAVFtp: fix locker static
 MAVFtp: add lock on dir list
 Graphs: update
