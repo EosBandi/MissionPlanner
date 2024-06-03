@@ -5261,6 +5261,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                         int ind = logdata.IndexOf('\0');
                         if (ind != -1)
                             logdata = logdata.Substring(0, ind);
+
                         log.Info(DateTime.Now + " " + sev + " " + logdata);
 
                         MAVlist[sysid, compid].cs.messages.Add((DateTime.Now, logdata));
