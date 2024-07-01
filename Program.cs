@@ -522,7 +522,7 @@ namespace MissionPlanner
         private static void CurrentDomain_FirstChanceException(object sender,
             System.Runtime.ExceptionServices.FirstChanceExceptionEventArgs e)
         {
-            log.Debug("FirstChanceException in: " + e.Exception.Source, e.Exception);
+            //log.Debug("FirstChanceException in: " + e.Exception.Source, e.Exception);
         }
 
         private static Assembly CurrentDomain_TypeResolve(object sender, ResolveEventArgs args)
