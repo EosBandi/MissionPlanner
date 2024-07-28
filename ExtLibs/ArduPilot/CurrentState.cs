@@ -311,7 +311,7 @@ namespace MissionPlanner
             get => (_alt - altoffsethome) * multiplieralt;
             set
             {
-                // check update rate, and ensure time hasnt gone backwards                
+                // check update rate, and ensure time hasnt gone backwards
                 _alt = value;
 
                 if ((datetime - lastalt).TotalSeconds >= 0.2 && oldalt != alt || lastalt > datetime)
@@ -2037,9 +2037,9 @@ namespace MissionPlanner
                 || mavLinkMessage.msgid == (uint)MAVLink.MAVLINK_MSG_ID.RADIO // propagate the RADIO/RADIO_STATUS message across all devices on this link
                 || mavLinkMessage.msgid == (uint)MAVLink.MAVLINK_MSG_ID.RADIO_STATUS
                 || ( mavLinkMessage.sysid == parent.sysid                      // Propagate NAMED_VALUE_FLOAT messages across all components within the same device
-                     && mavLinkMessage.msgid == (uint)MAVLink.MAVLINK_MSG_ID.NAMED_VALUE_FLOAT 
+                     && mavLinkMessage.msgid == (uint)MAVLink.MAVLINK_MSG_ID.NAMED_VALUE_FLOAT
                      && Settings.Instance.GetBoolean("propagateNamedFloats", true)) )
-                     
+
             {
                 switch (mavLinkMessage.msgid)
                 {
@@ -2273,9 +2273,9 @@ namespace MissionPlanner
                             yaw = highlatency.heading * 2;
                             target_bearing = highlatency.target_heading * 2;
                             ch3percent = highlatency.throttle;
-                            airspeed = highlatency.airspeed;
-                            targetairspeed = highlatency.airspeed_sp;
-                            groundspeed = highlatency.groundspeed;
+                            airspeed = highlatency.airspeed/5;
+                            targetairspeed = highlatency.airspeed_sp / 5.0f;
+                            groundspeed = highlatency.groundspeed / 5.0f;
                             wind_vel = highlatency.windspeed / 5.0f;
                             wind_dir = highlatency.wind_heading * 2;
                             gpshdop = highlatency.eph;
@@ -3556,7 +3556,7 @@ namespace MissionPlanner
                             float value = named_float.value;
                             var field = custom_field_names.FirstOrDefault(x => x.Value == name).Key;
 
-                            //todo: if field is null then check if we have a free customfield and add the named_value 
+                            //todo: if field is null then check if we have a free customfield and add the named_value
                             if (field == null)
                             {
                                 short i;
@@ -3649,7 +3649,7 @@ namespace MissionPlanner
                             var status = mavLinkMessage.ToStructure<MAVLink.mavlink_gimbal_device_attitude_status_t>();
                             Quaternion q = new Quaternion(status.q[0], status.q[1], status.q[2], status.q[3]);
                             campointa = (float)(q.get_euler_pitch() * (180.0 / Math.PI));
-                            campointb = (float)(q.get_euler_roll() * (180.0 / Math.PI)); 
+                            campointb = (float)(q.get_euler_roll() * (180.0 / Math.PI));
                             campointc = (float)(q.get_euler_yaw() * (180.0 / Math.PI));
                             if (campointc < 0) campointc += 360; //normalization
                         }
@@ -4002,7 +4002,7 @@ namespace MissionPlanner
         public void dowindcalc()
         {
             //Wind Fixed gain Observer
-            //Ryan Beall 
+            //Ryan Beall
             //8FEB10
 
             var Kw = 0.010; // 0.01 // 0.10
