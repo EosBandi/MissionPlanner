@@ -2270,6 +2270,20 @@ namespace MissionPlanner
             generatePacket((byte) MAVLINK_MSG_ID.MISSION_ACK, req);
         }
 
+
+        public void setWPCurrentNoACK(byte sysid, byte compid, ushort index)
+        {
+            mavlink_mission_set_current_t req = new mavlink_mission_set_current_t
+            {
+                target_system = sysid,
+                target_component = compid,
+                seq = index
+            };
+
+            generatePacket((byte) MAVLINK_MSG_ID.MISSION_SET_CURRENT, req);
+        }
+
+
         public bool setWPCurrent(byte sysid, byte compid, ushort index)
         {
             return setWPCurrentAsync(sysid, compid, index).AwaitSync();

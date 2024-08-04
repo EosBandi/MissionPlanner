@@ -439,6 +439,14 @@ namespace MissionPlanner.GCSViews
                             i++;
                         }
 
+                        //set the home and the plannedhome location as well
+                        if (MainV2.comPort.MAV.wps.Count > 0)
+                        {
+                            MainV2.comPort.MAV.cs.HomeLocation = new PointLatLngAlt(cmds[0].lat, cmds[0].lng, cmds[0].alt);
+                            MainV2.comPort.MAV.cs.PlannedHomeLocation = new PointLatLngAlt(cmds[0].lat, cmds[0].lng, cmds[0].alt);
+                        }
+
+
                     }
                     catch (Exception ex)
                     {
@@ -1610,7 +1618,7 @@ namespace MissionPlanner.GCSViews
             try
             {
                 ((Control) sender).Enabled = false;
-                MainV2.comPort.setWPCurrent(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
+                MainV2.comPort.setWPCurrentNoACK(MainV2.comPort.MAV.sysid, MainV2.comPort.MAV.compid,
                     (ushort) CMB_setwp.SelectedIndex); // set nav to
             }
             catch
