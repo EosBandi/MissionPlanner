@@ -2243,7 +2243,7 @@ namespace MissionPlanner
                             alt = altasl - (float)HomeAlt;
                             alt_error = highlatency.target_altitude - alt;
                             targetalt = highlatency.target_altitude;
-                            wp_dist = highlatency.target_distance;
+                            wp_dist = highlatency.target_distance / 10;
                             wpno = highlatency.wp_num;
 
                             if (highlatency.failure_flags != 0)
@@ -2283,6 +2283,9 @@ namespace MissionPlanner
                             airspeed1_temp = highlatency.temperature_air;
                             climbrate = highlatency.climb_rate;
                             battery_remaining = highlatency.battery;
+
+                            gotwind = true;
+
 
                         }
 

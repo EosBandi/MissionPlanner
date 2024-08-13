@@ -49,7 +49,7 @@ namespace MissionPlanner
 
         public static menuicons displayicons; //do not initialize to allow update of custom icons
         public static string running_directory = Settings.GetRunningDirectory();
-        
+
         public abstract class menuicons
         {
             public abstract Image fd { get; }
@@ -205,7 +205,7 @@ namespace MissionPlanner
         public class highcontrastmenuicons : menuicons
         {
             private string running_directory = Settings.GetRunningDirectory();
-            
+
             public override Image fd
             {
                 get
@@ -988,7 +988,7 @@ namespace MissionPlanner
                 try
                 {
                     DisplayConfiguration = Settings.Instance.GetDisplayView("displayview");
-                    //Force new view in case of saved view in config.xml 
+                    //Force new view in case of saved view in config.xml
                     DisplayConfiguration.displayAdvancedParams = false;
                     DisplayConfiguration.displayStandardParams = false;
                     DisplayConfiguration.displayFullParamList = true;
@@ -1102,10 +1102,10 @@ namespace MissionPlanner
             {
             }
 
-            if (CurrentState.rateattitudebackup == 0) // initilised to 10, configured above from save
-            {
-                CustomMessageBox.Show("NOTE: your attitude rate is 0, the hud will not work\nChange in Configuration > Planner > Telemetry Rates");
-            }
+            //if (CurrentState.rateattitudebackup == 0) // initilised to 10, configured above from save
+            //{
+            //    CustomMessageBox.Show("NOTE: your attitude rate is 0, the hud will not work\nChange in Configuration > Planner > Telemetry Rates");
+            //}
 
             // create log dir if it doesnt exist
             try
@@ -1852,7 +1852,7 @@ namespace MissionPlanner
 
                 //                        can.WriteToStreamSLCAN(slcan);
                 //                    };
-                                                       
+
                 //                    // be invisible
                 //                    can.NodeStatus = false;
                 //                    can.StartSLCAN(port.BaseStream);
@@ -1860,7 +1860,7 @@ namespace MissionPlanner
                 //                    //start on bus
                 //                    var ans = MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent,
                 //                     (byte)MainV2.comPort.compidcurrent, MAVLink.MAV_CMD.CAN_FORWARD, bus, 0, 0, 0, 0, 0, 0,
-                //                     false);                                    
+                //                     false);
 
                 //                    Thread.Sleep(5000);
 
@@ -4869,10 +4869,10 @@ namespace MissionPlanner
                         Comports.Add(mav);
                     });
                 }
-                
+
                 */
 
-                Parallel.ForEach(mavs, mav => 
+                Parallel.ForEach(mavs, mav =>
                 {
                     Console.WriteLine("Process connect " + mav);
                     doConnect(mav, "preset", "0", false, false);
