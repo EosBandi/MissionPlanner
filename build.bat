@@ -7,3 +7,10 @@ del bin\release\MissionPlannerBeta.zip
 
 MSBuild.exe MissionPlanner.sln /restore /m /p:Configuration=Release /verbosity:n
 
+if errorlevel 1 exit /b errorlevel
+
+cd ./msi
+./installer.bat
+
+
+
