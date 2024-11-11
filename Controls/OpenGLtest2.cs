@@ -775,6 +775,7 @@ namespace MissionPlanner.Controls
                 stile = C * Math.Cos(_center.Lat) / Math.Pow(2, tilearea.zoom);
                 pxstep = (int)(stile / 45);
                 pxstep = FloorPowerOf2(pxstep);
+                if (pxstep == int.MinValue) pxstep = 0;
                 if (pxstep == 0)
                     pxstep = 1;
                 foreach (var p in tilearea.points)
