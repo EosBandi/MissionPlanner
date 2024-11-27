@@ -54,6 +54,8 @@ using MissionPlanner.ArduPilot.Mavlink;
 using System.Drawing.Imaging;
 using SharpKml.Engine;
 using MissionPlanner.Controls.Waypoints;
+using KMLib;
+using Core.Geometry;
 
 namespace MissionPlanner.GCSViews
 {
@@ -3610,7 +3612,6 @@ namespace MissionPlanner.GCSViews
         public void FlightPlanner_FormClosing(object sender, FormClosingEventArgs e)
         {
             timer1.Stop();
-            stopInjectCustomMap = true;
         }
 
         public void FlightPlanner_Load(object sender, EventArgs e)
@@ -3645,11 +3646,11 @@ namespace MissionPlanner.GCSViews
                 });
             }
 
-            trackBar1.Value = (int)MainMap.Zoom;
+            //trackBar1.Value = (int)MainMap.Zoom;
 
-            Zoomlevel.Minimum = MainMap.MapProvider.MinZoom;
-            Zoomlevel.Maximum = 24;
-            Zoomlevel.Value = Convert.ToDecimal(MainMap.Zoom);
+            //Zoomlevel.Minimum = MainMap.MapProvider.MinZoom;
+            //Zoomlevel.Maximum = 24;
+            //Zoomlevel.Value = Convert.ToDecimal(MainMap.Zoom);
 
             updateCMDParams();
 
@@ -5193,7 +5194,7 @@ namespace MissionPlanner.GCSViews
         public void Planner_Resize(object sender, EventArgs e)
         {
             MainMap.Zoom = TRK_zoom.Value;
-            Zoomlevel.Value = Convert.ToDecimal(MainMap.Zoom);
+            //Zoomlevel.Value = Convert.ToDecimal(MainMap.Zoom);
         }
 
         /// <summary>
@@ -5353,7 +5354,7 @@ namespace MissionPlanner.GCSViews
                 if (((Placemark)Element).Geometry != null)
                 {
                     var Element2 = ((Placemark)Element).Geometry;
-                    if (Element2 is Polygon)
+                    if (Element2 is SharpKml.Dom.Polygon)
                     {
                         GMapPolygon kmlpolygon = new GMapPolygon(new List<PointLatLng>(), "kmlpolygon");
 
@@ -5361,21 +5362,21 @@ namespace MissionPlanner.GCSViews
                         kmlpolygon.Stroke = new Pen(colorwidth.Item1, colorwidth.Item2);
                         kmlpolygon.Fill = Brushes.Transparent;
 
-                        foreach (var loc in ((Polygon)Element2).OuterBoundary.LinearRing.Coordinates)
+                        foreach (var loc in ((SharpKml.Dom.Polygon)Element2).OuterBoundary.LinearRing.Coordinates)
                         {
                             kmlpolygon.Points.Add(new PointLatLng(loc.Latitude, loc.Longitude));
                         }
 
                         kmlpolygonsoverlay.Polygons.Add(kmlpolygon);
                     }
-                    else if (Element2 is LineString)
+                    else if (Element2 is SharpKml.Dom.LineString)
                     {
                         GMapRoute kmlroute = new GMapRoute(new List<PointLatLng>(), "kmlroute");
 
                         var colorwidth = GetKMLLineColor(styleurl.OriginalString.TrimStart('#'), root);
                         kmlroute.Stroke = new Pen(colorwidth.Item1, colorwidth.Item2);
 
-                        foreach (var loc in ((LineString)Element2).Coordinates)
+                        foreach (var loc in ((SharpKml.Dom.LineString)Element2).Coordinates)
                         {
                             kmlroute.Points.Add(new PointLatLng(loc.Latitude, loc.Longitude));
                         }
@@ -5415,21 +5416,21 @@ namespace MissionPlanner.GCSViews
                 var style = root.Styles.Where(a => a.Id == styleurl2.OriginalString.TrimStart('#')).First();
                 if (style != null)
                 {
-                    if (((Style)style).Line != null)
+                    if (((SharpKml.Dom.Style)style).Line != null)
                     {
                         int color;
-                        if (((Style)style).Line.Color != null)
+                        if (((SharpKml.Dom.Style)style).Line.Color != null)
                         {
-                            color = ((Style)style).Line.Color.Value.Abgr;
+                            color = ((SharpKml.Dom.Style)style).Line.Color.Value.Abgr;
                             color = (int)((color & 0xFF00FF00) | ((color & 0x00FF0000) >> 16) | ((color & 0x000000FF) << 16));
 
                         }
                         else color = Color.White.ToArgb();
                         // convert color from ABGR to ARGB
 
-                        if (((Style)style).Line.Width != null)
+                        if (((SharpKml.Dom.Style)style).Line.Width != null)
                         {
-                            return (Color.FromArgb(color), (int)((Style)style).Line.Width.Value);
+                            return (Color.FromArgb(color), (int)((SharpKml.Dom.Style)style).Line.Width.Value);
                         }
                         else
                             return (Color.FromArgb(color), 2);
@@ -7014,7 +7015,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 lock (thisLock)
                 {
                     MainMap.Zoom = TRK_zoom.Value;
-                    Zoomlevel.Value = Convert.ToDecimal(TRK_zoom.Value);
+                    //Zoomlevel.Value = Convert.ToDecimal(TRK_zoom.Value);
                 }
             }
             catch (Exception ex)
@@ -7023,21 +7024,21 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             }
         }
 
-        private void Zoomlevel_ValueChanged(object sender, EventArgs e)
-        {
-            try
-            {
-                lock (thisLock)
-                {
-                    MainMap.Zoom = (double)Zoomlevel.Value;
-                    TRK_zoom.Value = (float)Zoomlevel.Value;
-                }
-            }
-            catch (Exception ex)
-            {
-                log.Error(ex);
-            }
-        }
+        //private void Zoomlevel_ValueChanged(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        lock (thisLock)
+        //        {
+        //            MainMap.Zoom = (double)Zoomlevel.Value;
+        //            TRK_zoom.Value = (float)Zoomlevel.Value;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        log.Error(ex);
+        //    }
+        //}
 
         public void trackerHomeToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -8131,14 +8132,14 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
         {
             if (MainMap.Zoom > 0)
             {
-                try
-                {
-                    trackBar1.Value = (int)(MainMap.Zoom);
-                }
-                catch (Exception ex)
-                {
-                    log.Error(ex);
-                }
+                //try
+                //{
+                //    //trackBar1.Value = (int)(MainMap.Zoom);
+                //}
+                //catch (Exception ex)
+                //{
+                //    log.Error(ex);
+                //}
 
                 //textBoxZoomCurrent.Text = MainMap.Zoom.ToString();
                 center.Position = MainMap.Position;

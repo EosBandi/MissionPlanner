@@ -1027,6 +1027,9 @@
     <None Update="SerialOptionRules.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="splashbg.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="version.exe">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

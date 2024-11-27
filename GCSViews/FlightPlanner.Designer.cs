@@ -114,8 +114,8 @@ namespace MissionPlanner.GCSViews
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
-            this.progressBarInjectCustomMap = new System.Windows.Forms.ProgressBar();
-            this.BUT_InjectCustomMap = new MissionPlanner.Controls.MyButton();
+            //this.progressBarInjectCustomMap = new System.Windows.Forms.ProgressBar();
+            //this.BUT_InjectCustomMap = new MissionPlanner.Controls.MyButton();
             this.chk_grid = new System.Windows.Forms.CheckBox();
             this.comboBoxMapType = new System.Windows.Forms.ComboBox();
             this.lnk_kml = new System.Windows.Forms.LinkLabel();
@@ -128,7 +128,7 @@ namespace MissionPlanner.GCSViews
             this.panelMap = new System.Windows.Forms.Panel();
             this.lbl_homedist = new System.Windows.Forms.Label();
             this.lbl_prevdist = new System.Windows.Forms.Label();
-            this.Zoomlevel = new System.Windows.Forms.NumericUpDown();
+            //this.Zoomlevel = new System.Windows.Forms.NumericUpDown();
             this.TRK_zoom = new MissionPlanner.Controls.MyTrackBar();
             this.label11 = new System.Windows.Forms.Label();
             this.lbl_distance = new System.Windows.Forms.Label();
@@ -239,7 +239,7 @@ namespace MissionPlanner.GCSViews
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panelMap.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Zoomlevel)).BeginInit();
+            //((System.ComponentModel.ISupportInitialize)(this.Zoomlevel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TRK_zoom)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.panelBASE.SuspendLayout();
@@ -728,27 +728,27 @@ namespace MissionPlanner.GCSViews
             // panel3
             // 
             this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel3.Controls.Add(this.progressBarInjectCustomMap);
-            this.panel3.Controls.Add(this.BUT_InjectCustomMap);
+            //this.panel3.Controls.Add(this.progressBarInjectCustomMap);
+            //this.panel3.Controls.Add(this.BUT_InjectCustomMap);
             this.panel3.Controls.Add(this.chk_grid);
             this.panel3.Controls.Add(this.lbl_status);
             this.panel3.Controls.Add(this.comboBoxMapType);
             this.panel3.Controls.Add(this.lnk_kml);
             resources.ApplyResources(this.panel3, "panel3");
             this.panel3.Name = "panel3";
-            // 
-            // progressBarInjectCustomMap
-            // 
-            resources.ApplyResources(this.progressBarInjectCustomMap, "progressBarInjectCustomMap");
-            this.progressBarInjectCustomMap.Name = "progressBarInjectCustomMap";
-            this.progressBarInjectCustomMap.Step = 1;
-            // 
-            // BUT_InjectCustomMap
-            // 
-            resources.ApplyResources(this.BUT_InjectCustomMap, "BUT_InjectCustomMap");
-            this.BUT_InjectCustomMap.Name = "BUT_InjectCustomMap";
-            this.BUT_InjectCustomMap.UseVisualStyleBackColor = true;
-            this.BUT_InjectCustomMap.Click += new System.EventHandler(this.BUT_InjectCustomMap_Click);
+            //// 
+            //// progressBarInjectCustomMap
+            //// 
+            //resources.ApplyResources(this.progressBarInjectCustomMap, "progressBarInjectCustomMap");
+            //this.progressBarInjectCustomMap.Name = "progressBarInjectCustomMap";
+            //this.progressBarInjectCustomMap.Step = 1;
+            //// 
+            //// BUT_InjectCustomMap
+            //// 
+            //resources.ApplyResources(this.BUT_InjectCustomMap, "BUT_InjectCustomMap");
+            //this.BUT_InjectCustomMap.Name = "BUT_InjectCustomMap";
+            //this.BUT_InjectCustomMap.UseVisualStyleBackColor = true;
+            //this.BUT_InjectCustomMap.Click += new System.EventHandler(this.BUT_InjectCustomMap_Click);
             // 
             // chk_grid
             // 
@@ -820,7 +820,7 @@ namespace MissionPlanner.GCSViews
             // 
             this.panelMap.Controls.Add(this.lbl_homedist);
             this.panelMap.Controls.Add(this.lbl_prevdist);
-            this.panelMap.Controls.Add(this.Zoomlevel);
+            //this.panelMap.Controls.Add(this.Zoomlevel);
             this.panelMap.Controls.Add(this.TRK_zoom);
             this.panelMap.Controls.Add(this.label11);
             this.panelMap.Controls.Add(this.lbl_distance);
@@ -840,34 +840,34 @@ namespace MissionPlanner.GCSViews
             // 
             resources.ApplyResources(this.lbl_prevdist, "lbl_prevdist");
             this.lbl_prevdist.Name = "lbl_prevdist";
-            // 
-            // Zoomlevel
-            // 
-            resources.ApplyResources(this.Zoomlevel, "Zoomlevel");
-            this.Zoomlevel.DecimalPlaces = 1;
-            this.Zoomlevel.Increment = new decimal(new int[] {
-            5,
-            0,
-            0,
-            65536});
-            this.Zoomlevel.Maximum = new decimal(new int[] {
-            18,
-            0,
-            0,
-            0});
-            this.Zoomlevel.Minimum = new decimal(new int[] {
-            1,
-            0,
-            0,
-            0});
-            this.Zoomlevel.Name = "Zoomlevel";
-            this.toolTip1.SetToolTip(this.Zoomlevel, resources.GetString("Zoomlevel.ToolTip"));
-            this.Zoomlevel.Value = new decimal(new int[] {
-            2,
-            0,
-            0,
-            0});
-            this.Zoomlevel.ValueChanged += new System.EventHandler(this.Zoomlevel_ValueChanged);
+            //// 
+            //// Zoomlevel
+            //// 
+            //resources.ApplyResources(this.Zoomlevel, "Zoomlevel");
+            //this.Zoomlevel.DecimalPlaces = 1;
+            //this.Zoomlevel.Increment = new decimal(new int[] {
+            //5,
+            //0,
+            //0,
+            //65536});
+            //this.Zoomlevel.Maximum = new decimal(new int[] {
+            //18,
+            //0,
+            //0,
+            //0});
+            //this.Zoomlevel.Minimum = new decimal(new int[] {
+            //1,
+            //0,
+            //0,
+            //0});
+            //this.Zoomlevel.Name = "Zoomlevel";
+            //this.toolTip1.SetToolTip(this.Zoomlevel, resources.GetString("Zoomlevel.ToolTip"));
+            //this.Zoomlevel.Value = new decimal(new int[] {
+            //2,
+            //0,
+            //0,
+            //0});
+            //this.Zoomlevel.ValueChanged += new System.EventHandler(this.Zoomlevel_ValueChanged);
             // 
             // TRK_zoom
             // 
@@ -1611,7 +1611,7 @@ namespace MissionPlanner.GCSViews
             this.panel2.ResumeLayout(false);
             this.panelMap.ResumeLayout(false);
             this.panelMap.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.Zoomlevel)).EndInit();
+            //((System.ComponentModel.ISupportInitialize)(this.Zoomlevel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TRK_zoom)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
             this.panelBASE.ResumeLayout(false);
@@ -1794,7 +1794,7 @@ namespace MissionPlanner.GCSViews
         private DataGridViewTextBoxColumn Dist;
         private DataGridViewTextBoxColumn AZ;
         private DataGridViewTextBoxColumn TagData;
-        private ToolStripMenuItem gDALOpacityToolStripMenuItem; 
+        //private ToolStripMenuItem gDALOpacityToolStripMenuItem; 
         public MyButton myButton1;
         public MyButton myButton2;
     }
