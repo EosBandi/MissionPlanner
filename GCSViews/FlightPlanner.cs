@@ -3439,12 +3439,12 @@ namespace MissionPlanner.GCSViews
                 }
                 points.Add(new PointLatLngAlt(item.Lat, item.Lng, relAlt));
             }
-
+            int i = Alt.Index;
             double homealt = MainV2.comPort.MAV.cs.HomeAlt;
-            Form temp = new ElevationProfile(pointlist, homealt,
-                (altmode)Enum.Parse(typeof(altmode), CMB_altmode.Text));
+            Form temp = new ElevationProfileSpray(pointlist, homealt,
+                (altmode)Enum.Parse(typeof(altmode), CMB_altmode.Text), Alt.Index);
             ThemeManager.ApplyThemeTo(temp);
-            temp.ShowDialog();
+            temp.Show();
         }
 
         public void enterUTMCoordToolStripMenuItem_Click(object sender, EventArgs e)

@@ -4,12 +4,14 @@ using MissionPlanner.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Dynamic;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using ZedGraph; // GE xml alt reader
 
 namespace MissionPlanner.Controls
 {
-    public partial class ElevationProfile : Form
+    public partial class ElevationProfileSpray : Form
     {
         //List<PointLatLngAlt> gelocs = new List<PointLatLngAlt>();
         List<PointLatLngAlt> srtmlocs = new List<PointLatLngAlt>();
@@ -17,21 +19,22 @@ namespace MissionPlanner.Controls
         PointPairList flightPlanPoints = new PointPairList();
         PointPairList flightPlanCheckedPoints = new PointPairList();
         PointPairList relativeToHomeElevation = new PointPairList();
-        PointPairList differenceList = new PointPairList(); 
+        PointPairList differenceList = new PointPairList();
 
         List<PointLatLngAlt> problemlocs = new List<PointLatLngAlt>();
 
         //PointPairList list4terrain = new PointPairList();
         int distance = 0;
         double homealt = 0;
+        int altindex = 0; // index of the altitude in the command list
         FlightPlanner.altmode altmode = FlightPlanner.altmode.Relative;
 
-        public ElevationProfile(List<PointLatLngAlt> locs, double homealt, FlightPlanner.altmode altmode)
+
+        public void initGraph(List<PointLatLngAlt> locs, double homealt, FlightPlanner.altmode altmode, int altindex)
         {
-            InitializeComponent();
 
-            this.altmode = altmode;
-
+            this.altindex = altindex;
+            //this.altmode = altmode;
             planlocs = locs;
 
             for (int a = 0; a < planlocs.Count; a++)
@@ -90,14 +93,37 @@ namespace MissionPlanner.Controls
                 lastloc = loc;
             }
 
+            relativeToHomeElevation.Clear();
+            flightPlanCheckedPoints.Clear();
+            differenceList.Clear();
+            flightPlanPoints.Clear();
+            zg1.GraphPane.CurveList.Clear();
+            zg1.GraphPane.GraphObjList.Clear();
+            zg1.RestoreScale(zg1.GraphPane);
+            zg1.AxisChange();
+
+
             Form frm = Common.LoadingBox("Loading", "using alt data");
 
             srtmlocs = getSRTMAltPathArea(planlocs);
 
             frm.Close();
 
-            //MissionPlanner.Utilities.Tracking.AddPage(this.GetType().ToString(), this.Text);
+
+
+
         }
+
+
+
+
+        public ElevationProfileSpray(List<PointLatLngAlt> locs, double homealt, FlightPlanner.altmode altmode, int altindex)
+        {
+            InitializeComponent();
+            initGraph(locs, homealt, altmode, altindex);
+
+        }
+
 
         private void ElevationProfile_Load(object sender, EventArgs e)
         {
@@ -140,14 +166,14 @@ namespace MissionPlanner.Controls
 
         // Returns the maximum altitude in the area from srtm
 
-        // To get lngOnecm 
+        // To get lngOnecm
         //lngonecm = 111.320 * math.cos(math.radians(lattitude)) / 1000 / 100;
         //latonecm = 111.320 / 1000 / 100;
         //heading is the heading of the plane in degrees
-        
 
 
-        
+
+
         srtm.altresponce getMaxAltinArea(double lat, double lng, List<PointF> displacement_points)
         {
             srtm.altresponce result = new srtm.altresponce();
@@ -278,10 +304,10 @@ namespace MissionPlanner.Controls
                 PointLatLngAlt lastpnt = last;
 
                 //Go through between the twp points in distance/4+1 steps which is 25cm
-                for (int a = 0; a <= points; a++)                   
+                for (int a = 0; a <= points; a++)
                 {
                     double lat = last.Lat - steplat * a;        //location new position
-                    double lng = last.Lng - steplng * a;        
+                    double lng = last.Lng - steplng * a;
                     double alt = last.Alt - stepalt * a;        //vehicle center estimated altitude of a given point, extrapolated from the two points
 
 
@@ -521,6 +547,54 @@ namespace MissionPlanner.Controls
         private void zg1_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private static readonly IntPtr HWND_TOPMOST = new IntPtr(-1);
+        private const UInt32 SWP_NOSIZE = 0x0001;
+        private const UInt32 SWP_NOMOVE = 0x0002;
+        private const UInt32 TOPMOST_FLAGS = SWP_NOMOVE | SWP_NOSIZE;
+
+        [DllImport("user32.dll")]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, uint uFlags);
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBox1.Checked)
+                SetWindowPos(this.Handle, HWND_TOPMOST, 0, 0, 0, 0, TOPMOST_FLAGS);
+            else
+                SetWindowPos(this.Handle, MainV2.instance.Handle, 0, 0, 0, 0, TOPMOST_FLAGS);
+        }
+
+        private void myButton1_Click(object sender, EventArgs e)
+        {
+
+            MainV2.instance.FlightPlanner.writeKML();
+
+            List<PointLatLngAlt> points = new List<PointLatLngAlt>();
+
+            foreach (var item in MainV2.instance.FlightPlanner.pointlist)
+            {
+                if (item is null)
+                    continue;
+
+                double relAlt = 0;
+                if (item.Tag != "H")
+                {
+                    int index = int.Parse(item.Tag.ToString()) - 1;
+                    relAlt = MainV2.instance.FlightPlanner.Commands.Rows[index].Cells[altindex].Value == null
+                        ? item.Alt
+                        : double.Parse(MainV2.instance.FlightPlanner.Commands.Rows[index].Cells[altindex].Value.ToString());
+                }
+                points.Add(new PointLatLngAlt(item.Lat, item.Lng, relAlt));
+            }
+
+            //double homealt = MainV2.comPort.MAV.cs.HomeAlt;
+            var altmode = FlightPlanner.altmode.Relative;
+            // altmode should not change in sprayplanner mode.
+            initGraph(MainV2.instance.FlightPlanner.pointlist, homealt, FlightPlanner.altmode.Relative, altindex);
+            ElevationProfile_Load(sender, e);
+            zg1.Invalidate();
         }
     }
 }
