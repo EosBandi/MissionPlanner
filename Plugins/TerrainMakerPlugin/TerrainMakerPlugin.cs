@@ -44,7 +44,7 @@ namespace TerrainMakerPlugin
 
         public override string Version
         {
-            get { return "2.0"; }
+            get { return "2.1"; }
         }
 
         public override string Author
@@ -89,7 +89,7 @@ namespace TerrainMakerPlugin
             if (!area.IsEmpty)
             {
                 string spacingstring = "30";
-                if (InputBox.Show("SPACING", "Enter the grid spacing in meters (5-100).", ref spacingstring) !=
+                if (InputBox.Show("SPACING", "Enter the grid spacing in meters (1-100).", ref spacingstring) !=
                     DialogResult.OK)
                     return;
 
@@ -100,15 +100,22 @@ namespace TerrainMakerPlugin
                     return;
                 }
 
-                if (spacing < 5 || spacing > 100)
+                if (spacing < 1 || spacing > 100)
                 {
-                    CustomMessageBox.Show("Spacing must be between 5 and 100 meters", "ERROR");
+                    CustomMessageBox.Show("Spacing must be between 1 and 100 meters", "ERROR");
                     return;
                 }
 
 
-
-                //Do it in the selected area with the selected spacing
+                if (spacing < 4)
+                {
+                    var res = CustomMessageBox.Show("Spacing is less than 4 meters! It will create a file larger than 2 Gb. Due a filesystem bug, Ardupilot does not support files larger than 2Gb (yet) ", "WARNING", MessageBoxButtons.OKCancel);
+                    if (res == (int)DialogResult.Cancel)
+                    {
+                        return;
+                    }
+                }
+                    //Do it in the selected area with the selected spacing
                 int lat_start = (int)Math.Floor(area.Bottom);
                 int lat_end = (int)Math.Ceiling(area.Top);
 
