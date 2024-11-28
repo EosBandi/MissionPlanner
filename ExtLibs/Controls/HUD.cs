@@ -68,7 +68,7 @@ namespace MissionPlanner.Controls
                 // start drawing
                 //OnPaintSurface(new SKPaintSurfaceEventArgs(surface, info));
 
-                graphicsObjectGDIP = new SkiaGraphics(surface);
+                //graphicsObjectGDIP = new SkiaGraphics(surface);
                 doPaint();
 
                 surface.Canvas.Flush();
@@ -271,7 +271,7 @@ namespace MissionPlanner.Controls
             objBitmap.MakeTransparent();
 
             graphicsObject = this;
-            graphicsObjectGDIP = new GdiGraphics(Graphics.FromImage(objBitmap));
+            //graphicsObjectGDIP = new GdiGraphics(Graphics.FromImage(objBitmap));
         }
 
         protected override void Dispose(bool disposing)
@@ -1353,7 +1353,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.Clear(color);
+                //graphicsObjectGDIP.Clear(color);
             }
         }
 
@@ -1396,7 +1396,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.DrawArc(penn, rect, start, degrees);
+                //graphicsObjectGDIP.DrawArc(penn, rect, start, degrees);
             }
         }
 
@@ -1433,7 +1433,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.DrawEllipse(penn, rect);
+                //graphicsObjectGDIP.DrawEllipse(penn, rect);
             }
         }
 
@@ -1555,7 +1555,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.DrawImage(img, x, y, width, height);
+                //raphicsObjectGDIP.DrawImage(img, x, y, width, height);
             }
         }
 
@@ -1680,8 +1680,9 @@ namespace MissionPlanner.Controls
                     //GL.ClearStencil(0);
                     //FillPolygon(brushh, gp.PathPoints);
                 }
-                else
-                    graphicsObjectGDIP.FillPath(brushh, gp);
+                //else
+
+                    //graphicsObjectGDIP.FillPath(brushh, gp);
             }
             catch
             {
@@ -1706,7 +1707,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.ResetTransform();
+                //graphicsObjectGDIP.ResetTransform();
             }
         }
 
@@ -1718,7 +1719,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.RotateTransform(angle);
+                //graphicsObjectGDIP.RotateTransform(angle);
             }
         }
 
@@ -1730,7 +1731,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.TranslateTransform(x, y);
+                //graphicsObjectGDIP.TranslateTransform(x, y);
             }
         }
 
@@ -1750,7 +1751,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.FillPolygon(brushh, list);
+                //graphicsObjectGDIP.FillPolygon(brushh, list);
             }
         }
 
@@ -1770,7 +1771,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.FillPolygon(brushh, list);
+                //graphicsObjectGDIP.FillPolygon(brushh, list);
             }
         }
 
@@ -1791,7 +1792,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.DrawPolygon(penn, list);
+                //graphicsObjectGDIP.DrawPolygon(penn, list);
             }
         }
 
@@ -1812,7 +1813,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.DrawPolygon(penn, list);
+                //graphicsObjectGDIP.DrawPolygon(penn, list);
             }
         }
 
@@ -1860,7 +1861,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.FillRectangle(brushh, rectf);
+                //graphicsObjectGDIP.FillRectangle(brushh, rectf);
             }
         }
 
@@ -1886,7 +1887,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.DrawRectangle(penn, (float) x1, (float) y1, (float) width, (float) height);
+                //graphicsObjectGDIP.DrawRectangle(penn, (float) x1, (float) y1, (float) width, (float) height);
             }
         }
                 
@@ -1910,7 +1911,7 @@ namespace MissionPlanner.Controls
             }
             else
             {
-                graphicsObjectGDIP.DrawLine(penn, (float)x1, (float)y1, (float)x2, (float)y2);
+                //graphicsObjectGDIP.DrawLine(penn, (float)x1, (float)y1, (float)x2, (float)y2);
             }
         }
 
@@ -1924,22 +1925,22 @@ namespace MissionPlanner.Controls
             bool isNaN = false;
             try
             {
-                if (graphicsObjectGDIP == null || !opengl &&
-                    (objBitmap.Width != this.Width || objBitmap.Height != this.Height))
-                {
-                    objBitmap = new Bitmap(this.Width, this.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
-                    objBitmap.MakeTransparent();
-                    graphicsObjectGDIP = new GdiGraphics(Graphics.FromImage(objBitmap));
+                //if (graphicsObjectGDIP == null || !opengl &&
+                //    (objBitmap.Width != this.Width || objBitmap.Height != this.Height))
+                //{
+                //    objBitmap = new Bitmap(this.Width, this.Height, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+                //    objBitmap.MakeTransparent();
+                //    graphicsObjectGDIP = new GdiGraphics(Graphics.FromImage(objBitmap));
 
-                    graphicsObjectGDIP.SmoothingMode = SmoothingMode.HighSpeed;
-                    graphicsObjectGDIP.InterpolationMode = InterpolationMode.NearestNeighbor;
-                    graphicsObjectGDIP.CompositingMode = CompositingMode.SourceOver;
-                    graphicsObjectGDIP.CompositingQuality = CompositingQuality.HighSpeed;
-                    graphicsObjectGDIP.PixelOffsetMode = PixelOffsetMode.HighSpeed;
-                    graphicsObjectGDIP.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
-                }
+                //    graphicsObjectGDIP.SmoothingMode = SmoothingMode.HighSpeed;
+                //    graphicsObjectGDIP.InterpolationMode = InterpolationMode.NearestNeighbor;
+                //    graphicsObjectGDIP.CompositingMode = CompositingMode.SourceOver;
+                //    graphicsObjectGDIP.CompositingQuality = CompositingQuality.HighSpeed;
+                //    graphicsObjectGDIP.PixelOffsetMode = PixelOffsetMode.HighSpeed;
+                //    graphicsObjectGDIP.TextRenderingHint = System.Drawing.Text.TextRenderingHint.SystemDefault;
+                //}
 
-                graphicsObjectGDIP.InterpolationMode = InterpolationMode.Bilinear;
+                //graphicsObjectGDIP.InterpolationMode = InterpolationMode.Bilinear;
 
                 try
                 {
@@ -3719,7 +3720,7 @@ namespace MissionPlanner.Controls
                 }
             }
 
-            graphicsObjectGDIP = new GdiGraphics(Graphics.FromImage(objBitmap));
+            //graphicsObjectGDIP = new GdiGraphics(Graphics.FromImage(objBitmap));
 
             try
             {
