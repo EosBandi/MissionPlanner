@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using DotSpatial.Data.Properties;
 using GMap.NET;
 using GMap.NET.WindowsForms;
 using MissionPlanner.Controls;
@@ -46,6 +47,7 @@ namespace MissionPlanner.SprayGrid
             but.Click += but_Click;
 
             bool hit = false;
+
             ToolStripItemCollection col = Host.FPMenuMap.Items;
             int index = col.Count;
             foreach (ToolStripItem item in col)
@@ -75,23 +77,27 @@ namespace MissionPlanner.SprayGrid
                 }
             }
 
-
             if (hit == false)
                 col.Add(but);
-            MainV2.instance.Invoke((Action)
-                delegate
-                {
-                    customButton = Host.MainForm.FlightPlanner.Controls.Find("customButton", true).FirstOrDefault() as MyButton;
-                    if (customButton != null)
+
+
+            if (MissionPlanner.Utilities.Settings.Instance.GetBoolean("ShowSprayGridButton", true) == true)
+            {
+
+                MainV2.instance.Invoke((Action)
+                    delegate
                     {
-                        customButton.Click += but_Click;
-                        customButton.Text = "SprayGrid";
-                        customButton.Visible = true;
-                    }
+                        customButton = Host.MainForm.FlightPlanner.Controls.Find("customButton", true).FirstOrDefault() as MyButton;
+                        if (customButton != null)
+                        {
+                            customButton.Click += but_Click;
+                            customButton.Text = "SprayGrid";
+                            customButton.Visible = true;
+                        }
 
-                 });
+                    });
 
-
+            }
             return true;
         }
 
