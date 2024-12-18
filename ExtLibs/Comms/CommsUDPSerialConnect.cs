@@ -133,9 +133,23 @@ namespace MissionPlanner.Comms
             var dest = Port;
             var host = "127.0.0.1";
 
-            dest = OnSettings("UDP_port" + ConfigRef, dest);
+            if (this.client.Client.RemoteEndPoint != null)
+            {
+                string address = this.client.Client.RemoteEndPoint.ToString();
+                host = address.Substring(0,address.LastIndexOf(':'));
+            }
 
+
+            dest = OnSettings("UDP_port" + ConfigRef, dest);
             host = OnSettings("UDP_host" + ConfigRef, host);
+
+            if (this.client.Client.RemoteEndPoint != null)
+            {
+                string address = this.client.Client.RemoteEndPoint.ToString();
+                host = address.Substring(0, address.LastIndexOf(':'));
+                dest = address.Substring(address.LastIndexOf(':') + 1);
+            }
+
 
             //if (!MainV2.MONO)
             {
