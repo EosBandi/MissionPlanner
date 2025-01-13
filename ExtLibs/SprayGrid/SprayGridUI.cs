@@ -1271,21 +1271,25 @@ namespace MissionPlanner.SprayGrid
             if (tag == "S") p4 = 1;
             if (tag == "E") p4 = 2;
 
-            if (HomeAlt is double.NaN)
+
+            //We need reference value only if we are using Relative Altitude
+            if ((altmode)CMB_AltReference.SelectedValue == altmode.Relative)
             {
-                p3 = Alt;
+                if (HomeAlt is double.NaN)
+                {
+                    p3 = Alt;
+                }
+                else
+                {
+                    //p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value;
+                    //We have a valid home altitude, so calculate back the relative altitude at the given point (Alt tracking)
+                    p3 = Alt - (pointAlt - HomeAlt);
+
+                }
+
+                //Add rounding
+                p3 = Math.Round(p3, 2);
             }
-            else
-            {
-                //  p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value;
-                //We have a valid home altitude, so calculate back the relative altitude at the given point (Alt tracking)
-                p3 = Alt - (pointAlt - HomeAlt);
-
-            }
-
-            //Add rounding
-            p3 = Math.Round(p3, 2);
-
             if (NUM_DelayAtWP.Value > 0)
             {
                 plugin.Host.AddWPtoList(MAVLink.MAV_CMD.WAYPOINT, (double)NUM_DelayAtWP.Value, 0, p3, p4, Lng, Lat, Alt * CurrentState.multiplierdist, null);

@@ -6687,20 +6687,22 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                             }
 
                             //Check if the waypoint AGL value is zero
-                            if (Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Command.Index].Value.ToString() != "LAND")
+                            if ((altmode)CMB_altmode.SelectedValue == altmode.Relative)
                             {
-                               double aglvalue = double.Parse(Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Param3.Index].Value.ToString());
-                                if (aglvalue == 0)
+                                if (Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Command.Index].Value.ToString() != "LAND")
                                 {
-                                    Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Param3.Index].Style.BackColor = Color.Red;
-                                }
-                                else
-                                {
-                                    Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Param3.Index].Style.BackColor = Commands.BackgroundColor;
+                                    double aglvalue = double.Parse(Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Param3.Index].Value.ToString());
+                                    if (aglvalue == 0)
+                                    {
+                                        Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Param3.Index].Style.BackColor = Color.Red;
+                                    }
+                                    else
+                                    {
+                                        Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Param3.Index].Style.BackColor = Commands.BackgroundColor;
 
+                                    }
                                 }
                             }
-
 
 
                         }
@@ -7088,7 +7090,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             if (suppress_textchanged)
                 return;
 
-            if (CHK_verifyheight.Checked && Commands.Rows.Count > 0 && previous_homealt != TXT_homealt.Text)
+            if (CHK_verifyheight.Checked && Commands.Rows.Count > 0 && previous_homealt != TXT_homealt.Text && (altmode)CMB_altmode.SelectedItem == altmode.Relative)
             {
                 double prev, next;
                 if (double.TryParse(previous_homealt, out prev)

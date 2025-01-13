@@ -52,11 +52,6 @@ namespace MissionPlanner.Controls
                 return;
             }
 
-            if (altmode != FlightPlanner.altmode.Relative)
-            {
-                CustomMessageBox.Show("Current version uses relative alt mode only", Strings.ERROR);
-                return;
-            }
 
             if (locs.Count <= 1)
             {
