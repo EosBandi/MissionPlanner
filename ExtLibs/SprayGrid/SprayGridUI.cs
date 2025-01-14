@@ -822,141 +822,156 @@ namespace MissionPlanner.SprayGrid
             //Do the ALT tracking calculation
             if (CHK_enableAltTracking.Checked == true)
             {
-                //Do grid altitude based on srtm
 
-                srtm.altresponce altsrtm = srtm.getAltitude(MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng);
 
-                if (altsrtm.currenttype == srtm.tiletype.valid)
+                if ((altmode)CMB_AltReference.SelectedValue != altmode.Terrain)
                 {
-                    homealt = altsrtm.alt;
-                }
-                else
-                {
-                    homealt = MainV2.comPort.MAV.cs.PlannedHomeLocation.Alt;
-                }
 
-                foreach (var p in grid)
-                {
-                    altsrtm = getVehicleSRTMAlt(p.Lat, p.Lng, displacementMap);
-                    p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value;
-                }
 
-                List<PointLatLngAlt> newGrid = new List<PointLatLngAlt>();
+                    //Do grid altitude based on srtm
 
-                //expand grid with altitude issue point
-                PointLatLngAlt last = null;
-                double targetRelativeAlt = (double)NUM_altitude.Value;
+                    srtm.altresponce altsrtm = srtm.getAltitude(MainV2.comPort.MAV.cs.PlannedHomeLocation.Lat, MainV2.comPort.MAV.cs.PlannedHomeLocation.Lng);
 
-                foreach (PointLatLngAlt loc in grid)
-                {
-                    if (loc == null)
-                        continue;
-
-                    //Removed terrain following, we use relative altitudes
-                    //Ignore the first point We don't have a heading
-                    if (last == null)
+                    if (altsrtm.currenttype == srtm.tiletype.valid)
                     {
+                        homealt = altsrtm.alt;
+                    }
+                    else
+                    {
+                        homealt = MainV2.comPort.MAV.cs.PlannedHomeLocation.Alt;
+                    }
+
+                    if ((altmode)CMB_AltReference.SelectedValue == altmode.Absolute)
+                    {
+                        homealt = 0;
+                    }
+
+                    foreach (var p in grid)
+                    {
+                        altsrtm = getVehicleSRTMAlt(p.Lat, p.Lng, displacementMap);
+                        p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value;
+                    }
+
+                    List<PointLatLngAlt> newGrid = new List<PointLatLngAlt>();
+
+                    //expand grid with altitude issue point
+                    PointLatLngAlt last = null;
+                    double targetRelativeAlt = (double)NUM_altitude.Value;
+
+                    foreach (PointLatLngAlt loc in grid)
+                    {
+                        if (loc == null)
+                            continue;
+
+                        //Removed terrain following, we use relative altitudes
+                        //Ignore the first point We don't have a heading
+                        if (last == null)
+                        {
+                            newGrid.Add(loc);
+                            last = loc;
+                            continue;
+                        }
+
+                        double dist = last.GetDistance(loc);
+
+                        int points = (int)(dist * 2.5) + 1;
+
+                        double deltalat = (last.Lat - loc.Lat);
+                        double deltalng = (last.Lng - loc.Lng);
+                        double steplat = deltalat / points;
+                        double steplng = deltalng / points;
+
+                        double deltaalt = last.Alt - loc.Alt;
+                        double stepalt = deltaalt / points;
+
+                        double lastalt = last.Alt;
+                        int lasta = 0;
+
+                        //Go through between the two points in distance/4+1 steps which is 25cm
+                        for (int a = 0; a <= points; a++)
+                        {
+                            double lat = last.Lat - steplat * a;        //location new position
+                            double lng = last.Lng - steplng * a;
+
+                            double extrapolatedRelativeAlt = lastalt - stepalt * (a - lasta);        //vehicle center estimated altitude of a given point, extrapolated from the two points
+
+                            double actualTerrainAlt = getMaxAltinArea(lat, lng, displacementMap).alt;
+
+                            double terrainToHome = actualTerrainAlt - homealt;
+
+                            double altAboveTerrain = extrapolatedRelativeAlt - terrainToHome;
+
+                            PointLatLngAlt newpoint = new PointLatLngAlt(lat, lng, terrainToHome + targetRelativeAlt, "");
+
+                            if (Math.Abs(altAboveTerrain - targetRelativeAlt) > (double)NUM_trackingAltError.Value)
+                            {
+                                newGrid.Add(newpoint);
+                                lastalt = newpoint.Alt;
+                                deltaalt = lastalt - loc.Alt;
+                                int remaining = points - a;
+                                stepalt = deltaalt / (remaining);
+                                lasta = a;
+                            }
+                        }
                         newGrid.Add(loc);
                         last = loc;
-                        continue;
                     }
 
-                    double dist = last.GetDistance(loc);
+                    //Check interim alt points to see if they really needed
+                    //Go throght the grid and get prev, current and next point
 
-                    int points = (int)(dist * 2.5) + 1;
+                    List<PointLatLngAlt> pointstoremove = new List<PointLatLngAlt>();
 
-                    double deltalat = (last.Lat - loc.Lat);
-                    double deltalng = (last.Lng - loc.Lng);
-                    double steplat = deltalat / points;
-                    double steplng = deltalng / points;
-
-                    double deltaalt = last.Alt - loc.Alt;
-                    double stepalt = deltaalt / points;
-
-                    double lastalt = last.Alt;
-                    int lasta = 0;
-
-                    //Go through between the two points in distance/4+1 steps which is 25cm
-                    for (int a = 0; a <= points; a++)
+                    bool notDoneYet = true;
+                    while (notDoneYet)
                     {
-                        double lat = last.Lat - steplat * a;        //location new position
-                        double lng = last.Lng - steplng * a;
+                        notDoneYet = false;
+                        PointLatLngAlt pointToRemove = new PointLatLngAlt();
 
-                        double extrapolatedRelativeAlt = lastalt - stepalt * (a - lasta);        //vehicle center estimated altitude of a given point, extrapolated from the two points
-
-                        double actualTerrainAlt = getMaxAltinArea(lat, lng, displacementMap).alt;
-
-                        double terrainToHome = actualTerrainAlt - homealt;
-
-                        double altAboveTerrain = extrapolatedRelativeAlt - terrainToHome;
-
-                        PointLatLngAlt newpoint = new PointLatLngAlt(lat, lng, terrainToHome + targetRelativeAlt, "");
-
-                        if (Math.Abs(altAboveTerrain - targetRelativeAlt) > (double)NUM_trackingAltError.Value)
+                        foreach (var p in newGrid)
                         {
-                            newGrid.Add(newpoint);
-                            lastalt = newpoint.Alt;
-                            deltaalt = lastalt - loc.Alt;
-                            int remaining = points - a;
-                            stepalt = deltaalt / (remaining);
-                            lasta = a;
-                        }
-                    }
-                    newGrid.Add(loc);
-                    last = loc;
-                }
-
-                //Check interim alt points to see if they really needed
-                //Go throght the grid and get prev, current and next point
-
-                List<PointLatLngAlt> pointstoremove = new List<PointLatLngAlt>();
-
-                bool notDoneYet = true;
-                while (notDoneYet)
-                {
-                    notDoneYet = false;
-                    PointLatLngAlt pointToRemove = new PointLatLngAlt();
-
-                    foreach (var p in newGrid)
-                    {
-                        int index = newGrid.IndexOf(p);
-                        if (index > 0 && index < newGrid.Count - 1)
-                        {
-                            PointLatLngAlt prev = newGrid[index - 1];
-                            PointLatLngAlt next = newGrid[index + 1];
-
-                            if (p.Tag == "S" || p.Tag == "E")
-                                continue;
-
-                            // Assume that x1 and y1 is the zero point
-                            double x2 = prev.GetDistance(next);
-                            double xc = prev.GetDistance(p);
-                            double y2 = prev.Alt - next.Alt;
-                            double yc = prev.Alt - p.Alt;
-
-                            double m = y2 / x2;
-                            double c = y2 - m * x2;
-                            double y_prime = m * xc + c;
-                            double d = Math.Abs(y_prime - yc);
-
-                            if (d < (double)NUM_trackingAltError.Value)
+                            int index = newGrid.IndexOf(p);
+                            if (index > 0 && index < newGrid.Count - 1)
                             {
-                                pointToRemove = p;
-                                notDoneYet = true;
+                                PointLatLngAlt prev = newGrid[index - 1];
+                                PointLatLngAlt next = newGrid[index + 1];
+
+                                if (p.Tag == "S" || p.Tag == "E")
+                                    continue;
+
+                                // Assume that x1 and y1 is the zero point
+                                double x2 = prev.GetDistance(next);
+                                double xc = prev.GetDistance(p);
+                                double y2 = prev.Alt - next.Alt;
+                                double yc = prev.Alt - p.Alt;
+
+                                double m = y2 / x2;
+                                double c = y2 - m * x2;
+                                double y_prime = m * xc + c;
+                                double d = Math.Abs(y_prime - yc);
+
+                                if (d < (double)NUM_trackingAltError.Value)
+                                {
+                                    pointToRemove = p;
+                                    notDoneYet = true;
+                                }
+                                if (notDoneYet)
+                                    break;
                             }
-                            if (notDoneYet)
-                                break;
+                        }
+                        if (notDoneYet)
+                        {
+                            newGrid.Remove(pointToRemove);
                         }
                     }
-                    if (notDoneYet)
-                    {
-                        newGrid.Remove(pointToRemove);
-                    }
-                }
 
-                grid = newGrid;
+                    grid = newGrid;
+
+                }
 
             }
+            //////////// End alt tracking
+
 
             int split_segment = 0;
             int split_time = 0;
