@@ -4329,22 +4329,22 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                 log.InfoFormat("setGuidedModeWP {0}:{1} lat {2} lng {3} alt {4}", sysid, compid, gotohere.lat,
                     gotohere.lng, gotohere.alt);
 
-                if (MAVlist[sysid, compid].cs.firmware == Firmwares.ArduPlane)
-                {
-                    MAV_MISSION_RESULT ans = setWP(sysid, compid, gotohere, 0, MAV_FRAME.GLOBAL_RELATIVE_ALT, (byte) 2);
+                //if (MAVlist[sysid, compid].cs.firmware == Firmwares.ArduPlane)
+                //{
+                //    MAV_MISSION_RESULT ans = setWP(sysid, compid, gotohere, 0, MAV_FRAME.GLOBAL_RELATIVE_ALT, (byte) 2);
 
-                    if (ans != MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED)
-                    {
-                        giveComport = false;
-                        throw new Exception("Guided Mode Failed");
-                    }
-                }
-                else
-                {
+                //    if (ans != MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED)
+                //    {
+                //        giveComport = false;
+                //        throw new Exception("Guided Mode Failed");
+                //    }
+                //}
+                //else
+                //{
                     setPositionTargetGlobalInt((byte) sysid, (byte) compid,
                         true, false, false, false, MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT_INT,
                         gotohere.lat, gotohere.lng, gotohere.alt, 0, 0, 0, 0, 0);
-                }
+                //}
             }
             catch (Exception ex)
             {
