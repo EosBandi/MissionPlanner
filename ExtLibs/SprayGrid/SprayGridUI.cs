@@ -48,6 +48,7 @@ namespace MissionPlanner.SprayGrid
         public int lanesep;
         public bool extendedpoint;
         public double takeoffalt;
+        public double gpsOffset;
 
         public List<PointLatLngAlt> polygon;
         public List<List<PointLatLngAlt>> obstaclesmarks;
@@ -176,6 +177,7 @@ namespace MissionPlanner.SprayGrid
             loadsetting("SprayGrid_litersperha", NUM_LitPerHa);
             loadsetting("SprayGrid_flyspeed", NUM_UpDownFlySpeed);
             loadsetting("SprayGrid_alt", NUM_altitude);
+            loadsetting("SprayGrid_gpsoffset", NUM_gpsOffset);
             loadsetting("SprayGrid_barsize", NUM_SprayBarWidth);
             loadsetting("SprayGrid_lanesep", NUM_LaneSeparation);
             loadsetting("SprayGrid_addtakeoff", CHK_addTakeoffAndLanding);
@@ -211,7 +213,9 @@ namespace MissionPlanner.SprayGrid
         }
         void savesettings()
         {
+
             plugin.Host.config["SprayGrid_alt"] = NUM_altitude.Value.ToString();
+            plugin.Host.config["SprayGrid_gpsoffset"] = NUM_gpsOffset.Value.ToString();
             plugin.Host.config["SprayGrid_linedistance"] = NUM_Distance.Value.ToString();
             plugin.Host.config["SprayGrid_litersperha"] = NUM_LitPerHa.Value.ToString();
             plugin.Host.config["SprayGrid_flyspeed"] = NUM_UpDownFlySpeed.Value.ToString();
@@ -464,7 +468,7 @@ namespace MissionPlanner.SprayGrid
                 barwidth = 0;
             }
 
-            grid = Utilities.Grid.CreateSprayGrid(list, (double)NUM_altitude.Value, (double)NUM_Distance.Value,
+            grid = Utilities.Grid.CreateSprayGrid(list, (double)NUM_altitude.Value + (double)NUM_gpsOffset.Value, (double)NUM_Distance.Value,
                 (double)NUM_angle.Value,
                 (Utilities.Grid.StartPosition)Enum.Parse(typeof(Utilities.Grid.StartPosition), CMB_startfrom.Text), (float)NUM_LaneSeparation.Value,
                 plugin.Host.cs.PlannedHomeLocation, obstacles, (double)NUM_Shift.Value, barwidth, CHK_extendedpoint.Checked);
@@ -814,7 +818,7 @@ namespace MissionPlanner.SprayGrid
             double homealt = 0;
             //verifyHeightState = MainV2.instance.FlightPlanner.CHK_verifyheight.Checked;
             verifyHeightState = true; //Force verify height
-            MainV2.instance.FlightPlanner.TXT_DefaultAlt.Text = NUM_altitude.Value.ToString();
+            MainV2.instance.FlightPlanner.TXT_DefaultAlt.Text = (NUM_altitude.Value + NUM_gpsOffset.Value).ToString();
             List<PointF> displacementMap = new List<PointF>();
             displacementMap = getVehicleAreaDisplacementPoints((double)NUM_angle.Value, (double)NUM_SprayBarWidth.Value);
 
@@ -823,6 +827,23 @@ namespace MissionPlanner.SprayGrid
             if (CHK_enableAltTracking.Checked == true)
             {
 
+                if ((altmode)CMB_AltReference.SelectedValue == altmode.Terrain)
+                {
+                    // Set all point's altitude to the actual terrain altitude
+
+                    srtm.altresponce altsrtm;
+                    srtm.altresponce maxaltsrtm;
+                    Console.WriteLine("Terrain follow, vehicle size correction");
+                    foreach (var p in grid)
+                    {
+
+                        altsrtm = srtm.getAltitude(p.Lat, p.Lng);
+                        maxaltsrtm = getVehicleSRTMAlt(p.Lat, p.Lng, displacementMap);
+                        Console.WriteLine(String.Format("At point: {0} max: {1}", altsrtm.alt, maxaltsrtm.alt));
+                        p.Alt = maxaltsrtm.alt - altsrtm.alt + (double)NUM_altitude.Value + (double)NUM_gpsOffset.Value;
+                    }
+
+                }
 
                 if ((altmode)CMB_AltReference.SelectedValue != altmode.Terrain)
                 {
@@ -849,14 +870,15 @@ namespace MissionPlanner.SprayGrid
                     foreach (var p in grid)
                     {
                         altsrtm = getVehicleSRTMAlt(p.Lat, p.Lng, displacementMap);
-                        p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value;
+                        p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value + (double)NUM_gpsOffset.Value;
                     }
+
 
                     List<PointLatLngAlt> newGrid = new List<PointLatLngAlt>();
 
                     //expand grid with altitude issue point
                     PointLatLngAlt last = null;
-                    double targetRelativeAlt = (double)NUM_altitude.Value;
+                    double targetRelativeAlt = (double)NUM_altitude.Value + (double)NUM_gpsOffset.Value;
 
                     foreach (PointLatLngAlt loc in grid)
                     {
@@ -1296,7 +1318,6 @@ namespace MissionPlanner.SprayGrid
                 }
                 else
                 {
-                    //p.Alt = altsrtm.alt - homealt + (double)NUM_altitude.Value;
                     //We have a valid home altitude, so calculate back the relative altitude at the given point (Alt tracking)
                     p3 = Alt - (pointAlt - HomeAlt);
 
@@ -1461,6 +1482,7 @@ namespace MissionPlanner.SprayGrid
             answer.lanesep = (int)NUM_LaneSeparation.Value;
             answer.extendedpoint = CHK_extendedpoint.Checked;
             answer.takeoffalt = (double)NUM_TakeoffAlt.Value;
+            answer.gpsOffset = (double)NUM_gpsOffset.Value;
 
             answer.polygon = list;
             answer.obstaclesmarks = obstacles;
@@ -1477,6 +1499,7 @@ namespace MissionPlanner.SprayGrid
             NUM_LitPerHa.Value = (decimal)data.litersperha;
             NUM_UpDownFlySpeed.Value = (decimal)data.flyspeed;
             NUM_altitude.Value = (decimal)data.altitude;
+            NUM_gpsOffset.Value = (decimal)data.gpsOffset;
             NUM_angle.Value = (decimal)data.angle;
             CMB_AltReference.SelectedIndex = (int)data.altreference;
             CMB_startfrom.SelectedIndex = (int)data.startfrom;

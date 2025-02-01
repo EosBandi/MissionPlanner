@@ -99,7 +99,7 @@ namespace MissionPlanner.Utilities
                 VerticalCitationGeoKey = 4097, /* documentation */
                 VerticalDatumGeoKey = 4098, /* Section 6.3.4.2 codes   */
                 VerticalUnitsGeoKey = 4099, /* Section 6.3.1.3 codes   */
-       
+
 
                 ModelPixelScaleTag = 33550,
                 ModelTiepointTag = 33922,
@@ -186,12 +186,12 @@ namespace MissionPlanner.Utilities
                             }
                             if (TIFFTagLocation == 34736) // double
                             {
-                                
+
                                 var value = tiff.GetField((TiffTag)TIFFTagLocation)[1].ToByteArray().Skip(Value_Offset*8)                                    .Take(Count*8);
                                 log.InfoFormat("GeoKeyDirectoryTag ID={0} Value={1}", (GKID)KeyID, BitConverter.ToDouble(value.ToArray(), 0));
-                                
+
                             }
-                          
+
                             if (KeyID == (int)GKID.PCSCitationGeoKey)
                             {
                                 var value = tiff.GetField((TiffTag) TIFFTagLocation)[1].ToByteArray().Skip(Value_Offset)                                    .Take(Count);
@@ -310,14 +310,14 @@ namespace MissionPlanner.Utilities
                     }
 
                     if (srcProjection != null) {
-                        
+
                     }
                     else
                     // wgs84 utm
                     if (ProjectedCSTypeGeoKey >= 32601 && ProjectedCSTypeGeoKey <= 32760)
                     {
                         if (ProjectedCSTypeGeoKey > 32700)
-                        {                            
+                        {
                             UTMZone = (ProjectedCSTypeGeoKey - 32700) * -1;
                             srcProjection = ProjectionInfo.FromProj4String($"+proj=utm +zone={UTMZone} +ellps=WGS84 +datum=WGS84 +units=m +no_defs ");
                             //tl
@@ -387,7 +387,7 @@ namespace MissionPlanner.Utilities
                         ymax = Math.Max(Math.Max(Math.Max(pnt.Lat, pnt2.Lat), pnt3.Lat), pnt4.Lat);
                         xmax = Math.Max(Math.Max(Math.Max(pnt.Lng, pnt2.Lng), pnt3.Lng), pnt4.Lng);
                     }
-                    else                 
+                    else
                     /// gda94
                     if (ProjectedCSTypeGeoKey >= 28348 && ProjectedCSTypeGeoKey <= 28358)
                     {
@@ -536,8 +536,8 @@ namespace MissionPlanner.Utilities
                     // get answer
                     var xf = map(lat, geotiffdata.Area.Top, geotiffdata.Area.Bottom, 0, geotiffdata.height-1);
                     var yf = map(lng, geotiffdata.Area.Left, geotiffdata.Area.Right, 0, geotiffdata.width-1);
-                   
-                    if (geotiffdata.srcProjection != null) 
+
+                    if (geotiffdata.srcProjection != null)
                     {
                         ProjectionInfo pESRIEnd = KnownCoordinateSystems.Geographic.World.WGS1984;
 
@@ -546,7 +546,7 @@ namespace MissionPlanner.Utilities
 
                         xf = map(xyarray[1], geotiffdata.y, geotiffdata.y - geotiffdata.height * geotiffdata.yscale, 0, geotiffdata.height - 1);
                         yf = map(xyarray[0], geotiffdata.x, geotiffdata.x + geotiffdata.width * geotiffdata.xscale, 0, geotiffdata.width - 1);
-                    }           
+                    }
                     //wgs84 && etrs89
                     else if (geotiffdata.ProjectedCSTypeGeoKey >= 3038 && geotiffdata.ProjectedCSTypeGeoKey <= 3051 ||
                         geotiffdata.ProjectedCSTypeGeoKey >= 32601 && geotiffdata.ProjectedCSTypeGeoKey <= 32760 ||
@@ -567,7 +567,7 @@ namespace MissionPlanner.Utilities
                     int y_int = (int) yf;
                     double y_frac = yf - y_int;
 
-                    
+
                     //could be on one of the other images
                     if (x_int < 0 || y_int < 0 || x_int >= geotiffdata.height -1  || y_int >= geotiffdata.width-1)
                         continue;
@@ -583,10 +583,13 @@ namespace MissionPlanner.Utilities
 
                     if (v > -1000)
                         answer.currenttype = srtm.tiletype.valid;
-                    if(alt00 < -1000 || alt10 < -1000 || alt01 < -1000 || alt11 < -1000 )
+                    if (alt00 < -1000 || alt10 < -1000 || alt01 < -1000 || alt11 < -1000)
+                    {
                         answer.currenttype = srtm.tiletype.invalid;
+                        continue; // check for the second image
+                    }
                     answer.alt = v;
-                    answer.altsource = "GeoTiff";
+                    answer.altsource = "GeoTiff\r\n" + Path.GetFileName(geotiffdata.FileName);
                     return answer;
                 }
             }
@@ -634,10 +637,10 @@ namespace MissionPlanner.Utilities
                                 //log.Info("read scanline " + x);
 
                                 //RowsPerStrip
-                                //http://www.libtiff.org/man/TIFFReadScanline.3t.html   
+                                //http://www.libtiff.org/man/TIFFReadScanline.3t.html
                                 var rps = geotiffdata.Tiff.GetField(TiffTag.ROWSPERSTRIP);
                                 if (rps != null && rps.Length > 0 &&  (int)rps[0].Value > 1)
-                                {                                    
+                                {
                                     var start = x - (x % (int)rps[0].Value);
                                     for (int i = start; i < start + (int)rps[0].Value; i++)
                                     {
@@ -742,7 +745,7 @@ namespace MissionPlanner.Utilities
             if (geotiffdata.bits == 8)
             {
                 throw new Exception("ProcessScanLine: 8bit alt is invalid");
-            } 
+            }
             else if (geotiffdata.bits == 16)
             {
                 return (short) ((scanline[y * 2 + 1] << 8) + scanline[y * 2]);

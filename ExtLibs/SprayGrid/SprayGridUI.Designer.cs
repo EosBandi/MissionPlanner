@@ -30,6 +30,8 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SprayGridUI));
             this.groupBox5 = new System.Windows.Forms.GroupBox();
+            this.lbl_SprayDistance = new System.Windows.Forms.Label();
+            this.label14 = new System.Windows.Forms.Label();
             this.myButton1 = new MissionPlanner.Controls.MyButton();
             this.CHK_extendedpoint = new System.Windows.Forms.CheckBox();
             this.chk_grid = new System.Windows.Forms.CheckBox();
@@ -54,6 +56,9 @@
             this.label12 = new System.Windows.Forms.Label();
             this.NUM_trackingAltError = new System.Windows.Forms.NumericUpDown();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.btN_SaveGrid = new MissionPlanner.Controls.MyButton();
+            this.btn_LoadGrid = new MissionPlanner.Controls.MyButton();
+            this.cb_flip = new System.Windows.Forms.CheckBox();
             this.label15 = new System.Windows.Forms.Label();
             this.CHK_expandObstacles = new System.Windows.Forms.CheckBox();
             this.NUM_TakeoffAlt = new System.Windows.Forms.NumericUpDown();
@@ -82,18 +87,15 @@
             this.NUM_altitude = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
             this.BUT_Accept = new MissionPlanner.Controls.MyButton();
-            this.label1 = new System.Windows.Forms.Label();
             this.CMB_startfrom = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.NUM_Distance = new System.Windows.Forms.NumericUpDown();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.map = new MissionPlanner.Controls.myGMAP();
-            this.cb_flip = new System.Windows.Forms.CheckBox();
-            this.btn_LoadGrid = new MissionPlanner.Controls.MyButton();
-            this.btN_SaveGrid = new MissionPlanner.Controls.MyButton();
-            this.label14 = new System.Windows.Forms.Label();
-            this.lbl_SprayDistance = new System.Windows.Forms.Label();
+            this.label1 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
+            this.NUM_gpsOffset = new System.Windows.Forms.NumericUpDown();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).BeginInit();
             this.groupBox6.SuspendLayout();
@@ -113,6 +115,7 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_gpsOffset)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox5
@@ -142,6 +145,16 @@
             this.groupBox5.Controls.Add(this.label22);
             this.groupBox5.Name = "groupBox5";
             this.groupBox5.TabStop = false;
+            // 
+            // lbl_SprayDistance
+            // 
+            resources.ApplyResources(this.lbl_SprayDistance, "lbl_SprayDistance");
+            this.lbl_SprayDistance.Name = "lbl_SprayDistance";
+            // 
+            // label14
+            // 
+            resources.ApplyResources(this.label14, "label14");
+            this.label14.Name = "label14";
             // 
             // myButton1
             // 
@@ -298,6 +311,8 @@
             // groupBox6
             // 
             resources.ApplyResources(this.groupBox6, "groupBox6");
+            this.groupBox6.Controls.Add(this.NUM_gpsOffset);
+            this.groupBox6.Controls.Add(this.label18);
             this.groupBox6.Controls.Add(this.btN_SaveGrid);
             this.groupBox6.Controls.Add(this.btn_LoadGrid);
             this.groupBox6.Controls.Add(this.cb_flip);
@@ -338,6 +353,29 @@
             this.groupBox6.Controls.Add(this.NUM_Distance);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.TabStop = false;
+            // 
+            // btN_SaveGrid
+            // 
+            resources.ApplyResources(this.btN_SaveGrid, "btN_SaveGrid");
+            this.btN_SaveGrid.Name = "btN_SaveGrid";
+            this.btN_SaveGrid.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.btN_SaveGrid.UseVisualStyleBackColor = true;
+            this.btN_SaveGrid.Click += new System.EventHandler(this.btN_SaveGrid_Click);
+            // 
+            // btn_LoadGrid
+            // 
+            resources.ApplyResources(this.btn_LoadGrid, "btn_LoadGrid");
+            this.btn_LoadGrid.Name = "btn_LoadGrid";
+            this.btn_LoadGrid.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.btn_LoadGrid.UseVisualStyleBackColor = true;
+            this.btn_LoadGrid.Click += new System.EventHandler(this.btn_LoadGrid_Click);
+            // 
+            // cb_flip
+            // 
+            resources.ApplyResources(this.cb_flip, "cb_flip");
+            this.cb_flip.Name = "cb_flip";
+            this.cb_flip.UseVisualStyleBackColor = true;
+            this.cb_flip.CheckedChanged += new System.EventHandler(this.cb_flip_CheckedChanged);
             // 
             // label15
             // 
@@ -606,11 +644,6 @@
             this.BUT_Accept.UseVisualStyleBackColor = true;
             this.BUT_Accept.Click += new System.EventHandler(this.BUT_Accept_Click2);
             // 
-            // label1
-            // 
-            resources.ApplyResources(this.label1, "label1");
-            this.label1.Name = "label1";
-            // 
             // CMB_startfrom
             // 
             this.CMB_startfrom.FormattingEnabled = true;
@@ -693,38 +726,31 @@
             this.map.ShowTileGridLines = false;
             this.map.Zoom = 3D;
             // 
-            // cb_flip
+            // label1
             // 
-            resources.ApplyResources(this.cb_flip, "cb_flip");
-            this.cb_flip.Name = "cb_flip";
-            this.cb_flip.UseVisualStyleBackColor = true;
-            this.cb_flip.CheckedChanged += new System.EventHandler(this.cb_flip_CheckedChanged);
+            resources.ApplyResources(this.label1, "label1");
+            this.label1.Name = "label1";
             // 
-            // btn_LoadGrid
+            // label18
             // 
-            resources.ApplyResources(this.btn_LoadGrid, "btn_LoadGrid");
-            this.btn_LoadGrid.Name = "btn_LoadGrid";
-            this.btn_LoadGrid.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
-            this.btn_LoadGrid.UseVisualStyleBackColor = true;
-            this.btn_LoadGrid.Click += new System.EventHandler(this.btn_LoadGrid_Click);
+            resources.ApplyResources(this.label18, "label18");
+            this.label18.Name = "label18";
             // 
-            // btN_SaveGrid
+            // NUM_gpsOffset
             // 
-            resources.ApplyResources(this.btN_SaveGrid, "btN_SaveGrid");
-            this.btN_SaveGrid.Name = "btN_SaveGrid";
-            this.btN_SaveGrid.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
-            this.btN_SaveGrid.UseVisualStyleBackColor = true;
-            this.btN_SaveGrid.Click += new System.EventHandler(this.btN_SaveGrid_Click);
-            // 
-            // label14
-            // 
-            resources.ApplyResources(this.label14, "label14");
-            this.label14.Name = "label14";
-            // 
-            // lbl_SprayDistance
-            // 
-            resources.ApplyResources(this.lbl_SprayDistance, "lbl_SprayDistance");
-            this.lbl_SprayDistance.Name = "lbl_SprayDistance";
+            this.NUM_gpsOffset.DecimalPlaces = 2;
+            this.NUM_gpsOffset.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            resources.ApplyResources(this.NUM_gpsOffset, "NUM_gpsOffset");
+            this.NUM_gpsOffset.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.NUM_gpsOffset.Name = "NUM_gpsOffset";
             // 
             // SprayGridUI
             // 
@@ -755,6 +781,7 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_gpsOffset)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -777,7 +804,6 @@
         private System.Windows.Forms.NumericUpDown NUM_altitude;
         private System.Windows.Forms.Label label6;
         private Controls.MyButton BUT_Accept;
-        private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox CMB_startfrom;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.NumericUpDown NUM_Distance;
@@ -826,5 +852,8 @@
         private Controls.MyButton btn_LoadGrid;
         private System.Windows.Forms.Label lbl_SprayDistance;
         private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.NumericUpDown NUM_gpsOffset;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.Label label1;
     }
 }

@@ -30,7 +30,6 @@
         {
             this.components = new System.ComponentModel.Container();
             this.zg1 = new ZedGraph.ZedGraphControl();
-            this.label1 = new System.Windows.Forms.Label();
             this.myButton1 = new MissionPlanner.Controls.MyButton();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
@@ -40,7 +39,7 @@
             this.zg1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.zg1.Location = new System.Drawing.Point(12, 23);
+            this.zg1.Location = new System.Drawing.Point(12, 12);
             this.zg1.Name = "zg1";
             this.zg1.ScrollGrace = 0D;
             this.zg1.ScrollMaxX = 0D;
@@ -49,18 +48,8 @@
             this.zg1.ScrollMinX = 0D;
             this.zg1.ScrollMinY = 0D;
             this.zg1.ScrollMinY2 = 0D;
-            this.zg1.Size = new System.Drawing.Size(810, 388);
+            this.zg1.Size = new System.Drawing.Size(810, 399);
             this.zg1.TabIndex = 30;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(162, 7);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(507, 13);
-            this.label1.TabIndex = 31;
-            this.label1.Text = "NOTE: The ground height data is pulled from Google Earth at 100m intervals. You u" +
-    "se this at your own risk";
             // 
             // myButton1
             // 
@@ -92,7 +81,6 @@
             this.ClientSize = new System.Drawing.Size(834, 454);
             this.Controls.Add(this.checkBox1);
             this.Controls.Add(this.myButton1);
-            this.Controls.Add(this.label1);
             this.Controls.Add(this.zg1);
             this.ForeColor = System.Drawing.Color.White;
             this.Name = "ElevationProfileSpray";
@@ -106,7 +94,6 @@
         #endregion
 
         private ZedGraph.ZedGraphControl zg1;
-        private System.Windows.Forms.Label label1;
         private MyButton myButton1;
         private System.Windows.Forms.CheckBox checkBox1;
     }

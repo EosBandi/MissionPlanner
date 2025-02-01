@@ -3430,19 +3430,31 @@ namespace MissionPlanner.GCSViews
                     continue;
 
                 double relAlt = 0;
-                if (item.Tag != "H" )
+                if (item.Tag != "H")
                 {
-                    int index = int.Parse(item.Tag.ToString())-1;
+                    int index = int.Parse(item.Tag.ToString()) - 1;
                     relAlt = Commands.Rows[index].Cells[Alt.Index].Value == null
                         ? item.Alt
                         : double.Parse(Commands.Rows[index].Cells[Alt.Index].Value.ToString());
                 }
-                points.Add(new PointLatLngAlt(item.Lat, item.Lng, relAlt));
+                points.Add(new PointLatLngAlt(item.Lat, item.Lng, relAlt, item.Tag));
             }
             int i = Alt.Index;
             double homealt = MainV2.comPort.MAV.cs.HomeAlt;
-            Form temp = new ElevationProfileSpray(pointlist, homealt,
+
+
+            Form temp;
+            //check terrain mode
+            if (CMB_altmode.Text == "Terrain")
+            {
+                temp = new ElevationProfileSpray(points, homealt,
+                    (altmode)Enum.Parse(typeof(altmode), CMB_altmode.Text), Alt.Index);
+            }
+            else
+            {
+            temp = new ElevationProfileSpray(pointlist, homealt,
                 (altmode)Enum.Parse(typeof(altmode), CMB_altmode.Text), Alt.Index);
+            }
             ThemeManager.ApplyThemeTo(temp);
             temp.Show();
         }
@@ -5144,9 +5156,7 @@ namespace MissionPlanner.GCSViews
                 return;
             }
 
-            var dr = CustomMessageBox.Show("Do you want to change the AGL altitude of all waypoints ?", "Change AGL",
-                MessageBoxButtons.YesNo);
-            if (dr == (int)DialogResult.Yes)
+            if (CMB_altmode.Text == "Relative")
             {
                 foreach (DataGridViewRow line in Commands.Rows)
                 {
@@ -5158,6 +5168,7 @@ namespace MissionPlanner.GCSViews
                 }
                 doHomeAltRecalc();
             }
+
             else
             {
                 foreach (DataGridViewRow line in Commands.Rows)
@@ -7090,7 +7101,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             if (suppress_textchanged)
                 return;
 
-            if (CHK_verifyheight.Checked && Commands.Rows.Count > 0 && previous_homealt != TXT_homealt.Text && (altmode)CMB_altmode.SelectedItem == altmode.Relative)
+            if (CHK_verifyheight.Checked && Commands.Rows.Count > 0 && previous_homealt != TXT_homealt.Text && CMB_altmode.Text == "Relative")
             {
                 double prev, next;
                 if (double.TryParse(previous_homealt, out prev)
@@ -8793,9 +8804,13 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 {
                    realalt = home.alt + alt;
                 }
-                else        //TODO: add terrain reference
+                else if (frame == FlightPlanner.altmode.Terrain)       //TODO: add terrain reference
                 {
-                   realalt = alt;
+                   realalt = alt + srtm.getAltitude(lat, lng).alt;
+                }
+                else // Absolute
+                {
+                    realalt = alt;
                 }
 
                 if (wpno == 0)

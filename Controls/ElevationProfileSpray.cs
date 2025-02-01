@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Dynamic;
+using System.IdentityModel.Tokens;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using ZedGraph; // GE xml alt reader
@@ -27,6 +28,7 @@ namespace MissionPlanner.Controls
         int distance = 0;
         double homealt = 0;
         int altindex = 0; // index of the altitude in the command list
+        string graphTitle = "Elevation Profile";
         FlightPlanner.altmode altmode = FlightPlanner.altmode.Relative;
 
 
@@ -34,7 +36,7 @@ namespace MissionPlanner.Controls
         {
 
             this.altindex = altindex;
-            //this.altmode = altmode;
+            this.altmode = altmode;
             planlocs = locs;
 
             for (int a = 0; a < planlocs.Count; a++)
@@ -100,7 +102,14 @@ namespace MissionPlanner.Controls
 
             Form frm = Common.LoadingBox("Loading", "using alt data");
 
-            srtmlocs = getSRTMAltPathArea(planlocs);
+            //If we are in terrain relative mode, we need to get the terrain altitudes
+            if (altmode == FlightPlanner.altmode.Terrain)
+            {
+                srtmlocs = getSRTMAltPathAreaTerrain(planlocs);
+                this.graphTitle = "Terrain Following Elevation Profile (DEM/PATH relative to home altitude)";
+            }
+            else
+                srtmlocs = getSRTMAltPathArea(planlocs);
 
             frm.Close();
 
@@ -254,6 +263,100 @@ namespace MissionPlanner.Controls
             return points;
         }
 
+        List<PointLatLngAlt> getSRTMAltPathAreaTerrain(List<PointLatLngAlt> list)
+        {
+            List<PointLatLngAlt> answer = new List<PointLatLngAlt>();
+            List<PointF> displacement = new List<PointF>();
+
+            PointLatLngAlt last = null;
+
+            double disttotal = 0;
+
+            foreach (PointLatLngAlt loc in list)
+            {
+                if (loc == null)
+                    continue;
+
+                //Removed terrain following, we use relative altitudes
+                //Ignore the first point We don't have a heading
+                if (last == null)
+                {
+                    last = loc;
+                    continue;
+                }
+
+                double heading = last.GetBearing(loc);
+                displacement = getVehicleAreaDisplacementPoints(heading);
+
+                double dist = last.GetDistance(loc);
+
+
+                int points = (int)(dist * 2.5) + 1;
+
+                double deltalat = (last.Lat - loc.Lat);
+                double deltalng = (last.Lng - loc.Lng);
+                double deltaalt = last.Alt - loc.Alt;
+
+                double steplat = deltalat / points;
+                double steplng = deltalng / points;
+                double stepalt = deltaalt / points;
+
+                PointLatLngAlt lastpnt = last;
+
+                //myCurve = myPane.AddCurve("Planned Path", flightPlanCheckedPoints, Color.Red, SymbolType.None);
+                //myCurve = myPane.AddCurve("Difference", differenceList, Color.Green, SymbolType.None);
+                //myCurve = myPane.AddCurve("DEM", relativeToHomeElevation, Color.Blue, SymbolType.None);
+
+
+                //Go through between the two points in distance/4+1 steps which is 25cm
+
+                //Add the actual point to the list
+                for (int a = 0; a <= points; a++)
+                {
+                    double lat = last.Lat - steplat * a;        //location new position
+                    double lng = last.Lng - steplng * a;
+                    double alt = last.Alt - stepalt * a;        //vehicle center estimated altitude of a given point, extrapolated from the two points
+
+
+                    //newpoint.Alt max terrain  altitude under the vehicle
+                    //alt = vehicle center estimated altitude of a given point (in terrain relative mode)
+
+                    var vehicleAlt = srtm.getAltitude(lat, lng).alt;
+
+                    var newpoint = new PointLatLngAlt(lat, lng, getMaxAltinArea(lat, lng, displacement).alt, "");
+
+                    double subdist = lastpnt.GetDistance(newpoint);
+                    disttotal += subdist;
+
+                    // DEM
+                    relativeToHomeElevation.Add(disttotal, vehicleAlt - homealt);
+
+                    // FlightPlan
+                    if (a == points-1)
+                    {
+                        flightPlanCheckedPoints.Add(disttotal, newpoint.Alt - homealt + alt, loc.Tag);
+                    }
+                    else
+                    {
+                        flightPlanCheckedPoints.Add(disttotal, newpoint.Alt - homealt + alt);
+
+                    }
+                    double difference = vehicleAlt - newpoint.Alt + alt;
+                    //difference between the two
+                    differenceList.Add(disttotal, difference);
+                    Console.WriteLine(alt);
+
+                    lastpnt = newpoint;
+                }
+
+                //answer.Add(new PointLatLngAlt(loc.Lat, loc.Lng, srtm.getAltitude(loc.Lat, loc.Lng).alt, ""));
+                //answer.Add(new PointLatLngAlt(loc.Lat, loc.Lng, getMaxAltinArea(loc.Lat, loc.Lng, displacement).alt, ""));
+
+                last = loc;
+            }
+            return answer;
+        }
+
 
         List<PointLatLngAlt> getSRTMAltPathArea(List<PointLatLngAlt> list)
         {
@@ -298,7 +401,15 @@ namespace MissionPlanner.Controls
 
                 PointLatLngAlt lastpnt = last;
 
+
+                //myCurve = myPane.AddCurve("Planned Path", flightPlanCheckedPoints, Color.Red, SymbolType.None);
+                //myCurve = myPane.AddCurve("Difference", differenceList, Color.Green, SymbolType.None);
+                //myCurve = myPane.AddCurve("DEM", relativeToHomeElevation, Color.Blue, SymbolType.None);
+
                 //Go through between the twp points in distance/4+1 steps which is 25cm
+
+
+                //
                 for (int a = 0; a <= points; a++)
                 {
                     double lat = last.Lat - steplat * a;        //location new position
@@ -310,15 +421,26 @@ namespace MissionPlanner.Controls
                     //var newpoint = new PointLatLngAlt(lat, lng, srtm.getAltitude(lat, lng).alt, "");
                     var newpoint = new PointLatLngAlt(lat, lng, getMaxAltinArea(lat, lng, displacement).alt, "");
 
+
+
+
                     double subdist = lastpnt.GetDistance(newpoint);
 
                     disttotal += subdist;
 
                     // relative to home alt
                     relativeToHomeElevation.Add(disttotal, newpoint.Alt-homealt);
+                    // FlightPlan
+                    if (a == points - 1)
+                    {
+                        flightPlanCheckedPoints.Add(disttotal, alt - homealt, loc.Tag);
+                    }
+                    else
+                    {
+                        // Flight plane points
+                        flightPlanCheckedPoints.Add(disttotal, alt - homealt);
 
-                    // Flight plane points
-                    flightPlanCheckedPoints.Add(disttotal, alt - homealt);
+                    }
 
                     double difference = (alt - homealt) - (newpoint.Alt - homealt);
                     //difference between the two
@@ -326,6 +448,7 @@ namespace MissionPlanner.Controls
 
                     lastpnt = newpoint;
                 }
+
 
                 //answer.Add(new PointLatLngAlt(loc.Lat, loc.Lng, srtm.getAltitude(loc.Lat, loc.Lng).alt, ""));
                 //answer.Add(new PointLatLngAlt(loc.Lat, loc.Lng, getMaxAltinArea(loc.Lat, loc.Lng, displacement).alt, ""));
@@ -336,141 +459,8 @@ namespace MissionPlanner.Controls
         }
 
 
-        //List<PointLatLngAlt> getSRTMAltPath(List<PointLatLngAlt> list)
-        //{
-        //    List<PointLatLngAlt> answer = new List<PointLatLngAlt>();
 
-        //    PointLatLngAlt last = null;
 
-        //    double disttotal = 0;
-
-        //    foreach (PointLatLngAlt loc in list)
-        //    {
-        //        if (loc == null)
-        //            continue;
-
-        //        if (last == null)
-        //        {
-        //            last = loc;
-        //            if (altmode == FlightPlanner.altmode.Terrain)
-        //                loc.Alt -= srtm.getAltitude(loc.Lat, loc.Lng).alt;
-        //            continue;
-        //        }
-
-        //        double dist = last.GetDistance(loc);
-
-        //        if (altmode == FlightPlanner.altmode.Terrain)
-        //            loc.Alt -= srtm.getAltitude(loc.Lat, loc.Lng).alt;
-
-        //        int points = (int)(dist * 4) + 1;
-
-        //        double deltalat = (last.Lat - loc.Lat);
-        //        double deltalng = (last.Lng - loc.Lng);
-        //        double deltaalt = last.Alt - loc.Alt;
-
-        //        double steplat = deltalat / points;
-        //        double steplng = deltalng / points;
-        //        double stepalt = deltaalt / points;
-
-        //        PointLatLngAlt lastpnt = last;
-
-        //        for (int a = 0; a <= points; a++)
-        //        {
-        //            double lat = last.Lat - steplat * a;
-        //            double lng = last.Lng - steplng * a;
-        //            double alt = last.Alt - stepalt * a;
-
-        //            var newpoint = new PointLatLngAlt(lat, lng, srtm.getAltitude(lat, lng).alt, "");
-
-        //            double subdist = lastpnt.GetDistance(newpoint);
-
-        //            disttotal += subdist;
-
-        //            // srtm alts
-        //            replativeToHomeElevation.Add(disttotal * CurrentState.multiplierdist, newpoint.Alt * CurrentState.multiplieralt);
-
-        //            // terrain alt
-        //            list4terrain.Add(disttotal * CurrentState.multiplierdist, (newpoint.Alt + alt) * CurrentState.multiplieralt);
-
-        //            lastpnt = newpoint;
-        //        }
-
-        //        answer.Add(new PointLatLngAlt(loc.Lat, loc.Lng, srtm.getAltitude(loc.Lat, loc.Lng).alt, ""));
-
-        //        last = loc;
-        //    }
-        //    return answer;
-        //}
-
-        //List<PointLatLngAlt> getGEAltPath(List<PointLatLngAlt> list)
-        //{
-        //    double alt = 0;
-        //    double lat = 0;
-        //    double lng = 0;
-
-        //    int pos = 0;
-
-        //    List<PointLatLngAlt> answer = new List<PointLatLngAlt>();
-
-        //    //http://code.google.com/apis/maps/documentation/elevation/
-        //    //http://maps.google.com/maps/api/elevation/xml
-        //    string coords = "";
-
-        //    foreach (PointLatLngAlt loc in list)
-        //    {
-        //        if (loc == null)
-        //            continue;
-
-        //        coords = coords + loc.Lat.ToString(new System.Globalization.CultureInfo("en-US")) + "," +
-        //                 loc.Lng.ToString(new System.Globalization.CultureInfo("en-US")) + "|";
-        //    }
-        //    coords = coords.Remove(coords.Length - 1);
-
-        //    if (list.Count < 2 || coords.Length > (2048 - 256))
-        //    {
-        //        CustomMessageBox.Show("Too many/few WP's or to Big a Distance " + (distance / 1000) + "km", Strings.ERROR);
-        //        return answer;
-        //    }
-
-        //    try
-        //    {
-        //        using (
-        //            XmlTextReader xmlreader =
-        //                new XmlTextReader("https://maps.google.com/maps/api/elevation/xml?path=" + coords + "&samples=" +
-        //                                  (distance / 100).ToString(new System.Globalization.CultureInfo("en-US")) +
-        //                                  "&sensor=false&key=" + GoogleMapProvider.APIKey))
-        //        {
-        //            while (xmlreader.Read())
-        //            {
-        //                xmlreader.MoveToElement();
-        //                switch (xmlreader.Name)
-        //                {
-        //                    case "elevation":
-        //                        alt = double.Parse(xmlreader.ReadString(), new System.Globalization.CultureInfo("en-US"));
-        //                        Console.WriteLine("DO it " + lat + " " + lng + " " + alt);
-        //                        PointLatLngAlt loc = new PointLatLngAlt(lat, lng, alt, "");
-        //                        answer.Add(loc);
-        //                        pos++;
-        //                        break;
-        //                    case "lat":
-        //                        lat = double.Parse(xmlreader.ReadString(), new System.Globalization.CultureInfo("en-US"));
-        //                        break;
-        //                    case "lng":
-        //                        lng = double.Parse(xmlreader.ReadString(), new System.Globalization.CultureInfo("en-US"));
-        //                        break;
-        //                    default:
-        //                        break;
-        //                }
-        //            }
-        //        }
-        //    }
-        //    catch
-        //    {
-        //        CustomMessageBox.Show("Error getting GE data", Strings.ERROR);
-        //    }
-
-        //    return answer;
-        //}
 
         public void CreateChart(ZedGraphControl zgc)
         {
@@ -480,7 +470,7 @@ namespace MissionPlanner.Controls
             GraphPane myPane = zgc.GraphPane;
 
             // Set the titles and axis labels
-            myPane.Title.Text = "Elevation above ground";
+            myPane.Title.Text = this.graphTitle;
             myPane.XAxis.Title.Text = "Distance (" + CurrentState.DistanceUnit + ")";
             myPane.YAxis.Title.Text = "Elevation (" + CurrentState.AltUnit + ")";
 
@@ -490,7 +480,7 @@ namespace MissionPlanner.Controls
             myCurve = myPane.AddCurve("Difference", differenceList, Color.Green, SymbolType.None);
             myCurve = myPane.AddCurve("DEM", relativeToHomeElevation, Color.Blue, SymbolType.None);
 
-            foreach (PointPair pp in flightPlanPoints)
+            foreach (PointPair pp in flightPlanCheckedPoints)
             {
                 // Add a another text item to to point out a graph feature
                 TextObj text = new TextObj((string)pp.Tag, pp.X, pp.Y);
@@ -584,10 +574,14 @@ namespace MissionPlanner.Controls
                 points.Add(new PointLatLngAlt(item.Lat, item.Lng, relAlt));
             }
 
-            //double homealt = MainV2.comPort.MAV.cs.HomeAlt;
-            var altmode = FlightPlanner.altmode.Relative;
-            // altmode should not change in sprayplanner mode.
-            initGraph(MainV2.instance.FlightPlanner.pointlist, homealt, FlightPlanner.altmode.Relative, altindex);
+            if (this.altmode == FlightPlanner.altmode.Terrain)
+            {
+                initGraph(points, homealt, this.altmode, altindex);
+            }
+            else
+            {
+                initGraph(MainV2.instance.FlightPlanner.pointlist, homealt, this.altmode, altindex);
+            }
             ElevationProfile_Load(sender, e);
             zg1.Invalidate();
         }

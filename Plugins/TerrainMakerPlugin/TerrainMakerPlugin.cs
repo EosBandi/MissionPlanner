@@ -69,6 +69,7 @@ namespace TerrainMakerPlugin
         private int lat_int_togenerate = 0;
         private int lon_int_togenerate = 0;
         private ushort spacing_togenerate = 0;
+        private bool maxaltcalc_togenerate = false;
 
 
 
@@ -88,7 +89,7 @@ namespace TerrainMakerPlugin
 
             if (!area.IsEmpty)
             {
-                string spacingstring = "30";
+                string spacingstring = "4";
                 if (InputBox.Show("SPACING", "Enter the grid spacing in meters (1-100).", ref spacingstring) !=
                     DialogResult.OK)
                     return;
@@ -115,8 +116,15 @@ namespace TerrainMakerPlugin
                         return;
                     }
                 }
+                bool maxaltcalc = false;
+                if (CustomMessageBox.Show("Do you want calculate max alt within grid elements?", "Max Alt", MessageBoxButtons.YesNo) == (int)DialogResult.Yes)
+                    maxaltcalc = true;
+
+
+
+
                     //Do it in the selected area with the selected spacing
-                int lat_start = (int)Math.Floor(area.Bottom);
+                    int lat_start = (int)Math.Floor(area.Bottom);
                 int lat_end = (int)Math.Ceiling(area.Top);
 
                 int lon_start = (int)Math.Floor(area.Left);
@@ -133,6 +141,7 @@ namespace TerrainMakerPlugin
                         lat_int_togenerate = lat_int;
                         lon_int_togenerate = lon_int;
                         spacing_togenerate = (ushort)spacing;
+                        maxaltcalc_togenerate = maxaltcalc;
 
 
 
@@ -169,6 +178,7 @@ namespace TerrainMakerPlugin
             int lat_int = lat_int_togenerate;
             int lon_int = lon_int_togenerate;
             ushort spacing = spacing_togenerate;
+            bool maxaltcalc = maxaltcalc_togenerate;
 
 
             stopwatch.Start();
@@ -202,8 +212,6 @@ namespace TerrainMakerPlugin
 
             int a = TerrainDataFile.east_blocks(new Location(lat_int * 10 * 1000 * 1000, lon_int * 10 * 1000 * 1000));
 
-            Console.WriteLine("East Blocks {0}",a);
-
             int n = -1;
 
             while (true)
@@ -213,10 +221,7 @@ namespace TerrainMakerPlugin
                 Location locOfBlock = TerrainDataFile.pos_from_file_offset(lat_int, lon_int, n * TerrainDataFile.IO_BLOCK_SIZE);
                 if (locOfBlock.lat * 1.0e-7 - lat_int >= 1.0) break;
                 grid = new TerrainDataFile.GridBlock((sbyte)lat_int, (short)lon_int, locOfBlock, spacing);
-                Console.WriteLine("{0} {1} {2} {3} {4} {5} {6}", a, grid.blocknum(), n * TerrainDataFile.IO_BLOCK_SIZE, grid.GridIdxX, grid.GridIdxY, grid.Lat, grid.Lon);
             }
-
-            Console.WriteLine("Number of blocks in a dat file: {0}", n);
 
             //We have the max block number in N
             for (int blocknum = 0; blocknum < n; blocknum++)
@@ -237,31 +242,85 @@ namespace TerrainMakerPlugin
                 grid = new TerrainDataFile.GridBlock((sbyte)lat_int, (short)lon_int, loc, spacing);
 
 
-                int valids = 0;
-
-                for (int gx = 0; gx < TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_X; gx++)
+                if (maxaltcalc)
                 {
-                    for (int gy = 0; gy < TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_Y; gy++)
+
+                    //create an array of altitudes for the block
+                    short[,] maxalts = new short[TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_X, TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_Y];
+                    //clear the array
+                    for (int i = 0; i < TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_X; i++)
                     {
-                        Location pointLoc = grid.blockTopLeft.add_offset_meters(gx * TerrainDataFile.GRID_SPACING, gy * TerrainDataFile.GRID_SPACING);
-                        //// Check elevation
-                        double lat = pointLoc.lat * 1.0e-7;
-                        double lon = pointLoc.lng * 1.0e-7;
-                        altresponce = srtm.getAltitude(lat, lon, 20); //get at max zoom
-
-                        if (altresponce.altsource == "GeoTiff") Console.WriteLine("GeoTiff {0} {1} {2}", lat, lon, altresponce.alt);
-                        if (altresponce.currenttype == srtm.tiletype.valid && altresponce.alt != 0)
+                        for (int j = 0; j < TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_Y; j++)
                         {
-                            valids++;
-                            grid.SetHeight(gx, gy, (short)Math.Round(altresponce.alt));
+                            maxalts[i, j] = 0;
                         }
-                        else
-                        {
-                            grid.SetHeight(gx, gy, 0);
-                        }
+                    }
 
+
+                    for (int gx = 0; gx < TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_X; gx++)
+                    {
+                        for (int gy = 0; gy < TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_Y; gy++)
+                        {
+                            Location pointLoc_top_left = grid.blockTopLeft.add_offset_meters(gx * TerrainDataFile.GRID_SPACING, gy * TerrainDataFile.GRID_SPACING);
+
+                            double maxalt = 0;
+                            for (int y = 0; y < TerrainDataFile.GRID_SPACING; y++)
+                            {
+                                for (int x = 0; x < TerrainDataFile.GRID_SPACING; x++)
+                                {
+                                    Location pointLoc = pointLoc_top_left.add_offset_meters(x, y);
+                                    double lat = pointLoc.lat * 1.0e-7;
+                                    double lon = pointLoc.lng * 1.0e-7;
+                                    altresponce = srtm.getAltitude(lat, lon, 20); //get at max zoom
+                                    if (altresponce.currenttype == srtm.tiletype.valid)
+                                    {
+                                        if (altresponce.alt > maxalt) maxalt = altresponce.alt;
+                                    }
+                                }
+                            }
+
+                            maxalts[gx, gy] = (short)Math.Round(maxalt);
+
+
+                        }
+                    }
+
+                    for (int gx = 0; gx < TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_X - 1; gx++)
+                    {
+                        for (int gy = 0; gy < TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_Y - 1; gy++)
+                        {
+                            var alt = maxalts[gx, gy];
+                            if (grid.GetHeight(gx, gy) < alt) grid.SetHeight(gx, gy, alt);
+                            if (grid.GetHeight(gx + 1, gy) < alt) grid.SetHeight(gx + 1, gy, alt);
+                            if (grid.GetHeight(gx, gy + 1) < alt) grid.SetHeight(gx, gy + 1, alt);
+                            if (grid.GetHeight(gx + 1, gy + 1) < alt) grid.SetHeight(gx + 1, gy + 1, alt);
+
+                        }
                     }
                 }
+                else
+                {
+                    for (int gx = 0; gx < TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_X; gx++)
+                    {
+                        for (int gy = 0; gy < TerrainDataFile.TERRAIN_GRID_BLOCK_SIZE_Y; gy++)
+                        {
+                            Location pointLoc_top_left = grid.blockTopLeft.add_offset_meters(gx * TerrainDataFile.GRID_SPACING, gy * TerrainDataFile.GRID_SPACING);
+                            double lat = pointLoc_top_left.lat * 1.0e-7;
+                            double lon = pointLoc_top_left.lng * 1.0e-7;
+                            altresponce = srtm.getAltitude(lat, lon, 20); //get at max zoom
+
+                            if (altresponce.currenttype == srtm.tiletype.valid && altresponce.alt != 0)
+                            {
+                                grid.SetHeight(gx, gy, (short)Math.Round(altresponce.alt));
+                            }
+                            else
+                            {
+                                grid.SetHeight(gx, gy, 0);
+                            }
+                        }
+                    }
+                }
+
 
                 //Check block validity and fill bitmap
                 grid.Bitmap = 0; // Clear bitmap
