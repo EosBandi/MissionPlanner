@@ -8702,38 +8702,23 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             KMLRoot kml = new KMLRoot();
             KMLib.Feature.Folder fldr = new KMLib.Feature.Folder("Mission");
 
-            //KMLib.Style style = new KMLib.Style();
-            //style.Id = "yellowLineGreenPoly";
-            // style.Add(new KMLib.LineStyle(HexStringToColor("7f00ffff"), 4));
-
-            //KMLib.Style style1 = new KMLib.Style();
-            //style1.Id = "spray";
-            //style1.Add(new KMLib.LineStyle(HexStringToColor("4c0000ff"), 0));
-            //style1.Add(new KMLib.PolyStyle() { Color = HexStringToColor("4c0000ff") });
-
-            //PolyStyle pstyle = new PolyStyle();
-            //pstyle.Color = HexStringToColor("7f00ff00");
-            //style.Add(pstyle);
-
-            //kml.Document.AddStyle(style);
-            //kml.Document.AddStyle(style1);
 
 
-            KMLib.Style mainstyle = new KMLib.Style();
-            mainstyle.Id = "whiteLineRedPoly";
 
-            mainstyle.Add(new KMLib.LineStyle(HexStringToColor("ff3300ff"), 2));
-
-            KMLib.PolyStyle polystyle = new KMLib.PolyStyle();
-            polystyle.Color = HexStringToColor("cc0099ff");
-
+            KMLib.Style mainstyle = new KMLib.Style { Id = "redLine" };
+            mainstyle.Add(new KMLib.LineStyle(HexStringToColor("ffff002a"), 2));
+            KMLib.PolyStyle polystyle = new KMLib.PolyStyle { Color = HexStringToColor("ff3300ff") };
             mainstyle.Add(polystyle);
-
-
             kml.Document.AddStyle(mainstyle);
 
-            int stylecode = 0xff;
-            int g = -1;
+
+
+            KMLib.Style mainstyle1 = new KMLib.Style { Id = "blueLine" };
+            mainstyle1.Add(new KMLib.LineStyle(HexStringToColor("ff0400ff"), 2)); // Blue
+            KMLib.PolyStyle polystyle1 = new KMLib.PolyStyle { Color = HexStringToColor("ff0400ff") };
+            mainstyle1.Add(polystyle1);
+            kml.Document.AddStyle(mainstyle1);
+
 
             KMLib.Feature.Folder waypoints = new KMLib.Feature.Folder();
             waypoints.name = "Waypoints";
@@ -8762,7 +8747,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             }
 
 
-
+            // -------------------
             Coordinates coordswp = new Coordinates();
             int lastwp = 0;
             int i = 0;
@@ -8823,15 +8808,44 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             }
 
 
-            lswp.coordinates = coordswp;
-            KMLib.Feature.Placemark pmwp2 = new KMLib.Feature.Placemark();
+            //we have the coordinates in coordswp
+            KMLib.Feature.Placemark pm_inair = new KMLib.Feature.Placemark();
+            KMLib.Feature.Placemark pm_onland = new KMLib.Feature.Placemark();
 
-            pmwp2.name = "Waypoints";
-            pmwp2.styleUrl = "#whiteLineRedPoly";
-            pmwp2.LineString = lswp;
+            KMLib.LineString lsinair = new KMLib.LineString();
+            KMLib.LineString lsonland = new KMLib.LineString();
+
+
+
+            pm_inair.name = "Mission in air";
+            pm_onland.name = "Mission on land";
+            pm_inair.styleUrl = "blueLine";
+            pm_onland.styleUrl = "redLine";
+
+
+            lsinair.coordinates = coordswp;
+            lsinair.AltitudeMode = KMLib.AltitudeMode.absolute;
+            lsinair.Tessellate = true;
+            lsinair.Extrude = false;
+
+            lsonland.AltitudeMode = KMLib.AltitudeMode.clampedToGround;
+            lsonland.Tessellate = true;
+            lsinair.Extrude = false;
+            lsonland.coordinates = coordswp;
+
+
+            pm_inair.LineString = lsinair;
+            pm_onland.LineString = lsonland;
+
+
 
             if (coordswp.Count > 0)
-                waypoints.Add(pmwp2);
+            {
+                waypoints.Add(pm_inair);
+                waypoints.Add(pm_onland);
+            }
+
+
             kml.Document.Add(fldr);
             kml.Save(filename);
 

@@ -4,3 +4,9 @@ set PATH=%PATH%;C:\Program Files\Microsoft Visual Studio\2022\Professional\Msbui
 .nuget\nuget.exe restore MissionPlanner.sln
 
 MSBuild.exe MissionPlanner.sln /restore /m /p:Configuration=Release /verbosity:n
+
+if errorlevel 1 exit /b errorlevel
+
+cd msi
+
+./installer.bat

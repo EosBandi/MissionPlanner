@@ -1284,6 +1284,15 @@ namespace MissionPlanner.SprayGrid
 
                 savesettings();
 
+                //Change TAKEOFF commands alt reference to relative
+                for (int i = 0; i < MainV2.instance.FlightPlanner.Commands.Rows.Count; i++)
+                {
+                    if (MainV2.instance.FlightPlanner.Commands.Rows[i].Cells[MainV2.instance.FlightPlanner.Command.Index].Value.ToString() == "TAKEOFF")
+                    {
+                        MainV2.instance.FlightPlanner.Commands.Rows[i].Cells[MainV2.instance.FlightPlanner.Frame.Index].Value = FlightPlanner.altmode.Relative;
+                    }
+                }
+
                 MainV2.instance.FlightPlanner.quickadd = false;
                 MainV2.instance.FlightPlanner.writeKML();
                 MainV2.instance.FlightPlanner.CHK_verifyheight.Checked = verifyHeightState;
