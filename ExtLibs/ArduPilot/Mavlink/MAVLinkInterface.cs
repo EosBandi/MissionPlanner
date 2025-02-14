@@ -1189,7 +1189,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
             lock (writelock)
             {
                 byte[] data = MavlinkUtil.StructureToByteArray(indata);
-                
+
                 int i = 0;
 
                 // are we mavlink2 enabled for this sysid/compid
@@ -2040,7 +2040,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                         var backupseenvalid = seenvalid;
                         if (param_total > 1)
                             startindex = (short) (tenbytenindex % (param_total - 1));
-                        
+
                         seenvalid = 0;
 
                         // seeing more than what we requested... skip this round - maybe full param list is still inflight
@@ -2708,7 +2708,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                             start = DateTime.Now;
                             retrys = 0;
                             continue;
-                        } 
+                        }
                         else if (ack.result == (byte) MAV_RESULT.ACCEPTED)
                         {
                             giveComport = false;
@@ -4329,22 +4329,18 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                 log.InfoFormat("setGuidedModeWP {0}:{1} lat {2} lng {3} alt {4}", sysid, compid, gotohere.lat,
                     gotohere.lng, gotohere.alt);
 
-                //if (MAVlist[sysid, compid].cs.firmware == Firmwares.ArduPlane)
-                //{
-                //    MAV_MISSION_RESULT ans = setWP(sysid, compid, gotohere, 0, MAV_FRAME.GLOBAL_RELATIVE_ALT, (byte) 2);
 
-                //    if (ans != MAV_MISSION_RESULT.MAV_MISSION_ACCEPTED)
-                //    {
-                //        giveComport = false;
-                //        throw new Exception("Guided Mode Failed");
-                //    }
-                //}
-                //else
-                //{
                     setPositionTargetGlobalInt((byte) sysid, (byte) compid,
                         true, false, false, false, MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT_INT,
                         gotohere.lat, gotohere.lng, gotohere.alt, 0, 0, 0, 0, 0);
-                //}
+
+                    // Quick hack, send the message twice to make sure it gets through
+
+                    setPositionTargetGlobalInt((byte)sysid, (byte)compid,
+                        true, false, false, false, MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT_INT,
+                        gotohere.lat, gotohere.lng, gotohere.alt, 0, 0, 0, 0, 0);
+
+
             }
             catch (Exception ex)
             {
@@ -4583,12 +4579,12 @@ Mission Planner waits for 2 valid heartbeat packets before connecting");
                 Console.WriteLine(DateTime.Now.Millisecond + " SR0 " + BaseStream?.BytesToRead);
 
             await readlock.WaitAsync().ConfigureAwait(false);
-            
+
             try
             {
                 if (debug)
                     Console.WriteLine(DateTime.Now.Millisecond + " SR1 " + BaseStream?.BytesToRead);
-                
+
                 readloop:
 
                 while ((BaseStream != null && BaseStream.IsOpen) || logreadmode)

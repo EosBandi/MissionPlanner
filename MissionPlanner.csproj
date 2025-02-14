@@ -5174,4 +5174,8 @@
   <PropertyGroup>
     <PostBuildEvent>copy "$(ProjectDir)ExtLibs\System.IO.Compression.dll" "$(ProjectDir)$(OutDir)"</PostBuildEvent>
   </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
 </Project>
