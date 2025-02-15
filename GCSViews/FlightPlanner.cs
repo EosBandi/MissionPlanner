@@ -3074,8 +3074,16 @@ namespace MissionPlanner.GCSViews
                     }
                 }
 
-
-                var multipliers = cmdParamMultipliers[command];
+                //check if the command is in the cmdParamMultipliers dictionary
+                double[] multipliers;
+                if (cmdParamMultipliers.ContainsKey(command))
+                {
+                    multipliers = cmdParamMultipliers[command];
+                }
+                else
+                {
+                    multipliers = new double[] { 1,1,1,1,1,1,1};
+                }
                 temp.alt =
                     (float)
                     (double.Parse(Commands.Rows[a].Cells[Alt.Index].Value.ToString()) / multipliers[6]);
