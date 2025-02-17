@@ -56,7 +56,7 @@ namespace TerrainMakerPlugin
         }
 
 
-        public static Location pos_from_file_offset(Int32 file_base_lat, Int32 file_base_lon, int file_offset)
+        public static Location pos_from_file_offset(Int32 file_base_lat, Int32 file_base_lon, long file_offset)
         {
             Location ref_loc = new Location(file_base_lat * 10 * 1000 * 1000, file_base_lon * 10 * 1000 * 1000);
 
@@ -65,9 +65,11 @@ namespace TerrainMakerPlugin
             Int32 blocks = (Int32)Math.Floor((double)(file_offset / IO_BLOCK_SIZE));
 
             Int32 grid_idx_x = (Int32)Math.Floor((double)(blocks / stride));
-
             Int32 grid_idx_y = blocks % stride;
 
+
+            Int32 xx = grid_idx_x;
+            Int32 yy = grid_idx_y;
 
 
             Int32 idx_x = grid_idx_x * TERRAIN_GRID_BLOCK_SPACING_X;
@@ -79,7 +81,6 @@ namespace TerrainMakerPlugin
             grid_idx_y = (Int32)(idx_y / TERRAIN_GRID_BLOCK_SPACING_Y);
 
             loc = ref_loc.add_offset_meters(grid_idx_x * TERRAIN_GRID_BLOCK_SPACING_X * GRID_SPACING, grid_idx_y * TERRAIN_GRID_BLOCK_SPACING_Y * GRID_SPACING);
-
             return loc;
 
         }

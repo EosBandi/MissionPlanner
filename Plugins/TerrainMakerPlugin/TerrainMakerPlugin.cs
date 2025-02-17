@@ -217,16 +217,21 @@ namespace TerrainMakerPlugin
             while (true)
             {
                 n += 1;
+                //string message = string.Format("Generate block matrix {n} of {n}", n,n);
+                //sender.UpdateProgressAndStatus(-1, message);
 
-                Location locOfBlock = TerrainDataFile.pos_from_file_offset(lat_int, lon_int, n * TerrainDataFile.IO_BLOCK_SIZE);
+                Location locOfBlock = TerrainDataFile.pos_from_file_offset(lat_int, lon_int, (long)n * (long)TerrainDataFile.IO_BLOCK_SIZE);
                 if (locOfBlock.lat * 1.0e-7 - lat_int >= 1.0) break;
                 grid = new TerrainDataFile.GridBlock((sbyte)lat_int, (short)lon_int, locOfBlock, spacing);
             }
 
+            Console.WriteLine(String.Format("Generating file size : {0:F3} Gigabyte", (float)((long)n * (long)TerrainDataFile.IO_BLOCK_SIZE) / 1073741824.0));
+
+
             //We have the max block number in N
             for (int blocknum = 0; blocknum < n; blocknum++)
             {
-                string message = string.Format("Making block {0} of {1}", blocknum, n);
+                string message = string.Format("Generating DAT {0:F2} of {1:F2} Mbyte", (float)((long)blocknum * (long)TerrainDataFile.IO_BLOCK_SIZE) / 1024.0 / 1024.0, (float)((long)n * (long)TerrainDataFile.IO_BLOCK_SIZE) / 1024.0 / 1024.0);
                 sender.UpdateProgressAndStatus((int)(100.0 * blocknum / n), message);
                 if (sender.doWorkArgs.CancelRequested)
                 {
