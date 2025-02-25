@@ -12,6 +12,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using System.IO;
 using MissionPlanner.Controls;
+using System.Configuration;
 
 namespace TurbineStatus
 {
@@ -50,6 +51,21 @@ namespace TurbineStatus
         DateTime manual_timer_started = DateTime.Now;
         TimeSpan manual_timer_offset = TimeSpan.Zero;
         bool manual_timer_running = false;
+
+
+
+
+
+
+        DateTime flight_start = DateTime.MinValue;
+
+
+        double average_sum = 0;
+        int average_count = 0;
+        double last_remaining_time = 0;
+
+
+
 
         enum Relays
         {
@@ -386,6 +402,25 @@ namespace TurbineStatus
         Severity highest_severity = Severity.OK;
         int last_capacity_ml = 0; // For detecting changes in fuel capacity
 
+        //last time calculation
+        // After arming check consumption for five minutes and based on initial fuel level calculate total flight time (green side)
+        // While doing the initial calculation display "Calculating" on the gauge
+        // After the initial calculation display the calculated remaining flight time, updated at every seconds
+        // If the fuel level is below 10% display "Low Fuel" on the gauge
+
+        enum timecalcstate
+        {
+            disarmed,
+            calculating,
+            normal,
+            lowfuel
+        }
+
+        timecalcstate tcstate = timecalcstate.disarmed;
+        DateTime calcStarted = DateTime.MinValue;
+        DateTime lastUpdate = DateTime.MinValue;
+
+
         // Updates the UI with the latest data
         private void ui_timer_Tick(object sender, EventArgs e)
         {
@@ -394,6 +429,12 @@ namespace TurbineStatus
             {
                 return;
             }
+
+
+            var remaining_fuel_liters = 0.0;
+
+
+
 
             var messagetime = Host.cs.messages.LastOrDefault().time;
             if (lastmessagetime != messagetime)
@@ -561,6 +602,7 @@ namespace TurbineStatus
 
                     float capacity = capacity_ml * (gauge_settings[i].variable_scale ?? 1.0f);
 
+
                     // If the capacity has changed, set up gauge for this capacity
                     if (capacity_ml != 0 && capacity_ml != last_capacity_ml)
                     {
@@ -591,6 +633,10 @@ namespace TurbineStatus
                         val = Math.Max(val, gauges[i].MinValue);
                         val = Math.Min(val, gauges[i].MaxValue);
                         gauges[i].Value0 = val;
+
+                        //Used for calculating time;
+                        remaining_fuel_liters = val;
+
                     }
                 }
             }
@@ -624,6 +670,109 @@ namespace TurbineStatus
             but_mainpump.Enabled = !led_mainpump.On || !chk_lock.Checked;
             but_auxpump.Enabled = !led_auxpump.On || !chk_lock.Checked;
             but_empump.Enabled = !led_empump.On || !chk_lock.Checked;
+
+
+            var fuel_flow = Host.cs.current;  // liter/hours
+            // remaining fule liters;
+
+
+            var a = fuel_flow;
+            var b = remaining_fuel_liters;
+
+
+            // Remaining time calculation and update -----------------------
+
+            if (Host.cs.armed == false)
+            {
+                tcstate = timecalcstate.disarmed;
+
+            }
+            else
+            {
+                if (tcstate == timecalcstate.disarmed)
+                {
+                    tcstate = timecalcstate.calculating;
+                    calcStarted = DateTime.Now;
+                    lastUpdate = DateTime.Now;
+
+                    timeBar.Maximum = 10; // Set it to a small amount
+                    //init calculation
+                    timeBar.Value = 10; // Set it to maximum
+                    timeBar.Label = "Calulating remaining time ...";
+
+                    average_sum = 0;
+                    average_count = 0;
+
+
+                }
+                else if (tcstate == timecalcstate.calculating)
+                {
+                    TimeSpan ts1 = (DateTime.Now - calcStarted);
+                    average_sum += fuel_flow;
+                    average_count++;
+
+                    //calculate
+
+                    if (ts1.TotalSeconds > 120)
+                    {
+                        tcstate = timecalcstate.normal;
+                        lastUpdate = DateTime.Now;
+
+                        double average_consumption = average_sum / average_count; // liters/hour
+                        average_sum = 0;
+                        average_count = 0;
+
+
+                        //We assume this is the initial value
+                        int flight_minutes_remaining = (int)Math.Round(remaining_fuel_liters / average_consumption * 60);
+                        timeBar.Maximum = flight_minutes_remaining;
+                        timeBar.Value = flight_minutes_remaining;
+                        //get hours ans minutes from the minutes
+                        int hours = flight_minutes_remaining / 60;
+                        int minutes = flight_minutes_remaining % 60;
+                        timeBar.Label = String.Format("Remaining flight time : {0}h {1:00}min",hours, minutes);
+
+                    }
+                }
+                else if (tcstate == timecalcstate.normal)
+                {
+                    TimeSpan ts1 = (DateTime.Now - lastUpdate);
+                    average_sum += fuel_flow;
+                    average_count++;
+
+                    if (ts1.TotalSeconds > 10)
+                    {
+                        lastUpdate = DateTime.Now;
+                        //update label and calcualtion
+                        double average_consumption = average_sum / average_count; // liters/hour
+                        average_sum = 0;
+                        average_count = 0;
+                        int flight_minutes_remaining = (int)Math.Round(remaining_fuel_liters / average_consumption * 60);
+                        if (timeBar.Maximum < flight_minutes_remaining) { timeBar.Maximum = flight_minutes_remaining; }
+                        timeBar.Value = flight_minutes_remaining;
+                        //get hours ans minutes from the minutes
+                        int hours = flight_minutes_remaining / 60;
+                        int minutes = flight_minutes_remaining % 60;
+                        timeBar.Label = String.Format("Remaining flight time : {0}h {1:00}min", hours, minutes);
+                        lastUpdate = DateTime.Now;
+                    }
+
+                }
+            }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
         }
