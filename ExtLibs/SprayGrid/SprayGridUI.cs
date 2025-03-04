@@ -33,7 +33,7 @@ namespace MissionPlanner.SprayGrid
         public double flyspeed;
         public double altitude;
         public double angle;
-        public altmode altreference;
+        public int altreference;
         public Utilities.Grid.StartPosition startfrom;
         public double barsize;
         public double waitatwp;
@@ -1476,7 +1476,7 @@ namespace MissionPlanner.SprayGrid
             answer.flyspeed = (double)NUM_UpDownFlySpeed.Value;
             answer.altitude = (double)NUM_altitude.Value;
             answer.angle = (double)NUM_angle.Value;
-            answer.altreference = (altmode)CMB_AltReference.SelectedIndex;
+            answer.altreference = CMB_AltReference.SelectedIndex;
             answer.startfrom = (Utilities.Grid.StartPosition)CMB_startfrom.SelectedIndex;
             answer.barsize = (double)NUM_SprayBarWidth.Value;
             answer.waitatwp = (double)NUM_DelayAtWP.Value;
@@ -1510,7 +1510,7 @@ namespace MissionPlanner.SprayGrid
             NUM_altitude.Value = (decimal)data.altitude;
             NUM_gpsOffset.Value = (decimal)data.gpsOffset;
             NUM_angle.Value = (decimal)data.angle;
-            CMB_AltReference.SelectedIndex = (int)data.altreference;
+            CMB_AltReference.SelectedIndex = data.altreference;
             CMB_startfrom.SelectedIndex = (int)data.startfrom;
             NUM_SprayBarWidth.Value = (decimal)data.barsize;
             NUM_DelayAtWP.Value = (decimal)data.waitatwp;
