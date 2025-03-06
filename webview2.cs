@@ -22,7 +22,7 @@ namespace MissionPlanner
         {
             await webView21.EnsureCoreWebView2Async(null);
 
-            //These are the default values 
+            //These are the default values
             var accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlMzhmZTVhOS1lMzA3LTQ5MmYtOTQ5OC02MDAxMTQyNjNjMDYiLCJpZCI6MjAxNDAwLCJpYXQiOjE3MTAyNzUyMDB9.PmmRRBJ8T5WLTf4DTGBKv85-wRK5fXToId6Vmfgonl8";
             var assetID = "3172264";
             var mapUrl = @"https://api.mapbox.com/styles/v1/soleongmbh/clnalh0zi03i401nz95kl874l/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic29sZW9uZ21iaCIsImEiOiJjbG5jcDl1NnMwazJ2MnBuemZlazhvYnp5In0.fkj1qjzFo9jorLndFzijpw";
@@ -55,7 +55,6 @@ namespace MissionPlanner
             page = page.Replace("**accessToken**", accessToken);
             page = page.Replace("**assetID**", assetID);
             page = page.Replace("**mapUrl**", mapUrl);
-            Console.WriteLine(page);
             webView21.NavigateToString(page);
 
         }
