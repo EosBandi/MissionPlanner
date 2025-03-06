@@ -1,0 +1,91 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="soleon-Weingarten-Benni" content="width=device-width, initial-scale=1.0">
+    <title>soleon-Weingarten-Benni</title>
+    <!-- Cesium Stylesheet -->
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <style>
+        #toolbar {
+            margin: 5px;
+            padding: 2px 5px;
+            position: absolute;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toolbar"></div>
+    <!-- Container f�r den Cesium Viewer -->
+    <div id="cesiumContainer" style="width: 100%; height: 98vh;"></div>
+
+    <!-- Cesium Script -->
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Cesium.js"></script>
+    <script>
+        // Setze den Cesium Ion Access Token
+        //Cesium.Ion.defaultAccessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIzOGJjNDg4YS0yNTAyLTRjNzQtOTE2ZS03ZGQwNThjNzNmY2IiLCJpZCI6MjcyNzYzLCJpYXQiOjE3Mzg0MzMyNjB9.5fA8O27hKmaY1hMdIZHld0eC9EQqFhxBbbmYI9FoVMo";
+        //var accessToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJlMzhmZTVhOS1lMzA3LTQ5MmYtOTQ5OC02MDAxMTQyNjNjMDYiLCJpZCI6MjAxNDAwLCJpYXQiOjE3MTAyNzUyMDB9.PmmRRBJ8T5WLTf4DTGBKv85-wRK5fXToId6Vmfgonl8";
+        //var assetID = 3172264;
+        //var mapUrl = 'https://api.mapbox.com/styles/v1/soleongmbh/clnalh0zi03i401nz95kl874l/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic29sZW9uZ21iaCIsImEiOiJjbG5jcDl1NnMwazJ2MnBuemZlazhvYnp5In0.fkj1qjzFo9jorLndFzijpw'
+
+        var accessToken = "**accessToken**";
+        var assetID = "**assetID**";
+        var mapUrl = "**mapUrl**";
+
+
+
+
+        Cesium.Ion.defaultAccessToken = accessToken;
+
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'cesium - button';
+        button.onclick = function () {
+            onclick();
+        };
+        button.textContent = 'Update';
+        document.getElementById('toolbar').appendChild(button);
+
+        var viewer;
+
+        function onclick() {
+            viewer.dataSources.removeAll();
+            const src = Cesium.CzmlDataSource.load("http://localhost:56781/mission.czml");
+            viewer.dataSources.add(src);
+        }
+
+        async function createViewer() {
+            try {
+                viewer = new Cesium.Viewer("cesiumContainer", {
+                    //terrainProvider: await Cesium.CesiumTerrainProvider.fromIonAssetId(3090324), // Dein DTM von Ion 3172264
+                    terrainProvider: await Cesium.CesiumTerrainProvider.fromIonAssetId(assetID),
+                    timeline: false,
+                    animation: false
+                });
+
+
+                const imageryProvider = new Cesium.UrlTemplateImageryProvider({
+                    url: mapUrl
+                });
+
+                await viewer.imageryLayers.addImageryProvider(imageryProvider);
+
+                viewer.extend(Cesium.viewerDragDropMixin, {
+                    clearOnDrop: false,
+                    flyToOnDrop: true
+                });
+
+                const src = Cesium.CzmlDataSource.load("http://localhost:56781/mission.czml");
+                viewer.dataSources.add(src);
+                viewer.flyTo(src, { offset: new Cesium.HeadingPitchRange(Cesium.Math.toRadians(45), Cesium.Math.toRadians(-30), 800) });
+
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        createViewer();
+    </script>
+</body>
+</html>
