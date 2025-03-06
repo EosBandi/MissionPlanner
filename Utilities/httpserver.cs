@@ -400,6 +400,28 @@ namespace MissionPlanner.Utilities
 
                         //stream.Close();
                     }
+                    else if (url.Contains(" /mission.czml"))
+                    {
+
+                        byte[] buffer = Encoding.ASCII.GetBytes(FlightPlanner.instance.getCZML());
+
+                        string header =
+                            "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: " +
+                            buffer.Length + "\r\nAccess-Control-Allow-Origin: * \r\n\r\n";
+                        byte[] temp = asciiEncoding.GetBytes(header);
+                        stream.Write(temp, 0, temp.Length);
+
+
+                        stream.Write(buffer, 0, buffer.Length);
+
+                        stream.Flush();
+
+                        goto again;
+
+
+
+
+                    }
                     /////////////////////////////////////////////////////////////////
                     else if (url.Contains(" /location.kml"))
                     {
@@ -472,8 +494,8 @@ namespace MissionPlanner.Utilities
                         byte[] buffer = Encoding.ASCII.GetBytes(serializer.Xml);
 
                         string header =
-                            "HTTP/1.1 200 OK\r\nContent-Type: application/vnd.google-earth.kml+xml\r\nContent-Length: " +
-                            buffer.Length + "\r\n\r\n";
+                            "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: " +
+                            buffer.Length + "\r\nAccess-Control-Allow-Origin: * \r\n\r\n";
                         byte[] temp = asciiEncoding.GetBytes(header);
                         stream.Write(temp, 0, temp.Length);
 

@@ -78,6 +78,7 @@ namespace MissionPlanner.GCSViews
             this.coords1 = new MissionPlanner.Controls.Coords();
             this.lbl_status = new System.Windows.Forms.Label();
             this.panelWaypoints = new System.Windows.Forms.Panel();
+            this.myButton2 = new MissionPlanner.Controls.MyButton();
             this.myButton1 = new MissionPlanner.Controls.MyButton();
             this.chk_usemavftp = new System.Windows.Forms.CheckBox();
             this.but_mincommands = new MissionPlanner.Controls.MyButton();
@@ -114,8 +115,6 @@ namespace MissionPlanner.GCSViews
             this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.panel4 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
-            //this.progressBarInjectCustomMap = new System.Windows.Forms.ProgressBar();
-            //this.BUT_InjectCustomMap = new MissionPlanner.Controls.MyButton();
             this.chk_grid = new System.Windows.Forms.CheckBox();
             this.comboBoxMapType = new System.Windows.Forms.ComboBox();
             this.lnk_kml = new System.Windows.Forms.LinkLabel();
@@ -128,7 +127,6 @@ namespace MissionPlanner.GCSViews
             this.panelMap = new System.Windows.Forms.Panel();
             this.lbl_homedist = new System.Windows.Forms.Label();
             this.lbl_prevdist = new System.Windows.Forms.Label();
-            //this.Zoomlevel = new System.Windows.Forms.NumericUpDown();
             this.TRK_zoom = new MissionPlanner.Controls.MyTrackBar();
             this.label11 = new System.Windows.Forms.Label();
             this.lbl_distance = new System.Windows.Forms.Label();
@@ -228,7 +226,7 @@ namespace MissionPlanner.GCSViews
             this.zoomToVehicleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToMissionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToHomeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.myButton2 = new MissionPlanner.Controls.MyButton();
+            this.btnThreeDee = new MissionPlanner.Controls.MyButton();
             this.panel5.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelWaypoints.SuspendLayout();
@@ -239,7 +237,6 @@ namespace MissionPlanner.GCSViews
             this.panel3.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panelMap.SuspendLayout();
-            //((System.ComponentModel.ISupportInitialize)(this.Zoomlevel)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.TRK_zoom)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.panelBASE.SuspendLayout();
@@ -441,6 +438,15 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.panelWaypoints, "panelWaypoints");
             this.panelWaypoints.ForeColor = System.Drawing.SystemColors.ControlText;
             this.panelWaypoints.Name = "panelWaypoints";
+            // 
+            // myButton2
+            // 
+            resources.ApplyResources(this.myButton2, "myButton2");
+            this.myButton2.Name = "myButton2";
+            this.myButton2.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.toolTip1.SetToolTip(this.myButton2, resources.GetString("myButton2.ToolTip"));
+            this.myButton2.UseVisualStyleBackColor = true;
+            this.myButton2.Click += new System.EventHandler(this.myButton2_Click);
             // 
             // myButton1
             // 
@@ -728,27 +734,12 @@ namespace MissionPlanner.GCSViews
             // panel3
             // 
             this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            //this.panel3.Controls.Add(this.progressBarInjectCustomMap);
-            //this.panel3.Controls.Add(this.BUT_InjectCustomMap);
             this.panel3.Controls.Add(this.chk_grid);
             this.panel3.Controls.Add(this.lbl_status);
             this.panel3.Controls.Add(this.comboBoxMapType);
             this.panel3.Controls.Add(this.lnk_kml);
             resources.ApplyResources(this.panel3, "panel3");
             this.panel3.Name = "panel3";
-            //// 
-            //// progressBarInjectCustomMap
-            //// 
-            //resources.ApplyResources(this.progressBarInjectCustomMap, "progressBarInjectCustomMap");
-            //this.progressBarInjectCustomMap.Name = "progressBarInjectCustomMap";
-            //this.progressBarInjectCustomMap.Step = 1;
-            //// 
-            //// BUT_InjectCustomMap
-            //// 
-            //resources.ApplyResources(this.BUT_InjectCustomMap, "BUT_InjectCustomMap");
-            //this.BUT_InjectCustomMap.Name = "BUT_InjectCustomMap";
-            //this.BUT_InjectCustomMap.UseVisualStyleBackColor = true;
-            //this.BUT_InjectCustomMap.Click += new System.EventHandler(this.BUT_InjectCustomMap_Click);
             // 
             // chk_grid
             // 
@@ -776,6 +767,7 @@ namespace MissionPlanner.GCSViews
             // panel2
             // 
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.btnThreeDee);
             this.panel2.Controls.Add(this.lbl_wpfile);
             this.panel2.Controls.Add(this.BUT_loadwpfile);
             this.panel2.Controls.Add(this.BUT_saveWPFile);
@@ -820,7 +812,6 @@ namespace MissionPlanner.GCSViews
             // 
             this.panelMap.Controls.Add(this.lbl_homedist);
             this.panelMap.Controls.Add(this.lbl_prevdist);
-            //this.panelMap.Controls.Add(this.Zoomlevel);
             this.panelMap.Controls.Add(this.TRK_zoom);
             this.panelMap.Controls.Add(this.label11);
             this.panelMap.Controls.Add(this.lbl_distance);
@@ -840,34 +831,6 @@ namespace MissionPlanner.GCSViews
             // 
             resources.ApplyResources(this.lbl_prevdist, "lbl_prevdist");
             this.lbl_prevdist.Name = "lbl_prevdist";
-            //// 
-            //// Zoomlevel
-            //// 
-            //resources.ApplyResources(this.Zoomlevel, "Zoomlevel");
-            //this.Zoomlevel.DecimalPlaces = 1;
-            //this.Zoomlevel.Increment = new decimal(new int[] {
-            //5,
-            //0,
-            //0,
-            //65536});
-            //this.Zoomlevel.Maximum = new decimal(new int[] {
-            //18,
-            //0,
-            //0,
-            //0});
-            //this.Zoomlevel.Minimum = new decimal(new int[] {
-            //1,
-            //0,
-            //0,
-            //0});
-            //this.Zoomlevel.Name = "Zoomlevel";
-            //this.toolTip1.SetToolTip(this.Zoomlevel, resources.GetString("Zoomlevel.ToolTip"));
-            //this.Zoomlevel.Value = new decimal(new int[] {
-            //2,
-            //0,
-            //0,
-            //0});
-            //this.Zoomlevel.ValueChanged += new System.EventHandler(this.Zoomlevel_ValueChanged);
             // 
             // TRK_zoom
             // 
@@ -1579,14 +1542,13 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.zoomToHomeToolStripMenuItem, "zoomToHomeToolStripMenuItem");
             this.zoomToHomeToolStripMenuItem.Click += new System.EventHandler(this.zoomToHomeToolStripMenuItem_Click);
             // 
-            // myButton2
+            // btnThreeDee
             // 
-            resources.ApplyResources(this.myButton2, "myButton2");
-            this.myButton2.Name = "myButton2";
-            this.myButton2.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
-            this.toolTip1.SetToolTip(this.myButton2, resources.GetString("myButton2.ToolTip"));
-            this.myButton2.UseVisualStyleBackColor = true;
-            this.myButton2.Click += new System.EventHandler(this.myButton2_Click);
+            resources.ApplyResources(this.btnThreeDee, "btnThreeDee");
+            this.btnThreeDee.Name = "btnThreeDee";
+            this.btnThreeDee.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.btnThreeDee.UseVisualStyleBackColor = true;
+            this.btnThreeDee.Click += new System.EventHandler(this.btnThreeDee_Click);
             // 
             // FlightPlanner
             // 
@@ -1611,7 +1573,6 @@ namespace MissionPlanner.GCSViews
             this.panel2.ResumeLayout(false);
             this.panelMap.ResumeLayout(false);
             this.panelMap.PerformLayout();
-            //((System.ComponentModel.ISupportInitialize)(this.Zoomlevel)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.TRK_zoom)).EndInit();
             this.contextMenuStrip1.ResumeLayout(false);
             this.panelBASE.ResumeLayout(false);
@@ -1797,5 +1758,6 @@ namespace MissionPlanner.GCSViews
         //private ToolStripMenuItem gDALOpacityToolStripMenuItem; 
         public MyButton myButton1;
         public MyButton myButton2;
+        public MyButton btnThreeDee;
     }
 }

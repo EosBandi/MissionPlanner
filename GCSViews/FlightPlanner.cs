@@ -56,6 +56,10 @@ using SharpKml.Engine;
 using MissionPlanner.Controls.Waypoints;
 using KMLib;
 using Core.Geometry;
+using System.Web.Configuration;
+using System.Text;
+using System.Runtime.InteropServices.WindowsRuntime;
+using Accord.MachineLearning.VectorMachines.Learning;
 
 namespace MissionPlanner.GCSViews
 {
@@ -8688,9 +8692,6 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
 
 
-
-
-
             Color[] colours =
             {
                 Color.Red, Color.Orange, Color.Yellow, Color.Green, Color.Blue, Color.Indigo,
@@ -8854,7 +8855,351 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
         }
 
 
+        private void btnThreeDee_Click(object sender, EventArgs e)
+        {
+
+        }
+
+
+        public string getCZML()
+        {
+
+            var type = (MAVLink.MAV_MISSION_TYPE)Invoke((Func<MAVLink.MAV_MISSION_TYPE>)delegate
+            {
+                return (MAVLink.MAV_MISSION_TYPE)cmb_missiontype.SelectedValue;
+            });
+
+            //Only save Missions
+            if (type != MAVLink.MAV_MISSION_TYPE.MISSION) return "";
+
+            Locationwp home = new Locationwp();
+            try
+            {
+                home.frame = (byte)MAVLink.MAV_FRAME.GLOBAL;
+                home.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+                home.lat = (double.Parse(TXT_homelat.Text));
+                home.lng = (double.Parse(TXT_homelng.Text));
+                home.alt = (float.Parse(TXT_homealt.Text) / CurrentState.multiplierdist); // use saved home
+            }
+            catch
+            {
+                return "";
+            }
+
+            double takeoffalt = 0;
+
+            List<wp_info> wps = new List<wp_info>();
+
+            int i = 0;
+            while (i < Commands.Rows.Count)
+            {
+                var cmd = getCmdID(Commands.Rows[i].Cells[Command.Index].Value.ToString());
+
+                switch ((MAVLink.MAV_CMD)cmd)
+                {
+                    case MAVLink.MAV_CMD.TAKEOFF:
+                        takeoffalt = double.Parse(Commands.Rows[i].Cells[Alt.Index].Value.ToString()) + home.alt; //alwayas absolute
+                        break;
+                    case MAVLink.MAV_CMD.WAYPOINT:
+                        int spray = 0; //spray no change
+                        if (i < Commands.Rows.Count - 1)
+                        {
+                            if (Commands.Rows[i + 1].Cells[Command.Index].Value.ToString() == "DO_SEND_SCRIPT_MESSAGE")
+                            {
+                                if (Commands.Rows[i + 1].Cells[Param1.Index].Value.ToString() == "2" &&
+                                    Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "3")
+                                {
+                                    spray = 1; //spray on
+                                }
+                                else if (Commands.Rows[i + 1].Cells[Param1.Index].Value.ToString() == "2" &&
+                                         Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "0")
+                                {
+                                    spray = 2; //spray off
+                                }
+                            }
+                        }
+
+                        wp_info wp = new wp_info();
+                        wp.lat = double.Parse(Commands.Rows[i].Cells[Lat.Index].Value.ToString());
+                        wp.lng = double.Parse(Commands.Rows[i].Cells[Lon.Index].Value.ToString());
+                        double alt = double.Parse(Commands.Rows[i].Cells[Alt.Index].Value.ToString());
+                        double realalt = 0;
+                        altmode frame = (altmode)Commands[Frame.Index, i].Value;
+                        if (frame == FlightPlanner.altmode.Relative)
+                        {
+                            realalt = home.alt + alt;
+                        }
+                        else if (frame == FlightPlanner.altmode.Terrain)       //TODO: add terrain reference
+                        {
+                            realalt = alt + srtm.getAltitude(wp.lat, wp.lng).alt;
+                        }
+                        else // Absolute
+                        {
+                            realalt = alt;
+                        }
+
+                        wp.alt = realalt;
+                        //wp.alt = double.Parse(Commands.Rows[i].Cells[Alt.Index].Value.ToString());
+                        wp.gnd_alt = srtm.getAltitude(wp.lat, wp.lng).alt;
+                        wp.spray_status = spray;
+                        wp.number = i+1;
+                        wps.Add(wp);
+                        break;
+
+                }
+                i++;
+            }
+
+            if (takeoffalt == 0) takeoffalt = home.alt;
+            //Write a file
+            //string filename = @"C:\Users\eosba\source\repos\BrowserTest\" + "DisplayMission.czml";
+            //StreamWriter sw = new StreamWriter(filename);
+
+            MemoryStream mem = new MemoryStream();
+            StreamWriter sw = new StreamWriter(mem);
+
+            sw.WriteLine("[");
+            sw.WriteLine("  {");
+            sw.WriteLine("    \"id\": \"document\",");
+            sw.WriteLine("    \"version\": \"1.0\",");
+            sw.WriteLine("    \"name\": \"Cesium Flight Plan\"");
+            sw.WriteLine("  },");
+
+
+            List<wp_info> homepath = new List<wp_info>();
+            homepath.Add(new wp_info() { lat = home.lat, lng = home.lng, alt = takeoffalt });
+            homepath.Add(wps.First());
+            sw.WriteLine(polyLine(homepath, "homepath", "[255, 255, 0, 100]", false));
+            sw.WriteLine(polyLine(homepath, "homepathground", "[200,200, 0, 100]", true));
+
+            sw.WriteLine(verticalLine(new wp_info() { lat = home.lat, lng = home.lng, alt = takeoffalt, gnd_alt = home.alt, spray_status = 3, number = 0 }));
+            sw.WriteLine(wpmarker(new wp_info() { lat = home.lat, lng = home.lng, alt = takeoffalt, gnd_alt = home.alt, spray_status = 3, number = 0 }));
+
+
+            sw.WriteLine(polyLine(wps, "groundpath", "[255, 0, 0, 100]", true)); // Red line, clamped to ground
+
+
+            //sw.WriteLine(polyLine(wps, "mission", "[0, 0, 255, 255]")); // Blue line
+            var prev_wp = wps.First();
+            var a = 1;
+            var spray_on = false;
+            if (prev_wp.spray_status == 1) spray_on = true;
+            if (prev_wp.spray_status == 2) spray_on = false;
+
+
+            foreach (var wp in wps)
+            {
+                if (prev_wp.Equals(wp)) continue;
+                if (spray_on)
+                {
+                    sw.WriteLine(arrowLine(prev_wp, wp, "[0,255,0,180]", "missionpath" + a++.ToString()));
+                }
+                else
+                {
+                    sw.WriteLine(arrowLine(prev_wp, wp, "[100,100,255,180]", "missionpath" + a++.ToString()));
+
+                }
+                prev_wp = wp;
+                if (prev_wp.spray_status == 1) spray_on = true;
+                if (prev_wp.spray_status == 2) spray_on = false;
+            }
+
+            // Add waypoints and spray status
+            {
+
+                foreach (var wp in wps)
+                {
+                    sw.WriteLine(wpmarker(wp));
+                }
+            }
+
+            {
+                var last = wps.Last();
+                foreach (var wp in wps)
+                {
+                  sw.WriteLine(verticalLine(wp, last.Equals(wp)));
+                }
+
+            }
+
+            sw.WriteLine("]");
+            sw.Flush();
+            return Encoding.UTF8.GetString(mem.ToArray());
+
+        }
+
+        public string arrowLine(wp_info wp1, wp_info wp2, string color, string id)
+        {
+            MemoryStream mem = new MemoryStream();
+            StreamWriter sw = new StreamWriter(mem);
+            sw.WriteLine("  {");
+            sw.WriteLine("    \"id\": \"{0}\",", id);
+            sw.WriteLine("    \"polyline\": {");
+            sw.WriteLine("      \"positions\": {");
+            sw.WriteLine("        \"cartographicDegrees\": [");
+            sw.WriteLine("          " + wp1.lng + ", " + wp1.lat + ", " + wp1.alt + ",");
+            sw.WriteLine("          " + wp2.lng + ", " + wp2.lat + ", " + wp2.alt);
+            sw.WriteLine("        ]");
+            sw.WriteLine("      },");
+            sw.WriteLine("      \"width\": 20,");
+            sw.WriteLine("      \"material\": {");
+            sw.WriteLine("        \"polylineArrow\": {");
+            sw.WriteLine("          \"color\": {");
+            sw.WriteLine("            \"rgba\": " + color);
+            sw.WriteLine("          }");
+            sw.WriteLine("        }");
+            sw.WriteLine("      }");
+            sw.WriteLine("    }");
+            sw.WriteLine("  },");
+            sw.Flush();
+            return Encoding.UTF8.GetString(mem.ToArray());
+
+        }
+        public string polyLine(List<wp_info> wps, string id, string color, bool clampToGround = false)
+        {
+            MemoryStream mem = new MemoryStream();
+            StreamWriter sw = new StreamWriter(mem);
+            sw.WriteLine("  {");
+            sw.WriteLine("    \"id\": \"{0}\",", id);
+            sw.WriteLine("    \"polyline\": {");
+            sw.WriteLine("      \"positions\": {");
+            sw.WriteLine("        \"cartographicDegrees\": [");
+            var last = wps.Last();
+            foreach (var wp in wps)
+            {
+                sw.Write("          " + wp.lng + ", " + wp.lat + ", " + wp.alt);
+                if (!wp.Equals(last)) sw.WriteLine(",");
+                else sw.WriteLine();
+            }
+            sw.WriteLine("        ]");
+            sw.WriteLine("      },");
+            sw.WriteLine("      \"width\": 5,");
+            sw.WriteLine("      \"clampToGround\": " + clampToGround.ToString().ToLower() + ",");
+            sw.WriteLine("      \"material\": {");
+            sw.WriteLine("        \"polylineOutline\": {");
+            sw.WriteLine("          \"color\": {");
+            sw.WriteLine("            \"rgba\": " + color);
+            sw.WriteLine("          }");
+            sw.WriteLine("        }");
+            sw.WriteLine("      }");
+            sw.WriteLine("    }");
+            sw.WriteLine("  },");
+            sw.Flush();
+            return Encoding.UTF8.GetString(mem.ToArray());
+        }
+
+
+
+        public string wpmarker(wp_info wp, bool last = false)
+        {
+            MemoryStream mem = new MemoryStream();
+            StreamWriter sw = new StreamWriter(mem);
+            sw.WriteLine("  {");
+            sw.WriteLine("    \"id\": \"wp {0}\",", wp.number);
+            sw.WriteLine("    \"name\": \"wp {0}\",", wp.number);
+            var desc = "";
+            var image = "";
+            switch (wp.spray_status)
+            {
+                case 0:
+                    desc = String.Format("WP {0} - interim waypoint", wp.number);
+                    image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAB2AAAAdgFOeyYIAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAnxJREFUOI2NkWtIU2Ecxp+zs4u3iVOzeUFDVoJ4QR2V9SGVLOki1AfzWzCx8kMQBRoRJRUIhXQjI6VRBCUkQqEYufCY5iS25p0yRhtpR5M23aanc/GcPsTidGbQ++19/r/3x/O+LwHFKitrVvOhueNH9kfvyTdpjQAw8Vmgu1+vvtXFZTymqGZBzhPyze4ci76kNOr+jSZDqVaDbPmM5eBuavXbbaNomJ5uC4VzUg5VVu683XY58aiaROpKUAr0UMzUjJunM1JJfWw0Ydy3S5fpnV/LHnE6X0QIivIs5o5rSXXxcSrT+Ed2tv6ir7NvhLtgdzDdPRSrKszRJhtT1On5pvUoypFrpxfHaABQhwWbEjVV6SlkMQBcvRew9w91nJOVO6uPPWXoupO01RBPmrLSyGrnBD4AgCpMmLLIBAAajgfrWRAnlY/roYUpjgcLSOrtBWRGOP8jmP3C+QGsazXQGfSEUSlIiCPStBroBJ4XRyfWv0YIloNS/5JPdAFATVWMubig7nB4VlxYf6imKsYsSSLWGMHvnRN7w7O/vrGl8XTn+RPxxwCgd4B53zPIfJUkgqguj8o8UBZtZkJBvKTYgdozDyo2FJQUWsr7H25uNSSoipRXkCQR/iWff+9JvsY1abVFXAEAnOPWgevWgAuApBQwwSC6bBiUH44QAIBt+OfNGTc/LM8EnoN/hZ9vf85eUvKkMvi26PrupXO31B6M2UYQhB6QEFrxcY23pPY+yvpUyUc0AIBVN99y90lo9Hf1ACgX6fA4+OaN2IgGAOBZHhOWlnM9FTtUZoFnpYYrnMX+6ZH3vwUAQC+OzS/8yEt+NSQ63ryzPvsX9wsq4QdYTNKFRgAAAABJRU5ErkJggg==";
+                    break;
+                case 1:
+                    desc = String.Format("WP {0} - Spray starting", wp.number);
+                    image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAABcAAAAXAGHJ8xwAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAUZJREFUOI3Fj79OwlAYxc93KRjasNhEBn0Gn4FIUjWRuNANQWdegEXDCyiji4MkshvinxCqDDCwqaujiSEwKB2goYV+DkZD2mqNg57x3N/9nXuB/w4FlamzzZXIlCsAr783bICk0k3h6jFUsFbdWiZ2Hthl1bacAQDE4tElEvTCFF29LVw8z/PCN8/OEbusjk2r1im2kp1iKzk2rRq7vEiuc+jFfQICNNuavHbNdv6j65rtvD22h0TQQgUAbDCkFFKfZzp0CUCEAccLS74XEBoxeWFnpIwu9bKeAYCnRK+uyHKCCOehAkBUSLg5RVW0XnwwBABFluMkiAFRCfiyP+nTjTrAGQ9YN3Yb2765IIHg2QGA2VzlgkQ5kA0qm3vNewKO5/ZPjML13Y8FADDlyT6APoD+JBopfcV9m3RVy6arWvZXl/8sb/N4bjzrOzTSAAAAAElFTkSuQmCC";
+                    break;
+                case 2:
+                    desc = String.Format("WP {0} - Spray stopping", wp.number);
+                    image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAF6SURBVDiNfZK9LwRRFMV/980odtlEo+EfkKhEDMmSsEiEVkNBo1FIVCIU/gqlDonoJchuRmIlPlYjkYgofHQaYXeWrN2rMGTMzuyt3j33nHvPfe8JMVEaS7ejlW6qxhLVq6R79hzFkzDwkk6nEonKBsoMYPmwAjvlj6aFtnz+PbaBDg3ZJcvLAYMx006S1eSwuO7XL2aCBM8uzwbED6osCswDd76NAc/y5oIa+58DZco/1hSZSOXObgBeMz2uLdYtYClMAZuRDkA7fKteKvsjBmjNFe6BTz9tDypCDXjyrba8jfYN/ILFkd5xIOmnj7EroLKL6CSAUd0vZZwtFUmATv9xhL2gpP4VTPka0U6i4675tdolhUIlcgVx3S81tfUYMaqsBcV1DgAUpDjinAr0h0qXzdlzR34+1V+ELxEBxehK3XijK2FxZAOA1NHFMcJhADpoObrIRnEjGwBQZRmoASpqVmN5jaI46uwUM852I47dqKjGXmrgEYBvQ7J/Xg+rAFYAAAAASUVORK5CYII=";
+                    break;
+                case 3:
+                    desc = String.Format("WP {0} - Home", wp.number);
+                    image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwABOvQAATr0AUVPlLMAAAAZdEVYdFNvZnR3YXJlAHd3dy5pbmtzY2FwZS5vcmeb7jwaAAABh2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4NCjx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iPjxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+PHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9InV1aWQ6ZmFmNWJkZDUtYmEzZC0xMWRhLWFkMzEtZDMzZDc1MTgyZjFiIiB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+PHRpZmY6T3JpZW50YXRpb24+MTwvdGlmZjpPcmllbnRhdGlvbj48L3JkZjpEZXNjcmlwdGlvbj48L3JkZjpSREY+PC94OnhtcG1ldGE+DQo8P3hwYWNrZXQgZW5kPSd3Jz8+LJSYCwAAAjFJREFUOE+Fks9LVUEYhp9vZs6Zc+Z4VZKkTS6KXPQnaCYhuhQSbFdCv6BVEbiIFuHehFqGYRASGlT7Fimoa1dpmW101SaiyO6558y0sHu9V4VemMXM9z4v7zAjHKN4MIx7Cbfx9BMQFKuieFb7oBYPe6VlN+yzioQ3YtRIKA+GARANoRbe/8xljGX5VUfUAQ3dcZjLKmokEchSSIzfTYzfyVJIBLJ2Ge7O/ItmptGgZyzv11G04mugY/Bl2NWKPskJhWZNGTld5qAiKKoM7LyTFZobOKsvZw4yB9aEr4liaHtB7Xx5q3bTiCGr/XZ97qwfq3ONgNTS4ywksa/Furi2uaA+12cbr9RWouRqan3uLKRp6DkaEPu91EJbJqbN6gmAC3fCmb5be2cB0jRMZE6i1IKz8vtIgEvkk0sgS0WS2FcAIhUGo1hdAkisr2SpiEsgjUKjXSMgNn7JarAG0oRzo5PFeObCxYqTgdHJYtxZeq2BxEAa+6U613iF8cWgWS8+Rtb0liXoCEL5z6ShrIHSUFSLrW+ROb88JQXNDV5fkdI5edzeDtaURKEgVvsrCgXWlHS0g7MyU4dbAgDsyfW5kBcbnZ2axNKyOjs15MWmPaWfNzOtXxm4/yTvM7FZLYtAWe7fQWuNMYq9am3g6b14pdnf0gBg5m68JmXxoKtL4azgrNDVpaCsPjwMc1yDuqZm89mOE9ENAvz4Xp17dDO5ftjzX03P5y+n5//MHz5v1l9q57NFQkZUdwAAAABJRU5ErkJggg==";
+                    break;
+            }
+            sw.WriteLine("  \"description\":\"" + desc + "\",");
+            sw.WriteLine("  \"billboard\": {");
+            sw.WriteLine("    \"image\":\"" + image + "\",");
+            sw.WriteLine("    \"scale\":1.5,");
+            sw.WriteLine("   \"pixelOffset\": {");
+            sw.WriteLine("     \"cartesian2\": [0, -8]");
+            sw.WriteLine("   }");
+            sw.WriteLine("   },");
+            sw.WriteLine("  \"label\": {");
+            sw.WriteLine("    \"text\": \"{0}\",", wp.number);
+            sw.WriteLine("    \"font\": \"10pt Lucida Console\",");
+            sw.WriteLine("    \"style\": \"FILL\",");
+            sw.WriteLine("    \"scale\": 1.5,");
+            sw.WriteLine("    \"pixelOffset\": {");
+            sw.WriteLine("      \"cartesian2\": [0, -32]");
+            sw.WriteLine("    }");
+            sw.WriteLine("  },");
+            sw.WriteLine("  \"position\": {");
+            sw.WriteLine("    \"cartographicDegrees\": [{0}, {1}, {2}]", wp.lng, wp.lat, wp.alt);
+            sw.WriteLine("  }");
+            sw.Write("  }");
+            if (!last) sw.WriteLine(",");
+            else sw.WriteLine();
+            sw.Flush();
+            String result = System.Text.Encoding.UTF8.GetString(mem.ToArray(), 0, (int)mem.Length);
+            return result;
+        }
+
+
+
+
+
+
+        public string verticalLine(wp_info wp, bool last = false)
+        {
+            MemoryStream mem = new MemoryStream();
+            StreamWriter sw = new StreamWriter(mem);
+
+            sw.WriteLine("  {");
+            sw.WriteLine("    \"id\": \"wp {0} - gnd\",", wp.number);
+            sw.WriteLine("    \"name\": \"wp {0} - gnd\",", wp.number);
+            sw.WriteLine("    \"polyline\": {");
+            sw.WriteLine("      \"positions\": {");
+            sw.WriteLine("        \"cartographicDegrees\": [");
+            sw.WriteLine("          {0}, {1}, {2},", wp.lng, wp.lat, wp.alt);
+            sw.WriteLine("          {0}, {1}, {2}", wp.lng, wp.lat, wp.gnd_alt);
+            sw.WriteLine("        ]");
+            sw.WriteLine("      },");
+            sw.WriteLine("      \"width\": 2,");
+            sw.WriteLine("      \"material\": {");
+            sw.WriteLine("        \"polylineDash\": {");
+            sw.WriteLine("          \"color\": {");
+            sw.WriteLine("            \"rgba\": [255, 255, 255, 100]");
+            sw.WriteLine("          },");
+            sw.WriteLine("          \"gapColor\": {");
+            sw.WriteLine("            \"rgba\": [0, 0, 0, 0]");
+            sw.WriteLine("          },");
+            sw.WriteLine("          \"dashLength\": 10.0");
+            sw.WriteLine("        }");
+            sw.WriteLine("      }");
+            sw.WriteLine("    }");
+            sw.Write("  }");
+            if (!last) sw.WriteLine(",");
+            else sw.WriteLine();
+            sw.Flush();
+            String result = System.Text.Encoding.UTF8.GetString(mem.ToArray(), 0, (int)mem.Length);
+            return result;
+        }
 
 
     }
+
+
+    public struct wp_info
+    {
+        public int number;
+        public double lat;
+        public double lng;
+        public double alt;
+        public double gnd_alt;
+        public int spray_status; // 0 - none, 1-on, 2-off
+        public int servo_value;
+    }
+
 }
