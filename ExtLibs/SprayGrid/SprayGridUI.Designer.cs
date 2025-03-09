@@ -31,6 +31,8 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SprayGridUI));
             this.groupBox5 = new System.Windows.Forms.GroupBox();
             this.lbl_SprayDistance = new System.Windows.Forms.Label();
+            this.label20 = new System.Windows.Forms.Label();
+            this.lbl_SprayTime = new System.Windows.Forms.Label();
             this.label14 = new System.Windows.Forms.Label();
             this.myButton1 = new MissionPlanner.Controls.MyButton();
             this.CHK_extendedpoint = new System.Windows.Forms.CheckBox();
@@ -56,6 +58,8 @@
             this.label12 = new System.Windows.Forms.Label();
             this.NUM_trackingAltError = new System.Windows.Forms.NumericUpDown();
             this.groupBox6 = new System.Windows.Forms.GroupBox();
+            this.NUM_gpsOffset = new System.Windows.Forms.NumericUpDown();
+            this.label18 = new System.Windows.Forms.Label();
             this.btN_SaveGrid = new MissionPlanner.Controls.MyButton();
             this.btn_LoadGrid = new MissionPlanner.Controls.MyButton();
             this.cb_flip = new System.Windows.Forms.CheckBox();
@@ -87,18 +91,17 @@
             this.NUM_altitude = new System.Windows.Forms.NumericUpDown();
             this.label6 = new System.Windows.Forms.Label();
             this.BUT_Accept = new MissionPlanner.Controls.MyButton();
+            this.label1 = new System.Windows.Forms.Label();
             this.CMB_startfrom = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.NUM_Distance = new System.Windows.Forms.NumericUpDown();
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.map = new MissionPlanner.Controls.myGMAP();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label18 = new System.Windows.Forms.Label();
-            this.NUM_gpsOffset = new System.Windows.Forms.NumericUpDown();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).BeginInit();
             this.groupBox6.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_gpsOffset)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_TakeoffAlt)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Shift)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_LaneSeparation)).BeginInit();
@@ -115,13 +118,14 @@
             this.splitContainer1.Panel1.SuspendLayout();
             this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.NUM_gpsOffset)).BeginInit();
             this.SuspendLayout();
             // 
             // groupBox5
             // 
             resources.ApplyResources(this.groupBox5, "groupBox5");
             this.groupBox5.Controls.Add(this.lbl_SprayDistance);
+            this.groupBox5.Controls.Add(this.label20);
+            this.groupBox5.Controls.Add(this.lbl_SprayTime);
             this.groupBox5.Controls.Add(this.label14);
             this.groupBox5.Controls.Add(this.myButton1);
             this.groupBox5.Controls.Add(this.CHK_extendedpoint);
@@ -150,6 +154,16 @@
             // 
             resources.ApplyResources(this.lbl_SprayDistance, "lbl_SprayDistance");
             this.lbl_SprayDistance.Name = "lbl_SprayDistance";
+            // 
+            // label20
+            // 
+            resources.ApplyResources(this.label20, "label20");
+            this.label20.Name = "label20";
+            // 
+            // lbl_SprayTime
+            // 
+            resources.ApplyResources(this.lbl_SprayTime, "lbl_SprayTime");
+            this.lbl_SprayTime.Name = "lbl_SprayTime";
             // 
             // label14
             // 
@@ -353,6 +367,27 @@
             this.groupBox6.Controls.Add(this.NUM_Distance);
             this.groupBox6.Name = "groupBox6";
             this.groupBox6.TabStop = false;
+            // 
+            // NUM_gpsOffset
+            // 
+            this.NUM_gpsOffset.DecimalPlaces = 2;
+            this.NUM_gpsOffset.Increment = new decimal(new int[] {
+            1,
+            0,
+            0,
+            65536});
+            resources.ApplyResources(this.NUM_gpsOffset, "NUM_gpsOffset");
+            this.NUM_gpsOffset.Maximum = new decimal(new int[] {
+            5,
+            0,
+            0,
+            0});
+            this.NUM_gpsOffset.Name = "NUM_gpsOffset";
+            // 
+            // label18
+            // 
+            resources.ApplyResources(this.label18, "label18");
+            this.label18.Name = "label18";
             // 
             // btN_SaveGrid
             // 
@@ -644,6 +679,11 @@
             this.BUT_Accept.UseVisualStyleBackColor = true;
             this.BUT_Accept.Click += new System.EventHandler(this.BUT_Accept_Click2);
             // 
+            // label1
+            // 
+            resources.ApplyResources(this.label1, "label1");
+            this.label1.Name = "label1";
+            // 
             // CMB_startfrom
             // 
             this.CMB_startfrom.FormattingEnabled = true;
@@ -726,32 +766,6 @@
             this.map.ShowTileGridLines = false;
             this.map.Zoom = 3D;
             // 
-            // label1
-            // 
-            resources.ApplyResources(this.label1, "label1");
-            this.label1.Name = "label1";
-            // 
-            // label18
-            // 
-            resources.ApplyResources(this.label18, "label18");
-            this.label18.Name = "label18";
-            // 
-            // NUM_gpsOffset
-            // 
-            this.NUM_gpsOffset.DecimalPlaces = 2;
-            this.NUM_gpsOffset.Increment = new decimal(new int[] {
-            1,
-            0,
-            0,
-            65536});
-            resources.ApplyResources(this.NUM_gpsOffset, "NUM_gpsOffset");
-            this.NUM_gpsOffset.Maximum = new decimal(new int[] {
-            5,
-            0,
-            0,
-            0});
-            this.NUM_gpsOffset.Name = "NUM_gpsOffset";
-            // 
             // SprayGridUI
             // 
             resources.ApplyResources(this, "$this");
@@ -765,6 +779,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).EndInit();
             this.groupBox6.ResumeLayout(false);
             this.groupBox6.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.NUM_gpsOffset)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_TakeoffAlt)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_Shift)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_LaneSeparation)).EndInit();
@@ -781,7 +796,6 @@
             this.splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
             this.splitContainer1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.NUM_gpsOffset)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -850,10 +864,12 @@
         private System.Windows.Forms.CheckBox cb_flip;
         private Controls.MyButton btN_SaveGrid;
         private Controls.MyButton btn_LoadGrid;
-        private System.Windows.Forms.Label lbl_SprayDistance;
+        private System.Windows.Forms.Label lbl_SprayTime;
         private System.Windows.Forms.Label label14;
         private System.Windows.Forms.NumericUpDown NUM_gpsOffset;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lbl_SprayDistance;
+        private System.Windows.Forms.Label label20;
     }
 }

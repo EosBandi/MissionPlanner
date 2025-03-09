@@ -28,23 +28,23 @@ namespace MissionPlanner
             var mapUrl = @"https://api.mapbox.com/styles/v1/soleongmbh/clnalh0zi03i401nz95kl874l/tiles/{z}/{x}/{y}?access_token=pk.eyJ1Ijoic29sZW9uZ21iaCIsImEiOiJjbG5jcDl1NnMwazJ2MnBuemZlazhvYnp5In0.fkj1qjzFo9jorLndFzijpw";
 
             //get 3d settings from the settings file
-            if (Settings.Instance["3dmap_accessToken"] != null)
+            if (Settings.Instance["render_accessToken"] != null)
             {
-                accessToken = Settings.Instance["3dmap_accessToken"];
+                accessToken = Settings.Instance["render_accessToken"];
             }
-            if (Settings.Instance["3dmap_assetID"] != null)
+            if (Settings.Instance["render_assetID"] != null)
             {
-                assetID = Settings.Instance["3dmap_assetID"];
+                assetID = Settings.Instance["render_assetID"];
             }
-            if (Settings.Instance["3dmap_mapUrl"] != null)
+            if (Settings.Instance["render_mapUrl"] != null)
             {
-                mapUrl = Settings.Instance["3dmap_mapUrl"];
+                mapUrl = Settings.Instance["render_mapUrl"];
             }
 
             //Write back the settings to the settings file
-            Settings.Instance["3dmap_accessToken"] = accessToken;
-            Settings.Instance["3dmap_assetID"] = assetID;
-            Settings.Instance["3dmap_mapUrl"] = mapUrl;
+            Settings.Instance["render_accessToken"] = accessToken;
+            Settings.Instance["render_assetID"] = assetID;
+            Settings.Instance["render_mapUrl"] = mapUrl;
 
 
 

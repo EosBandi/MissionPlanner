@@ -651,7 +651,8 @@ namespace MissionPlanner.SprayGrid
             //fullArea = fullArea - obstacleArea;
 
             double distance = wppoly.Distance;
-            lbl_SprayDistance.Text = workingDistance.ToString("0.##") + " km";
+            lbl_SprayTime.Text = secondsToNice(workingDistance * 1000 / (double)NUM_UpDownFlySpeed.Value);
+            lbl_SprayDistance.Text = distance.ToString("0.##") + " km";
             lbl_area.Text = fullArea.ToString("#") + " m^2";
             lbl_distance.Text = distance.ToString("0.##") + " km";
             lbl_strips.Text = ((int)(strips / 2)).ToString();
