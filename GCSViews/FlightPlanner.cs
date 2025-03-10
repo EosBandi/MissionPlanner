@@ -9040,8 +9040,8 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             sw.WriteLine("    \"polyline\": {");
             sw.WriteLine("      \"positions\": {");
             sw.WriteLine("        \"cartographicDegrees\": [");
-            sw.WriteLine("          " + wp1.lng + ", " + wp1.lat + ", " + wp1.alt + ",");
-            sw.WriteLine("          " + wp2.lng + ", " + wp2.lat + ", " + wp2.alt);
+            sw.WriteLine("          " + wp1.lng.ToString(CultureInfo.InvariantCulture) + ", " + wp1.lat.ToString(CultureInfo.InvariantCulture) + ", " + wp1.alt.ToString(CultureInfo.InvariantCulture) + ",");
+            sw.WriteLine("          " + wp2.lng.ToString(CultureInfo.InvariantCulture) + ", " + wp2.lat.ToString(CultureInfo.InvariantCulture) + ", " + wp2.alt.ToString(CultureInfo.InvariantCulture));
             sw.WriteLine("        ]");
             sw.WriteLine("      },");
             sw.WriteLine("      \"width\": 20,");
@@ -9056,7 +9056,6 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             sw.WriteLine("  },");
             sw.Flush();
             return Encoding.UTF8.GetString(mem.ToArray());
-
         }
         public string polyLine(List<wp_info> wps, string id, string color, bool clampToGround = false)
         {
@@ -9070,14 +9069,14 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             var last = wps.Last();
             foreach (var wp in wps)
             {
-                sw.Write("          " + wp.lng + ", " + wp.lat + ", " + wp.alt);
+                sw.Write("          " + wp.lng.ToString(CultureInfo.InvariantCulture) + ", " + wp.lat.ToString(CultureInfo.InvariantCulture) + ", " + wp.alt.ToString(CultureInfo.InvariantCulture));
                 if (!wp.Equals(last)) sw.WriteLine(",");
                 else sw.WriteLine();
             }
             sw.WriteLine("        ]");
             sw.WriteLine("      },");
             sw.WriteLine("      \"width\": 5,");
-            sw.WriteLine("      \"clampToGround\": " + clampToGround.ToString().ToLower() + ",");
+            sw.WriteLine("      \"clampToGround\": " + clampToGround.ToString().ToLower(CultureInfo.InvariantCulture) + ",");
             sw.WriteLine("      \"material\": {");
             sw.WriteLine("        \"polylineOutline\": {");
             sw.WriteLine("          \"color\": {");
@@ -9105,19 +9104,19 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             switch (wp.spray_status)
             {
                 case 0:
-                    desc = String.Format("WP {0} - interim waypoint", wp.number);
+                    desc = String.Format(CultureInfo.InvariantCulture, "WP {0} - interim waypoint", wp.number);
                     image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAAB2AAAAdgFOeyYIAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAnxJREFUOI2NkWtIU2Ecxp+zs4u3iVOzeUFDVoJ4QR2V9SGVLOki1AfzWzCx8kMQBRoRJRUIhXQjI6VRBCUkQqEYufCY5iS25p0yRhtpR5M23aanc/GcPsTidGbQ++19/r/3x/O+LwHFKitrVvOhueNH9kfvyTdpjQAw8Vmgu1+vvtXFZTymqGZBzhPyze4ci76kNOr+jSZDqVaDbPmM5eBuavXbbaNomJ5uC4VzUg5VVu683XY58aiaROpKUAr0UMzUjJunM1JJfWw0Ydy3S5fpnV/LHnE6X0QIivIs5o5rSXXxcSrT+Ed2tv6ir7NvhLtgdzDdPRSrKszRJhtT1On5pvUoypFrpxfHaABQhwWbEjVV6SlkMQBcvRew9w91nJOVO6uPPWXoupO01RBPmrLSyGrnBD4AgCpMmLLIBAAajgfrWRAnlY/roYUpjgcLSOrtBWRGOP8jmP3C+QGsazXQGfSEUSlIiCPStBroBJ4XRyfWv0YIloNS/5JPdAFATVWMubig7nB4VlxYf6imKsYsSSLWGMHvnRN7w7O/vrGl8XTn+RPxxwCgd4B53zPIfJUkgqguj8o8UBZtZkJBvKTYgdozDyo2FJQUWsr7H25uNSSoipRXkCQR/iWff+9JvsY1abVFXAEAnOPWgevWgAuApBQwwSC6bBiUH44QAIBt+OfNGTc/LM8EnoN/hZ9vf85eUvKkMvi26PrupXO31B6M2UYQhB6QEFrxcY23pPY+yvpUyUc0AIBVN99y90lo9Hf1ACgX6fA4+OaN2IgGAOBZHhOWlnM9FTtUZoFnpYYrnMX+6ZH3vwUAQC+OzS/8yEt+NSQ63ryzPvsX9wsq4QdYTNKFRgAAAABJRU5ErkJggg==";
                     break;
                 case 1:
-                    desc = String.Format("WP {0} - Spray starting", wp.number);
+                    desc = String.Format(CultureInfo.InvariantCulture, "WP {0} - Spray starting", wp.number);
                     image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAABcAAAAXAGHJ8xwAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAAUZJREFUOI3Fj79OwlAYxc93KRjasNhEBn0Gn4FIUjWRuNANQWdegEXDCyiji4MkshvinxCqDDCwqaujiSEwKB2goYV+DkZD2mqNg57x3N/9nXuB/w4FlamzzZXIlCsAr783bICk0k3h6jFUsFbdWiZ2Hthl1bacAQDE4tElEvTCFF29LVw8z/PCN8/OEbusjk2r1im2kp1iKzk2rRq7vEiuc+jFfQICNNuavHbNdv6j65rtvD22h0TQQgUAbDCkFFKfZzp0CUCEAccLS74XEBoxeWFnpIwu9bKeAYCnRK+uyHKCCOehAkBUSLg5RVW0XnwwBABFluMkiAFRCfiyP+nTjTrAGQ9YN3Yb2765IIHg2QGA2VzlgkQ5kA0qm3vNewKO5/ZPjML13Y8FADDlyT6APoD+JBopfcV9m3RVy6arWvZXl/8sb/N4bjzrOzTSAAAAAElFTkSuQmCC";
                     break;
                 case 2:
-                    desc = String.Format("WP {0} - Spray stopping", wp.number);
+                    desc = String.Format(CultureInfo.InvariantCulture, "WP {0} - Spray stopping", wp.number);
                     image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAF6SURBVDiNfZK9LwRRFMV/980odtlEo+EfkKhEDMmSsEiEVkNBo1FIVCIU/gqlDonoJchuRmIlPlYjkYgofHQaYXeWrN2rMGTMzuyt3j33nHvPfe8JMVEaS7ejlW6qxhLVq6R79hzFkzDwkk6nEonKBsoMYPmwAjvlj6aFtnz+PbaBDg3ZJcvLAYMx006S1eSwuO7XL2aCBM8uzwbED6osCswDd76NAc/y5oIa+58DZco/1hSZSOXObgBeMz2uLdYtYClMAZuRDkA7fKteKvsjBmjNFe6BTz9tDypCDXjyrba8jfYN/ILFkd5xIOmnj7EroLKL6CSAUd0vZZwtFUmATv9xhL2gpP4VTPka0U6i4675tdolhUIlcgVx3S81tfUYMaqsBcV1DgAUpDjinAr0h0qXzdlzR34+1V+ELxEBxehK3XijK2FxZAOA1NHFMcJhADpoObrIRnEjGwBQZRmoASpqVmN5jaI46uwUM852I47dqKjGXmrgEYBvQ7J/Xg+rAFYAAAAASUVORK5CYII=";
                     break;
                 case 3:
-                    desc = String.Format("WP {0} - Home", wp.number);
+                    desc = String.Format(CultureInfo.InvariantCulture, "WP {0} - Home", wp.number);
                     image = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwABOvQAATr0AUVPlLMAAAAZdEVYdFNvZnR3YXJlAHd3dy5pbmtzY2FwZS5vcmeb7jwaAAABh2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSfvu78nIGlkPSdXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQnPz4NCjx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iPjxyZGY6UkRGIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyI+PHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9InV1aWQ6ZmFmNWJkZDUtYmEzZC0xMWRhLWFkMzEtZDMzZDc1MTgyZjFiIiB4bWxuczp0aWZmPSJodHRwOi8vbnMuYWRvYmUuY29tL3RpZmYvMS4wLyI+PHRpZmY6T3JpZW50YXRpb24+MTwvdGlmZjpPcmllbnRhdGlvbj48L3JkZjpEZXNjcmlwdGlvbj48L3JkZjpSREY+PC94OnhtcG1ldGE+DQo8P3hwYWNrZXQgZW5kPSd3Jz8+LJSYCwAAAjFJREFUOE+Fks9LVUEYhp9vZs6Zc+Z4VZKkTS6KXPQnaCYhuhQSbFdCv6BVEbiIFuHehFqGYRASGlT7Fimoa1dpmW101SaiyO6558y0sHu9V4VemMXM9z4v7zAjHKN4MIx7Cbfx9BMQFKuieFb7oBYPe6VlN+yzioQ3YtRIKA+GARANoRbe/8xljGX5VUfUAQ3dcZjLKmokEchSSIzfTYzfyVJIBLJ2Ge7O/ItmptGgZyzv11G04mugY/Bl2NWKPskJhWZNGTld5qAiKKoM7LyTFZobOKsvZw4yB9aEr4liaHtB7Xx5q3bTiCGr/XZ97qwfq3ONgNTS4ywksa/Furi2uaA+12cbr9RWouRqan3uLKRp6DkaEPu91EJbJqbN6gmAC3fCmb5be2cB0jRMZE6i1IKz8vtIgEvkk0sgS0WS2FcAIhUGo1hdAkisr2SpiEsgjUKjXSMgNn7JarAG0oRzo5PFeObCxYqTgdHJYtxZeq2BxEAa+6U613iF8cWgWS8+Rtb0liXoCEL5z6ShrIHSUFSLrW+ROb88JQXNDV5fkdI5edzeDtaURKEgVvsrCgXWlHS0g7MyU4dbAgDsyfW5kBcbnZ2axNKyOjs15MWmPaWfNzOtXxm4/yTvM7FZLYtAWe7fQWuNMYq9am3g6b14pdnf0gBg5m68JmXxoKtL4azgrNDVpaCsPjwMc1yDuqZm89mOE9ENAvz4Xp17dDO5ftjzX03P5y+n5//MHz5v1l9q57NFQkZUdwAAAABJRU5ErkJggg==";
                     break;
             }
@@ -9139,7 +9138,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             sw.WriteLine("    }");
             sw.WriteLine("  },");
             sw.WriteLine("  \"position\": {");
-            sw.WriteLine("    \"cartographicDegrees\": [{0}, {1}, {2}]", wp.lng, wp.lat, wp.alt);
+            sw.WriteLine("    \"cartographicDegrees\": [{0}, {1}, {2}]", wp.lng.ToString(CultureInfo.InvariantCulture), wp.lat.ToString(CultureInfo.InvariantCulture), wp.alt.ToString(CultureInfo.InvariantCulture));
             sw.WriteLine("  }");
             sw.Write("  }");
             if (!last) sw.WriteLine(",");
@@ -9165,8 +9164,8 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             sw.WriteLine("    \"polyline\": {");
             sw.WriteLine("      \"positions\": {");
             sw.WriteLine("        \"cartographicDegrees\": [");
-            sw.WriteLine("          {0}, {1}, {2},", wp.lng, wp.lat, wp.alt);
-            sw.WriteLine("          {0}, {1}, {2}", wp.lng, wp.lat, wp.gnd_alt);
+            sw.WriteLine("          {0}, {1}, {2},", wp.lng.ToString(CultureInfo.InvariantCulture), wp.lat.ToString(CultureInfo.InvariantCulture), wp.alt.ToString(CultureInfo.InvariantCulture));
+            sw.WriteLine("          {0}, {1}, {2}", wp.lng.ToString(CultureInfo.InvariantCulture), wp.lat.ToString(CultureInfo.InvariantCulture), wp.gnd_alt.ToString(CultureInfo.InvariantCulture));
             sw.WriteLine("        ]");
             sw.WriteLine("      },");
             sw.WriteLine("      \"width\": 2,");
