@@ -665,7 +665,7 @@ namespace MissionPlanner.SprayGrid
                 double d = home.GetDistance(wppoly.Points.First());
                 double d2 = home.GetDistance(wppoly.Points.Last());
 
-                distance = distance + d/1000.0 + d2/10000.0;
+                distance = distance + d/1000.0 + d2/1000.0;
 
 
             }
