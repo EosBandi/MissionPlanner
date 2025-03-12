@@ -650,9 +650,28 @@ namespace MissionPlanner.SprayGrid
 
             //fullArea = fullArea - obstacleArea;
 
+            // Add from gome to first wp and from last wp to home as a distance
+            // Get home location from FlightPlanner
+
             double distance = wppoly.Distance;
+            double homelat = 0;
+            double homelon = 0;
+            Double.TryParse(MainV2.instance.FlightPlanner.TXT_homelat.Text, out homelat);
+            Double.TryParse(MainV2.instance.FlightPlanner.TXT_homelng.Text, out homelon);
+
+            if (homelat != 0 && homelon != 0)
+            {
+                PointLatLngAlt home = new PointLatLngAlt(homelat, homelon, 0);
+                double d = home.GetDistance(wppoly.Points.First());
+                double d2 = home.GetDistance(wppoly.Points.Last());
+
+                distance = distance + d/1000.0 + d2/10000.0;
+
+
+            }
+
             lbl_SprayTime.Text = secondsToNice(workingDistance * 1000 / (double)NUM_UpDownFlySpeed.Value);
-            lbl_SprayDistance.Text = distance.ToString("0.##") + " km";
+            lbl_SprayDistance.Text = workingDistance.ToString("0.##") + " km";
             lbl_area.Text = fullArea.ToString("#") + " m^2";
             lbl_distance.Text = distance.ToString("0.##") + " km";
             lbl_strips.Text = ((int)(strips / 2)).ToString();
