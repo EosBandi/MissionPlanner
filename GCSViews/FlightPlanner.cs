@@ -1589,6 +1589,80 @@ namespace MissionPlanner.GCSViews
                         fenceoverlay.overlay.ForceUpdate();
                     }
 
+
+                    // Ok we have the home point in home and the command list in the commandlist
+                    // home is a pointlatlngalt and commandlist is a list of locationWP
+
+                    if (commandlist.Count > 0)
+                    {
+
+                        double distance = 0;
+                        double spraydistance = 0;
+
+                        double flightspeed = 8; // this is the default speed Todo: if connected get it from the vehicle !
+
+                        if (MainV2.comPort.MAV.cs.connected)
+                        {
+                            try
+                            {
+                                flightspeed = MainV2.comPort.MAV.param["WPNAV_SPEED"].Value / 100;
+                            }
+                            catch { }
+                        }
+
+                        // Find do_change_speed and get the speed from there
+                        foreach (var command in commandlist)
+                        {
+                            if (command.id == (ushort)MAVLink.MAV_CMD.DO_CHANGE_SPEED && command.p1 == 1)
+                            {
+                                flightspeed = command.p2;
+                            }
+                        }
+
+                        Console.WriteLine("Speed: " + flightspeed);
+
+                        //remove all not WAYPOINT commands
+                        commandlist.RemoveAll(a => a.id != (ushort)MAVLink.MAV_CMD.WAYPOINT);
+
+                        bool spraying = false;
+                        bool first = true;
+                        PointLatLngAlt lastwp = new PointLatLngAlt();
+
+                        foreach (var command in commandlist)
+                        {
+                            if (first)
+                            {
+                                lastwp = new PointLatLngAlt(command.lat, command.lng);
+                                first = false;
+                            }
+                            else
+                            {
+                                distance += lastwp.GetDistance(new PointLatLngAlt(command.lat, command.lng));
+                                if (spraying)
+                                {
+                                    spraydistance += lastwp.GetDistance(new PointLatLngAlt(command.lat, command.lng));
+                                }
+                                lastwp = new PointLatLngAlt(command.lat, command.lng);
+                            }
+
+                            // Check for spraying
+                            if (command.p4 == 1) spraying = true;
+                            if (command.p4 == 2) spraying = false;
+
+                        }
+                        //add from and to home
+                        PointLatLngAlt firstWP = new PointLatLngAlt(commandlist.First().lat, commandlist.First().lng);
+                        PointLatLngAlt lastWP = new PointLatLngAlt(commandlist.Last().lat, commandlist.Last().lng);
+                        distance += home.GetDistance(firstWP);
+                        distance += home.GetDistance(lastWP);
+
+                        lTotalDistance.Text = String.Format("{0:0.000} km", distance / 1000);
+                        lSprayDistance.Text = String.Format("{0:0.000} km", spraydistance / 1000);
+                        lTotalFlightTime.Text = secondsToNice(distance / flightspeed);
+                        lSprayTime.Text = secondsToNice(spraydistance / flightspeed);
+
+                    }
+
                     MainMap.Refresh();
                 }
 
@@ -1682,6 +1756,30 @@ namespace MissionPlanner.GCSViews
             catch (FormatException ex)
             {
                 CustomMessageBox.Show(Strings.InvalidNumberEntered + "\n" + ex.Message, Strings.ERROR);
+            }
+        }
+
+
+        string secondsToNice(double seconds)
+        {
+            if (seconds < 0)
+                return "NaN";
+
+            double secs = seconds % 60;
+            int mins = (int)(seconds / 60) % 60;
+            int hours = (int)(seconds / 3600);// % 24;
+
+            if (hours > 0)
+            {
+                return hours + ":" + mins.ToString("00") + ":" + secs.ToString("00") + " H";
+            }
+            else if (mins > 0)
+            {
+                return mins + ":" + secs.ToString("00") + " Min";
+            }
+            else
+            {
+                return secs.ToString("0.00") + " Sec";
             }
         }
 

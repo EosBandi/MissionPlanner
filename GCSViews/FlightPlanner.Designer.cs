@@ -119,6 +119,7 @@ namespace MissionPlanner.GCSViews
             this.comboBoxMapType = new System.Windows.Forms.ComboBox();
             this.lnk_kml = new System.Windows.Forms.LinkLabel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.btnThreeDee = new MissionPlanner.Controls.MyButton();
             this.lbl_wpfile = new System.Windows.Forms.Label();
             this.BUT_loadwpfile = new MissionPlanner.Controls.MyButton();
             this.BUT_saveWPFile = new MissionPlanner.Controls.MyButton();
@@ -226,7 +227,14 @@ namespace MissionPlanner.GCSViews
             this.zoomToVehicleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToMissionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToHomeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnThreeDee = new MissionPlanner.Controls.MyButton();
+            this.label7 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.lTotalDistance = new System.Windows.Forms.Label();
+            this.lTotalFlightTime = new System.Windows.Forms.Label();
+            this.lSprayDistance = new System.Windows.Forms.Label();
+            this.lSprayTime = new System.Windows.Forms.Label();
             this.panel5.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelWaypoints.SuspendLayout();
@@ -418,6 +426,14 @@ namespace MissionPlanner.GCSViews
             // 
             // panelWaypoints
             // 
+            this.panelWaypoints.Controls.Add(this.lSprayTime);
+            this.panelWaypoints.Controls.Add(this.lSprayDistance);
+            this.panelWaypoints.Controls.Add(this.lTotalFlightTime);
+            this.panelWaypoints.Controls.Add(this.lTotalDistance);
+            this.panelWaypoints.Controls.Add(this.label9);
+            this.panelWaypoints.Controls.Add(this.label10);
+            this.panelWaypoints.Controls.Add(this.label8);
+            this.panelWaypoints.Controls.Add(this.label7);
             this.panelWaypoints.Controls.Add(this.myButton2);
             this.panelWaypoints.Controls.Add(this.myButton1);
             this.panelWaypoints.Controls.Add(this.chk_usemavftp);
@@ -773,6 +789,14 @@ namespace MissionPlanner.GCSViews
             this.panel2.Controls.Add(this.BUT_saveWPFile);
             resources.ApplyResources(this.panel2, "panel2");
             this.panel2.Name = "panel2";
+            // 
+            // btnThreeDee
+            // 
+            resources.ApplyResources(this.btnThreeDee, "btnThreeDee");
+            this.btnThreeDee.Name = "btnThreeDee";
+            this.btnThreeDee.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.btnThreeDee.UseVisualStyleBackColor = true;
+            this.btnThreeDee.Click += new System.EventHandler(this.btnThreeDee_Click);
             // 
             // lbl_wpfile
             // 
@@ -1542,13 +1566,45 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.zoomToHomeToolStripMenuItem, "zoomToHomeToolStripMenuItem");
             this.zoomToHomeToolStripMenuItem.Click += new System.EventHandler(this.zoomToHomeToolStripMenuItem_Click);
             // 
-            // btnThreeDee
+            // label7
             // 
-            resources.ApplyResources(this.btnThreeDee, "btnThreeDee");
-            this.btnThreeDee.Name = "btnThreeDee";
-            this.btnThreeDee.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
-            this.btnThreeDee.UseVisualStyleBackColor = true;
-            this.btnThreeDee.Click += new System.EventHandler(this.btnThreeDee_Click);
+            resources.ApplyResources(this.label7, "label7");
+            this.label7.Name = "label7";
+            // 
+            // label8
+            // 
+            resources.ApplyResources(this.label8, "label8");
+            this.label8.Name = "label8";
+            // 
+            // label9
+            // 
+            resources.ApplyResources(this.label9, "label9");
+            this.label9.Name = "label9";
+            // 
+            // label10
+            // 
+            resources.ApplyResources(this.label10, "label10");
+            this.label10.Name = "label10";
+            // 
+            // lTotalDistance
+            // 
+            resources.ApplyResources(this.lTotalDistance, "lTotalDistance");
+            this.lTotalDistance.Name = "lTotalDistance";
+            // 
+            // lTotalFlightTime
+            // 
+            resources.ApplyResources(this.lTotalFlightTime, "lTotalFlightTime");
+            this.lTotalFlightTime.Name = "lTotalFlightTime";
+            // 
+            // lSprayDistance
+            // 
+            resources.ApplyResources(this.lSprayDistance, "lSprayDistance");
+            this.lSprayDistance.Name = "lSprayDistance";
+            // 
+            // lSprayTime
+            // 
+            resources.ApplyResources(this.lSprayTime, "lSprayTime");
+            this.lSprayTime.Name = "lSprayTime";
             // 
             // FlightPlanner
             // 
@@ -1759,5 +1815,13 @@ namespace MissionPlanner.GCSViews
         public MyButton myButton1;
         public MyButton myButton2;
         public MyButton btnThreeDee;
+        private Label label9;
+        private Label label10;
+        private Label label8;
+        private Label label7;
+        private Label lSprayTime;
+        private Label lSprayDistance;
+        private Label lTotalFlightTime;
+        private Label lTotalDistance;
     }
 }
