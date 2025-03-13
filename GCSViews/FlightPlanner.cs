@@ -1632,17 +1632,19 @@ namespace MissionPlanner.GCSViews
                         {
                             if (first)
                             {
-                                lastwp = new PointLatLngAlt(command.lat, command.lng);
+                                lastwp = new PointLatLngAlt(command.lat, command.lng, command.alt);
                                 first = false;
                             }
                             else
                             {
-                                distance += lastwp.GetDistance(new PointLatLngAlt(command.lat, command.lng));
+                                double d = lastwp.GetDistance(new PointLatLngAlt(command.lat, command.lng));
+                                double h = command.alt - lastwp.Alt;
+                                distance += (Math.Sqrt(Math.Pow(d, 2) + Math.Pow(h, 2)));
                                 if (spraying)
                                 {
-                                    spraydistance += lastwp.GetDistance(new PointLatLngAlt(command.lat, command.lng));
+                                    spraydistance += (Math.Sqrt(Math.Pow(d, 2) + Math.Pow(h, 2)));
                                 }
-                                lastwp = new PointLatLngAlt(command.lat, command.lng);
+                                lastwp = new PointLatLngAlt(command.lat, command.lng, command.alt);
                             }
 
                             // Check for spraying
