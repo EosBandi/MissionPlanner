@@ -352,7 +352,7 @@
     <None Include="MissionPlanner.GCSViews.ConfigurationView.ConfigGPSOrder+GPSCAN.datasource" />
     <None Include="MissionPlanner.GCSViews.ConfigurationView.ConfigHWCompass2+CompassDeviceInfo.datasource" />
     <None Include="NoFly\eunfz.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="plugins\example10-canlogfile.cs">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -969,13 +969,7 @@
     <None Update="m3u\networklink.kml">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Include="NoFly\Areas-Lisboa.kmz">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
     <None Include="NoFly\Drone No Fly Zones.kmz">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="NoFly\Regulamento-RPA-ver-5.0.kmz">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Include="NoFly\SouthAfricaNoRPASOutlined.kmz">
