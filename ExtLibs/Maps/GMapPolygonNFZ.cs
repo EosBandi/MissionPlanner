@@ -127,7 +127,7 @@ namespace MissionPlanner.Maps
 
 
                 double lat2 = polygon[(i + 1) % polygon.Count].Lat;
-                double lon2 = polygon[(i + 1) % polygon.Count].Lng; 
+                double lon2 = polygon[(i + 1) % polygon.Count].Lng;
                 // Get the next point, or the first point if we're at the end
 
 
@@ -181,7 +181,6 @@ namespace MissionPlanner.Maps
             if (startDateTime == DateTime.MinValue || endDateTime == DateTime.MinValue)
                 return true;
 
-            //get the 
             if (time < startDateTime || time > endDateTime)
                 return false;
 
@@ -205,10 +204,7 @@ namespace MissionPlanner.Maps
             return false;
         }
 
-
-
-
-        //All date and tim is in UTC (converted when read in from file)
+        //All date and time is in UTC (converted when read in from file)
         public DateTime startDateTime { get; set; }
         public DateTime endDateTime { get; set; }
         public List<nfzSchedule> Schedules { get; set;}

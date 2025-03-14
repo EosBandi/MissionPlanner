@@ -596,11 +596,15 @@ namespace MissionPlanner
 
         public void updateLayout(object sender, EventArgs e)
         {
+
+           // DisplayConfiguration = MainV2.DisplayConfiguration.Advanced();
+
             MenuSimulation.Visible = DisplayConfiguration.displaySimulation;
             MenuHelp.Visible = DisplayConfiguration.displayHelp;
-            MenuInitConfig.Visible = false;
-            MenuConfigTune.Visible = false;
-            
+            //MenuInitConfig.Visible = true;
+            //MenuConfigTune.Visible = true;
+
+
             MissionPlanner.Controls.BackstageView.BackstageView.Advanced = DisplayConfiguration.isAdvancedMode;
 
             // force autohide on
@@ -900,21 +904,17 @@ namespace MissionPlanner
                 Settings.Instance.Remove("advancedview");
             } //// load this before the other screens get loaded
 
-            if (Settings.Instance["displayview"] != null)
-            {
-                try
-                {
-                    DisplayConfiguration = Settings.Instance.GetDisplayView("displayview");
-                    //Force new view in case of saved view in config.xml
-                    DisplayConfiguration.displayAdvancedParams = false;
-                    DisplayConfiguration.displayStandardParams = false;
-                    DisplayConfiguration.displayFullParamList = true;
-                }
-                catch
-                {
-                    DisplayConfiguration = DisplayConfiguration.Advanced();
-                }
-            }
+            //if (Settings.Instance["displayview"] != null)
+            //{
+            //    try
+            //    {
+            //        DisplayConfiguration = Settings.Instance.GetDisplayView("displayview");
+            //    }
+            //    catch
+            //    {
+            //        DisplayConfiguration = DisplayConfiguration.Advanced();
+            //    }
+            //}
 
             LayoutChanged += updateLayout;
             LayoutChanged(null, EventArgs.Empty);

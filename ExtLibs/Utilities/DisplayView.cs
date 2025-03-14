@@ -99,7 +99,6 @@ namespace MissionPlanner.Utilities
         public Boolean displayParachute { get; set; }
         public Boolean displayEsp { get; set; }
         public Boolean displayAntennaTracker { get; set; }
-        public Boolean displaySerialPorts { get; set; }
 
 
         //config tuning
@@ -117,6 +116,10 @@ namespace MissionPlanner.Utilities
         public Boolean standardFlightModesOnly { get; set; }
         public Boolean autoHideMenuForce { get; set; }
         public Boolean displayInitialParams { get; set; }
+
+        public Boolean displayPlanner {  get; set; }
+
+
         public bool isAdvancedMode { get; set; }
         public Boolean displayREPL { get; set; }
         public bool displayServoOutput { get; set; } = true;
@@ -215,9 +218,11 @@ namespace MissionPlanner.Utilities
             displayBaudCMB = true;
             standardFlightModesOnly = false;
             displaySerialPortCMB = true;
+            displayPlanner = true;
             autoHideMenuForce = false;
             displayOSD = true;
             isAdvancedMode = false;
+            
         }
     }
     public static class DisplayViewExtensions
@@ -351,6 +356,90 @@ namespace MissionPlanner.Utilities
                 isAdvancedMode = false
             };
         }
+        //public static DisplayView Advanced(this DisplayView v)
+        //{
+        //    return new DisplayView()
+        //    {
+        //        displayName = DisplayNames.Advanced,
+        //        //MainV2 buttons
+        //        displaySimulation = true,
+        //        displayTerminal = true,
+        //        displayDonate = true,
+        //        displayHelp = true,
+
+        //        //flight Data view
+        //        displayAnenometer = true,
+        //        displayQuickTab = true,
+        //        displayPreFlightTab = true,
+        //        displayAdvActionsTab = true,
+        //        displaySimpleActionsTab = false,
+        //        displayGaugesTab = true,
+        //        displayStatusTab = true,
+        //        displayServoTab = true,
+        //        displayScriptsTab = true,
+        //        displayTelemetryTab = true,
+        //        displayDataflashTab = true,
+        //        displayMessagesTab = true,
+
+        //        //flight plan
+        //        displayRallyPointsMenu = true,
+        //        displayGeoFenceMenu = true,
+        //        displaySplineCircleAutoWp = true,
+        //        displayTextAutoWp = true,
+        //        displayCircleSurveyAutoWp = true,
+        //        displayPoiMenu = true,
+        //        displayTrackerHomeMenu = true,
+        //        displayCheckHeightBox = true,
+        //        displayPluginAutoWp = true,
+
+        //        //initial setup
+        //        displayInstallFirmware = true,
+        //        displayWizard = true,
+        //        displayFrameType = true,
+        //        displayAccelCalibration = true,
+        //        displayCompassConfiguration = true,
+        //        displayRadioCalibration = true,
+        //        displayServoOutput = true,
+        //        displayEscCalibration = true,
+        //        displayFlightModes = true,
+        //        displayFailSafe = true,
+        //        displaySikRadio = true,
+        //        displayBattMonitor = true,
+        //        displayCAN = true,
+        //        displayCompassMotorCalib = true,
+        //        displayRangeFinder = true,
+        //        displayAirSpeed = true,
+        //        displayPx4Flow = true,
+        //        displayOpticalFlow = true,
+        //        displayOsd = true,
+        //        displayCameraGimbal = true,
+        //        displayMotorTest = true,
+        //        displayBluetooth = true,
+        //        displayParachute = true,
+        //        displayEsp = true,
+        //        displayAntennaTracker = true,
+        //        displayRTKInject = true,
+        //        displayJoystick = true,
+
+
+        //        //config tuning
+        //        displayBasicTuning = true,
+        //        displayExtendedTuning = true,
+        //        displayStandardParams = true,
+        //        displayAdvancedParams = true,
+        //        displayFullParamList = true,
+        //        displayFullParamTree = true,
+        //        displayParamCommitButton = false,
+        //        displayBaudCMB = true,
+        //        displaySerialPortCMB = true,
+        //        standardFlightModesOnly =  false,
+        //        displayOSD = true,
+        //        autoHideMenuForce = false,
+        //        isAdvancedMode = true
+        //    };
+        //}
+
+
         public static DisplayView Advanced(this DisplayView v)
         {
             return new DisplayView()
@@ -365,12 +454,12 @@ namespace MissionPlanner.Utilities
                 displayAnenometer = true,
                 displayQuickTab = true,
                 displayPreFlightTab = true,
-                displayAdvActionsTab = true,
-                displaySimpleActionsTab = false,
+                displayAdvActionsTab = false,
+                displaySimpleActionsTab = true,
                 displayGaugesTab = true,
-                displayStatusTab = true,
-                displayServoTab = true,
-                displayScriptsTab = true,
+                displayStatusTab = false,
+                displayServoTab = false,
+                displayScriptsTab = false,
                 displayTelemetryTab = true,
                 displayDataflashTab = true,
                 displayMessagesTab = true,
@@ -382,8 +471,8 @@ namespace MissionPlanner.Utilities
                 displayRallyPointsMenu = true,
                 displayGeoFenceMenu = true,
                 displaySplineCircleAutoWp = true,
-                displayTextAutoWp = true,
                 displayCircleSurveyAutoWp = true,
+                displayTextAutoWp = true,
                 displayPoiMenu = true,
                 displayTrackerHomeMenu = true,
                 displayCheckHeightBox = true,
@@ -435,7 +524,7 @@ namespace MissionPlanner.Utilities
                 standardFlightModesOnly = false,
                 displayOSD = true,
                 autoHideMenuForce = false,
-                isAdvancedMode = true
+                isAdvancedMode = false
             };
         }
 
