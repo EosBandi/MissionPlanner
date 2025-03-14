@@ -48,7 +48,7 @@ namespace MissionPlanner
 
         public static menuicons displayicons; //do not initialize to allow update of custom icons
         public static string running_directory = Settings.GetRunningDirectory();
-        
+
         public abstract class menuicons
         {
             public abstract Image fd { get; }
@@ -204,7 +204,7 @@ namespace MissionPlanner
         public class highcontrastmenuicons : menuicons
         {
             private string running_directory = Settings.GetRunningDirectory();
-            
+
             public override Image fd
             {
                 get
@@ -562,11 +562,15 @@ namespace MissionPlanner
 
         public void updateLayout(object sender, EventArgs e)
         {
+
+           // DisplayConfiguration = MainV2.DisplayConfiguration.Advanced();
+
             MenuSimulation.Visible = DisplayConfiguration.displaySimulation;
             MenuHelp.Visible = DisplayConfiguration.displayHelp;
-            MenuInitConfig.Visible = false;
-            MenuConfigTune.Visible = false;
-            
+            //MenuInitConfig.Visible = true;
+            //MenuConfigTune.Visible = true;
+
+
             MissionPlanner.Controls.BackstageView.BackstageView.Advanced = DisplayConfiguration.isAdvancedMode;
 
             // force autohide on
@@ -972,17 +976,17 @@ namespace MissionPlanner
                 Settings.Instance.Remove("advancedview");
             } //// load this before the other screens get loaded
 
-            if (Settings.Instance["displayview"] != null)
-            {
-                try
-                {
-                    DisplayConfiguration = Settings.Instance.GetDisplayView("displayview");
-                }
-                catch
-                {
-                    DisplayConfiguration = DisplayConfiguration.Advanced();
-                }
-            }
+            //if (Settings.Instance["displayview"] != null)
+            //{
+            //    try
+            //    {
+            //        DisplayConfiguration = Settings.Instance.GetDisplayView("displayview");
+            //    }
+            //    catch
+            //    {
+            //        DisplayConfiguration = DisplayConfiguration.Advanced();
+            //    }
+            //}
 
             LayoutChanged += updateLayout;
             LayoutChanged(null, EventArgs.Empty);
@@ -4745,10 +4749,10 @@ namespace MissionPlanner
                         Comports.Add(mav);
                     });
                 }
-                
+
                 */
 
-                Parallel.ForEach(mavs, mav => 
+                Parallel.ForEach(mavs, mav =>
                 {
                     Console.WriteLine("Process connect " + mav);
                     doConnect(mav, "preset", "0", false, false);

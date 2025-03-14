@@ -71,7 +71,7 @@ namespace wix
 
             string path = args[0];
             basedir = path;
-            //Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar+ 
+            //Path.GetDirectoryName(Application.ExecutablePath) + Path.DirectorySeparatorChar+
             string file = "installer.wxs";
 
             string outputfilename = "MissionPlanner";
@@ -90,9 +90,9 @@ namespace wix
 
             sw.WriteLine("    <Directory Id=\"INSTALLDIR\" Name=\"Mission Planner\">");
 
-            sw.WriteLine(@"        <Component Id=""InstallDirPermissions"" Guid=""{525389D7-EB3C-4d77-A5F6-A285CF99437D}"" KeyPath=""yes""> 
-            <CreateFolder> 
-                <Permission User=""Everyone"" GenericAll=""yes"" /> 
+            sw.WriteLine(@"        <Component Id=""InstallDirPermissions"" Guid=""{525389D7-EB3C-4d77-A5F6-A285CF99437D}"" KeyPath=""yes"">
+            <CreateFolder>
+                <Permission User=""Everyone"" GenericAll=""yes"" />
             </CreateFolder>
         </Component>");
 
@@ -103,7 +103,7 @@ namespace wix
 
             sw.Close();
 
-    
+
 
             string fn = outputfilename + "-" + fvi.ProductVersion;
 
@@ -119,24 +119,7 @@ namespace wix
 
             st.WriteLine(@"""C:\Program Files\7-Zip\7z.exe"" a -tzip -xr!beta.bat -xr!cameras.xml -xr!firmware.hex -xr!*.zip -xr!stats.xml -xr!*.bin -xr!*.xyz -xr!*.sqlite -xr!*.dxf -xr!*.zip -xr!*.h -xr!*.param -xr!ParameterMetaData.xml -xr!translation -xr!mavelous_web -xr!stats.xml -xr!driver -xr!*.etag -xr!srtm -xr!*.rlog -xr!*.zip -xr!*.tlog -xr!config.xml -xr!gmapcache -xr!eeprom.bin -xr!dataflash.bin -xr!*.new -xr!*.log -xr!ArdupilotPlanner.log* -xr!cameras.xml -xr!firmware.hex -xr!*.zip -xr!stats.xml -xr!ParameterMetaData.xml -xr!*.etag -xr!*.rlog -xr!*.tlog -xr!config.xml -xr!gmapcache -xr!eeprom.bin -xr!dataflash.bin -xr!*.new " + fn + @".zip " + path + "*");
 
-            st.WriteLine("About to upload!!!!!!!!!");
-            st.WriteLine("pause");
-
-            st.WriteLine(@"c:\cygwin\bin\chmod.exe 777 " + fn + ".zip");
-            st.WriteLine(@"c:\cygwin\bin\chmod.exe 777 " + fn + ".msi");
-
-            st.WriteLine(@"c:\cygwin\bin\ln.exe -f -s " + fn + ".zip " + outputfilename + "-latest.zip");
-            st.WriteLine(@"c:\cygwin\bin\ln.exe -f -s " + fn + ".msi " + outputfilename + "-latest.msi");
-
-            st.WriteLine(@"c:\cygwin\bin\rsync.exe -Pv -e '/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /cygdrive/c/Users/michael/sitl' " + fn + ".zip michael@mega2.ardupilot.org:MissionPlanner/");
-            st.WriteLine(@"c:\cygwin\bin\rsync.exe -Pv -e '/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /cygdrive/c/Users/michael/sitl' " + fn + ".msi michael@mega2.ardupilot.org:MissionPlanner/");
-
-            st.WriteLine(@"c:\cygwin\bin\rsync.exe -Pv -e '/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /cygdrive/c/Users/michael/sitl'   -l MissionPlanner-latest.zip michael@mega2.ardupilot.org:MissionPlanner/");
-            st.WriteLine(@"c:\cygwin\bin\rsync.exe -Pv -e '/usr/bin/ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -i /cygdrive/c/Users/michael/sitl'   -l MissionPlanner-latest.msi michael@mega2.ardupilot.org:MissionPlanner/");
-
             st.Close();
-
-            //runProgram("create.bat");
 
 
         }
@@ -200,53 +183,53 @@ namespace wix
     </Directory>
 
     <Binary Id=""signedcer""  SourceFile=""..\Drivers\signed.cer"" />
-  
-    <CustomAction  Id='Drivercleanup' Execute='deferred' 
+
+    <CustomAction  Id='Drivercleanup' Execute='deferred'
     Directory='Drivers'  ExeCommand='[Drivers]DriverCleanup.exe' Return='ignore' Impersonate='no'/>
 
-    <CustomAction  Id='Install_signed_Driver86' Execute='deferred' 
+    <CustomAction  Id='Install_signed_Driver86' Execute='deferred'
     Directory='Drivers'  ExeCommand='[Drivers]DPInstx86.exe' Return='ignore' Impersonate='no'/>
-    <CustomAction  Id='Install_signed_Driver64' Execute='deferred' 
+    <CustomAction  Id='Install_signed_Driver64' Execute='deferred'
     Directory='Drivers'  ExeCommand='[Drivers]DPInstx64.exe' Return='ignore' Impersonate='no'/>
 
-    <InstallExecuteSequence>  
-    <Custom Action=""Install_signed_Driver86""  After=""CreateShortcuts"">NOT 
+    <InstallExecuteSequence>
+    <Custom Action=""Install_signed_Driver86""  After=""CreateShortcuts"">NOT
     Installed AND NOT VersionNT64</Custom>
-    <Custom Action=""Install_signed_Driver64""  After=""CreateShortcuts"">NOT 
+    <Custom Action=""Install_signed_Driver64""  After=""CreateShortcuts"">NOT
     Installed AND VersionNT64</Custom>
     <Custom Action=""Drivercleanup""  After=""CreateShortcuts"">NOT Installed</Custom>
     </InstallExecuteSequence>
 
     <InstallExecuteSequence>
     <Custom Action='comReg' After='CreateShortcuts'>NOT REMOVE</Custom>
-    <Custom Action='comUnreg' Before='RemoveFiles'>Installed</Custom> 
+    <Custom Action='comUnreg' Before='RemoveFiles'>Installed</Custom>
     <Custom Action='comReg64' After='CreateShortcuts'>NOT REMOVE AND VersionNT64</Custom>
-    <Custom Action='comUnreg64' Before='RemoveFiles'>Installed AND VersionNT64</Custom> 
+    <Custom Action='comUnreg64' Before='RemoveFiles'>Installed AND VersionNT64</Custom>
     </InstallExecuteSequence>
- 
+
     <CustomAction
-    Id='comReg' Impersonate='no' Execute='deferred' 
+    Id='comReg' Impersonate='no' Execute='deferred'
     Directory='INSTALLDIR'
     ExeCommand='[SystemFolder]cmd.exe /c """"[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\regasm.exe"" ""[INSTALLDIR]tlogThumbnailHandler.dll"" /codebase""'
     Return='ignore' />
- 
-    <CustomAction
-    Id='comUnreg' Impersonate='no' Execute='deferred' 
-    Directory='INSTALLDIR'
-    ExeCommand='[SystemFolder]cmd.exe /c """"[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\regasm.exe"" /u ""[INSTALLDIR]tlogThumbnailHandler.dll""""'
-    Return='ignore' />        
 
     <CustomAction
-    Id='comReg64' Impersonate='no' Execute='deferred' 
+    Id='comUnreg' Impersonate='no' Execute='deferred'
+    Directory='INSTALLDIR'
+    ExeCommand='[SystemFolder]cmd.exe /c """"[WindowsFolder]Microsoft.NET\Framework\v4.0.30319\regasm.exe"" /u ""[INSTALLDIR]tlogThumbnailHandler.dll""""'
+    Return='ignore' />
+
+    <CustomAction
+    Id='comReg64' Impersonate='no' Execute='deferred'
     Directory='INSTALLDIR'
     ExeCommand='[SystemFolder]cmd.exe /c """"[WindowsFolder]Microsoft.NET\Framework64\v4.0.30319\regasm.exe"" ""[INSTALLDIR]tlogThumbnailHandler.dll"" /codebase""'
     Return='ignore' />
- 
+
     <CustomAction
-    Id='comUnreg64' Impersonate='no' Execute='deferred' 
+    Id='comUnreg64' Impersonate='no' Execute='deferred'
     Directory='INSTALLDIR'
     ExeCommand='[SystemFolder]cmd.exe /c """"[WindowsFolder]Microsoft.NET\Framework64\v4.0.30319\regasm.exe"" /u ""[INSTALLDIR]tlogThumbnailHandler.dll""""'
-    Return='ignore' />           
+    Return='ignore' />
 
     <DirectoryRef Id=""ApplicationProgramsFolder"">
         <Component Id=""ApplicationShortcut"" Guid=""*"">
@@ -275,7 +258,7 @@ namespace wix
             
         <ComponentRef Id=""ApplicationShortcut"" />
     </Feature>
-        
+
     <!-- Step 2: Add UI to your installer / Step 4: Trigger the custom action -->
     <Property Id=""WIXUI_INSTALLDIR"" Value=""INSTALLDIR"" />
 
@@ -283,21 +266,21 @@ namespace wix
 
     <UI>
         <UIRef Id=""WixUI_InstallDir"" />
-        <Publish Dialog=""ExitDialog"" 
-            Control=""Finish"" 
-            Event=""DoAction"" 
+        <Publish Dialog=""ExitDialog""
+            Control=""Finish""
+            Event=""DoAction""
             Value=""LaunchApplication"">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
     </UI>
     <Property Id=""WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT"" Value=""Launch Mission Planner"" />
 
     <!-- Step 3: Include the custom action -->
     <Property Id=""WixShellExecTarget"" Value=""[#" + mainexeid + @"]"" />
-    <CustomAction Id=""LaunchApplication"" 
-        BinaryKey=""WixCA"" 
+    <CustomAction Id=""LaunchApplication""
+        BinaryKey=""WixCA""
         DllEntry=""WixShellExec""
         Impersonate=""yes"" />
     </Product>
-    
+
 </Wix>";
 
             sw.WriteLine(data);
