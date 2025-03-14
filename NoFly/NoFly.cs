@@ -48,92 +48,6 @@ namespace MissionPlanner.NoFly
             UpdateNoFlyZoneEvent = null;
 
 
-            if (!Settings.Instance.GetBoolean("ShowNoFly", true))
-                return;
-
-            var files = Directory.GetFiles(directory, "*.kmz");
-
-            foreach (var file in files)
-            {
-                try
-                {
-                    // get a temp dir
-                    var outputDirectory = Path.GetTempPath() + Path.DirectorySeparatorChar + "mpkml" +
-                                          DateTime.Now.Ticks;
-                    using (var zip = ZipFile.Read(File.OpenRead(file)))
-                    {
-                        zip.ExtractAll(outputDirectory, ExtractExistingFileAction.OverwriteSilently);
-                    }
-
-                    var kmls = Directory.GetFiles(outputDirectory, "*.kml");
-                    foreach (var kml in kmls)
-                    {
-                        LoadNoFly(kml);
-                    }
-
-                    Directory.Delete(outputDirectory, true);
-                }
-                catch
-                {
-                }
-            }
-
-            try
-            {
-                Utilities.nfz.HK.ConfirmNoFly += () =>
-                {
-                    return CustomMessageBox.Show("Show Hong Kong No fly zones?", "NoFly Zones", CustomMessageBox.MessageBoxButtons.YesNo) == CustomMessageBox.DialogResult.Yes;
-                };
-
-                var nfzinfo = Utilities.nfz.HK.LoadNFZ().Result;
-
-                if (nfzinfo != null)
-                    UpdateNoFlyZoneEvent += (sender, args) =>
-                    {
-                        if (nfzinfo.Type == GeoJSONObjectType.FeatureCollection)
-                        {
-                            foreach (var item in nfzinfo.Features)
-                            {
-                                if (item.Type == GeoJSONObjectType.Feature)
-                                {
-                                    if (item.Geometry.Type == GeoJSONObjectType.Polygon)
-                                    {
-                                        var poly = (GeoJSON.Net.Geometry.Polygon)item.Geometry;
-                                        var coordinates =
-                                            poly.Coordinates[0].Coordinates.OfType<GeoJSON.Net.Geometry.Position>()
-                                                .Select(c => new PointLatLng(c.Latitude, c.Longitude))
-                                                .ToList();
-
-                                        var close = coordinates.Any(a => a.ToPLLA(0).GetDistance(args) < 100000);
-                                        if (!close)
-                                            continue;
-
-                                        var name = item.Properties["name"];
-                                        var desc = item.Properties["description"];
-
-                                        GMapPolygon nfzpolygon = new GMapPolygon(coordinates, "HK"+name.ToString());
-                                        nfzpolygon.Tag = item;
-
-                                        nfzpolygon.Stroke.Color = Color.Purple;
-
-                                        nfzpolygon.Fill = new SolidBrush(Color.FromArgb(30, Color.Blue));
-
-                                        MainV2.instance.BeginInvoke(new Action(() =>
-                                        {
-                                            if (kmlpolygonsoverlay.Polygons.Any(a => a.Name == "HK" + name.ToString()))
-                                                return;
-                                            kmlpolygonsoverlay.Polygons.Add(nfzpolygon);
-                                        }));
-                                    }
-                                }
-                            }
-                        }
-                    };
-            }
-            catch
-            {
-            }
-
             try
             {
                 Utilities.nfz.EU.ConfirmNoFly += () =>
@@ -204,7 +118,7 @@ namespace MissionPlanner.NoFly
                                     //Add boundary
 
                                     //List<PointLatLng> points = new List<PointLatLng>();
-                                    
+
                                     //PointLatLng p1 = new PointLatLng( nfzpolygon.ExtendedBounds.Top, nfzpolygon.ExtendedBounds.Left);
                                     //PointLatLng p2 = new PointLatLng( nfzpolygon.ExtendedBounds.Top, nfzpolygon.ExtendedBounds.Right);
                                     //PointLatLng p3 = new PointLatLng( nfzpolygon.ExtendedBounds.Bottom, nfzpolygon.ExtendedBounds.Right);
@@ -219,7 +133,7 @@ namespace MissionPlanner.NoFly
                                     //g.Fill = new SolidBrush(Color.FromArgb(10, Color.Yellow));
 
 
-                                    //if (kmlpolygonsoverlay.Control.IsMouseOverPolygon) { 
+                                    //if (kmlpolygonsoverlay.Control.IsMouseOverPolygon) {
 
                                     //}
                                     MainV2.instance.BeginInvoke(new Action(() =>
