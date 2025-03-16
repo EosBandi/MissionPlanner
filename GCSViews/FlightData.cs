@@ -4472,7 +4472,6 @@ namespace MissionPlanner.GCSViews
                     MainV2.comPort.MAV.cs.messageHigh = "Link Lost";
                     MainV2.comPort.MAV.cs.messages.Add((DateTime.Now, "GCS Link Lost"));
                     new Thread(() => { MessageBox.Show("Link Lost"); }).Start();
-                    //CustomMessageBox.Show("Link Lost", "Link Lost");
                 }
                 lastlinkqualitygcs = MainV2.comPort.MAV.cs.linkqualitygcs;
 

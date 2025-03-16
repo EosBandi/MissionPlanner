@@ -1237,7 +1237,7 @@ namespace MissionPlanner
                 _messagehigh = value;
                 messageHighSeverity = MAVLink.MAV_SEVERITY.EMERGENCY;
 
-                // logging messagehigh data 
+                // logging messagehigh data
                 alertLog.Info("gps time:" + gpstime.ToString() + " loc:" + lat.ToString() + "," + lng.ToString() + " User Warning:" + value);
             }
         }
@@ -2088,7 +2088,7 @@ namespace MissionPlanner
         [GroupText("PID")] public float pidSRateAccZ { get; set; }
 
         [GroupText("PID")] public float pidSRateSteer { get; set; }
-        
+
         [GroupText("PID")] public float pidSRateLanding { get; set; }
 
         [GroupText("Vibe")] public uint vibeclip0 { get; set; }
@@ -4075,7 +4075,7 @@ namespace MissionPlanner
                     case (uint)MAVLink.MAVLINK_MSG_ID.AHRS:
                         {
                             var ahrs = mavLinkMessage.ToStructure<MAVLink.mavlink_ahrs_t>();
-                            
+
                         }
                         break;
                     case (uint)MAVLink.MAVLINK_MSG_ID.AHRS2:
@@ -4402,7 +4402,7 @@ namespace MissionPlanner
                     //check if valid mavinterface
                     if (parent != null && parent.packetsnotlost != 0)
                     {
-                        if ((DateTime.Now - MAV.lastvalidpacket).TotalSeconds > 3)
+                        if ((DateTime.UtcNow - MAV.lastvalidpacket).TotalSeconds > 3)
                             linkqualitygcs = 0;
                         else
                             linkqualitygcs =
