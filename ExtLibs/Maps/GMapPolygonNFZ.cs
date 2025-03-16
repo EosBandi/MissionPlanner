@@ -131,8 +131,7 @@ namespace MissionPlanner.Maps
                 // Get the next point, or the first point if we're at the end
 
 
-
-                double distance = DistanceFromPointToLineSegment((p.Lat, p.Lng), (lat1, lon1), (lat2, lon2));
+                double distance = DistancePointToLine(lat1, lon1, lat2, lon2, p.Lat, p.Lng);
 
                 if (distance < minDistance)
                 {
@@ -144,15 +143,47 @@ namespace MissionPlanner.Maps
         }
 
 
+        const double EarthRadiusKm = 6371.0; // Approximate Earth radius in km
 
-        public double DistanceFromPointToLineSegment((double lat, double lon) point, (double lat, double lon) point1, (double lat, double lon) point2)
+        // Converts latitude/longitude differences to Cartesian distances (X, Y)
+        static (double x, double y) LatLonToXY(double lat1, double lon1, double lat2, double lon2)
         {
-            double distance1 = HaversineDistance(point, point1);
-            double distance2 = HaversineDistance(point, point2);
-
-            return Math.Min(distance1, distance2) * 1000; //convert to meters
+            double latMid = (lat1 + lat2) / 2.0; // Midpoint latitude
+            double dLat = (lat2 - lat1) * Math.PI / 180.0 * EarthRadiusKm;
+            double dLon = (lon2 - lon1) * Math.PI / 180.0 * EarthRadiusKm * Math.Cos(latMid * Math.PI / 180.0);
+            return (dLon, dLat);
         }
 
+        // Computes the shortest distance from a point P(latP, lonP) to the line segment AB
+        public static double DistancePointToLine(double latA, double lonA, double latB, double lonB, double latP, double lonP)
+        {
+            // Convert latitude/longitude to Cartesian coordinates
+            var (xA, yA) = LatLonToXY(latA, lonA, latA, lonA);
+            var (xB, yB) = LatLonToXY(latA, lonA, latB, lonB);
+            var (xP, yP) = LatLonToXY(latA, lonA, latP, lonP);
+
+            // Compute vector components
+            double ABx = xB - xA, ABy = yB - yA; // Vector AB
+            double APx = xP - xA, APy = yP - yA; // Vector AP
+            double AB2 = ABx * ABx + ABy * ABy; // Squared length of AB
+
+            // Compute projection scalar t = (AP • AB) / |AB|^2
+            double t = (APx * ABx + APy * ABy) / AB2;
+
+            if (t < 0) // Closest to point A
+                return Math.Sqrt(APx * APx + APy * APy) * 1000;
+
+            if (t > 1) // Closest to point B
+            {
+                double BPx = xP - xB, BPy = yP - yB;
+                return Math.Sqrt(BPx * BPx + BPy * BPy) * 1000;
+            }
+
+            // Projection falls on the segment → Compute perpendicular distance
+            double Px = xA + t * ABx, Py = yA + t * ABy; // Projected point
+            double dx = xP - Px, dy = yP - Py;
+            return Math.Sqrt(dx * dx + dy * dy) * 1000; // Convert to meters
+        }
         public double HaversineDistance((double lat, double lon) point1, (double lat, double lon) point2)
         {
             double R = 6371; // Radius of the Earth in kilometers
