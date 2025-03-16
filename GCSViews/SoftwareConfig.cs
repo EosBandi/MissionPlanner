@@ -211,11 +211,11 @@ namespace MissionPlanner.GCSViews
                     }
                 }
 
-                if (MainV2.DisplayConfiguration.displayFullParamList)
-                {
-                    if(!MainV2.comPort.BaseStream.IsOpen || gotAllParams)
-                        AddBackstageViewPage(typeof(ConfigRawParams), Strings.FullParameterList, null, false);
-                }
+                //if (MainV2.DisplayConfiguration.displayFullParamList)
+                //{
+                //    if(!MainV2.comPort.BaseStream.IsOpen || gotAllParams)
+                //        AddBackstageViewPage(typeof(ConfigRawParams), Strings.FullParameterList, null, false);
+                //}
                 if (MainV2.comPort.BaseStream.IsOpen)
                 {
                     //if (MainV2.comPort.MAV.cs.firmware == Firmwares.Ateryx)
@@ -240,10 +240,10 @@ namespace MissionPlanner.GCSViews
                 }
                 else
                 {
-                    if (MainV2.DisplayConfiguration.displayPlanner)
-                    {
-                        start = AddBackstageViewPage(typeof(ConfigPlanner), Strings.Planner);
-                    }
+                    //if (MainV2.DisplayConfiguration.displayPlanner)
+                    //{
+                    //    start = AddBackstageViewPage(typeof(ConfigPlanner), Strings.Planner);
+                    //}
                 }
 
                 // Add custrom pages set up by plugins
