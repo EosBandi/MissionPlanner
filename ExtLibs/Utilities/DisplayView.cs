@@ -99,8 +99,8 @@ namespace MissionPlanner.Utilities
         public Boolean displayParachute { get; set; }
         public Boolean displayEsp { get; set; }
         public Boolean displayAntennaTracker { get; set; }
-
-
+        public Boolean displaySecure { get; set; }
+        public Boolean displaySerialPorts { get; set; }
         //config tuning
         public Boolean displayGeoFence { get; set; }
         public Boolean displayBasicTuning { get; set; }
@@ -222,7 +222,7 @@ namespace MissionPlanner.Utilities
             autoHideMenuForce = false;
             displayOSD = true;
             isAdvancedMode = false;
-            
+
         }
     }
     public static class DisplayViewExtensions
