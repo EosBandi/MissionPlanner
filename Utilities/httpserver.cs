@@ -22,7 +22,7 @@ namespace MissionPlanner.Utilities
         /// </summary>
         private TcpListener listener;
 
-        // Thread signal. 
+        // Thread signal.
         public static ManualResetEvent tcpClientConnected =
             new ManualResetEvent(false);
 
@@ -52,9 +52,9 @@ namespace MissionPlanner.Utilities
             tcpClientConnected.Set();
         }
 
-        /// <summary>          
-        /// little web server for sending network link kml's          
-        /// </summary>          
+        /// <summary>
+        /// little web server for sending network link kml's
+        /// </summary>
         public void listernforclients()
         {
             try
@@ -68,11 +68,11 @@ namespace MissionPlanner.Utilities
                 log.Error("Exception starting listener. Possible multiple instances of planner?", e);
                 return;
             } // in use
-            // Enter the listening loop.               
+            // Enter the listening loop.
             while (run)
             {
-                // Perform a blocking call to accept requests.           
-                // You could also user server.AcceptSocket() here.               
+                // Perform a blocking call to accept requests.
+                // You could also user server.AcceptSocket() here.
                 try
                 {
                     log.Info("Listening for client");
@@ -83,7 +83,7 @@ namespace MissionPlanner.Utilities
 
                     listener.BeginAcceptTcpClient(new AsyncCallback(DoAcceptTcpClientCallback), listener);
 
-                    // Wait until a connection is made and processed before  
+                    // Wait until a connection is made and processed before
                     // continuing.
                     tcpClientConnected.WaitOne();
 
@@ -106,7 +106,7 @@ namespace MissionPlanner.Utilities
             // Get the listener that handles the client request.
             TcpListener listener = (TcpListener)ar.AsyncState;
 
-            // End the operation and display the received data on  
+            // End the operation and display the received data on
             // the console.
 
             TcpClient client = listener.EndAcceptTcpClient(ar);
@@ -125,7 +125,7 @@ namespace MissionPlanner.Utilities
             {
                 try
                 {
-                    // Get a stream object for reading and writing          
+                    // Get a stream object for reading and writing
                     log.Info("Accepted Client " + client.Client.RemoteEndPoint.ToString());
                     //client.SendBufferSize = 100 * 1024; // 100kb
                     //client.LingerState.Enabled = true;
@@ -372,7 +372,7 @@ namespace MissionPlanner.Utilities
 
 
 
-                         
+
                                 }
 
                                 Thread.Sleep(200);
@@ -403,7 +403,13 @@ namespace MissionPlanner.Utilities
                     else if (url.Contains(" /mission.czml"))
                     {
 
+
                         byte[] buffer = Encoding.ASCII.GetBytes(FlightPlanner.instance.getCZML());
+
+                        //StreamWriter f = new StreamWriter(@"d:\mission.czml");
+                        //f.Write(FlightPlanner.instance.getCZML());
+                        //f.Close();
+
 
                         string header =
                             "HTTP/1.1 200 OK\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: " +
@@ -511,7 +517,7 @@ namespace MissionPlanner.Utilities
         <name> Network Links </name>
         <open> 1 </open>
         <NetworkLink>
-            <name> View Centered Placemark</name> 
+            <name> View Centered Placemark</name>
             <open> 1 </open>
             <refreshVisibility> 0 </refreshVisibility>
             <flyToView> 1 </flyToView>
@@ -523,7 +529,7 @@ namespace MissionPlanner.Utilities
             </Link>
         </NetworkLink>
         <NetworkLink>
-            <name> View Centered Placemark</name> 
+            <name> View Centered Placemark</name>
             <open> 1 </open>
             <refreshVisibility> 0 </refreshVisibility>
             <flyToView> 0 </flyToView>
@@ -857,7 +863,7 @@ namespace MissionPlanner.Utilities
         Connection: keep-alive
         X-Requested-With: XMLHttpRequest
         User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.97 Safari/537.11
-        Accept: 
+        Accept:
         Referer: http://ubuntu:9999/index.html
         Accept-Encoding: gzip,deflate,sdch
         Accept-Language: en-GB,en-US;q=0.8,en;q=0.6
@@ -871,13 +877,13 @@ namespace MissionPlanner.Utilities
 
         {
         "VFR_HUD": {"msg": {"throttle": 0, "groundspeed": 0.0, "airspeed": 0.0, "climb": 0.0, "mavpackettype": "VFR_HUD", "alt": -0.47999998927116394, "heading": 108}, "index": 687, "time_usec": 0},
-        "STATUSTEXT": {"msg": {"mavpackettype": "STATUSTEXT", "severity": 1, "text": "Initialising APM..."}, "index": 2, "time_usec": 0}, 
-        "SYS_STATUS": {"msg": {"onboard_control_sensors_present": 4294966287, "load": 0, "battery_remaining": -1, "errors_count4": 0, "drop_rate_comm": 0, "errors_count2": 0, "errors_count3": 0, "errors_comm": 0, "current_battery": -1, "errors_count1": 0, "onboard_control_sensors_health": 4294966287, "mavpackettype": "SYS_STATUS", "onboard_control_sensors_enabled": 4294945807, "voltage_battery": 10080}, "index": 693, "time_usec": 0}, 
+        "STATUSTEXT": {"msg": {"mavpackettype": "STATUSTEXT", "severity": 1, "text": "Initialising APM..."}, "index": 2, "time_usec": 0},
+        "SYS_STATUS": {"msg": {"onboard_control_sensors_present": 4294966287, "load": 0, "battery_remaining": -1, "errors_count4": 0, "drop_rate_comm": 0, "errors_count2": 0, "errors_count3": 0, "errors_comm": 0, "current_battery": -1, "errors_count1": 0, "onboard_control_sensors_health": 4294966287, "mavpackettype": "SYS_STATUS", "onboard_control_sensors_enabled": 4294945807, "voltage_battery": 10080}, "index": 693, "time_usec": 0},
         "META_LINKQUALITY": {"msg": {"master_in": 11110, "mav_loss": 0, "mavpackettype": "META_LINKQUALITY", "master_out": 194, "packet_loss": 0.0}, "index": 194, "time_usec": 0},
-        "ATTITUDE": {"msg": {"pitchspeed": -0.000976863200776279, "yaw": 1.8878594636917114, "rollspeed": -0.0030046366155147552, "time_boot_ms": 194676, "pitch": -0.09986469894647598, "mavpackettype": "ATTITUDE", "yawspeed": -0.0015030358918011189, "roll": -0.029391441494226456}, "index": 687, "time_usec": 0}, 
-        "GPS_RAW_INT": {"msg": {"fix_type": 1, "cog": 0, "epv": 65535, "lon": 0, "time_usec": 0, "eph": 9999, "satellites_visible": 0, "lat": 0, "mavpackettype": "GPS_RAW_INT", "alt": 137000, "vel": 0}, "index": 687, "time_usec": 0}, 
+        "ATTITUDE": {"msg": {"pitchspeed": -0.000976863200776279, "yaw": 1.8878594636917114, "rollspeed": -0.0030046366155147552, "time_boot_ms": 194676, "pitch": -0.09986469894647598, "mavpackettype": "ATTITUDE", "yawspeed": -0.0015030358918011189, "roll": -0.029391441494226456}, "index": 687, "time_usec": 0},
+        "GPS_RAW_INT": {"msg": {"fix_type": 1, "cog": 0, "epv": 65535, "lon": 0, "time_usec": 0, "eph": 9999, "satellites_visible": 0, "lat": 0, "mavpackettype": "GPS_RAW_INT", "alt": 137000, "vel": 0}, "index": 687, "time_usec": 0},
         "HEARTBEAT": {"msg": {"custom_mode": 0, "system_status": 4, "base_mode": 81, "autopilot": 3, "mavpackettype": "HEARTBEAT", "type": 2, "mavlink_version": 3}, "index": 190, "time_usec": 0},
-        "GPS_STATUS": {"msg": {"satellite_snr": "", "satellite_azimuth": "", "satellite_prn": "", "satellite_elevation": "", "satellites_visible": 0, "satellite_used": "", "mavpackettype": "GPS_STATUS"}, "index": 2, "time_usec": 0}, 
+        "GPS_STATUS": {"msg": {"satellite_snr": "", "satellite_azimuth": "", "satellite_prn": "", "satellite_elevation": "", "satellites_visible": 0, "satellite_used": "", "mavpackettype": "GPS_STATUS"}, "index": 2, "time_usec": 0},
         "NAV_CONTROLLER_OUTPUT": {"msg": {"wp_dist": 0, "nav_pitch": 0.0, "target_bearing": 0, "nav_roll": 0.0, "aspd_error": 0.0, "alt_error": 0.0, "mavpackettype": "NAV_CONTROLLER_OUTPUT", "xtrack_error": 0.0, "nav_bearing": 0}, "index": 687, "time_usec": 0}}
                       */
 

@@ -8992,14 +8992,21 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             double takeoffalt = 0;
 
             List<wp_info> wps = new List<wp_info>();
+            List<PointLatLngAlt> yaws = new List<PointLatLngAlt>();
 
             int i = 0;
+            PointLatLngAlt yaw_wp = new PointLatLngAlt(0,0,0); //alt is used for heading !!!! Hack but works
+
             while (i < Commands.Rows.Count)
             {
                 var cmd = getCmdID(Commands.Rows[i].Cells[Command.Index].Value.ToString());
 
                 switch ((MAVLink.MAV_CMD)cmd)
                 {
+                    case MAVLink.MAV_CMD.CONDITION_YAW:
+                        var heading = double.Parse(Commands.Rows[i].Cells[Param1.Index].Value.ToString());
+                        yaws.Add(new PointLatLngAlt(yaw_wp.Lat, yaw_wp.Lng, heading));
+                        break;
                     case MAVLink.MAV_CMD.TAKEOFF:
                         takeoffalt = double.Parse(Commands.Rows[i].Cells[Alt.Index].Value.ToString()) + home.alt; //alwayas absolute
                         break;
@@ -9047,6 +9054,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                         wp.spray_status = spray;
                         wp.number = i+1;
                         wps.Add(wp);
+                        yaw_wp = new PointLatLngAlt(wp.lat, wp.lng, 0);
                         break;
 
                 }
@@ -9102,6 +9110,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                     sw.WriteLine(arrowLine(prev_wp, wp, "[100,100,255,180]", "missionpath" + a++.ToString()));
 
                 }
+
                 prev_wp = wp;
                 if (prev_wp.spray_status == 1) spray_on = true;
                 if (prev_wp.spray_status == 2) spray_on = false;
@@ -9120,16 +9129,68 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 var last = wps.Last();
                 foreach (var wp in wps)
                 {
-                  sw.WriteLine(verticalLine(wp, last.Equals(wp)));
+                  sw.WriteLine(verticalLine(wp, last.Equals(wp))) ;
                 }
 
             }
 
+
+            {
+                foreach (var p in yaws)
+                {
+                    sw.WriteLine(",");
+                    if (p.Lat == 0 && p.Lng == 0)
+                    {
+                        sw.WriteLine(groundarrow(wps.First(), p.Alt, a++.ToString(), "[247, 5, 183,200]"));
+                    }
+                    else
+                    {
+                        wp_info p1 = new wp_info() { lat = p.Lat, lng = p.Lng };
+                        sw.WriteLine(groundarrow(p1, p.Alt, a++.ToString(), "[247, 5, 183, 200]"));
+
+                    }
+                }
+
+            }
             sw.WriteLine("]");
             sw.Flush();
             return Encoding.UTF8.GetString(mem.ToArray());
 
         }
+
+
+        public string groundarrow(wp_info wp1, double heading, string id, string color)
+        {
+            //get the end point
+            PointLatLngAlt p1 = new PointLatLngAlt(wp1.lat, wp1.lng, wp1.alt);
+            PointLatLngAlt p2 = p1.newpos(heading, 2);
+
+            MemoryStream mem = new MemoryStream();
+            StreamWriter sw = new StreamWriter(mem);
+            sw.WriteLine("  {");
+            sw.WriteLine("    \"id\": \"{0}\",", id);
+            sw.WriteLine("    \"polyline\": {");
+            sw.WriteLine("      \"positions\": {");
+            sw.WriteLine("        \"cartographicDegrees\": [");
+            sw.WriteLine("          " + p1.Lng.ToString(CultureInfo.InvariantCulture) + ", " + p1.Lat.ToString(CultureInfo.InvariantCulture) + ", " + 0.ToString(CultureInfo.InvariantCulture) + ",");
+            sw.WriteLine("          " + p2.Lng.ToString(CultureInfo.InvariantCulture) + ", " + p2.Lat.ToString(CultureInfo.InvariantCulture) + ", " + 0.ToString(CultureInfo.InvariantCulture));
+            sw.WriteLine("        ]");
+            sw.WriteLine("      },");
+            sw.WriteLine("      \"width\": 50,");
+            sw.WriteLine("      \"clampToGround\": true,");
+            sw.WriteLine("      \"material\": {");
+            sw.WriteLine("        \"polylineArrow\": {");
+            sw.WriteLine("          \"color\": {");
+            sw.WriteLine("            \"rgba\": " + color);
+            sw.WriteLine("          }");
+            sw.WriteLine("        }");
+            sw.WriteLine("      }");
+            sw.WriteLine("    }");
+            sw.WriteLine("  }");
+            sw.Flush();
+            return Encoding.UTF8.GetString(mem.ToArray());
+        }
+
 
         public string arrowLine(wp_info wp1, wp_info wp2, string color, string id)
         {
