@@ -41,14 +41,13 @@ namespace MissionPlanner.Controls
             this.label13 = new System.Windows.Forms.Label();
             this.LED_RemoteID_Messages = new Bulb.LedBulb();
             this.LED_gps_valid = new Bulb.LedBulb();
-            this.label14 = new System.Windows.Forms.Label();            
+            this.label14 = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.CMB_uas_id_type = new System.Windows.Forms.ComboBox();
             this.CMB_uas_type = new System.Windows.Forms.ComboBox();
             this.label17 = new System.Windows.Forms.Label();
             this.CMB_self_id_type = new System.Windows.Forms.ComboBox();
             this.label18 = new System.Windows.Forms.Label();
-            this.label18_info = new System.Windows.Forms.Label();
             this.TXT_self_id_TXT = new System.Windows.Forms.TextBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.ODOD_tabs = new System.Windows.Forms.TabControl();
@@ -63,6 +62,12 @@ namespace MissionPlanner.Controls
             this.label7 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
             this.CMB_op_id_type = new System.Windows.Forms.ComboBox();
+            this.lOpIDStatus = new System.Windows.Forms.Label();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.label9 = new System.Windows.Forms.Label();
+            this.CMB_EU_Class = new System.Windows.Forms.ComboBox();
+            this.label10 = new System.Windows.Forms.Label();
+            this.CMB_EU_Category = new System.Windows.Forms.ComboBox();
             this.nmea_GPS_1 = new MissionPlanner.NMEA_GPS_Connection();
             this.myODID_Status = new MissionPlanner.Controls.OpenDroneID_Map_Status();
             this.groupBox2.SuspendLayout();
@@ -70,6 +75,7 @@ namespace MissionPlanner.Controls
             this.tabStatus.SuspendLayout();
             this.tab_uid.SuspendLayout();
             this.tab_ops.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // txt_UserID
@@ -80,6 +86,7 @@ namespace MissionPlanner.Controls
             this.txt_UserID.Name = "txt_UserID";
             this.txt_UserID.Size = new System.Drawing.Size(195, 20);
             this.txt_UserID.TabIndex = 0;
+            this.txt_UserID.TextChanged += new System.EventHandler(this.txt_UserID_TextChanged);
             // 
             // label1
             // 
@@ -130,18 +137,16 @@ namespace MissionPlanner.Controls
             this.label4.Size = new System.Drawing.Size(49, 13);
             this.label4.TabIndex = 11;
             this.label4.Text = "UA Type";
-
             // 
-            // label4 info
+            // label4_info
             // 
             this.label4_info.AutoSize = true;
             this.label4_info.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label4_info.Location = new System.Drawing.Point(6, 119);
             this.label4_info.Name = "label4_info";
-            this.label4_info.Size = new System.Drawing.Size(49, 13);
+            this.label4_info.Size = new System.Drawing.Size(298, 26);
             this.label4_info.TabIndex = 12;
             this.label4_info.Text = "Optional settings. Typically these are set in the ArduRemoteID\r\ndevice instead.";
-
             // 
             // label12
             // 
@@ -202,7 +207,13 @@ namespace MissionPlanner.Controls
             this.label14.Size = new System.Drawing.Size(54, 13);
             this.label14.TabIndex = 35;
             this.label14.Text = "GCS GPS";
-
+            // 
+            // label16
+            // 
+            this.label16.Location = new System.Drawing.Point(0, 0);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(100, 23);
+            this.label16.TabIndex = 36;
             // 
             // CMB_uas_id_type
             // 
@@ -226,7 +237,7 @@ namespace MissionPlanner.Controls
             // 
             this.label17.AutoSize = true;
             this.label17.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label17.Location = new System.Drawing.Point(7, 116);
+            this.label17.Location = new System.Drawing.Point(7, 151);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(66, 13);
             this.label17.TabIndex = 44;
@@ -236,7 +247,7 @@ namespace MissionPlanner.Controls
             // 
             this.CMB_self_id_type.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.CMB_self_id_type.FormattingEnabled = true;
-            this.CMB_self_id_type.Location = new System.Drawing.Point(100, 116);
+            this.CMB_self_id_type.Location = new System.Drawing.Point(100, 151);
             this.CMB_self_id_type.Name = "CMB_self_id_type";
             this.CMB_self_id_type.Size = new System.Drawing.Size(195, 21);
             this.CMB_self_id_type.TabIndex = 45;
@@ -245,7 +256,7 @@ namespace MissionPlanner.Controls
             // 
             this.label18.AutoSize = true;
             this.label18.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label18.Location = new System.Drawing.Point(6, 88);
+            this.label18.Location = new System.Drawing.Point(6, 123);
             this.label18.Name = "label18";
             this.label18.Size = new System.Drawing.Size(67, 13);
             this.label18.TabIndex = 47;
@@ -254,23 +265,11 @@ namespace MissionPlanner.Controls
             // TXT_self_id_TXT
             // 
             this.TXT_self_id_TXT.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.TXT_self_id_TXT.Location = new System.Drawing.Point(100, 88);
+            this.TXT_self_id_TXT.Location = new System.Drawing.Point(100, 123);
             this.TXT_self_id_TXT.MaxLength = 23;
             this.TXT_self_id_TXT.Name = "TXT_self_id_TXT";
             this.TXT_self_id_TXT.Size = new System.Drawing.Size(195, 20);
             this.TXT_self_id_TXT.TabIndex = 46;
-
-            // 
-            // label18 info
-            // 
-            this.label18_info.AutoSize = true;
-            this.label18_info.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label18_info.Location = new System.Drawing.Point(6, 150);
-            this.label18_info.Name = "label18_info";
-            this.label18_info.Size = new System.Drawing.Size(273, 26);
-            this.label18_info.TabIndex = 47;
-            this.label18_info.Text = "These fields are optional in the USA.\r\nThey can also be set in the ArduRemoteID device.";
-
             // 
             // groupBox2
             // 
@@ -294,6 +293,7 @@ namespace MissionPlanner.Controls
             this.ODOD_tabs.Controls.Add(this.tabStatus);
             this.ODOD_tabs.Controls.Add(this.tab_uid);
             this.ODOD_tabs.Controls.Add(this.tab_ops);
+            this.ODOD_tabs.Controls.Add(this.tabPage1);
             this.ODOD_tabs.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.ODOD_tabs.Location = new System.Drawing.Point(6, 164);
             this.ODOD_tabs.Name = "ODOD_tabs";
@@ -383,6 +383,7 @@ namespace MissionPlanner.Controls
             // 
             // tab_ops
             // 
+            this.tab_ops.Controls.Add(this.lOpIDStatus);
             this.tab_ops.Controls.Add(this.label7);
             this.tab_ops.Controls.Add(this.label6);
             this.tab_ops.Controls.Add(this.CMB_op_id_type);
@@ -391,7 +392,6 @@ namespace MissionPlanner.Controls
             this.tab_ops.Controls.Add(this.txt_UserID);
             this.tab_ops.Controls.Add(this.CMB_self_id_type);
             this.tab_ops.Controls.Add(this.label18);
-            this.tab_ops.Controls.Add(this.label18_info);
             this.tab_ops.Controls.Add(this.TXT_self_id_TXT);
             this.tab_ops.Location = new System.Drawing.Point(4, 22);
             this.tab_ops.Name = "tab_ops";
@@ -405,7 +405,7 @@ namespace MissionPlanner.Controls
             // 
             this.label7.AutoSize = true;
             this.label7.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label7.Location = new System.Drawing.Point(7, 66);
+            this.label7.Location = new System.Drawing.Point(7, 101);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(45, 13);
             this.label7.TabIndex = 50;
@@ -430,6 +430,68 @@ namespace MissionPlanner.Controls
             this.CMB_op_id_type.Size = new System.Drawing.Size(195, 21);
             this.CMB_op_id_type.TabIndex = 49;
             // 
+            // lOpIDStatus
+            // 
+            this.lOpIDStatus.AutoSize = true;
+            this.lOpIDStatus.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lOpIDStatus.Location = new System.Drawing.Point(7, 67);
+            this.lOpIDStatus.Name = "lOpIDStatus";
+            this.lOpIDStatus.Size = new System.Drawing.Size(90, 13);
+            this.lOpIDStatus.TabIndex = 51;
+            this.lOpIDStatus.Text = "Enter Operator ID";
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.label10);
+            this.tabPage1.Controls.Add(this.CMB_EU_Category);
+            this.tabPage1.Controls.Add(this.label9);
+            this.tabPage1.Controls.Add(this.CMB_EU_Class);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(354, 183);
+            this.tabPage1.TabIndex = 3;
+            this.tabPage1.Text = "EU Class/Category";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label9.Location = new System.Drawing.Point(11, 23);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(67, 13);
+            this.label9.TabIndex = 50;
+            this.label9.Text = "UA Category";
+            // 
+            // CMB_EU_Class
+            // 
+            this.CMB_EU_Class.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CMB_EU_Class.FormattingEnabled = true;
+            this.CMB_EU_Class.Location = new System.Drawing.Point(104, 59);
+            this.CMB_EU_Class.Name = "CMB_EU_Class";
+            this.CMB_EU_Class.Size = new System.Drawing.Size(195, 21);
+            this.CMB_EU_Class.TabIndex = 51;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label10.Location = new System.Drawing.Point(11, 62);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(50, 13);
+            this.label10.TabIndex = 52;
+            this.label10.Text = "UA Class";
+            // 
+            // CMB_EU_Category
+            // 
+            this.CMB_EU_Category.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.CMB_EU_Category.FormattingEnabled = true;
+            this.CMB_EU_Category.Location = new System.Drawing.Point(104, 23);
+            this.CMB_EU_Category.Name = "CMB_EU_Category";
+            this.CMB_EU_Category.Size = new System.Drawing.Size(195, 21);
+            this.CMB_EU_Category.TabIndex = 53;
+            // 
             // nmea_GPS_1
             // 
             this.nmea_GPS_1.Location = new System.Drawing.Point(6, 3);
@@ -439,6 +501,7 @@ namespace MissionPlanner.Controls
             // 
             // myODID_Status
             // 
+            this.myODID_Status._parent_ODID = null;
             this.myODID_Status.Location = new System.Drawing.Point(6, 97);
             this.myODID_Status.Name = "myODID_Status";
             this.myODID_Status.Size = new System.Drawing.Size(140, 40);
@@ -463,6 +526,8 @@ namespace MissionPlanner.Controls
             this.tab_uid.PerformLayout();
             this.tab_ops.ResumeLayout(false);
             this.tab_ops.PerformLayout();
+            this.tabPage1.ResumeLayout(false);
+            this.tabPage1.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -488,7 +553,6 @@ namespace MissionPlanner.Controls
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.ComboBox CMB_self_id_type;
         private System.Windows.Forms.Label label18;
-        private System.Windows.Forms.Label label18_info;
         private System.Windows.Forms.TextBox TXT_self_id_TXT;
         private System.Windows.Forms.GroupBox groupBox2;
         private OpenDroneID_Map_Status myODID_Status;
@@ -505,5 +569,11 @@ namespace MissionPlanner.Controls
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.Label LBL_version;
+        private System.Windows.Forms.Label lOpIDStatus;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.ComboBox CMB_EU_Category;
+        private System.Windows.Forms.Label label9;
+        private System.Windows.Forms.ComboBox CMB_EU_Class;
     }
 }
