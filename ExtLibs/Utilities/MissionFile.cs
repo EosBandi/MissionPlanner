@@ -287,6 +287,7 @@ namespace MissionPlanner.Utilities
                 mission = new Mission()
             };
             temp.mission.vehicleType = 2;
+            temp.mission.firmwareType = 3;
             temp.mission.items = new List<Item>();
 
             if (list.Count > 0)
