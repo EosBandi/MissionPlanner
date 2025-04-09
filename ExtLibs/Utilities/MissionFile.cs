@@ -183,7 +183,7 @@ namespace MissionPlanner.Utilities
         }
 
         //http://json2csharp.com/#
-      
+
         public class Circle2
         {
             public List<double> center { get; set; }
@@ -237,6 +237,7 @@ namespace MissionPlanner.Utilities
             public bool autoContinue { get; set; }
             public int command { get; set; }
             public int doJumpId { get; set; }
+            public int altitudemode { get; set; }
             public int frame { get; set; }
             public List<double?> @params { get; set; }
             public string type { get; set; }
@@ -308,7 +309,7 @@ namespace MissionPlanner.Utilities
                     temploc.doJumpId = a+1;
 
                     // set frame type
-                    temploc.frame = frame;
+                    temploc.frame = item.frame;
                     temploc.type = "SimpleItem";
 
                     temp.mission.items.Add(temploc);
@@ -373,7 +374,7 @@ namespace MissionPlanner.Utilities
                     fencePolygon.version = 1;
                     geoFence.polygons.Add(fencePolygon);
                 }
-               
+
             }
             temp.geoFence = geoFence;
             temp.fileType = "Plan";

@@ -1613,7 +1613,7 @@ namespace MissionPlanner.GCSViews
                         // Find do_change_speed and get the speed from there
                         foreach (var command in commandlist)
                         {
-                            if (command.id == (ushort)MAVLink.MAV_CMD.DO_CHANGE_SPEED && command.p1 == 0)
+                            if (command.id == (ushort)MAVLink.MAV_CMD.DO_CHANGE_SPEED)
                             {
                                 flightspeed = command.p2;
                             }
