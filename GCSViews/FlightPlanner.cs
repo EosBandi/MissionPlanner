@@ -9035,6 +9035,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                         double alt = double.Parse(Commands.Rows[i].Cells[Alt.Index].Value.ToString());
                         double realalt = 0;
                         altmode frame = (altmode)Commands[Frame.Index, i].Value;
+                        wp.frame = frame;
                         if (frame == FlightPlanner.altmode.Relative)
                         {
                             realalt = home.alt + alt;
@@ -9042,6 +9043,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                         else if (frame == FlightPlanner.altmode.Terrain)       //TODO: add terrain reference
                         {
                             realalt = alt + srtm.getAltitude(wp.lat, wp.lng).alt;
+                            wp.terrainalt = alt;
                         }
                         else // Absolute
                         {
@@ -9101,13 +9103,16 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             foreach (var wp in wps)
             {
                 if (prev_wp.Equals(wp)) continue;
+
                 if (spray_on)
                 {
-                    sw.WriteLine(arrowLine(prev_wp, wp, "[0,255,0,180]", "missionpath" + a++.ToString()));
+                    if (wp.frame != altmode.Terrain) sw.WriteLine(arrowLine(prev_wp, wp, "[0,255,0,180]", "missionpath" + a++.ToString()));
+                    else sw.WriteLine(arrowLineTerrain(prev_wp, wp, "[0,255,0,180]", "missionpath" + a++.ToString()));
                 }
                 else
                 {
-                    sw.WriteLine(arrowLine(prev_wp, wp, "[100,100,255,180]", "missionpath" + a++.ToString()));
+                    if (wp.frame != altmode.Terrain) sw.WriteLine(arrowLine(prev_wp, wp, "[100,100,255,180]", "missionpath" + a++.ToString()));
+                    else sw.WriteLine(arrowLineTerrain(prev_wp, wp, "[100,100,255,180]", "missionpath" + a++.ToString()));
 
                 }
 
@@ -9192,6 +9197,8 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
         }
 
 
+
+
         public string arrowLine(wp_info wp1, wp_info wp2, string color, string id)
         {
             MemoryStream mem = new MemoryStream();
@@ -9218,6 +9225,61 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             sw.Flush();
             return Encoding.UTF8.GetString(mem.ToArray());
         }
+
+        public string arrowLineTerrain(wp_info wp1, wp_info wp2, string color, string id)
+        {
+
+            double res = 4.0;
+            if (Settings.Instance["render_terrain_resolution"] != null)
+            {
+                res = Settings.Instance.GetDouble("render_terrain_resolution");
+            }
+            Settings.Instance["render_terrain_resolution"] = res.ToString(CultureInfo.InvariantCulture);
+
+            //Assumption wp1 and wp2 is in terrain mode (edge case ?)
+            var points = new List<(double lat, double lng, double alt)>();
+            points = Utilities.GeoInterpolation.GetPointsAtInterval(wp1.lat, wp1.lng, wp2.lat, wp2.lng, wp1.terrainalt,res);
+
+            MemoryStream mem = new MemoryStream();
+            StreamWriter sw = new StreamWriter(mem);
+            sw.WriteLine("  {");
+            sw.WriteLine("    \"id\": \"{0}\",", id);
+            sw.WriteLine("    \"polyline\": {");
+            sw.WriteLine("      \"positions\": {");
+            sw.WriteLine("        \"cartographicDegrees\": [");
+
+
+            foreach (var p in points)
+            {
+                sw.WriteLine("          " + p.lng.ToString(CultureInfo.InvariantCulture) + ", " + p.lat.ToString(CultureInfo.InvariantCulture) + ", " + (p.alt + srtm.getAltitude(p.lat, p.lng).alt).ToString(CultureInfo.InvariantCulture) + ",");
+            }
+            sw.WriteLine("          " + wp2.lng.ToString(CultureInfo.InvariantCulture) + ", " + wp2.lat.ToString(CultureInfo.InvariantCulture) + ", " + wp2.alt.ToString(CultureInfo.InvariantCulture));
+
+
+            sw.WriteLine("        ]");
+            sw.WriteLine("      },");
+            sw.WriteLine("      \"width\": 20,");
+            sw.WriteLine("      \"material\": {");
+            sw.WriteLine("        \"polylineArrow\": {");
+            sw.WriteLine("          \"color\": {");
+            sw.WriteLine("            \"rgba\": " + color);
+            sw.WriteLine("          }");
+            sw.WriteLine("        }");
+            sw.WriteLine("      }");
+            sw.WriteLine("    }");
+            sw.WriteLine("  },");
+            sw.Flush();
+            return Encoding.UTF8.GetString(mem.ToArray());
+
+
+
+
+
+
+        }
+
+
+
         public string polyLine(List<wp_info> wps, string id, string color, bool clampToGround = false)
         {
             MemoryStream mem = new MemoryStream();
@@ -9363,6 +9425,8 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
         public double gnd_alt;
         public int spray_status; // 0 - none, 1-on, 2-off
         public int servo_value;
+        public FlightPlanner.altmode frame;
+        public double terrainalt;
     }
 
 }
