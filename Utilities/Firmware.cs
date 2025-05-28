@@ -40,6 +40,8 @@ namespace MissionPlanner.Utilities
 
         private optionsObject options = new optionsObject();
 
+        public bool checkID = true;
+
         [Serializable]
         [XmlType(TypeName = "options")]
         public class optionsObject
@@ -244,7 +246,7 @@ namespace MissionPlanner.Utilities
 
             return options.softwares;
         }
-      
+
         void updateProgress(int percent, string status)
         {
             if (Progress != null)
@@ -588,7 +590,7 @@ namespace MissionPlanner.Utilities
         /// upload to px4 standalone
         /// </summary>
         /// <param name="filename"></param>
-        public bool UploadPX4(string filename, BoardDetect.boards board)
+        public bool UploadPX4(string filename, BoardDetect.boards board, bool checkID)
         {
             updateProgress(-1, "Reading Hex File");
             px4uploader.Firmware fw;
@@ -658,13 +660,13 @@ namespace MissionPlanner.Utilities
                             up.board_rev, up.bl_rev, up.fw_maxsize, port, up.chip, up.chip_desc, up.extf_maxsize);
 
                         // if the apj is not for the detected board type - keep looking
-                        if (up.board_type != fw.board_id)
+                        if ((up.board_type != fw.board_id) && checkID == true)
                         {
                             log.InfoFormat("Board type mismatch - keep looking, detected {0}, fw file {1}", up.board_type, fw.board_id);
                             up.close();
                             return;
                         }
-
+                        up.checkID = checkID;
                         up.ProgressEvent += new Uploader.ProgressEventHandler(up_ProgressEvent);
                         up.LogEvent += new Uploader.LogEventHandler(up_LogEvent);
                         up.identify();
@@ -1300,7 +1302,7 @@ namespace MissionPlanner.Utilities
             {
                 try
                 {
-                    return UploadPX4(filename, board);
+                    return UploadPX4(filename, board, checkID);
                 }
                 catch (MissingFieldException)
                 {

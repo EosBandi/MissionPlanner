@@ -412,6 +412,12 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
         private void Lbl_Custom_firmware_label_Click(object sender, EventArgs e)
         {
+
+            // get yes/not if want to force the firmware
+            bool notforce = CustomMessageBox.Show("Do you want to force the firmware install, ignoring device ID?", "Force Upload",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) == (int)DialogResult.No;
+
+
             using (var fd = new OpenFileDialog
                 {Filter = "Firmware (*.hex;*.px4;*.vrx;*.apj)|*.hex;*.px4;*.vrx;*.apj|DFU|*.hex;*.bin;*.dfu|All files (*.*)|*.*"})
             {
@@ -499,6 +505,7 @@ namespace MissionPlanner.GCSViews.ConfigurationView
 
                     try
                     {
+                        fw.checkID = notforce; // if force, ignore the board id
                         fw.UploadFlash(MainV2.comPortName, fd.FileName, boardtype);
                     }
                     catch (Exception ex)

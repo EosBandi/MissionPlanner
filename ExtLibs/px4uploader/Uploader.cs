@@ -38,6 +38,9 @@ namespace px4uploader
         public bool libre = false;
         public byte[] sn = new byte[0];
 
+
+        public bool checkID = true;
+
         public enum Code : byte
         {
             // response codes
@@ -58,8 +61,8 @@ namespace px4uploader
             PROG_MULTI = 0x27,
             READ_MULTI = 0x28,//# rev2 only
             GET_CRC = 0x29,//	# rev3+
-            GET_OTP = 0x2a, // read a byte from OTP at the given address 
-            GET_SN = 0x2b,    // read a word from UDID area ( Serial)  at the given address 
+            GET_OTP = 0x2a, // read a byte from OTP at the given address
+            GET_SN = 0x2b,    // read a word from UDID area ( Serial)  at the given address
             GET_CHIP = 0x2c, // read chip version (MCU IDCODE)
             SET_DELAY = 0x2d, // set minimum boot delay
             GET_CHIP_DES = 0x2e,
@@ -82,7 +85,7 @@ namespace px4uploader
             EXTF_SIZE = 6
         }
 
-        public const byte BL_REV_MIN = 2;//	# minimum supported bootloader protocol 
+        public const byte BL_REV_MIN = 2;//	# minimum supported bootloader protocol
         public const byte BL_REV_MAX = 20;//	# maximum supported bootloader protocol
         public const byte PROG_MULTI_MAX = 252;//		# protocol max is 255, must be multiple of 4
         public const byte READ_MULTI_MAX = 252;//		# protocol max is 255, something overflows with >= 64
@@ -350,7 +353,7 @@ namespace px4uploader
                     }
 
                 }
-                catch 
+                catch
                 {
                     print("Failed to read Certificate of Authenticity");
                     throw;
@@ -796,7 +799,7 @@ namespace px4uploader
             }
         }
 
-        
+
         public void currentChecksum(Firmware fw)
         {
             if (self.bl_rev < 3)
@@ -821,7 +824,7 @@ namespace px4uploader
                 print("Current 0x" + hexlify(BitConverter.GetBytes(report_crc)) + " " + report_crc);
 
                 if (expect_crc != report_crc)
-                    sameflash = false;                    
+                    sameflash = false;
             }
 
             if (self.extf_maxsize > 0)
@@ -919,8 +922,8 @@ namespace px4uploader
         {
             this.port.ReadTimeout = 1000; // 1 sec
 
-            //Make sure we are doing the right thing
-            if (self.board_type != fw.board_id)
+            //Make sure we are doing the right thing, if we allow checkID
+            if ((self.board_type != fw.board_id) && checkID == true)
             {
                 if (!(self.board_type == 33 && fw.board_id == 9))
                     throw new Exception("Firmware not suitable for this board fw:" + fw.board_id + " - board:" +
@@ -1001,7 +1004,7 @@ namespace px4uploader
             {
                 this.port.Dispose();
             }
-            catch { }            
+            catch { }
 
             this.port = null;
         }
