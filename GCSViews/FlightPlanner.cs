@@ -284,6 +284,18 @@ namespace MissionPlanner.GCSViews
             drawnpolygon.Stroke = new Pen(Color.Red, 2);
             drawnpolygon.Fill = Brushes.Transparent;
 
+
+            // check config.xml for 3drender variable
+            if (Settings.Instance.GetBoolean("cesiumrender", false))
+            {
+                btnThreeDee.Visible = true;
+            }
+            else
+            {
+                btnThreeDee.Visible = false;            }
+
+
+
             /*
             var timer = new System.Timers.Timer();
 
