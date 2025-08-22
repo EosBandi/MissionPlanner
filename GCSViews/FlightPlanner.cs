@@ -104,7 +104,7 @@ namespace MissionPlanner.GCSViews
         public GMapMarker center = new GMarkerGoogle(new PointLatLng(0.0, 0.0), GMarkerGoogleType.none);
         private Dictionary<string, string[]> cmdParamNames = new Dictionary<string, string[]>();
         private GMapMarkerRect CurentRectMarker;
-        private altmode currentaltmode = (altmode) Settings.Instance.GetInt32("FPaltmode", (int)altmode.Relative);
+        private altmode currentaltmode = (altmode)Settings.Instance.GetInt32("FPaltmode", (int)altmode.Relative);
         private GMapMarker CurrentGMapMarker;
         public GMapMarker currentMarker;
         private GMapMarkerPOI CurrentPOIMarker;
@@ -289,11 +289,13 @@ namespace MissionPlanner.GCSViews
             if (Settings.Instance.GetBoolean("cesiumrender", false))
             {
                 btnThreeDee.Visible = true;
+                btnSaveCZML.Visible = true;
             }
             else
             {
-                btnThreeDee.Visible = false;            }
-
+                btnThreeDee.Visible = false;
+                btnSaveCZML.Visible = false;
+            }
 
 
             /*
@@ -676,7 +678,7 @@ namespace MissionPlanner.GCSViews
                 }
 
             }
-                return true;
+            return true;
         }
 
 
@@ -1380,7 +1382,7 @@ namespace MissionPlanner.GCSViews
                     try
                     {
                         log.Info("Process " + cmds.Count);
-                        processToScreen(cmds,false);
+                        processToScreen(cmds, false);
                     }
                     catch (Exception exx)
                     {
@@ -1469,7 +1471,7 @@ namespace MissionPlanner.GCSViews
 
                     //Check points and change overlayType if needed
                     //Tag is the waypoint number
-                    for (int i = 0; i<wpOverlay.overlay.Markers.Count; i++)
+                    for (int i = 0; i < wpOverlay.overlay.Markers.Count; i++)
                     {
                         if (wpOverlay.overlay.Markers[i] is GMapMarkerWP && wpOverlay.overlay.Markers[i].Tag != null)
                         {
@@ -1478,9 +1480,9 @@ namespace MissionPlanner.GCSViews
                             {
                                 if (wpNumber > 0)
                                 {
-                                    if (wpNumber < commandlist.Count+1)
+                                    if (wpNumber < commandlist.Count + 1)
                                     {
-                                        var marker = Commands.Rows[wpNumber-1].Cells[Param4.Index].Value;
+                                        var marker = Commands.Rows[wpNumber - 1].Cells[Param4.Index].Value;
                                         if (marker != null)
                                         {
                                             GMapMarkerWP newwp = wpOverlay.overlay.Markers[i] as GMapMarkerWP;
@@ -1543,7 +1545,7 @@ namespace MissionPlanner.GCSViews
                         {
                             if (p != null)
                             {
-                                editedFencePoints.Add(new PointLatLngAlt(p.Lat, p.Lng, p.Alt,p.Tag));
+                                editedFencePoints.Add(new PointLatLngAlt(p.Lat, p.Lng, p.Alt, p.Tag));
                             }
                         }
 
@@ -2051,13 +2053,13 @@ namespace MissionPlanner.GCSViews
                             var cmds = MissionFile.ConvertToLocationwps(format);
 
                             //Get the fences from the plan file as well.
-                            processToScreen(cmds,false);
+                            processToScreen(cmds, false);
                             writeKML();
                             //Select Fences
                             cmds.Clear();
                             cmds = MissionFile.ConvertToFenceItems(format);
                             cmb_missiontype.SelectedItem = MAVLink.MAV_MISSION_TYPE.FENCE;
-                            processToScreen(cmds,false);
+                            processToScreen(cmds, false);
                             writeKML();
                             //select mission
                             cmb_missiontype.SelectedItem = MAVLink.MAV_MISSION_TYPE.MISSION;
@@ -2082,7 +2084,7 @@ namespace MissionPlanner.GCSViews
 
         public void BUT_saveWPFile_Click(object sender, EventArgs e)
         {
-            if (!missionSanityChecks()  )
+            if (!missionSanityChecks())
                 return;
 
             SaveFile_Click(null, null);
@@ -2377,9 +2379,10 @@ namespace MissionPlanner.GCSViews
 
             if (lastEditorMode == MAVLink.MAV_MISSION_TYPE.MISSION)
             {
-               //If we were editing a mission, save the points to keep it in editor
-               editedMissionPoints.Clear();
-               editedMissionPoints = GetCommandList();}
+                //If we were editing a mission, save the points to keep it in editor
+                editedMissionPoints.Clear();
+                editedMissionPoints = GetCommandList();
+            }
 
 
             // switch the mavcmd list and init
@@ -2566,14 +2569,14 @@ namespace MissionPlanner.GCSViews
 
                     if (currentaltmode == altmode.Relative)
                     {
-                        alt = srtmAlt - homealt  + agl;
+                        alt = srtmAlt - homealt + agl;
                     }
                     else
                     {
                         alt = agl;
                     }
 
-                    Commands.Rows[e.RowIndex].Cells[Alt.Index].Value = Math.Round(alt,2);
+                    Commands.Rows[e.RowIndex].Cells[Alt.Index].Value = Math.Round(alt, 2);
                 }
                 catch (Exception ex)
                 {
@@ -3568,8 +3571,8 @@ namespace MissionPlanner.GCSViews
             }
             else
             {
-            temp = new ElevationProfileSpray(pointlist, homealt,
-                (altmode)Enum.Parse(typeof(altmode), CMB_altmode.Text), Alt.Index);
+                temp = new ElevationProfileSpray(pointlist, homealt,
+                    (altmode)Enum.Parse(typeof(altmode), CMB_altmode.Text), Alt.Index);
             }
             ThemeManager.ApplyThemeTo(temp);
             temp.Show();
@@ -4571,7 +4574,7 @@ namespace MissionPlanner.GCSViews
 
                             processKML(rootnode.Feature);
 
-                            if ((int) DialogResult.Yes ==
+                            if ((int)DialogResult.Yes ==
                                 CustomMessageBox.Show(Strings.Do_you_want_to_load_this_into_the_flight_data_screen,
                                     Strings.Load_data,
                                     MessageBoxButtons.YesNo))
@@ -5425,20 +5428,20 @@ namespace MissionPlanner.GCSViews
                 for (int i = minzoom; i <= maxzoom; i++)
                 {
                     try
-                {
-                    TilePrefetcher obj = new TilePrefetcher();
-                    ThemeManager.ApplyThemeTo(obj);
-                    obj.ShowCompleteMessage = false;
-                    obj.Start(area, i, MainMap.MapProvider, 0, 0);
-
-                    if (obj.UserAborted)
                     {
-                        obj.Dispose();
-                        break;
-                    }
+                        TilePrefetcher obj = new TilePrefetcher();
+                        ThemeManager.ApplyThemeTo(obj);
+                        obj.ShowCompleteMessage = false;
+                        obj.Start(area, i, MainMap.MapProvider, 0, 0);
 
-                    obj.Dispose();
-                }
+                        if (obj.UserAborted)
+                        {
+                            obj.Dispose();
+                            break;
+                        }
+
+                        obj.Dispose();
+                    }
                     catch
                     {
                     }
@@ -5532,7 +5535,7 @@ namespace MissionPlanner.GCSViews
             }
         }
 
-        private (Color,int) GetKMLLineColor(string styleurl, Document root)
+        private (Color, int) GetKMLLineColor(string styleurl, Document root)
         {
             var style2 = root.Styles.Where(a => a.Id == styleurl.TrimStart('#')).First();
 
@@ -7229,14 +7232,14 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                     for (int a = 0; a < Commands.Rows.Count; a++)
                     {
                         // If the frame is Relative, add the height difference to the altitude
-                        if ((altmode)Commands[Frame.Index, a].Value == altmode.Relative && (string)Commands[Command.Index,a].Value == MAVLink.MAV_CMD.WAYPOINT.ToString())
+                        if ((altmode)Commands[Frame.Index, a].Value == altmode.Relative && (string)Commands[Command.Index, a].Value == MAVLink.MAV_CMD.WAYPOINT.ToString())
                         {
-                                double alt;
-                                if (double.TryParse(Commands[Alt.Index, a].Value.ToString(), out alt))
-                                {
-                                    alt += prev - next;
-                                    Commands[Alt.Index, a].Value = alt.ToString("0.00");
-                                }
+                            double alt;
+                            if (double.TryParse(Commands[Alt.Index, a].Value.ToString(), out alt))
+                            {
+                                alt += prev - next;
+                                Commands[Alt.Index, a].Value = alt.ToString("0.00");
+                            }
                         }
                     }
                 }
@@ -8716,9 +8719,9 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 if (Commands.Rows[i].Cells[Command.Index].Value.ToString() == "WAYPOINT")
                 {
                     //Get next command
-                    if (i< Commands.Rows.Count - 1)
+                    if (i < Commands.Rows.Count - 1)
                     {
-                        if (Commands.Rows[i+1].Cells[Command.Index].Value.ToString() == "DO_SEND_SCRIPT_MESSAGE")
+                        if (Commands.Rows[i + 1].Cells[Command.Index].Value.ToString() == "DO_SEND_SCRIPT_MESSAGE")
                         {
                             if (Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "0")
                             {
@@ -8897,14 +8900,14 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 double alt = double.Parse(line.Cells[Alt.Index].Value.ToString()); // This supposed to be relative altitiude
 
                 double realalt = 0;
-                altmode frame = (altmode)Commands[Frame.Index, i-1].Value;
+                altmode frame = (altmode)Commands[Frame.Index, i - 1].Value;
                 if (frame == FlightPlanner.altmode.Relative)
                 {
-                   realalt = home.alt + alt;
+                    realalt = home.alt + alt;
                 }
                 else if (frame == FlightPlanner.altmode.Terrain)       //TODO: add terrain reference
                 {
-                   realalt = alt + srtm.getAltitude(lat, lng).alt;
+                    realalt = alt + srtm.getAltitude(lat, lng).alt;
                 }
                 else // Absolute
                 {
@@ -9007,7 +9010,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             List<PointLatLngAlt> yaws = new List<PointLatLngAlt>();
 
             int i = 0;
-            PointLatLngAlt yaw_wp = new PointLatLngAlt(0,0,0); //alt is used for heading !!!! Hack but works
+            PointLatLngAlt yaw_wp = new PointLatLngAlt(0, 0, 0); //alt is used for heading !!!! Hack but works
 
             while (i < Commands.Rows.Count)
             {
@@ -9066,7 +9069,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                         //wp.alt = double.Parse(Commands.Rows[i].Cells[Alt.Index].Value.ToString());
                         wp.gnd_alt = srtm.getAltitude(wp.lat, wp.lng).alt;
                         wp.spray_status = spray;
-                        wp.number = i+1;
+                        wp.number = i + 1;
                         wps.Add(wp);
                         yaw_wp = new PointLatLngAlt(wp.lat, wp.lng, 0);
                         break;
@@ -9146,7 +9149,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 var last = wps.Last();
                 foreach (var wp in wps)
                 {
-                  sw.WriteLine(verticalLine(wp, last.Equals(wp))) ;
+                    sw.WriteLine(verticalLine(wp, last.Equals(wp)));
                 }
 
             }
@@ -9250,7 +9253,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
             //Assumption wp1 and wp2 is in terrain mode (edge case ?)
             var points = new List<(double lat, double lng, double alt)>();
-            points = Utilities.GeoInterpolation.GetPointsAtInterval(wp1.lat, wp1.lng, wp2.lat, wp2.lng, wp1.terrainalt,res);
+            points = Utilities.GeoInterpolation.GetPointsAtInterval(wp1.lat, wp1.lng, wp2.lat, wp2.lng, wp1.terrainalt, res);
 
             MemoryStream mem = new MemoryStream();
             StreamWriter sw = new StreamWriter(mem);
@@ -9384,10 +9387,6 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
         }
 
 
-
-
-
-
         public string verticalLine(wp_info wp, bool last = false)
         {
             MemoryStream mem = new MemoryStream();
@@ -9424,21 +9423,46 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             return result;
         }
 
+        private void btnSaveCZML_Click(object sender, EventArgs e)
+        {
+            //Save a file dialog
 
-    }
+            SaveFileDialog sfd = new SaveFileDialog();
+            sfd.Filter = "CZML files|*.czml|All files|*.*";
+            sfd.Title = "Save a CZML file";
+            sfd.FileName = "Mission.czml";
+            if (sfd.ShowDialog() == DialogResult.OK)
+            {
+                string czml = getCZML();
+                if (czml != "")
+                {
+                    StreamWriter sw = new StreamWriter(sfd.FileName);
+                    sw.Write(czml);
+                    sw.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Error generating mission czml", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
 
+            }
 
-    public struct wp_info
-    {
-        public int number;
-        public double lat;
-        public double lng;
-        public double alt;
-        public double gnd_alt;
-        public int spray_status; // 0 - none, 1-on, 2-off
-        public int servo_value;
-        public FlightPlanner.altmode frame;
-        public double terrainalt;
+        }
+
+        public struct wp_info
+        {
+            public int number;
+            public double lat;
+            public double lng;
+            public double alt;
+            public double gnd_alt;
+            public int spray_status; // 0 - none, 1-on, 2-off
+            public int servo_value;
+            public FlightPlanner.altmode frame;
+            public double terrainalt;
+        }
+
     }
 
 }
+

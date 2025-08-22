@@ -78,6 +78,14 @@ namespace MissionPlanner.GCSViews
             this.coords1 = new MissionPlanner.Controls.Coords();
             this.lbl_status = new System.Windows.Forms.Label();
             this.panelWaypoints = new System.Windows.Forms.Panel();
+            this.lSprayTime = new System.Windows.Forms.Label();
+            this.lSprayDistance = new System.Windows.Forms.Label();
+            this.lTotalFlightTime = new System.Windows.Forms.Label();
+            this.lTotalDistance = new System.Windows.Forms.Label();
+            this.label9 = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.label8 = new System.Windows.Forms.Label();
+            this.label7 = new System.Windows.Forms.Label();
             this.myButton2 = new MissionPlanner.Controls.MyButton();
             this.myButton1 = new MissionPlanner.Controls.MyButton();
             this.chk_usemavftp = new System.Windows.Forms.CheckBox();
@@ -227,14 +235,7 @@ namespace MissionPlanner.GCSViews
             this.zoomToVehicleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToMissionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToHomeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label8 = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
-            this.lTotalDistance = new System.Windows.Forms.Label();
-            this.lTotalFlightTime = new System.Windows.Forms.Label();
-            this.lSprayDistance = new System.Windows.Forms.Label();
-            this.lSprayTime = new System.Windows.Forms.Label();
+            this.btnSaveCZML = new MissionPlanner.Controls.MyButton();
             this.panel5.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelWaypoints.SuspendLayout();
@@ -454,6 +455,46 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.panelWaypoints, "panelWaypoints");
             this.panelWaypoints.ForeColor = System.Drawing.SystemColors.ControlText;
             this.panelWaypoints.Name = "panelWaypoints";
+            // 
+            // lSprayTime
+            // 
+            resources.ApplyResources(this.lSprayTime, "lSprayTime");
+            this.lSprayTime.Name = "lSprayTime";
+            // 
+            // lSprayDistance
+            // 
+            resources.ApplyResources(this.lSprayDistance, "lSprayDistance");
+            this.lSprayDistance.Name = "lSprayDistance";
+            // 
+            // lTotalFlightTime
+            // 
+            resources.ApplyResources(this.lTotalFlightTime, "lTotalFlightTime");
+            this.lTotalFlightTime.Name = "lTotalFlightTime";
+            // 
+            // lTotalDistance
+            // 
+            resources.ApplyResources(this.lTotalDistance, "lTotalDistance");
+            this.lTotalDistance.Name = "lTotalDistance";
+            // 
+            // label9
+            // 
+            resources.ApplyResources(this.label9, "label9");
+            this.label9.Name = "label9";
+            // 
+            // label10
+            // 
+            resources.ApplyResources(this.label10, "label10");
+            this.label10.Name = "label10";
+            // 
+            // label8
+            // 
+            resources.ApplyResources(this.label8, "label8");
+            this.label8.Name = "label8";
+            // 
+            // label7
+            // 
+            resources.ApplyResources(this.label7, "label7");
+            this.label7.Name = "label7";
             // 
             // myButton2
             // 
@@ -738,6 +779,7 @@ namespace MissionPlanner.GCSViews
             this.flowLayoutPanel1.Controls.Add(this.panel5);
             this.flowLayoutPanel1.Controls.Add(this.panel1);
             this.flowLayoutPanel1.Controls.Add(this.customButton);
+            this.flowLayoutPanel1.Controls.Add(this.btnSaveCZML);
             resources.ApplyResources(this.flowLayoutPanel1, "flowLayoutPanel1");
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             // 
@@ -1566,45 +1608,13 @@ namespace MissionPlanner.GCSViews
             resources.ApplyResources(this.zoomToHomeToolStripMenuItem, "zoomToHomeToolStripMenuItem");
             this.zoomToHomeToolStripMenuItem.Click += new System.EventHandler(this.zoomToHomeToolStripMenuItem_Click);
             // 
-            // label7
+            // btnSaveCZML
             // 
-            resources.ApplyResources(this.label7, "label7");
-            this.label7.Name = "label7";
-            // 
-            // label8
-            // 
-            resources.ApplyResources(this.label8, "label8");
-            this.label8.Name = "label8";
-            // 
-            // label9
-            // 
-            resources.ApplyResources(this.label9, "label9");
-            this.label9.Name = "label9";
-            // 
-            // label10
-            // 
-            resources.ApplyResources(this.label10, "label10");
-            this.label10.Name = "label10";
-            // 
-            // lTotalDistance
-            // 
-            resources.ApplyResources(this.lTotalDistance, "lTotalDistance");
-            this.lTotalDistance.Name = "lTotalDistance";
-            // 
-            // lTotalFlightTime
-            // 
-            resources.ApplyResources(this.lTotalFlightTime, "lTotalFlightTime");
-            this.lTotalFlightTime.Name = "lTotalFlightTime";
-            // 
-            // lSprayDistance
-            // 
-            resources.ApplyResources(this.lSprayDistance, "lSprayDistance");
-            this.lSprayDistance.Name = "lSprayDistance";
-            // 
-            // lSprayTime
-            // 
-            resources.ApplyResources(this.lSprayTime, "lSprayTime");
-            this.lSprayTime.Name = "lSprayTime";
+            resources.ApplyResources(this.btnSaveCZML, "btnSaveCZML");
+            this.btnSaveCZML.Name = "btnSaveCZML";
+            this.btnSaveCZML.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.btnSaveCZML.UseVisualStyleBackColor = true;
+            this.btnSaveCZML.Click += new System.EventHandler(this.btnSaveCZML_Click);
             // 
             // FlightPlanner
             // 
@@ -1823,5 +1833,6 @@ namespace MissionPlanner.GCSViews
         private Label lSprayDistance;
         private Label lTotalFlightTime;
         private Label lTotalDistance;
+        public MyButton btnSaveCZML;
     }
 }
