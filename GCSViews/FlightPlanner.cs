@@ -9053,14 +9053,41 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                             if (Commands.Rows[i + 1].Cells[Command.Index].Value.ToString() == "DO_SEND_SCRIPT_MESSAGE")
                             {
                                 if (Commands.Rows[i + 1].Cells[Param1.Index].Value.ToString() == "2" &&
-                                    Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "3")
+                                        Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "3")
                                 {
-                                    spray = 1; //spray on
+                                    spray = 1; //green
+                                }
+                                else if (Commands.Rows[i + 1].Cells[Param1.Index].Value.ToString() == "2" &&
+                                         Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "12")
+                                {
+                                    spray = 1; //green
                                 }
                                 else if (Commands.Rows[i + 1].Cells[Param1.Index].Value.ToString() == "2" &&
                                          Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "0")
                                 {
-                                    spray = 2; //spray off
+                                    spray = 2; //purple
+                                }
+                                else if (Commands.Rows[i + 1].Cells[Param1.Index].Value.ToString() == "2" &&
+                                         Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "8")
+                                {
+                                    spray = 3; //spray yellow
+                                }
+
+                                else if (Commands.Rows[i + 1].Cells[Param1.Index].Value.ToString() == "2" &&
+                                         Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "2")
+                                {
+                                    spray = 3; //spray yellow
+                                }
+
+                                else if (Commands.Rows[i + 1].Cells[Param1.Index].Value.ToString() == "2" &&
+                                         Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "4")
+                                {
+                                    spray = 4; //spray orange
+                                }
+                                else if (Commands.Rows[i + 1].Cells[Param1.Index].Value.ToString() == "2" &&
+                                         Commands.Rows[i + 1].Cells[Param2.Index].Value.ToString() == "1")
+                                {
+                                    spray = 4; //spray orange
                                 }
                             }
                         }
@@ -9132,29 +9159,28 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             var prev_wp = wps.First();
             var a = 1;
             var spray_on = false;
-            if (prev_wp.spray_status == 1) spray_on = true;
-            if (prev_wp.spray_status == 2) spray_on = false;
+            string spray_color = "[0,0,0,180]";
+            if (prev_wp.spray_status == 1) spray_color = "[0,255,0,180]"; //Green
+            if (prev_wp.spray_status == 2) spray_color = "[100,100,255,180]"; //Blue
+            if (prev_wp.spray_status == 3) spray_color = "[243,218,11,180]"; //Yellow
+            if (prev_wp.spray_status == 4) spray_color = "[255,79,0,180]"; //Orange
+
 
 
             foreach (var wp in wps)
             {
                 if (prev_wp.Equals(wp)) continue;
 
-                if (spray_on)
-                {
-                    if (wp.frame != altmode.Terrain) sw.WriteLine(arrowLine(prev_wp, wp, "[0,255,0,180]", "missionpath" + a++.ToString()));
-                    else sw.WriteLine(arrowLineTerrain(prev_wp, wp, "[0,255,0,180]", "missionpath" + a++.ToString()));
-                }
-                else
-                {
-                    if (wp.frame != altmode.Terrain) sw.WriteLine(arrowLine(prev_wp, wp, "[100,100,255,180]", "missionpath" + a++.ToString()));
-                    else sw.WriteLine(arrowLineTerrain(prev_wp, wp, "[100,100,255,180]", "missionpath" + a++.ToString()));
-
-                }
+                if (wp.frame != altmode.Terrain) sw.WriteLine(arrowLine(prev_wp, wp, spray_color, "missionpath" + a++.ToString()));
+                else sw.WriteLine(arrowLineTerrain(prev_wp, wp, spray_color, "missionpath" + a++.ToString()));
 
                 prev_wp = wp;
-                if (prev_wp.spray_status == 1) spray_on = true;
-                if (prev_wp.spray_status == 2) spray_on = false;
+
+                if (prev_wp.spray_status == 1) spray_color = "[0,255,0,180]"; //Green
+                if (prev_wp.spray_status == 2) spray_color = "[100,100,255,180]"; //Blue
+                if (prev_wp.spray_status == 3) spray_color = "[243,218,11,180]"; //Yellow
+                if (prev_wp.spray_status == 4) spray_color = "[255,79,0,180]"; //Orange
+
             }
 
             // Add waypoints and spray status
