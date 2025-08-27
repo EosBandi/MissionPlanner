@@ -148,6 +148,11 @@ namespace MissionPlanner.GCSViews
         public List<Locationwp> editedFencePoints = new List<Locationwp>();
         public List<Locationwp> editedMissionPoints = new List<Locationwp>();
 
+        private string totalDistance = "";
+        private string totalTime = "";
+        private string totalSprayDistance = "";
+        private string totalSprayTime = "";
+
         public void Init()
         {
             instance = this;
@@ -1673,9 +1678,17 @@ namespace MissionPlanner.GCSViews
                         distance += home.GetDistance(lastWP);
 
                         lTotalDistance.Text = String.Format("{0:0.000} km", distance / 1000);
+                        totalDistance = String.Format("FD{0:#0000}", distance);
+
                         lSprayDistance.Text = String.Format("{0:0.000} km", spraydistance / 1000);
+                        totalSprayDistance = String.Format("FT{0:#0000}", spraydistance);
+
                         lTotalFlightTime.Text = secondsToNice(distance / flightspeed);
+                        totalTime = String.Format("FT{0:00}-{1:00}", (distance / flightspeed) % 60, (((distance / flightspeed) / 60) % 60));
+
                         lSprayTime.Text = secondsToNice(spraydistance / flightspeed);
+                        totalSprayTime = String.Format("ST{0:00}-{1:00}", (spraydistance / flightspeed) % 60, (((spraydistance / flightspeed) / 60) % 60));
+
 
                     }
 
@@ -6226,6 +6239,14 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             }
         }
 
+
+
+
+
+
+
+
+
         /// <summary>
         /// Saves a waypoint writer file
         /// </summary>
@@ -9423,22 +9444,140 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             return result;
         }
 
-        private void btnSaveCZML_Click(object sender, EventArgs e)
+        private void btnSaveAllFormats_Click(object sender, EventArgs e)
         {
+
+            //Mission sanity checks
+            if (!missionSanityChecks())
+                return;
+
             //Save a file dialog
 
             SaveFileDialog sfd = new SaveFileDialog();
-            sfd.Filter = "CZML files|*.czml|All files|*.*";
-            sfd.Title = "Save a CZML file";
-            sfd.FileName = "Mission.czml";
+            sfd.Filter = "All files|*.*";
+            sfd.Title = "Save mission on All three formats";
+            sfd.FileName = "Mission";
+
+            string file = "";
+            string stat = "_" + totalDistance + "_" + totalTime + "_" + totalSprayTime + "_" + totalSprayDistance;
+
+
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-                string czml = getCZML();
+
+                file = sfd.FileName + stat;
+
+
+
+                //save plan file
+                //Switch back to MISSION view
+                cmb_missiontype.SelectedItem = MAVLink.MAV_MISSION_TYPE.MISSION;
+
+                var list = GetCommandList();
+                Locationwp home = new Locationwp();
+                try
+                {
+                    home.id = (ushort)MAVLink.MAV_CMD.WAYPOINT;
+                    home.lat = (double.Parse(TXT_homelat.Text));
+                    home.lng = (double.Parse(TXT_homelng.Text));
+                    home.alt = (float.Parse(TXT_homealt.Text) /
+                                CurrentState.multiplieralt); // use saved home
+                }
+                catch
+                {
+                }
+
+                list.Insert(0, home);
+
+                List<Locationwp> fencelist = new List<Locationwp>();
+                if (MainV2.comPort.MAV.cs.connected)
+                {
+                    fencelist = MainV2.comPort.MAV.fencepoints.Values.Select(a => (Locationwp)a).ToList();
+                }
+                else
+                {
+                    fencelist = editedFencePoints.Select(a => (Locationwp)a).ToList();
+                }
+
+
+
+                var format =
+                    MissionFile.ConvertFromLocationwps(list, fencelist, (byte)(altmode)CMB_altmode.SelectedValue);
+                MissionFile.WriteFile(file + ".plan", format);   // file contains the full path.
+
+
+                //Save waypoint file
+
+                StreamWriter sw = new StreamWriter(file + ".waypoint");
+                sw.WriteLine("QGC WPL 110");
+                try
+                {
+                    sw.WriteLine("0\t1\t0\t16\t0\t0\t0\t0\t" +
+                                 double.Parse(TXT_homelat.Text).ToString("0.0000000", new CultureInfo("en-US")) +
+                                 "\t" +
+                                 double.Parse(TXT_homelng.Text).ToString("0.0000000", new CultureInfo("en-US")) +
+                                 "\t" +
+                                 (double.Parse(TXT_homealt.Text) / CurrentState.multiplieralt).ToString("0.000000", new CultureInfo("en-US")) +
+                                 "\t1");
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                    sw.WriteLine("0\t1\t0\t0\t0\t0\t0\t0\t0\t0\t0\t1");
+                }
+
+                for (int a = 0; a < Commands.Rows.Count - 0; a++)
+                {
+                    ushort mode = 0;
+
+                    if (Commands.Rows[a].Cells[0].Value.ToString() == "UNKNOWN")
+                    {
+                        mode = (ushort)Commands.Rows[a].Cells[Command.Index].Tag;
+                    }
+                    else
+                    {
+                        mode = getCmdID(Commands.Rows[a].Cells[Command.Index].Value.ToString());
+                    }
+
+                    sw.Write((a + 1)); // seq
+                    sw.Write("\t" + 0); // current
+                    sw.Write("\t" + ((int)Commands.Rows[a].Cells[Frame.Index].Value).ToString()); //frame
+                    sw.Write("\t" + mode);
+                    sw.Write("\t" +
+                             double.Parse(Commands.Rows[a].Cells[Param1.Index].Value.ToString())
+                                 .ToString("0.00000000", new CultureInfo("en-US")));
+                    sw.Write("\t" +
+                             double.Parse(Commands.Rows[a].Cells[Param2.Index].Value.ToString())
+                                 .ToString("0.00000000", new CultureInfo("en-US")));
+                    sw.Write("\t" +
+                             double.Parse(Commands.Rows[a].Cells[Param3.Index].Value.ToString())
+                                 .ToString("0.00000000", new CultureInfo("en-US")));
+                    sw.Write("\t" +
+                             double.Parse(Commands.Rows[a].Cells[Param4.Index].Value.ToString())
+                                 .ToString("0.00000000", new CultureInfo("en-US")));
+                    sw.Write("\t" +
+                             double.Parse(Commands.Rows[a].Cells[Lat.Index].Value.ToString())
+                                 .ToString("0.00000000", new CultureInfo("en-US")));
+                    sw.Write("\t" +
+                             double.Parse(Commands.Rows[a].Cells[Lon.Index].Value.ToString())
+                                 .ToString("0.00000000", new CultureInfo("en-US")));
+                    sw.Write("\t" +
+                             (double.Parse(Commands.Rows[a].Cells[Alt.Index].Value.ToString()) /
+                              CurrentState.multiplieralt).ToString("0.000000", new CultureInfo("en-US")));
+                    sw.Write("\t" + 1);
+                    sw.WriteLine("");
+                }
+
+                sw.Close();
+
+
+            //Save CZML file
+            string czml = getCZML();
                 if (czml != "")
                 {
-                    StreamWriter sw = new StreamWriter(sfd.FileName);
-                    sw.Write(czml);
-                    sw.Close();
+                    StreamWriter sw1 = new StreamWriter(file + ".czml");
+                    sw1.Write(czml);
+                    sw1.Close();
                 }
                 else
                 {

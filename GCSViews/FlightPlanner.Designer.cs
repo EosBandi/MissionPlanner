@@ -132,6 +132,7 @@ namespace MissionPlanner.GCSViews
             this.BUT_loadwpfile = new MissionPlanner.Controls.MyButton();
             this.BUT_saveWPFile = new MissionPlanner.Controls.MyButton();
             this.customButton = new MissionPlanner.Controls.MyButton();
+            this.btnSaveCZML = new MissionPlanner.Controls.MyButton();
             this.splitter2 = new System.Windows.Forms.Splitter();
             this.panelMap = new System.Windows.Forms.Panel();
             this.lbl_homedist = new System.Windows.Forms.Label();
@@ -235,7 +236,6 @@ namespace MissionPlanner.GCSViews
             this.zoomToVehicleToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToMissionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToHomeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.btnSaveCZML = new MissionPlanner.Controls.MyButton();
             this.panel5.SuspendLayout();
             this.panel1.SuspendLayout();
             this.panelWaypoints.SuspendLayout();
@@ -867,6 +867,14 @@ namespace MissionPlanner.GCSViews
             this.customButton.Name = "customButton";
             this.customButton.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
             this.customButton.UseVisualStyleBackColor = true;
+            // 
+            // btnSaveCZML
+            // 
+            resources.ApplyResources(this.btnSaveCZML, "btnSaveCZML");
+            this.btnSaveCZML.Name = "btnSaveCZML";
+            this.btnSaveCZML.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
+            this.btnSaveCZML.UseVisualStyleBackColor = true;
+            this.btnSaveCZML.Click += new System.EventHandler(this.btnSaveAllFormats_Click);
             // 
             // splitter2
             // 
@@ -1607,14 +1615,6 @@ namespace MissionPlanner.GCSViews
             this.zoomToHomeToolStripMenuItem.Name = "zoomToHomeToolStripMenuItem";
             resources.ApplyResources(this.zoomToHomeToolStripMenuItem, "zoomToHomeToolStripMenuItem");
             this.zoomToHomeToolStripMenuItem.Click += new System.EventHandler(this.zoomToHomeToolStripMenuItem_Click);
-            // 
-            // btnSaveCZML
-            // 
-            resources.ApplyResources(this.btnSaveCZML, "btnSaveCZML");
-            this.btnSaveCZML.Name = "btnSaveCZML";
-            this.btnSaveCZML.TextColorNotEnabled = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(87)))), ((int)(((byte)(4)))));
-            this.btnSaveCZML.UseVisualStyleBackColor = true;
-            this.btnSaveCZML.Click += new System.EventHandler(this.btnSaveCZML_Click);
             // 
             // FlightPlanner
             // 
