@@ -10,7 +10,7 @@ MSBuild.exe MissionPlanner.sln /restore /m /p:Configuration=Release /verbosity:n
 if errorlevel 1 exit /b errorlevel
 
 cd ./msi
+del MissionPlanner*.*
 ./installer.bat
-
 
 
