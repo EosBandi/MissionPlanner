@@ -6846,8 +6846,25 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                             (Math.Sqrt(Math.Pow(distance, 2) + Math.Pow(height, 2)) * CurrentState.multiplierdist)
                             .ToString("0.0");
 
-                        Commands.Rows[int.Parse(lla.Tag) - 1].Cells[AZ.Index].Value =
-                            ((lla.GetBearing(last) + 180) % 360).ToString("0");
+                        Commands.Rows[int.Parse(lla.Tag) - 1].Cells[AZ.Index].Value =                            ((lla.GetBearing(last) + 180) % 360).ToString("0");
+
+
+                        // Add a warning color to the frame if it is different from the selected al mode
+                        if (CHK_checkFrame.Checked)
+                        {
+
+                            string altref = CMB_altmode.SelectedValue.ToString();
+                            string wpaltref = Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Frame.Index].Value.ToString();
+
+                            if (Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Frame.Index].Value.ToString() != altref)
+                            {
+                                Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Frame.Index].Style.BackColor = Color.DarkOrange;
+                            }
+                            else
+                            {
+                                Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Frame.Index].Style.BackColor = Commands.BackgroundColor;
+                            }
+                        }
 
 
                         // Dont do AGL calculation for TAKEOFF and LAND commands
@@ -9653,6 +9670,11 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             public double terrainalt;
         }
 
+        private void CHK_checkFrame_CheckedChanged(object sender, EventArgs e)
+        {
+            writeKML();
+
+        }
     }
 
 }
