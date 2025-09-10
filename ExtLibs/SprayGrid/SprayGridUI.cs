@@ -468,6 +468,15 @@ namespace MissionPlanner.SprayGrid
                 barwidth = 0;
             }
 
+            //Quick hack to ignore obstacles
+            if (chkIgnoreFences.Checked)
+            {
+                obstacles.Clear();
+            }
+            else
+            {
+                getObstaclesFromFences();
+            }
             grid = Utilities.Grid.CreateSprayGrid(list, (double)NUM_altitude.Value + (double)NUM_gpsOffset.Value, (double)NUM_Distance.Value,
                 (double)NUM_angle.Value,
                 (Utilities.Grid.StartPosition)Enum.Parse(typeof(Utilities.Grid.StartPosition), CMB_startfrom.Text), (float)NUM_LaneSeparation.Value,
@@ -1654,6 +1663,10 @@ namespace MissionPlanner.SprayGrid
         private void btN_SaveGrid_Click(object sender, EventArgs e)
         {
             SaveGrid();
+        }
+        private void chkIgnoreFences_CheckedChanged(object sender, EventArgs e)
+        {
+            recalculateGrid(sender,e);
         }
     }
 }

@@ -98,6 +98,7 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.map = new MissionPlanner.Controls.myGMAP();
+            this.chkIgnoreFences = new System.Windows.Forms.CheckBox();
             this.groupBox5.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.NUM_trackingAltError)).BeginInit();
             this.groupBox6.SuspendLayout();
@@ -325,6 +326,7 @@
             // groupBox6
             // 
             resources.ApplyResources(this.groupBox6, "groupBox6");
+            this.groupBox6.Controls.Add(this.chkIgnoreFences);
             this.groupBox6.Controls.Add(this.NUM_gpsOffset);
             this.groupBox6.Controls.Add(this.label18);
             this.groupBox6.Controls.Add(this.btN_SaveGrid);
@@ -766,6 +768,13 @@
             this.map.ShowTileGridLines = false;
             this.map.Zoom = 3D;
             // 
+            // chkIgnoreFences
+            // 
+            resources.ApplyResources(this.chkIgnoreFences, "chkIgnoreFences");
+            this.chkIgnoreFences.Name = "chkIgnoreFences";
+            this.chkIgnoreFences.UseVisualStyleBackColor = true;
+            this.chkIgnoreFences.CheckedChanged += new System.EventHandler(this.chkIgnoreFences_CheckedChanged);
+            // 
             // SprayGridUI
             // 
             resources.ApplyResources(this, "$this");
@@ -871,5 +880,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label lbl_SprayDistance;
         private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.CheckBox chkIgnoreFences;
     }
 }
