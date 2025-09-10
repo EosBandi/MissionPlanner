@@ -82,8 +82,8 @@ namespace MissionPlanner.GCSViews
             this.lSprayDistance = new System.Windows.Forms.Label();
             this.lTotalFlightTime = new System.Windows.Forms.Label();
             this.lTotalDistance = new System.Windows.Forms.Label();
-            this.label9 = new System.Windows.Forms.Label();
-            this.label10 = new System.Windows.Forms.Label();
+            this.lTextSprayTime = new System.Windows.Forms.Label();
+            this.lTextSprayDistance = new System.Windows.Forms.Label();
             this.label8 = new System.Windows.Forms.Label();
             this.label7 = new System.Windows.Forms.Label();
             this.myButton2 = new MissionPlanner.Controls.MyButton();
@@ -431,8 +431,8 @@ namespace MissionPlanner.GCSViews
             this.panelWaypoints.Controls.Add(this.lSprayDistance);
             this.panelWaypoints.Controls.Add(this.lTotalFlightTime);
             this.panelWaypoints.Controls.Add(this.lTotalDistance);
-            this.panelWaypoints.Controls.Add(this.label9);
-            this.panelWaypoints.Controls.Add(this.label10);
+            this.panelWaypoints.Controls.Add(this.lTextSprayTime);
+            this.panelWaypoints.Controls.Add(this.lTextSprayDistance);
             this.panelWaypoints.Controls.Add(this.label8);
             this.panelWaypoints.Controls.Add(this.label7);
             this.panelWaypoints.Controls.Add(this.myButton2);
@@ -478,13 +478,13 @@ namespace MissionPlanner.GCSViews
             // 
             // label9
             // 
-            resources.ApplyResources(this.label9, "label9");
-            this.label9.Name = "label9";
+            resources.ApplyResources(this.lTextSprayTime, "label9");
+            this.lTextSprayTime.Name = "label9";
             // 
             // label10
             // 
-            resources.ApplyResources(this.label10, "label10");
-            this.label10.Name = "label10";
+            resources.ApplyResources(this.lTextSprayDistance, "label10");
+            this.lTextSprayDistance.Name = "label10";
             // 
             // label8
             // 
@@ -1825,8 +1825,8 @@ namespace MissionPlanner.GCSViews
         public MyButton myButton1;
         public MyButton myButton2;
         public MyButton btnThreeDee;
-        private Label label9;
-        private Label label10;
+        private Label lTextSprayTime;
+        private Label lTextSprayDistance;
         private Label label8;
         private Label label7;
         private Label lSprayTime;

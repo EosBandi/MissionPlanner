@@ -81,7 +81,7 @@ namespace MissionPlanner.SprayGrid
                 col.Add(but);
 
 
-            if (MissionPlanner.Utilities.Settings.Instance.GetBoolean("ShowSprayGridButton", true) == true)
+            if (MissionPlanner.Utilities.Settings.Instance.GetBoolean("ShowSprayGridButton", false) == true)
             {
 
                 MainV2.instance.Invoke((Action)

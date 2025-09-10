@@ -302,16 +302,22 @@ namespace MissionPlanner.GCSViews
                 btnSaveCZML.Visible = false;
             }
 
+            // Check config.xml for sprayPlanner
+            if (Settings.Instance.GetBoolean("ShowSprayGridButton", false))
+            {
+                lTextSprayDistance.Visible = true;
+                lTextSprayTime.Visible = true;
+                lSprayDistance.Visible = true;
+                lSprayTime.Visible = true;
+            }
+            else
+            {
+                lTextSprayDistance.Visible = false;
+                lTextSprayTime.Visible = false;
+                lSprayDistance.Visible = false;
+                lSprayTime.Visible = false;
+            }
 
-            /*
-            var timer = new System.Timers.Timer();
-
-            // 2 second
-            timer.Interval = 2000;
-            timer.Elapsed += updateMapType;
-
-            timer.Start();
-            */
         }
 
         public static FlightPlanner instance { get; set; }
