@@ -153,6 +153,7 @@ namespace MissionPlanner.GCSViews
         private string totalSprayDistance = "";
         private string totalSprayTime = "";
 
+        private string lastLoadedFilename = "";
         public void Init()
         {
             instance = this;
@@ -1683,17 +1684,21 @@ namespace MissionPlanner.GCSViews
                         distance += home.GetDistance(firstWP);
                         distance += home.GetDistance(lastWP);
 
+
+                        //Display labels
                         lTotalDistance.Text = String.Format("{0:0.000} km", distance / 1000);
-                        totalDistance = String.Format("FD{0:#0000}", distance);
-
                         lSprayDistance.Text = String.Format("{0:0.000} km", spraydistance / 1000);
-                        totalSprayDistance = String.Format("FT{0:#0000}", spraydistance);
-
                         lTotalFlightTime.Text = secondsToNice(distance / flightspeed);
-                        totalTime = String.Format("FT{0:00}-{1:00}", (distance / flightspeed) % 60, (((distance / flightspeed) / 60) % 60));
-
                         lSprayTime.Text = secondsToNice(spraydistance / flightspeed);
-                        totalSprayTime = String.Format("ST{0:00}-{1:00}", (spraydistance / flightspeed) % 60, (((spraydistance / flightspeed) / 60) % 60));
+
+
+                        //Filename stats
+                        totalDistance = String.Format("FD{0:#0000}", distance);
+                        totalSprayDistance = String.Format("SD{0:#0000}", spraydistance);
+                        double flightseconds = distance / flightspeed;
+                        totalTime = String.Format("FT{1:00}-{0:00}", (int)(flightseconds) % 60, (((int)(flightseconds) / 60) % 60));
+                        flightseconds = spraydistance / flightspeed;
+                        totalSprayTime = String.Format("ST{1:00}-{0:00}", (int)(flightseconds) % 60, (((int)(flightseconds) / 60) % 60));
 
 
                     }
@@ -2093,6 +2098,11 @@ namespace MissionPlanner.GCSViews
                     }
 
                     lbl_wpfile.Text = "Loaded " + Path.GetFileName(file);
+                    lastLoadedFilename = Path.GetFileName(file);
+                    //remove the extension from the filename, but allow the filename contains dots
+                    if (lastLoadedFilename.Contains('.'))
+                        lastLoadedFilename = lastLoadedFilename.Substring(0, lastLoadedFilename.LastIndexOf('.'));
+
                 }
             }
         }
@@ -9488,18 +9498,13 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             SaveFileDialog sfd = new SaveFileDialog();
             sfd.Filter = "All files|*.*";
             sfd.Title = "Save mission on All three formats";
-            sfd.FileName = "Mission";
+            sfd.FileName = lastLoadedFilename;
 
-            string file = "";
-            string stat = "_" + totalDistance + "_" + totalTime + "_" + totalSprayTime + "_" + totalSprayDistance;
+            string stat_czml = "." + totalDistance + "." + totalTime + "." + totalSprayTime + "." + totalSprayDistance;
 
 
             if (sfd.ShowDialog() == DialogResult.OK)
             {
-
-                file = sfd.FileName + stat;
-
-
 
                 //save plan file
                 //Switch back to MISSION view
@@ -9535,12 +9540,12 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
                 var format =
                     MissionFile.ConvertFromLocationwps(list, fencelist, (byte)(altmode)CMB_altmode.SelectedValue);
-                MissionFile.WriteFile(file + ".plan", format);   // file contains the full path.
+                MissionFile.WriteFile(sfd.FileName + ".plan", format);   // file contains the full path.
 
 
                 //Save waypoint file
 
-                StreamWriter sw = new StreamWriter(file + ".waypoint");
+                StreamWriter sw = new StreamWriter(sfd.FileName + ".waypoints");
                 sw.WriteLine("QGC WPL 110");
                 try
                 {
@@ -9607,7 +9612,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             string czml = getCZML();
                 if (czml != "")
                 {
-                    StreamWriter sw1 = new StreamWriter(file + ".czml");
+                    StreamWriter sw1 = new StreamWriter(sfd.FileName + stat_czml + ".czml");
                     sw1.Write(czml);
                     sw1.Close();
                 }
