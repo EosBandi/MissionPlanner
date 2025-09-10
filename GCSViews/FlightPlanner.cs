@@ -5748,7 +5748,22 @@ namespace MissionPlanner.GCSViews
                     // not home
                     if (i != 0)
                     {
-                        CMB_altmode.SelectedValue = temp.frame;
+                        switch((altmode)temp.frame)
+                        {
+                            case altmode.Absolute:
+                                CMB_altmode.SelectedIndex = 1;
+                                break;
+
+                            case altmode.Terrain:
+                                CMB_altmode.SelectedIndex = 2;
+                                break;
+                            case altmode.Relative:
+                                CMB_altmode.SelectedIndex = 0;
+                                break;
+                            default:
+                                CMB_altmode.SelectedIndex = 1;
+                                break;
+                        }
                     }
                 }
 
