@@ -6824,6 +6824,8 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
             PointLatLngAlt last = HomeLocation;
             double min_agl = 0;
             double.TryParse(TXT_altwarn.Text.Replace(',', '.'), NumberStyles.Any, CultureInfo.InvariantCulture, out min_agl);
+            bool altmodewarning = false;
+
 
             foreach (var lla in pointlist)
             {
@@ -6860,12 +6862,19 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                             if (Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Frame.Index].Value.ToString() != altref)
                             {
                                 Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Frame.Index].Style.BackColor = Color.DarkOrange;
+                                altmodewarning = true;
                             }
                             else
                             {
                                 Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Frame.Index].Style.BackColor = Commands.BackgroundColor;
                             }
                         }
+                        else
+                        {
+                            // if no check then color back to normal
+                            Commands.Rows[int.Parse(lla.Tag) - 1].Cells[Frame.Index].Style.BackColor = Commands.BackgroundColor;
+                        }
+
 
 
                         // Dont do AGL calculation for TAKEOFF and LAND commands
@@ -6916,6 +6925,16 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
                 a++;
                 last = lla;
             }
+
+            if (altmodewarning && CHK_checkFrame.Checked)
+            {
+                CHK_checkFrame.BackColor = Color.DarkOrange;
+            }
+            else
+            {
+                CHK_checkFrame.BackColor = CHK_verifyheight.BackColor;
+            }
+
         }
 
         public void setHomeHereToolStripMenuItem_Click(object sender, EventArgs e)
@@ -9673,6 +9692,7 @@ Column 1: Field type (RALLY is the only one at the moment -- may have RALLY_LAND
 
         private void CHK_checkFrame_CheckedChanged(object sender, EventArgs e)
         {
+            //quickadd = false;
             writeKML();
 
         }
