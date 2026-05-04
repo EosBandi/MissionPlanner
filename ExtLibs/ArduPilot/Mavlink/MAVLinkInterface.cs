@@ -424,21 +424,21 @@ namespace MissionPlanner
         private int _bps2 = 0;
         private DateTime _bpstime { get; set; }
 
-        public bool MirrorStreamWrite { 
+        public bool MirrorStreamWrite {
             get {
                 if (Mirrors.Count > 0)
                     return Mirrors[0].MirrorStreamWrite;
 
                 Mirrors.Add(new Mirror());
                 return MirrorStreamWrite;
-            } 
-            set 
+            }
+            set
             {
                 if (Mirrors.Count > 0)
                     Mirrors[0].MirrorStreamWrite = value;
                 else
                     Mirrors.Add(new Mirror() { MirrorStreamWrite = value });
-            } 
+            }
         }
         public ICommsSerial MirrorStream {
             get
@@ -1257,7 +1257,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting
             lock (writelock)
             {
                 byte[] data = MavlinkUtil.StructureToByteArray(indata);
-                
+
                 int i = 0;
 
                 // are we mavlink2 enabled for this sysid/compid
@@ -2108,7 +2108,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting
                         var backupseenvalid = seenvalid;
                         if (param_total > 1)
                             startindex = (short) (tenbytenindex % (param_total - 1));
-                        
+
                         seenvalid = 0;
 
                         // seeing more than what we requested... skip this round - maybe full param list is still inflight
@@ -2776,7 +2776,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting
                             start = DateTime.Now;
                             retrys = 0;
                             continue;
-                        } 
+                        }
                         else if (ack.result == (byte) MAV_RESULT.ACCEPTED)
                         {
                             giveComport = false;
@@ -4410,7 +4410,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting
                 else
                 {
                     setPositionTargetGlobalInt((byte) sysid, (byte) compid,
-                        true, false, false, false, MAVLink.MAV_FRAME.GLOBAL_RELATIVE_ALT_INT,
+                        true, false, false, false, (MAV_FRAME)gotohere.frame,
                         gotohere.lat, gotohere.lng, gotohere.alt, 0, 0, 0, 0, 0);
                 }
             }
@@ -4651,12 +4651,12 @@ Mission Planner waits for 2 valid heartbeat packets before connecting
                 Console.WriteLine(DateTime.Now.Millisecond + " SR0 " + BaseStream?.BytesToRead);
 
             await readlock.WaitAsync().ConfigureAwait(false);
-            
+
             try
             {
                 if (debug)
                     Console.WriteLine(DateTime.Now.Millisecond + " SR1 " + BaseStream?.BytesToRead);
-                
+
                 readloop:
 
                 while ((BaseStream != null && BaseStream.IsOpen) || logreadmode)
@@ -5959,7 +5959,7 @@ Mission Planner waits for 2 valid heartbeat packets before connecting
                 OnPacketReceived += handler;
 
                 _OnPacketReceived.GetInvocationList().ForEach(a => log.Info(a.GetMethodInfo().ToJSON()));
-                
+
 
                 mavlink_log_request_data_t req = new mavlink_log_request_data_t();
 
