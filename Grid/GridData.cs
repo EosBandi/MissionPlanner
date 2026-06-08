@@ -63,6 +63,13 @@ namespace MissionPlanner.Grid
         public decimal setservo_low;
         public decimal setservo_high;
 
+        // mount control
+        public bool mount_duringflight;
+        public decimal mount_df_pitch;
+        public decimal mount_df_yaw;
+        public bool mount_afterflight;
+        public decimal mount_af_pitch;
+        public decimal mount_af_yaw;
 
     }
 }

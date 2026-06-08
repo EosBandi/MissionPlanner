@@ -57,6 +57,15 @@
             this.label23 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
             this.tabCamera = new System.Windows.Forms.TabPage();
+            this.groupBox_mount = new System.Windows.Forms.GroupBox();
+            this.lbl_mount_pitch = new System.Windows.Forms.Label();
+            this.lbl_mount_yaw = new System.Windows.Forms.Label();
+            this.chk_mount_duringflight = new System.Windows.Forms.CheckBox();
+            this.num_mount_df_pitch = new System.Windows.Forms.NumericUpDown();
+            this.num_mount_df_yaw = new System.Windows.Forms.NumericUpDown();
+            this.chk_mount_afterflight = new System.Windows.Forms.CheckBox();
+            this.num_mount_af_pitch = new System.Windows.Forms.NumericUpDown();
+            this.num_mount_af_yaw = new System.Windows.Forms.NumericUpDown();
             this.groupBox3 = new System.Windows.Forms.GroupBox();
             this.label42 = new System.Windows.Forms.Label();
             this.num_setservono = new System.Windows.Forms.NumericUpDown();
@@ -171,6 +180,11 @@
             this.map = new MissionPlanner.Controls.myGMAP();
             this.groupBox5.SuspendLayout();
             this.tabCamera.SuspendLayout();
+            this.groupBox_mount.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.num_mount_df_pitch)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.num_mount_df_yaw)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.num_mount_af_pitch)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.num_mount_af_yaw)).BeginInit();
             this.groupBox3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.num_setservono)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.num_setservolow)).BeginInit();
@@ -373,11 +387,94 @@
             // 
             // tabCamera
             // 
+            this.tabCamera.Controls.Add(this.groupBox_mount);
             this.tabCamera.Controls.Add(this.groupBox3);
             this.tabCamera.Controls.Add(this.groupBox2);
             resources.ApplyResources(this.tabCamera, "tabCamera");
             this.tabCamera.Name = "tabCamera";
             this.tabCamera.UseVisualStyleBackColor = true;
+            //
+            // groupBox_mount
+            //
+            this.groupBox_mount.Controls.Add(this.lbl_mount_pitch);
+            this.groupBox_mount.Controls.Add(this.lbl_mount_yaw);
+            this.groupBox_mount.Controls.Add(this.chk_mount_duringflight);
+            this.groupBox_mount.Controls.Add(this.num_mount_df_pitch);
+            this.groupBox_mount.Controls.Add(this.num_mount_df_yaw);
+            this.groupBox_mount.Controls.Add(this.chk_mount_afterflight);
+            this.groupBox_mount.Controls.Add(this.num_mount_af_pitch);
+            this.groupBox_mount.Controls.Add(this.num_mount_af_yaw);
+            this.groupBox_mount.Location = new System.Drawing.Point(7, 510);
+            this.groupBox_mount.Name = "groupBox_mount";
+            this.groupBox_mount.Size = new System.Drawing.Size(231, 95);
+            this.groupBox_mount.TabStop = false;
+            this.groupBox_mount.Text = "Mount Control";
+            //
+            // lbl_mount_pitch
+            //
+            this.lbl_mount_pitch.AutoSize = true;
+            this.lbl_mount_pitch.Location = new System.Drawing.Point(110, 18);
+            this.lbl_mount_pitch.Name = "lbl_mount_pitch";
+            this.lbl_mount_pitch.Size = new System.Drawing.Size(34, 13);
+            this.lbl_mount_pitch.Text = "Pitch";
+            //
+            // lbl_mount_yaw
+            //
+            this.lbl_mount_yaw.AutoSize = true;
+            this.lbl_mount_yaw.Location = new System.Drawing.Point(172, 18);
+            this.lbl_mount_yaw.Name = "lbl_mount_yaw";
+            this.lbl_mount_yaw.Size = new System.Drawing.Size(28, 13);
+            this.lbl_mount_yaw.Text = "Yaw";
+            //
+            // chk_mount_duringflight
+            //
+            this.chk_mount_duringflight.AutoSize = true;
+            this.chk_mount_duringflight.Location = new System.Drawing.Point(9, 38);
+            this.chk_mount_duringflight.Name = "chk_mount_duringflight";
+            this.chk_mount_duringflight.Size = new System.Drawing.Size(85, 17);
+            this.chk_mount_duringflight.Text = "During flight";
+            this.chk_mount_duringflight.UseVisualStyleBackColor = true;
+            //
+            // num_mount_df_pitch
+            //
+            this.num_mount_df_pitch.Location = new System.Drawing.Point(105, 36);
+            this.num_mount_df_pitch.Maximum = new decimal(new int[] { 180, 0, 0, 0});
+            this.num_mount_df_pitch.Minimum = new decimal(new int[] { 180, 0, 0, -2147483648});
+            this.num_mount_df_pitch.Name = "num_mount_df_pitch";
+            this.num_mount_df_pitch.Size = new System.Drawing.Size(50, 20);
+            //
+            // num_mount_df_yaw
+            //
+            this.num_mount_df_yaw.Location = new System.Drawing.Point(160, 36);
+            this.num_mount_df_yaw.Maximum = new decimal(new int[] { 180, 0, 0, 0});
+            this.num_mount_df_yaw.Minimum = new decimal(new int[] { 180, 0, 0, -2147483648});
+            this.num_mount_df_yaw.Name = "num_mount_df_yaw";
+            this.num_mount_df_yaw.Size = new System.Drawing.Size(50, 20);
+            //
+            // chk_mount_afterflight
+            //
+            this.chk_mount_afterflight.AutoSize = true;
+            this.chk_mount_afterflight.Location = new System.Drawing.Point(9, 65);
+            this.chk_mount_afterflight.Name = "chk_mount_afterflight";
+            this.chk_mount_afterflight.Size = new System.Drawing.Size(79, 17);
+            this.chk_mount_afterflight.Text = "After flight";
+            this.chk_mount_afterflight.UseVisualStyleBackColor = true;
+            //
+            // num_mount_af_pitch
+            //
+            this.num_mount_af_pitch.Location = new System.Drawing.Point(105, 63);
+            this.num_mount_af_pitch.Maximum = new decimal(new int[] { 180, 0, 0, 0});
+            this.num_mount_af_pitch.Minimum = new decimal(new int[] { 180, 0, 0, -2147483648});
+            this.num_mount_af_pitch.Name = "num_mount_af_pitch";
+            this.num_mount_af_pitch.Size = new System.Drawing.Size(50, 20);
+            //
+            // num_mount_af_yaw
+            //
+            this.num_mount_af_yaw.Location = new System.Drawing.Point(160, 63);
+            this.num_mount_af_yaw.Maximum = new decimal(new int[] { 180, 0, 0, 0});
+            this.num_mount_af_yaw.Minimum = new decimal(new int[] { 180, 0, 0, -2147483648});
+            this.num_mount_af_yaw.Name = "num_mount_af_yaw";
+            this.num_mount_af_yaw.Size = new System.Drawing.Size(50, 20);
             // 
             // groupBox3
             // 
@@ -1470,6 +1567,12 @@
             this.groupBox5.ResumeLayout(false);
             this.groupBox5.PerformLayout();
             this.tabCamera.ResumeLayout(false);
+            this.groupBox_mount.ResumeLayout(false);
+            this.groupBox_mount.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.num_mount_df_pitch)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.num_mount_df_yaw)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.num_mount_af_pitch)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.num_mount_af_yaw)).EndInit();
             this.groupBox3.ResumeLayout(false);
             this.groupBox3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.num_setservono)).EndInit();
@@ -1546,6 +1649,15 @@
         private System.Windows.Forms.Label lbl_photoevery;
         private System.Windows.Forms.Label label35;
         private System.Windows.Forms.TabPage tabCamera;
+        private System.Windows.Forms.GroupBox groupBox_mount;
+        private System.Windows.Forms.Label lbl_mount_pitch;
+        private System.Windows.Forms.Label lbl_mount_yaw;
+        private System.Windows.Forms.CheckBox chk_mount_duringflight;
+        private System.Windows.Forms.NumericUpDown num_mount_df_pitch;
+        private System.Windows.Forms.NumericUpDown num_mount_df_yaw;
+        private System.Windows.Forms.CheckBox chk_mount_afterflight;
+        private System.Windows.Forms.NumericUpDown num_mount_af_pitch;
+        private System.Windows.Forms.NumericUpDown num_mount_af_yaw;
         private System.Windows.Forms.GroupBox groupBox3;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label label17;

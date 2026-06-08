@@ -238,6 +238,13 @@ namespace MissionPlanner.Grid
             num_setservolow.Value = griddata.setservo_low;
             num_setservohigh.Value = griddata.setservo_high;
 
+            chk_mount_duringflight.Checked = griddata.mount_duringflight;
+            num_mount_df_pitch.Value = griddata.mount_df_pitch;
+            num_mount_df_yaw.Value = griddata.mount_df_yaw;
+            chk_mount_afterflight.Checked = griddata.mount_afterflight;
+            num_mount_af_pitch.Value = griddata.mount_af_pitch;
+            num_mount_af_yaw.Value = griddata.mount_af_yaw;
+
             // Copter Settings
             NUM_copter_delay.Value = griddata.copter_delay;
             CHK_copter_headinghold.Checked = griddata.copter_headinghold_chk;
@@ -318,6 +325,13 @@ namespace MissionPlanner.Grid
             griddata.setservo_no = num_setservono.Value;
             griddata.setservo_low = num_setservolow.Value;
             griddata.setservo_high = num_setservohigh.Value;
+
+            griddata.mount_duringflight = chk_mount_duringflight.Checked;
+            griddata.mount_df_pitch = num_mount_df_pitch.Value;
+            griddata.mount_df_yaw = num_mount_df_yaw.Value;
+            griddata.mount_afterflight = chk_mount_afterflight.Checked;
+            griddata.mount_af_pitch = num_mount_af_pitch.Value;
+            griddata.mount_af_yaw = num_mount_af_yaw.Value;
 
             return griddata;
         }
@@ -790,7 +804,7 @@ namespace MissionPlanner.Grid
             float v_sq = (float)(((float)NUM_UpDownFlySpeed.Value / CurrentState.multiplierspeed) * ((float)NUM_UpDownFlySpeed.Value / CurrentState.multiplierspeed));
             float turnrad = (float)(v_sq / (float)(9.808f * Math.Tan(45 * deg2rad)));
 
-            // Update Stats 
+            // Update Stats
             if (DistUnits == "Feet")
             {
                 // Area
@@ -886,6 +900,12 @@ namespace MissionPlanner.Grid
 
         private void AddWP(double Lng, double Lat, double Alt, string tag, object gridobject = null)
         {
+            if (chk_mount_duringflight.Checked)
+            {
+                plugin.Host.AddWPtoList(MAVLink.MAV_CMD.DO_GIMBAL_MANAGER_PITCHYAW,
+                    (double)num_mount_df_pitch.Value, (double)num_mount_df_yaw.Value, 0, 0, 0, 0, 0, gridobject);
+            }
+
             if (CHK_copter_headinghold.Checked)
             {
                 plugin.Host.AddWPtoList(MAVLink.MAV_CMD.CONDITION_YAW, Convert.ToInt32(TXT_headinghold.Text), 0, 0, 0, 0, 0, 0, gridobject);
@@ -1810,6 +1830,12 @@ namespace MissionPlanner.Grid
                     if (rad_trigdist.Checked)
                     {
                         plugin.Host.AddWPtoList(MAVLink.MAV_CMD.DO_SET_CAM_TRIGG_DIST, 0, 0, 1, 0, 0, 0, 0, gridobject);
+                    }
+
+                    if (chk_mount_afterflight.Checked)
+                    {
+                        plugin.Host.AddWPtoList(MAVLink.MAV_CMD.DO_GIMBAL_MANAGER_PITCHYAW,
+                            (double)num_mount_af_pitch.Value, (double)num_mount_af_yaw.Value, 0, 0, 0, 0, 0, gridobject);
                     }
 
                     if (CHK_usespeed.Checked)
