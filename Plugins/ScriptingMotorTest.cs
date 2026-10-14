@@ -19,16 +19,17 @@ using CustomMessageBox = MissionPlanner.MsgBox.CustomMessageBox;
 namespace MissionPlanner.plugins
 {
     /// <summary>
-    /// Motor test for scripted frames (FRAME_CLASS / Q_FRAME_CLASS 15, 16, 17).
-    /// The motor layout of these frames is defined in a Lua script on the vehicle, so the
-    /// standard Motor Test page cannot know the motors. This plugin downloads the scripts
-    /// via MAVFTP (or loads a local .lua), finds the one that defines the matrix, extracts
-    /// motor numbers / testing order and offers the usual DO_MOTOR_TEST buttons.
+    /// Motor test for standard and scripted frames.
+    /// Standard frames use the AP_Motors layout table (APMotorLayout.json) like the built-in Motor Test.
+    /// For scripted frames (FRAME_CLASS / Q_FRAME_CLASS 15, 16, 17) the motor layout is defined in a
+    /// Lua script on the vehicle, so this plugin downloads the scripts via MAVFTP (or loads a local
+    /// .lua), finds the one that defines the matrix, extracts motor numbers / testing order and offers
+    /// the usual DO_MOTOR_TEST buttons.
     /// </summary>
     public class ScriptingMotorTestPlugin : Plugin.Plugin
     {
         public override string Name => "Scripting Matrix Motor Test";
-        public override string Version => "1.0";
+        public override string Version => "1.2";
         public override string Author => "Andras Schaffer";
 
         public override bool Init()
@@ -38,7 +39,7 @@ namespace MissionPlanner.plugins
 
         public override bool Loaded()
         {
-            InitialSetup.AddPluginViewPage(typeof(ConfigScriptingMotorTest), "Scripting Motor Test",
+            InitialSetup.AddPluginViewPage(typeof(ConfigScriptingMotorTest), "Motor Test+",
                 InitialSetup.pageOptions.isConnected | InitialSetup.pageOptions.gotAllParams);
             return true;
         }
@@ -86,12 +87,14 @@ namespace MissionPlanner.plugins
         public string Source = "";
         public int FrameClass;
         public int InitCount = -1;
+        /// <summary>layout comes from APMotorLayout.json instead of a script</summary>
+        public bool IsStandard;
         public List<ScriptMotor> Motors = new List<ScriptMotor>();
         public List<string> Warnings = new List<string>();
 
         public bool HasFactors
         {
-            get { return FrameClass == 15 && Motors.Count > 0 && Motors.All(m => m.Roll.HasValue && m.Pitch.HasValue); }
+            get { return (FrameClass == 15 || IsStandard) && Motors.Count > 0 && Motors.All(m => m.Roll.HasValue && m.Pitch.HasValue); }
         }
 
         public override string ToString()
@@ -730,7 +733,181 @@ namespace MissionPlanner.plugins
         }
     }
 
-    public class ConfigScriptingMotorTest : MyUserControl, IActivate
+    /// <summary>
+    /// A QuadPlane forward (horizontal) motor output: SERVOn_FUNCTION 70 Throttle, 73 Throttle Left, 74 Throttle Right.
+    /// </summary>
+    public class ForwardMotor
+    {
+        public static readonly int[] Functions = { 70, 73, 74 };
+
+        public int Output;
+        public int Function;
+        public int Min = 1100;
+        public int Max = 1900;
+        public int Trim = 1500;
+        public bool Reversed;
+        public bool DShot;
+
+        public string FunctionName
+        {
+            get
+            {
+                switch (Function)
+                {
+                    case 70: return "Throttle";
+                    case 73: return "Throttle Left";
+                    case 74: return "Throttle Right";
+                    default: return "Function " + Function;
+                }
+            }
+        }
+
+        public string ParamName
+        {
+            get { return "SERVO" + Output + "_FUNCTION"; }
+        }
+
+        /// <summary>PWM for a throttle percentage, 0% = SERVOn_MIN (SERVOn_MAX when reversed)</summary>
+        public int PwmForPercent(int pct)
+        {
+            pct = Math.Max(0, Math.Min(100, pct));
+            var range = Max - Min;
+            return Reversed ? Max - range * pct / 100 : Min + range * pct / 100;
+        }
+
+        public int IdlePwm
+        {
+            get { return PwmForPercent(0); }
+        }
+
+        public static List<ForwardMotor> Find(MAVLink.MAVLinkParamList param)
+        {
+            var result = new List<ForwardMotor>();
+            int blhOtype = GetInt(param, "SERVO_BLH_OTYPE", 0);
+            int blhMask = GetInt(param, "SERVO_BLH_MASK", 0);
+            bool blhAuto = GetInt(param, "SERVO_BLH_AUTO", 0) == 1;
+
+            for (int i = 1; i <= 32; i++)
+            {
+                var func = GetInt(param, "SERVO" + i + "_FUNCTION", -1);
+                if (!Functions.Contains(func))
+                    continue;
+                result.Add(new ForwardMotor
+                {
+                    Output = i,
+                    Function = func,
+                    Min = GetInt(param, "SERVO" + i + "_MIN", 1100),
+                    Max = GetInt(param, "SERVO" + i + "_MAX", 1900),
+                    Trim = GetInt(param, "SERVO" + i + "_TRIM", 1500),
+                    Reversed = GetInt(param, "SERVO" + i + "_REVERSED", 0) != 0,
+                    // a digital (DShot) output can not be driven with DO_SET_SERVO PWM
+                    DShot = blhOtype > 0 && (blhAuto || ((blhMask >> (i - 1)) & 1) == 1)
+                });
+            }
+
+            return result;
+        }
+
+        private static int GetInt(MAVLink.MAVLinkParamList param, string name, int def)
+        {
+            if (!param.ContainsKey(name) || param[name] == null)
+                return def;
+            return (int)param[name].Value;
+        }
+    }
+
+    /// <summary>
+    /// Motor layouts of the built-in frames, from the APMotorLayout.json that ships with Mission Planner
+    /// (generated from the AP_Motors library), the same source as the standard Motor Test page.
+    /// </summary>
+    public static class StandardLayout
+    {
+        private const string LayoutVersion = "AP_Motors library test ver 1.2";
+
+        // motor count per FRAME_CLASS when the frame type is not in the layout file
+        private static readonly Dictionary<int, int> FallbackCount = new Dictionary<int, int>
+        {
+            { 0, 4 }, { 1, 4 }, { 2, 6 }, { 3, 8 }, { 4, 8 }, { 5, 6 }, { 7, 3 }, { 8, 1 }, { 9, 2 }, { 10, 2 },
+            { 12, 12 }, { 13, 4 }, { 14, 10 }
+        };
+
+        public static bool IsHeli(int frameClass)
+        {
+            return frameClass == 6 || frameClass == 11;
+        }
+
+        public static ScriptMatrix Load(int frameClass, int frameType, string className, string typeName)
+        {
+            var result = new ScriptMatrix { FrameClass = frameClass, IsStandard = true };
+            result.FileName = className + " / " + typeName;
+
+            try
+            {
+                var file = Path.Combine(Settings.GetRunningDirectory(), "APMotorLayout.json");
+                var root = Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(file));
+                if ((string)root["Version"] != LayoutVersion)
+                {
+                    result.Warnings.Add("APMotorLayout.json has unexpected version " + (string)root["Version"]);
+                }
+                else
+                {
+                    foreach (var layout in root["layouts"])
+                    {
+                        if ((int)layout["Class"] != frameClass || (int)layout["Type"] != frameType)
+                            continue;
+
+                        foreach (var m in layout["motors"])
+                        {
+                            var rotation = (string)m["Rotation"];
+                            result.Motors.Add(new ScriptMotor
+                            {
+                                MotorNum = (int)m["Number"] - 1,
+                                TestOrder = (int)m["TestOrder"],
+                                Roll = (double)m["Roll"],
+                                Pitch = (double)m["Pitch"],
+                                // only the sign is used, for the CW/CCW label
+                                Yaw = rotation == "CW" ? -1 : rotation == "CCW" ? 1 : (double?)null
+                            });
+                        }
+
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                result.Warnings.Add("Could not read APMotorLayout.json: " + ex.Message);
+            }
+
+            if (result.Motors.Count == 0)
+            {
+                int count;
+                if (!FallbackCount.TryGetValue(frameClass, out count))
+                    count = 8;
+                result.Warnings.Add(string.Format(
+                    "Frame class {0} type {1} is not in the layout table, using {2} motors with unknown numbering",
+                    frameClass, frameType, count));
+                for (int a = 1; a <= count; a++)
+                    result.Motors.Add(new ScriptMotor { TestOrder = a });
+            }
+
+            result.InitCount = result.Motors.Count;
+            result.Motors = result.Motors.OrderBy(a => a.TestOrder).ToList();
+            return result;
+        }
+
+        /// <summary>Rover / boat: the standard page offers 4 motor test outputs</summary>
+        public static ScriptMatrix Rover()
+        {
+            var result = new ScriptMatrix { FileName = "Rover / Boat", IsStandard = true, FrameClass = -1 };
+            for (int a = 1; a <= 4; a++)
+                result.Motors.Add(new ScriptMotor { TestOrder = a });
+            result.InitCount = 4;
+            return result;
+        }
+    }
+
+    public class ConfigScriptingMotorTest : MyUserControl, IActivate, IDeactivate
     {
         private static readonly ILog log =
             LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
@@ -752,10 +929,17 @@ namespace MissionPlanner.plugins
         private readonly NumericUpDown numDuration;
         private readonly Panel panelMotors;
         private readonly Panel panelDiagram;
-        private readonly FlowLayoutPanel panelAll;
+        private readonly Panel panelForward;
 
         private int frameClass = -1;
         private ScriptMatrix current;
+
+        // QuadPlane forward motors
+        private const string RestoreSettingKey = "MotorTestPlus_restore";
+        private List<ForwardMotor> forwardMotors = new List<ForwardMotor>();
+        private readonly System.Windows.Forms.Timer forwardTimer = new System.Windows.Forms.Timer();
+        private ForwardMotor forwardRunning;
+        private bool forwardConfirmed;
 
         public ConfigScriptingMotorTest()
         {
@@ -772,7 +956,7 @@ namespace MissionPlanner.plugins
             Controls.Add(lblStatus);
             y += 22;
 
-            Controls.Add(new Label { Text = "Script:", Location = new Point(6, y + 4), AutoSize = true });
+            Controls.Add(new Label { Text = "Layout:", Location = new Point(6, y + 4), AutoSize = true });
             cmbScript = new ComboBox
             {
                 Location = new Point(60, y), Width = 260, DropDownStyle = ComboBoxStyle.DropDownList
@@ -803,7 +987,7 @@ namespace MissionPlanner.plugins
 
             var lblSafety = new Label
             {
-                Text = "NOTE: REMOVE PROPELLERS OR HOLD DOWN YOUR VEHICLE. Buttons follow the testing order defined in the script.",
+                Text = "NOTE: REMOVE PROPELLERS OR HOLD DOWN YOUR VEHICLE. Buttons follow the motor testing order (A = first).",
                 Location = new Point(6, y), AutoSize = true, ForeColor = Color.Red
             };
             Controls.Add(lblSafety);
@@ -834,28 +1018,39 @@ namespace MissionPlanner.plugins
             Controls.Add(link);
             y += 32;
 
-            panelMotors = new Panel { Location = new Point(6, y), Size = new Size(440, 100), AutoSize = true };
+            // motor rows on the left, diagram to their right, forward motors below both.
+            // The positions are recalculated in ShowMatrix so the panels never overlap.
+            panelMotors = new Panel
+            {
+                Location = new Point(6, y), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink
+            };
             Controls.Add(panelMotors);
 
             panelDiagram = new Panel { Location = new Point(456, y), Size = new Size(230, 230), BorderStyle = BorderStyle.FixedSingle };
             panelDiagram.Paint += panelDiagram_Paint;
             Controls.Add(panelDiagram);
 
-            panelAll = new FlowLayoutPanel { AutoSize = true, FlowDirection = FlowDirection.LeftToRight, WrapContents = false };
-            AddAllButton("Test all motors", but_TestAll_Click);
-            AddAllButton("Stop all motors", but_StopAll_Click);
-            AddAllButton("Test all in Sequence", but_TestAllSeq_Click);
+            panelForward = new Panel
+            {
+                Location = new Point(6, y + 240), AutoSize = true, AutoSizeMode = AutoSizeMode.GrowAndShrink,
+                Visible = false
+            };
+            Controls.Add(panelForward);
+
+            forwardTimer.Tick += (s, e) => StopForward();
         }
 
-        private void AddAllButton(string text, EventHandler handler)
+        private void AddAllButton(string text, EventHandler handler, int x, int y)
         {
-            var b = new MyButton { Text = text, Size = new Size(85, 37) };
+            var b = new MyButton { Text = text, Location = new Point(x, y), Size = new Size(85, 37) };
             b.Click += handler;
-            panelAll.Controls.Add(b);
+            panelMotors.Controls.Add(b);
         }
 
         public void Activate()
         {
+            RestorePending(false);
+
             current = null;
             cmbScript.Items.Clear();
             panelMotors.Controls.Clear();
@@ -863,13 +1058,23 @@ namespace MissionPlanner.plugins
             txtWarnings.Text = "";
 
             frameClass = -1;
+
+            var mav = MainV2.comPort.MAV;
+            if (mav.aptype == MAVLink.MAV_TYPE.GROUND_ROVER || mav.aptype == MAVLink.MAV_TYPE.SURFACE_BOAT)
+            {
+                lblFrame.Text = "Rover / Boat";
+                lblStatus.Text = "";
+                ShowStandard(StandardLayout.Rover());
+                return;
+            }
+
             string paramName = null;
             foreach (var name in new[] { "FRAME_CLASS", "Q_FRAME_CLASS" })
             {
-                if (MainV2.comPort.MAV.param.ContainsKey(name) && MainV2.comPort.MAV.param[name] != null)
+                if (mav.param.ContainsKey(name) && mav.param[name] != null)
                 {
                     paramName = name;
-                    frameClass = (int)MainV2.comPort.MAV.param[name].Value;
+                    frameClass = (int)mav.param[name].Value;
                     break;
                 }
             }
@@ -877,33 +1082,69 @@ namespace MissionPlanner.plugins
             if (paramName == null)
             {
                 lblFrame.Text = "No FRAME_CLASS or Q_FRAME_CLASS parameter found";
+                lblStatus.Text = "";
                 SetEnabled(false);
                 return;
             }
 
-            lblFrame.Text = paramName + " = " + frameClass + " (" + FrameClassName(paramName, frameClass) + ")";
+            var className = FrameClassName(paramName, frameClass);
+            lblFrame.Text = paramName + " = " + frameClass + " (" + className + ")";
 
             if (!LuaMatrixParser.IsScriptingFrame(frameClass))
             {
-                lblStatus.Text = "This is not a scripting frame (15, 16 or 17) - use the standard Motor Test page.";
-                SetEnabled(false);
+                if (StandardLayout.IsHeli(frameClass))
+                {
+                    lblStatus.Text = "Helicopter frames are not supported here - use the standard Motor Test page.";
+                    SetEnabled(false);
+                    return;
+                }
+
+                // FRAME_CLASS -> FRAME_TYPE, Q_FRAME_CLASS -> Q_FRAME_TYPE
+                var typeParam = paramName.Replace("CLASS", "TYPE");
+                int frameType = -1;
+                var typeName = "unknown";
+                if (mav.param.ContainsKey(typeParam) && mav.param[typeParam] != null)
+                {
+                    frameType = (int)mav.param[typeParam].Value;
+                    typeName = FrameClassName(typeParam, frameType);
+                    lblFrame.Text += ",  " + typeParam + " = " + frameType + " (" + typeName + ")";
+                }
+
+                lblStatus.Text = "";
+                ShowStandard(StandardLayout.Load(frameClass, frameType, className, typeName));
                 return;
             }
 
-            SetEnabled(true);
-
-            if (!MainV2.comPort.MAV.param.ContainsKey("SCR_ENABLE") ||
-                MainV2.comPort.MAV.param["SCR_ENABLE"].Value == 0)
+            if (!mav.param.ContainsKey("SCR_ENABLE") || mav.param["SCR_ENABLE"].Value == 0)
                 lblStatus.Text = "WARNING: SCR_ENABLE is not set, the matrix script is not running and motor tests will likely be denied.";
             else
                 lblStatus.Text = "";
 
+            SetEnabled(true);
+
             List<ScriptMatrix> cached;
-            if (cache.TryGetValue(MainV2.comPort.MAV.sysid, out cached) && cached.Count > 0 &&
+            if (cache.TryGetValue(mav.sysid, out cached) && cached.Count > 0 &&
                 cached[0].FrameClass == frameClass)
                 ShowScripts(cached);
             else
                 LoadFromVehicle();
+        }
+
+        /// <summary>
+        /// Built-in frame: no script involved, so the script selection controls are disabled.
+        /// </summary>
+        private void ShowStandard(ScriptMatrix layout)
+        {
+            SetEnabled(true);
+            butReread.Enabled = false;
+            butLoadLocal.Enabled = false;
+            cmbScript.Enabled = false;
+            ShowScripts(new List<ScriptMatrix> { layout });
+        }
+
+        public void Deactivate()
+        {
+            StopForward();
         }
 
         private void SetEnabled(bool enabled)
@@ -1070,7 +1311,7 @@ namespace MissionPlanner.plugins
                     {
                         if (CustomMessageBox.Show(
                                 "The selected file does not call " + ObjName(frameClass) +
-                                ":init(). Parse it anyway?", "Scripting Motor Test", MessageBoxButtons.YesNo) !=
+                                ":init(). Parse it anyway?", "Motor Test+", MessageBoxButtons.YesNo) !=
                             DialogResult.Yes)
                             return;
                     }
@@ -1105,6 +1346,8 @@ namespace MissionPlanner.plugins
         {
             current = matrix;
             panelMotors.Controls.Clear();
+            panelForward.Controls.Clear();
+            panelForward.Visible = false;
 
             if (matrix == null)
             {
@@ -1121,9 +1364,10 @@ namespace MissionPlanner.plugins
             warnings.AddRange(matrix.Motors.Where(m => m.MotorNum >= 0 && m.OutputLabel == "")
                 .Select(m => "Motor " + (m.MotorNum + 1) + " is not assigned to any output (SERVOx_FUNCTION = " +
                              (33 + m.MotorNum) + ")"));
-            txtWarnings.Text = warnings.Count == 0 ? "Script parsed without warnings." : string.Join(Environment.NewLine, warnings);
+            txtWarnings.Text = warnings.Count == 0 ? "No warnings." : string.Join(Environment.NewLine, warnings);
 
             int y = 0;
+            int right = 0;
             foreach (var motor in matrix.Motors)
             {
                 var but = new MyButton
@@ -1139,14 +1383,28 @@ namespace MissionPlanner.plugins
                     Text = MotorDescription(motor), Location = new Point(92, y + 4), AutoSize = true
                 };
                 panelMotors.Controls.Add(lbl);
+                right = Math.Max(right, lbl.Left + lbl.PreferredWidth);
                 y += 25;
             }
 
-            panelAll.Location = new Point(0, y + 5);
-            panelMotors.Controls.Add(panelAll);
+            AddAllButton("Test all motors", but_TestAll_Click, 0, y + 5);
+            AddAllButton("Stop all motors", but_StopAll_Click, 91, y + 5);
+            AddAllButton("Test all in Sequence", but_TestAllSeq_Click, 182, y + 5);
+            right = Math.Max(right, 182 + 85);
+            int motorsBottom = panelMotors.Top + y + 5 + 37;
 
+            panelDiagram.Location = new Point(Math.Max(456, panelMotors.Left + right + 15), panelMotors.Top);
             panelDiagram.Visible = matrix.HasFactors;
             panelDiagram.Invalidate();
+
+            forwardMotors = IsQuadPlane() ? ForwardMotor.Find(MainV2.comPort.MAV.param) : new List<ForwardMotor>();
+            if (forwardMotors.Count > 0)
+            {
+                AddForwardSection();
+                int top = Math.Max(motorsBottom, panelDiagram.Visible ? panelDiagram.Bottom : 0) + 15;
+                panelForward.Location = new Point(6, top);
+                panelForward.Visible = true;
+            }
 
             ThemeManager.ApplyThemeTo(this);
         }
@@ -1228,6 +1486,235 @@ namespace MissionPlanner.plugins
             }
         }
 
+        private static bool IsQuadPlane()
+        {
+            var mav = MainV2.comPort.MAV;
+            return mav.cs.firmware == MissionPlanner.ArduPilot.Firmwares.ArduPlane &&
+                   mav.param.ContainsKey("Q_ENABLE") && mav.param["Q_ENABLE"] != null &&
+                   mav.param["Q_ENABLE"].Value == 1;
+        }
+
+        private void AddForwardSection()
+        {
+            int y = 0;
+            panelForward.Controls.Add(new Label
+            {
+                Text = "Forward motors (not covered by the ArduPilot motor test)", Location = new Point(0, y),
+                AutoSize = true, Font = new Font(Font, FontStyle.Bold)
+            });
+            y += 20;
+
+            foreach (var fm in forwardMotors)
+            {
+                var but = new MyButton
+                {
+                    Text = "Test " + fm.FunctionName, Location = new Point(0, y), Size = new Size(110, 22), Tag = fm,
+                    Enabled = !fm.DShot
+                };
+                but.Click += but_TestForward_Click;
+                panelForward.Controls.Add(but);
+
+                var text = string.Format("SERVO{0}  ·  MIN {1} MAX {2} TRIM {3}{4}", fm.Output, fm.Min, fm.Max, fm.Trim,
+                    fm.Reversed ? "  ·  REVERSED" : "");
+                if (fm.DShot)
+                    text += "  ·  DShot output, cannot be tested with PWM";
+                panelForward.Controls.Add(new Label { Text = text, Location = new Point(117, y + 4), AutoSize = true });
+                y += 25;
+            }
+
+            panelForward.Controls.Add(new Label
+            {
+                Text = "The test temporarily sets SERVOn_FUNCTION to 0 and drives the output with DO_SET_SERVO,\n" +
+                       "then restores the function. Throttle % is applied between SERVOn_MIN and SERVOn_MAX.",
+                Location = new Point(0, y + 2), AutoSize = true
+            });
+        }
+
+        private void but_TestForward_Click(object sender, EventArgs e)
+        {
+            var fm = (ForwardMotor)((Control)sender).Tag;
+            if (forwardRunning != null)
+            {
+                CustomMessageBox.Show("A forward motor test is already running.", "Motor Test+");
+                return;
+            }
+
+            if (!CheckSafety())
+                return;
+
+            int pct = (int)numThrottle.Value;
+            int seconds = (int)numDuration.Value;
+            if (pct < 0 || seconds <= 0)
+            {
+                CustomMessageBox.Show("Forward motor test needs a throttle of 0..100 % and a duration above 0 s.",
+                    Strings.ERROR);
+                return;
+            }
+
+            if (!forwardConfirmed)
+            {
+                if (CustomMessageBox.Show(
+                        "ArduPilot has no motor test for forward motors. To spin " + fm.FunctionName + " on SERVO" +
+                        fm.Output + " this will:\n\n" +
+                        "1. set " + fm.ParamName + " from " + fm.Function + " to 0 (disabled)\n" +
+                        "2. send DO_SET_SERVO " + fm.Output + " with " + fm.PwmForPercent(pct) + " us for " + seconds +
+                        " s\n" +
+                        "3. send the idle PWM (" + fm.IdlePwm + " us) and set " + fm.ParamName + " back to " +
+                        fm.Function + "\n\n" +
+                        "If the link is lost during the test the output stays disabled until it is restored " +
+                        "(this page offers the restore on the next visit). Check " + fm.ParamName +
+                        " before flying.\n\nContinue?", "Motor Test+", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                    return;
+                forwardConfirmed = true;
+            }
+
+            StartForward(fm, pct, seconds);
+        }
+
+        private void StartForward(ForwardMotor fm, int pct, int seconds)
+        {
+            var mav = MainV2.comPort.MAV;
+            try
+            {
+                SavePending(mav.sysid, fm.Output, fm.Function);
+                if (!MainV2.comPort.setParam((byte)mav.sysid, (byte)mav.compid, fm.ParamName, 0))
+                {
+                    ClearPending(mav.sysid, fm.Output);
+                    CustomMessageBox.Show("Failed to set " + fm.ParamName + " to 0", Strings.ERROR);
+                    return;
+                }
+
+                forwardRunning = fm;
+                // make sure the now unassigned output starts from idle
+                SetServo(fm.Output, fm.IdlePwm);
+                if (!SetServo(fm.Output, fm.PwmForPercent(pct)))
+                {
+                    CustomMessageBox.Show("DO_SET_SERVO was denied by the autopilot", Strings.ERROR);
+                    StopForward();
+                    return;
+                }
+
+                forwardTimer.Interval = seconds * 1000;
+                forwardTimer.Start();
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+                StopForward();
+                CustomMessageBox.Show(Strings.ErrorCommunicating + "\n" + ex.Message, Strings.ERROR);
+            }
+        }
+
+        private void StopForward()
+        {
+            forwardTimer.Stop();
+            var fm = forwardRunning;
+            forwardRunning = null;
+            if (fm == null)
+                return;
+
+            try
+            {
+                SetServo(fm.Output, fm.IdlePwm);
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+
+            RestorePending(false);
+        }
+
+        private bool SetServo(int output, int pwm)
+        {
+            return MainV2.comPort.doCommand((byte)MainV2.comPort.sysidcurrent, (byte)MainV2.comPort.compidcurrent,
+                MAVLink.MAV_CMD.DO_SET_SERVO, output, pwm, 0, 0, 0, 0, 0);
+        }
+
+        // pending restores are kept in config.xml so they survive a crash or a lost link:
+        // "sysid:output:function;..."
+        private static List<int[]> LoadPending()
+        {
+            var list = new List<int[]>();
+            try
+            {
+                var value = Settings.Instance[RestoreSettingKey];
+                if (string.IsNullOrEmpty(value))
+                    return list;
+                foreach (var item in value.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    var parts = item.Split(':');
+                    if (parts.Length == 3)
+                        list.Add(new[] { int.Parse(parts[0]), int.Parse(parts[1]), int.Parse(parts[2]) });
+                }
+            }
+            catch (Exception ex)
+            {
+                log.Error(ex);
+            }
+
+            return list;
+        }
+
+        private static void StorePending(List<int[]> list)
+        {
+            Settings.Instance[RestoreSettingKey] = string.Join(";", list.Select(a => a[0] + ":" + a[1] + ":" + a[2]));
+            Settings.Instance.Save();
+        }
+
+        private static void SavePending(uint sysid, int output, int function)
+        {
+            var list = LoadPending();
+            list.RemoveAll(a => a[0] == sysid && a[1] == output);
+            list.Add(new[] { (int)sysid, output, function });
+            StorePending(list);
+        }
+
+        private static void ClearPending(uint sysid, int output)
+        {
+            var list = LoadPending();
+            list.RemoveAll(a => a[0] == sysid && a[1] == output);
+            StorePending(list);
+        }
+
+        /// <summary>
+        /// Writes back the SERVOn_FUNCTION of outputs that a forward motor test left disabled.
+        /// </summary>
+        private void RestorePending(bool quiet)
+        {
+            var mav = MainV2.comPort.MAV;
+            var pending = LoadPending().Where(a => a[0] == mav.sysid).ToList();
+            foreach (var p in pending)
+            {
+                var name = "SERVO" + p[1] + "_FUNCTION";
+                if (mav.param.ContainsKey(name) && mav.param[name] != null && (int)mav.param[name].Value == p[2])
+                {
+                    ClearPending(mav.sysid, p[1]);
+                    continue;
+                }
+
+                bool ok = false;
+                try
+                {
+                    ok = MainV2.comPort.setParam((byte)mav.sysid, (byte)mav.compid, name, p[2]);
+                }
+                catch (Exception ex)
+                {
+                    log.Error(ex);
+                }
+
+                if (ok)
+                {
+                    ClearPending(mav.sysid, p[1]);
+                }
+                else if (!quiet)
+                {
+                    CustomMessageBox.Show("Could not restore " + name + " to " + p[2] +
+                                          ". Set it manually before flying!", Strings.ERROR);
+                }
+            }
+        }
+
         private bool CheckSafety()
         {
             if (MainV2.comPort.MAV.cs.armed)
@@ -1240,7 +1727,7 @@ namespace MissionPlanner.plugins
                 return true;
 
             if (CustomMessageBox.Show("Motors will spin. Make sure the propellers are removed or the vehicle is held down.\n\nContinue?",
-                    "Scripting Motor Test", MessageBoxButtons.YesNo) != DialogResult.Yes)
+                    "Motor Test+", MessageBoxButtons.YesNo) != DialogResult.Yes)
                 return false;
 
             safetyConfirmed = true;
@@ -1264,6 +1751,7 @@ namespace MissionPlanner.plugins
 
         private void but_StopAll_Click(object sender, EventArgs e)
         {
+            StopForward();
             if (current == null)
                 return;
             foreach (var order in current.Motors.Select(m => m.TestOrder).Distinct())
