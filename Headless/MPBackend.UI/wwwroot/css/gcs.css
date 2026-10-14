@@ -201,3 +201,4 @@ table.compare td.name { font-weight: 700; }
 table.compare td.desc { color: var(--c-text-secondary); white-space: normal; }
 .layout-phone .prow { grid-template-columns: 120px 100px minmax(0, 1fr); }
 .layout-phone .prow .units, .layout-phone .prow .range { display: none; }
+.prow input[list]::-webkit-calendar-picker-indicator { opacity: .6; filter: invert(1); }

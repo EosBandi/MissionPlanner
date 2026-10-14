@@ -63,7 +63,20 @@
                 <div class="prow @(isPending ? "pending" : "") @(result is { Accepted: false } ? "failed" : "")" @key="p.Name" @onclick="() => Expand(p.Name)">
                     <span class="name" title="@p.Name">@p.Name@(m?.RebootRequired == true ? " ↻" : "")</span>
                     <span class="value" @onclick:stopPropagation>
-                        @if (m?.Values is { Count: > 0 })
+                        @if (m?.Values is { Count: > 0 } && (m.Min != null || m.Max != null || m.Increment != null))
+                        {
+                            @* a numeric parameter with named suggestions (e.g. ATC_RATE_R_MAX 0:Disabled 360:Slow …): free entry plus the names *@
+                            <input type="number" value="@Fmt(isPending ? pendingValue : p.Value)" list="@("dl-" + p.Name)"
+                                   step="@(m.Increment is { } inc2 && inc2 > 0 ? Svg.F(inc2) : "any")"
+                                   @onchange="e => Edit(p, e.Value?.ToString())" disabled="@(m.ReadOnly || busy)" />
+                            <datalist id="@("dl-" + p.Name)">
+                                @foreach (var o in m.Values)
+                                {
+                                    <option value="@o.Value">@o.Name</option>
+                                }
+                            </datalist>
+                        }
+                        else if (m?.Values is { Count: > 0 })
                         {
                             <select value="@Fmt(isPending ? pendingValue : p.Value)" @onchange="e => Edit(p, e.Value?.ToString())" disabled="@(m.ReadOnly || busy)">
                                 @if (m.Values.All(o => o.Value != (long)(isPending ? pendingValue : p.Value)))
@@ -92,6 +105,11 @@
                         @if (m != null)
                         {
                             <b>@m.DisplayName</b>
+                            @if (m.Values is { Count: > 0 } && (m.Min != null || m.Max != null || m.Increment != null)
+                                 && m.Values.FirstOrDefault(o => o.Value == (long)(isPending ? pendingValue : p.Value)) is { } named)
+                            {
+                                <span class="sel"> = @named.Name</span>
+                            }
                             @(expanded == p.Name ? " — " + m.Description : "")
                             @if (expanded == p.Name && m.Bitmask is { Count: > 0 })
                             {
