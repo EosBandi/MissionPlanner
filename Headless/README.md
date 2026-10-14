@@ -274,3 +274,14 @@ and frame, DTK, DIS and ETE (the active leg measured from the vehicle, the other
 ground speed or the profile's cruise speed when stationary), remaining distance and time, the active row in magenta
 with the → marker and a cyan cursor row (UP / DOWN keys, ↑ / ↓, or tap). SET WP (hold) sends MISSION_SET_CURRENT
 for the cursor row; PAUSE / CONTINUE send MAV_CMD_DO_PAUSE_CONTINUE in AUTO; RELOAD re-downloads the list.
+
+### Parameters page
+
+AUX › PARAMETERS (`Pages/ParametersPage.razor`): the vehicle's full list in a virtualised table with the apm.pdef.xml
+metadata (display name, description on tap, units, range, options as a drop-down, bitmask bits, reboot marker).
+Search ranks name prefixes, then name matches, then description mentions. Edits are held as pending (cyan) until
+WRITE (hold) sends them as one backend job and marks each row WRITTEN or FAILED; REVERT drops them, MODIFIED filters
+to them, REFRESH re-downloads the list, EXPORT saves a Mission Planner .param file under the app's data directory,
+and COMPARE loads a .param / .parm / QGC file, lists the differences against the vehicle and APPLY FILE (hold)
+writes them. Copter 4.7's renamed m/s parameters (WP_SPD, LOIT_SPEED_MS, PILOT_SPD_UP, LAND_SPD_MS, ATC_ANGLE_MAX)
+are understood by the vehicle profile alongside the older cm/s names.

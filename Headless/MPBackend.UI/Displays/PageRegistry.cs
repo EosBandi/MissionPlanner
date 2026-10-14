@@ -54,7 +54,7 @@ public static class PageRegistry
             P("setup", "SETUP"),
             P("sysstatus", "SYSTEM STATUS", typeof(SystemStatusPage)),
             P("video", "VIDEO"),
-            P("params", "PARAMETERS"),
+            P("params", "PARAMETERS", typeof(ParametersPage)),
             P("logs", "LOGS")
         })
     };

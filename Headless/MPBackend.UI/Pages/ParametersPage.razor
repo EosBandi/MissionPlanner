@@ -1,0 +1,412 @@
+@* AUX > PARAMETERS: full parameter list with metadata, search, edit + bulk write, refresh, export and file compare. *@
+@inject GcsSession Session
+@inject ShellState Shell
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="page params">
+    <div class="params-head">
+        <input @ref="searchBox" class="search" placeholder="SEARCH NAME / DESCRIPTION" @bind="search" @bind:event="oninput" @bind:after="Filter" />
+        <span class="dim">@rows.Count / @all.Count</span>
+        @if (pending.Count > 0)
+        {
+            <span class="sel">@pending.Count MODIFIED</span>
+        }
+        @if (meta.Count == 0 && all.Count > 0)
+        {
+            <span class="caution">NO METADATA</span>
+        }
+        <span class="spacer"></span>
+        <InputFile @ref="fileInput" OnChange="OnFileAsync" accept=".param,.parm,.txt" style="display:none" />
+    </div>
+    @if (status != null)
+    {
+        <div class="mission-status @(statusOk ? "ok" : "caution")">@status</div>
+    }
+
+    @if (compare != null)
+    {
+        <div class="params-list">
+            <div class="compare-title">COMPARE <b>@compareName</b>: @compare.Count differences, @compare.Count(d => d.VehicleValue == null) not on the vehicle</div>
+            <table class="compare">
+                <thead><tr><th>NAME</th><th>VEHICLE</th><th>FILE</th><th>DESCRIPTION</th></tr></thead>
+                <tbody>
+                @foreach (var d in compare)
+                {
+                    <tr class="@(d.VehicleValue == null ? "dim" : "")">
+                        <td class="name">@d.Name</td>
+                        <td>@(d.VehicleValue is { } v ? Fmt(v) : "—")</td>
+                        <td class="sel">@Fmt(d.FileValue)</td>
+                        <td class="desc">@(meta.TryGetValue(d.Name, out var m) ? m.DisplayName : "")</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
+    else if (all.Count == 0)
+    {
+        <div class="params-list"><div class="dim" style="padding:12px">@(Session.ActiveVehicle == null ? "no vehicle" : busy ? "loading…" : "no parameters yet")</div></div>
+    }
+    else
+    {
+        <div class="params-list">
+            <div class="prow head">
+                <span class="name">NAME</span><span class="value">VALUE</span><span class="units">UNITS</span><span class="range">RANGE</span><span class="desc">DESCRIPTION</span>
+            </div>
+            <Virtualize Items="rows" ItemSize="34" Context="p" OverscanCount="8">
+                @{
+                    meta.TryGetValue(p.Name, out var m);
+                    var isPending = pending.TryGetValue(p.Name, out var pendingValue);
+                    results.TryGetValue(p.Name, out var result);
+                }
+                <div class="prow @(isPending ? "pending" : "") @(result is { Accepted: false } ? "failed" : "")" @key="p.Name" @onclick="() => Expand(p.Name)">
+                    <span class="name" title="@p.Name">@p.Name@(m?.RebootRequired == true ? " ↻" : "")</span>
+                    <span class="value" @onclick:stopPropagation>
+                        @if (m?.Values is { Count: > 0 })
+                        {
+                            <select value="@Fmt(isPending ? pendingValue : p.Value)" @onchange="e => Edit(p, e.Value?.ToString())" disabled="@(m.ReadOnly || busy)">
+                                @if (m.Values.All(o => o.Value != (long)(isPending ? pendingValue : p.Value)))
+                                {
+                                    <option value="@Fmt(isPending ? pendingValue : p.Value)">@Fmt(isPending ? pendingValue : p.Value)</option>
+                                }
+                                @foreach (var o in m.Values)
+                                {
+                                    <option value="@o.Value">@o.Value: @o.Name</option>
+                                }
+                            </select>
+                        }
+                        else
+                        {
+                            <input type="number" value="@Fmt(isPending ? pendingValue : p.Value)" step="@(m?.Increment is { } inc && inc > 0 ? Svg.F(inc) : "any")"
+                                   @onchange="e => Edit(p, e.Value?.ToString())" disabled="@(m?.ReadOnly == true || busy)" />
+                        }
+                    </span>
+                    <span class="units">@(m?.Units ?? "")</span>
+                    <span class="range">@(m?.Min != null || m?.Max != null ? $"{Fmt(m?.Min)}..{Fmt(m?.Max)}" : "")</span>
+                    <span class="desc">
+                        @if (result != null)
+                        {
+                            <b class="@(result.Accepted ? "ok" : "warning")">@(result.Accepted ? "WRITTEN" : "FAILED: " + result.Error)</b><span class="dim"> &middot; </span>
+                        }
+                        @if (m != null)
+                        {
+                            <b>@m.DisplayName</b>
+                            @(expanded == p.Name ? " — " + m.Description : "")
+                            @if (expanded == p.Name && m.Bitmask is { Count: > 0 })
+                            {
+                                <span class="dim"> · bits: @string.Join(", ", m.Bitmask.Select(b => $"{b.Value}={b.Name}"))</span>
+                            }
+                        }
+                        @if (p.Default is { } def && def != p.Value)
+                        {
+                            <span class="dim"> (default @Fmt(def))</span>
+                        }
+                    </span>
+                </div>
+            </Virtualize>
+        </div>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public MfdDisplay? Mfd { get; set; }
+    [Parameter] public PageDef? Page { get; set; }
+
+    private ElementReference searchBox;
+    private InputFile? fileInput;
+    private IJSObjectReference? module;
+    private List<ParamValue> all = new();
+    private List<ParamValue> rows = new();
+    private IReadOnlyDictionary<string, ParamMetadata> meta = new Dictionary<string, ParamMetadata>();
+    private readonly Dictionary<string, double> pending = new(StringComparer.Ordinal);
+    private readonly Dictionary<string, ParamSetResult> results = new(StringComparer.Ordinal);
+    private List<ParamDiff>? compare;
+    private string compareName = "";
+    private string search = "";
+    private string? expanded;
+    private bool modifiedOnly, busy, statusOk;
+    private string? status;
+    private VehicleInfo? loadedFor;
+    private uint? metaFor;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Session.Changed += OnSessionChanged;
+        Session.Gcs.Published += OnPublished;
+        PublishKeys();
+        await LoadAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+            module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/MPBackend.UI/js/shell.js");
+    }
+
+    private void OnSessionChanged()
+    {
+        var v = Session.ActiveVehicle;
+        if (v?.SysId != loadedFor?.SysId || v?.CompId != loadedFor?.CompId)
+            _ = InvokeAsync(LoadAsync);
+    }
+
+    private void OnPublished(string topic, object data)
+    {
+        // the backend reports param downloads and changes; reload the list unless we are mid-edit
+        if (topic == MPBackend.Core.Topics.Params && data is ParamEvent e && e.Event != "changed" && pending.Count == 0)
+            _ = InvokeAsync(LoadAsync);
+    }
+
+    private async Task LoadAsync()
+    {
+        var v = Session.ActiveVehicle;
+        loadedFor = v;
+        if (v == null)
+        {
+            all = new List<ParamValue>();
+            Filter();
+            return;
+        }
+
+        busy = true;
+        StateHasChanged();
+        try
+        {
+            all = (await Session.Gcs.GetParamsAsync(v.SysId, v.CompId)).ToList();
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, false);
+        }
+        finally
+        {
+            busy = false;
+        }
+
+        Filter();
+        PublishKeys();
+        StateHasChanged();
+
+        // apm.pdef.xml lookups for ~1400 names take seconds: fill the metadata columns in afterwards
+        if (meta.Count == 0 || metaFor != v.SysId)
+        {
+            try
+            {
+                var m = await Session.Gcs.GetParamMetadataAsync(v.SysId, v.CompId);
+                if (loadedFor?.SysId == v.SysId)
+                {
+                    meta = m;
+                    metaFor = v.SysId;
+                    Filter();
+                }
+            }
+            catch (Exception ex)
+            {
+                SetStatus("METADATA: " + ex.Message, false);
+            }
+        }
+    }
+
+    private void Filter()
+    {
+        var q = search.Trim();
+        IEnumerable<ParamValue> list = all;
+        if (modifiedOnly)
+            list = list.Where(p => pending.ContainsKey(p.Name) || results.ContainsKey(p.Name));
+        if (q.Length > 0)
+        {
+            // rank: name starts with the query, name contains it, then display name / description mentions
+            int Rank(ParamValue p)
+            {
+                if (p.Name.StartsWith(q, StringComparison.OrdinalIgnoreCase)) return 0;
+                if (p.Name.Contains(q, StringComparison.OrdinalIgnoreCase)) return 1;
+                if (meta.TryGetValue(p.Name, out var m) && (m.DisplayName?.Contains(q, StringComparison.OrdinalIgnoreCase) == true
+                                                             || m.Description?.Contains(q, StringComparison.OrdinalIgnoreCase) == true)) return 2;
+                return 3;
+            }
+            list = list.Select(p => (p, rank: Rank(p))).Where(x => x.rank < 3).OrderBy(x => x.rank).ThenBy(x => x.p.Name, StringComparer.Ordinal).Select(x => x.p);
+        }
+        rows = list.ToList();
+        StateHasChanged();
+    }
+
+    private static string Fmt(double? v) => v is { } d ? d.ToString("0.######", System.Globalization.CultureInfo.InvariantCulture) : "";
+
+    private void Expand(string name) => expanded = expanded == name ? null : name;
+
+    private void Edit(ParamValue p, string? text)
+    {
+        if (!double.TryParse(text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var value))
+            return;
+        if ((float)value == (float)p.Value)
+            pending.Remove(p.Name);
+        else
+            pending[p.Name] = value;
+        results.Remove(p.Name);
+        PublishKeys();
+    }
+
+    // ---- actions -----------------------------------------------------------------------------------------
+    private async Task WriteAsync()
+    {
+        var v = Session.ActiveVehicle;
+        if (v == null || pending.Count == 0 || busy) return;
+        busy = true;
+        SetStatus($"WRITING {pending.Count}…", true);
+        try
+        {
+            var written = await Session.Gcs.WriteParamsAsync(v.SysId, v.CompId, new Dictionary<string, double>(pending));
+            foreach (var r in written)
+                results[r.Name] = r;
+            var failed = written.Count(r => !r.Accepted);
+            var reboot = written.Any(r => r.Accepted && r.RebootRequired);
+            pending.Clear();
+            all = (await Session.Gcs.GetParamsAsync(v.SysId, v.CompId)).ToList();
+            SetStatus(failed == 0 ? $"{written.Count} WRITTEN{(reboot ? " · REBOOT REQUIRED" : "")}" : $"{failed} OF {written.Count} FAILED", failed == 0);
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, false);
+        }
+        finally
+        {
+            busy = false;
+        }
+
+        Filter();
+        PublishKeys();
+    }
+
+    private void Revert()
+    {
+        pending.Clear();
+        results.Clear();
+        Filter();
+        PublishKeys();
+    }
+
+    private async Task RefreshAsync()
+    {
+        var v = Session.ActiveVehicle;
+        if (v == null || busy) return;
+        busy = true;
+        SetStatus("DOWNLOADING…", true);
+        PublishKeys();
+        try
+        {
+            await Session.Gcs.RefreshParamsAsync(v.SysId, v.CompId);
+            SetStatus("REFRESHED", true);
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, false);
+        }
+        finally
+        {
+            busy = false;
+        }
+
+        await LoadAsync();
+    }
+
+    private async Task ExportAsync()
+    {
+        var v = Session.ActiveVehicle;
+        if (v == null) return;
+        try
+        {
+            SetStatus("SAVED " + await Session.Gcs.SaveParamFileAsync(v.SysId, v.CompId), true);
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, false);
+        }
+    }
+
+    private async Task PickFileAsync()
+    {
+        if (module != null && fileInput != null)
+            await module.InvokeVoidAsync("click", fileInput.Element);
+    }
+
+    private async Task OnFileAsync(InputFileChangeEventArgs e)
+    {
+        var v = Session.ActiveVehicle;
+        if (v == null) return;
+        try
+        {
+            using var reader = new StreamReader(e.File.OpenReadStream(4 * 1024 * 1024));
+            var text = await reader.ReadToEndAsync();
+            compare = (await Session.Gcs.CompareParamsAsync(v.SysId, v.CompId, text)).ToList();
+            compareName = e.File.Name;
+            SetStatus(compare.Count == 0 ? "FILE MATCHES THE VEHICLE" : null, true);
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, false);
+        }
+
+        PublishKeys();
+    }
+
+    private async Task ApplyFileAsync()
+    {
+        if (compare == null) return;
+        foreach (var d in compare.Where(d => d.VehicleValue != null))
+            pending[d.Name] = d.FileValue;
+        compare = null;
+        modifiedOnly = true;
+        Filter();
+        await WriteAsync();
+    }
+
+    private void CloseCompare()
+    {
+        compare = null;
+        PublishKeys();
+        StateHasChanged();
+    }
+
+    private void SetStatus(string? text, bool ok)
+    {
+        status = text;
+        statusOk = ok;
+        StateHasChanged();
+    }
+
+    private void PublishKeys()
+    {
+        var v = Session.ActiveVehicle;
+        if (compare != null)
+        {
+            Mfd?.SetSoftKeys(SoftKey.Bar(
+                new SoftKey("APPLY FILE", ApplyFileAsync, Critical: true, Disabled: v == null || busy || compare.All(d => d.VehicleValue == null)),
+                null, null, null, null, null, null, null, null, null,
+                SoftKey.Simple("BACK", CloseCompare)));
+            return;
+        }
+
+        Mfd?.SetSoftKeys(SoftKey.Bar(
+            new SoftKey("SEARCH", async () => { if (module != null) await module.InvokeVoidAsync("focus", searchBox); }),
+            new SoftKey("WRITE", WriteAsync, Critical: true, Disabled: v == null || busy || pending.Count == 0),
+            new SoftKey("REVERT", () => { Revert(); return Task.CompletedTask; }, Disabled: pending.Count == 0 && results.Count == 0),
+            SoftKey.Simple("MODIFIED", () => { modifiedOnly = !modifiedOnly; Filter(); PublishKeys(); }, modifiedOnly),
+            new SoftKey("REFRESH", RefreshAsync, Disabled: v == null || busy),
+            new SoftKey("COMPARE", PickFileAsync, Disabled: v == null || busy),
+            new SoftKey("EXPORT", ExportAsync, Disabled: v == null || all.Count == 0)));
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Session.Changed -= OnSessionChanged;
+        Session.Gcs.Published -= OnPublished;
+        try
+        {
+            if (module != null) await module.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+}

@@ -65,6 +65,55 @@ public sealed class InProcessGcs : IGcs, IDisposable
         }
     }
 
+    public Task<IReadOnlyList<MPBackend.Core.Params.ParamValue>> GetParamsAsync(uint sysid, byte compid) =>
+        Task.Run(() => backend.Params.List(sysid, compid));
+
+    public Task<IReadOnlyDictionary<string, MPBackend.Core.Params.ParamMetadata>> GetParamMetadataAsync(uint sysid, byte compid) =>
+        Task.Run(() => backend.Params.GetMetadata(sysid, compid));
+
+    public async Task<IReadOnlyList<MPBackend.Core.Params.ParamSetResult>> WriteParamsAsync(uint sysid, byte compid,
+        IReadOnlyDictionary<string, double> values)
+    {
+        var job = backend.Params.StartBulkSet(sysid, compid, values);
+        job = await backend.Jobs.WaitAsync(job, TimeSpan.FromSeconds(10 + values.Count * 2));
+        if (job.State == MPBackend.Core.Jobs.JobState.Failed)
+            throw new InvalidOperationException(job.Error ?? "write failed");
+        if (job.State != MPBackend.Core.Jobs.JobState.Succeeded)
+            throw new TimeoutException("parameter write did not finish");
+
+        // the job result is the REST shape { written, failed[], rebootRequired[] }: turn it back into per-name results
+        var result = job.Result!;
+        var failed = result.GetType().GetProperty("failed")?.GetValue(result) as IEnumerable<MPBackend.Core.Params.ParamSetResult>
+                     ?? Array.Empty<MPBackend.Core.Params.ParamSetResult>();
+        var reboot = result.GetType().GetProperty("rebootRequired")?.GetValue(result) as IEnumerable<string> ?? Array.Empty<string>();
+        var failedByName = failed.ToDictionary(f => f.Name, StringComparer.Ordinal);
+        var rebootSet = new HashSet<string>(reboot, StringComparer.Ordinal);
+        return values.Keys.Select(name => failedByName.TryGetValue(name, out var f)
+                ? f
+                : new MPBackend.Core.Params.ParamSetResult(name, true, backend.Params.Get(sysid, compid, name)?.Value, null, rebootSet.Contains(name)))
+            .ToList();
+    }
+
+    public async Task RefreshParamsAsync(uint sysid, byte compid)
+    {
+        var job = backend.Params.StartDownload(sysid, compid, allowCache: false);
+        job = await backend.Jobs.WaitAsync(job, TimeSpan.FromMinutes(3));
+        if (job.State == MPBackend.Core.Jobs.JobState.Failed)
+            throw new InvalidOperationException(job.Error ?? "download failed");
+    }
+
+    public Task<IReadOnlyList<MPBackend.Core.Params.ParamDiff>> CompareParamsAsync(uint sysid, byte compid, string fileText) =>
+        Task.Run(() => backend.Params.Compare(sysid, compid, MPBackend.Core.Params.ParamService.ParseParamFile(fileText)));
+
+    public Task<string> SaveParamFileAsync(uint sysid, byte compid) => Task.Run(() =>
+    {
+        var dir = Path.Combine(HeadlessHost.Options.DataDirectory, "params");
+        Directory.CreateDirectory(dir);
+        var path = Path.Combine(dir, $"{sysid}-{compid}-{DateTime.Now:yyyyMMdd-HHmmss}.param");
+        File.WriteAllText(path, backend.Params.ExportParamFile(sysid, compid));
+        return path;
+    });
+
     public Task<(uint Present, uint Enabled, uint Health)> GetSensorsAsync(uint sysid, byte compid)
     {
         try

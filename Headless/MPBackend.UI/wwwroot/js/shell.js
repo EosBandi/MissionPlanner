@@ -20,3 +20,6 @@ export function observeSize(dotnet, el, method) {
   report();
   return { dispose: () => ro.disconnect() };
 }
+
+export function focus(el) { el?.focus(); el?.select?.(); }
+export function click(el) { el?.click(); }

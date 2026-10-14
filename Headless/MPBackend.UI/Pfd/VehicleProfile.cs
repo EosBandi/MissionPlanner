@@ -122,12 +122,17 @@ public sealed class VehicleProfile
             };
         }
 
-        var wp = P("WPNAV_SPEED", 1000, 0.01);
-        var loit = P("LOIT_SPEED", 1250, 0.01);
-        var rtl = P("RTL_SPEED", 0, 0.01);
-        var up = P("PILOT_SPEED_UP", 250, 0.01);
-        var dn = param("PILOT_SPEED_DN") is { } d && d > 0 ? d / 100 : up;
-        var angle = P("ANGLE_MAX", 3000) / 100;
+        // ArduCopter 4.7 renamed the cm/s speed parameters to m/s ones (WPNAV_SPEED -> WP_SPD, LOIT_SPEED ->
+        // LOIT_SPEED_MS, PILOT_SPEED_UP -> PILOT_SPD_UP, LAND_SPEED -> LAND_SPD_MS, ANGLE_MAX -> ATC_ANGLE_MAX in deg)
+        double Speed(string cms, string ms, double fallback) =>
+            param(cms) is { } c ? c / 100 : param(ms) ?? fallback;
+        var wp = Speed("WPNAV_SPEED", "WP_SPD", 10);
+        var loit = Speed("LOIT_SPEED", "LOIT_SPEED_MS", 12.5);
+        var rtl = Speed("RTL_SPEED", "RTL_SPEED_MS", 0);
+        var up = Speed("PILOT_SPEED_UP", "PILOT_SPD_UP", 2.5);
+        var dnRaw = Speed("PILOT_SPEED_DN", "PILOT_SPD_DN", 0);
+        var dn = dnRaw > 0 ? dnRaw : up;
+        var angle = param("ANGLE_MAX") is { } am ? am / 100 : param("ATC_ANGLE_MAX") ?? 30;
         var caution = Math.Max(loit, 1.25 * wp);
         var fence = (param("FENCE_ENABLE") ?? 0) > 0;
         var fenceType = (int)(param("FENCE_TYPE") ?? 0);
@@ -139,7 +144,7 @@ public sealed class VehicleProfile
             SpeedRefs = new[] { new RefMark("W", wp), new RefMark("L", loit), new RefMark("R", rtl > 0 ? rtl : wp) },
             Overspeed = 999, Caution = caution,
             VsRange = 5, VsMajor = 1, VsMinor = 0.5, VsMax = up, VsMin = -dn,
-            VsMarks = new[] { new RefMark("LND", -P("LAND_SPEED", 50, 0.01)) },
+            VsMarks = new[] { new RefMark("LND", -Speed("LAND_SPEED", "LAND_SPD_MS", 0.5)) },
             AltSpan = 40, AltLabel = 10, AltMinor = 2,
             ExtremeRoll = angle + 15, ExtremePitchUp = angle + 15, ExtremePitchDown = angle + 15, ChevronUp = 60, ChevronDown = 60,
             SlipSkid = false, FpmMinSpeed = 1.5, CdiFullScale = 20, VdiDot = 1,

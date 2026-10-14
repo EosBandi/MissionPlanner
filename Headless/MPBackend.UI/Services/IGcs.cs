@@ -32,6 +32,24 @@ public interface IGcs
     /// <summary>Current value of a vehicle parameter, null when unknown or not downloaded yet.</summary>
     Task<double?> GetParamAsync(uint sysid, byte compid, string name);
 
+    /// <summary>All parameters of the vehicle (sorted by name).</summary>
+    Task<IReadOnlyList<MPBackend.Core.Params.ParamValue>> GetParamsAsync(uint sysid, byte compid);
+
+    /// <summary>apm.pdef.xml metadata for the vehicle's parameters (empty until downloaded).</summary>
+    Task<IReadOnlyDictionary<string, MPBackend.Core.Params.ParamMetadata>> GetParamMetadataAsync(uint sysid, byte compid);
+
+    /// <summary>Write many parameters and wait for the vehicle to confirm each.</summary>
+    Task<IReadOnlyList<MPBackend.Core.Params.ParamSetResult>> WriteParamsAsync(uint sysid, byte compid, IReadOnlyDictionary<string, double> values);
+
+    /// <summary>Re-download the full parameter list (ignoring the cache) and wait for it.</summary>
+    Task RefreshParamsAsync(uint sysid, byte compid);
+
+    /// <summary>Differences between a .param / .parm / QGC file's values and the vehicle.</summary>
+    Task<IReadOnlyList<MPBackend.Core.Params.ParamDiff>> CompareParamsAsync(uint sysid, byte compid, string fileText);
+
+    /// <summary>Save the vehicle's parameters as a Mission Planner .param file; returns the path written.</summary>
+    Task<string> SaveParamFileAsync(uint sysid, byte compid);
+
     /// <summary>SYS_STATUS sensor bitmasks (MAV_SYS_STATUS_SENSOR): present, enabled, healthy.</summary>
     Task<(uint Present, uint Enabled, uint Health)> GetSensorsAsync(uint sysid, byte compid);
 

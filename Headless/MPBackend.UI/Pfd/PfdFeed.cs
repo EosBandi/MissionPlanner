@@ -162,7 +162,8 @@ public sealed class PfdFeed : IDisposable
                      {
                          "AIRSPEED_MIN", "ARSPD_FBW_MIN", "AIRSPEED_MAX", "ARSPD_FBW_MAX", "AIRSPEED_CRUISE", "TRIM_ARSPD_CM",
                          "TKOFF_ROTATE_SPD", "TECS_CLMB_MAX", "TECS_SINK_MAX", "LIM_ROLL_CD", "Q_ASSIST_SPEED",
-                         "WPNAV_SPEED", "LOIT_SPEED", "RTL_SPEED", "PILOT_SPEED_UP", "PILOT_SPEED_DN", "LAND_SPEED", "ANGLE_MAX",
+                         "WPNAV_SPEED", "WP_SPD", "LOIT_SPEED", "LOIT_SPEED_MS", "RTL_SPEED", "RTL_SPEED_MS", "PILOT_SPEED_UP", "PILOT_SPD_UP",
+                         "PILOT_SPEED_DN", "PILOT_SPD_DN", "LAND_SPEED", "LAND_SPD_MS", "ANGLE_MAX", "ATC_ANGLE_MAX",
                          "FENCE_ENABLE", "FENCE_TYPE", "FENCE_ALT_MAX", "FENCE_ALT_MIN"
                      })
             {

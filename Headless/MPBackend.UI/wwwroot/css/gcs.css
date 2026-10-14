@@ -175,3 +175,29 @@ button, input, select { font-family: inherit; font-variant-numeric: tabular-nums
 .page.mission tr.sel td { box-shadow: inset 0 2px 0 var(--c-selected-operator), inset 0 -2px 0 var(--c-selected-operator); }
 .page.mission tr.sel td:first-child { box-shadow: inset 2px 2px 0 var(--c-selected-operator), inset 0 -2px 0 var(--c-selected-operator); }
 .page.mission tr.sel td:last-child { box-shadow: inset -2px 2px 0 var(--c-selected-operator), inset 0 -2px 0 var(--c-selected-operator); }
+
+/* ---- parameters page ---- */
+.page.params { padding: 8px 12px; display: flex; flex-direction: column; overflow: hidden; }
+.params-head { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; margin-bottom: 6px; text-transform: uppercase; flex: none; }
+.params-head .search { flex: 0 1 320px; background: #000; color: var(--c-text-primary); border: 1px solid var(--p-gray700); padding: 6px 8px; font-size: 14px; min-height: 36px; font-family: inherit; }
+.params-head .search:focus { outline: none; border-color: var(--c-selected-operator); }
+.params-head .spacer { flex: 1; }
+.params-list { flex: 1; min-height: 0; overflow: auto; }
+.prow { display: grid; grid-template-columns: 190px 150px 60px 110px minmax(0, 1fr); gap: 8px; align-items: center; height: 34px; padding: 0 4px; border-bottom: 1px solid var(--p-gray900); font-size: 14px; white-space: nowrap; }
+.prow.head { height: 26px; font-size: var(--fs-fieldLabel); font-weight: var(--fw-fieldLabel); color: var(--c-text-secondary); border-bottom: 1px solid var(--p-panelLine); text-transform: uppercase; }
+.prow .name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; }
+.prow .desc { overflow: hidden; text-overflow: ellipsis; color: var(--c-text-secondary); }
+.prow .desc b { color: var(--c-text-primary); font-weight: 600; }
+.prow .units, .prow .range { color: var(--c-text-secondary); font-size: 13px; }
+.prow input, .prow select { width: 100%; background: #000; color: var(--c-text-primary); border: 1px solid var(--p-gray700); padding: 3px 6px; font-size: 14px; min-height: 28px; font-family: inherit; font-variant-numeric: tabular-nums; }
+.prow input:focus, .prow select:focus { outline: none; border-color: var(--c-selected-operator); }
+.prow.pending input, .prow.pending select { border-color: var(--c-selected-operator); color: var(--c-selected-operator); }
+.prow.failed input, .prow.failed select { border-color: var(--c-alert-warning); }
+.compare-title { margin: 4px 0 8px; font-size: 14px; font-weight: 600; text-transform: uppercase; }
+table.compare { width: 100%; border-collapse: collapse; font-size: 14px; }
+table.compare th { text-align: left; font-size: var(--fs-fieldLabel); font-weight: var(--fw-fieldLabel); color: var(--c-text-secondary); padding: 4px 6px; border-bottom: 1px solid var(--p-panelLine); }
+table.compare td { padding: 5px 6px; border-bottom: 1px solid var(--p-gray900); white-space: nowrap; }
+table.compare td.name { font-weight: 700; }
+table.compare td.desc { color: var(--c-text-secondary); white-space: normal; }
+.layout-phone .prow { grid-template-columns: 120px 100px minmax(0, 1fr); }
+.layout-phone .prow .units, .layout-phone .prow .range { display: none; }
