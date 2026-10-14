@@ -3,6 +3,7 @@
 @inject GcsSession Session
 @inject PfdFeed Feed
 @inject SelectedValues Sel
+@inject AuralService Aural
 @inject IJSRuntime JS
 @inject Microsoft.Extensions.Logging.ILogger<PfdDisplay> Logger
 @using Microsoft.Extensions.Logging
@@ -59,6 +60,7 @@
         Session.Changed += OnSessionChanged;
         Feed.Updated += OnFrame;
         Sel.Changed += OnFrame;
+        Aural.Changed += OnSessionChanged;
         PublishKeys();
     }
 
@@ -228,7 +230,9 @@
                     SoftKey.Off("CDI"),
                     SoftKey.Simple("PFD", () => Enter("PFD")),
                     SoftKey.Off("VIDEO"),
-                    SoftKey.Off("TMR"));
+                    SoftKey.Off("TMR"),
+                    null,
+                    SoftKey.Simple("MUTE", () => Aural.SetMuted(!Aural.Muted), Aural.Muted));
         }
     }
 
@@ -274,6 +278,7 @@
         Session.Changed -= OnSessionChanged;
         Feed.Updated -= OnFrame;
         Sel.Changed -= OnFrame;
+        Aural.Changed -= OnSessionChanged;
         revert?.Dispose();
     }
 }

@@ -297,3 +297,14 @@ as a hollow cyan bug and in the popup left of the HSI; in GUIDED it is sent auto
 Outside GUIDED the popup says GUIDED ONLY. HDG uses CONDITION_YAW (copter) / GUIDED_CHANGE_HEADING (plane), ALT a
 guided reposition at the current position (copter) / GUIDED_CHANGE_ALTITUDE (plane), SPD DO_CHANGE_SPEED; CRS and
 V/S are local references. The mode reverts to HDG after 10 s idle and the popup disappears after 10 s.
+
+### Aural alerts
+
+`Alerts/AuralService.cs` plays the spec's aurals: master warning = triple high tone plus a voice message, repeated
+every 5 s until the alert is acknowledged; master caution = double tone plus the message once; advisories and
+status messages are silent. The altitude alerter gives a single tone on approach and a double tone on deviation,
+the floor alerter says "Minimum, minimum". Tones are synthesised in the WebView with Web Audio (`wwwroot/js/audio.js`,
+started on the first touch or key because WebViews begin with the audio context suspended); voice goes through
+`IVoice`, which the MAUI app implements with the platform text-to-speech. Spec phrases ("Battery low", "Telemetry
+lost", "Traffic, traffic", …) are used for the known alerts, STATUSTEXT alerts speak their full message. The MUTE
+soft key on the PFD bar silences everything.

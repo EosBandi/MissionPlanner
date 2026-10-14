@@ -1,5 +1,6 @@
 @* Altimeter tape (spec pfd.altitudeTape): REL altitude, fence band, ground band, selected altitude with alerter. *@
 @inherits PfdPart
+@inject AuralService Aural
 
 <g>
     <rect x="@F(X)" y="@F(Y)" width="@F(W)" height="@F(H)" fill="var(--p-tapeFill)" />
@@ -108,8 +109,21 @@
         else if (d <= P.AlertApproach2) { captured = true; next = "captured"; }
         else if (d <= P.AlertApproach1 && !captured) next = "approach1";
         else next = captured ? "captured" : "idle";
-        if (next != alerter) SetState(next);
+        if (next != alerter)
+        {
+            SetState(next);
+            // spec interaction.aural: single tone on approach, double tone on deviation
+            if (next == "approach1") Aural.AltitudeApproach();
+            else if (next == "deviation") Aural.AltitudeDeviation();
+        }
+
+        var floorNow = FloorState;
+        if (floorNow == "reached" && lastFloor != "reached")
+            Aural.Minimums();
+        lastFloor = floorNow;
     }
+
+    private string lastFloor = "hidden";
 
     private void SetState(string s)
     {

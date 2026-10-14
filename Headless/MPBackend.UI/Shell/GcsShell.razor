@@ -3,6 +3,7 @@
 @inject ShellState Shell
 @inject AlertService Alerts
 @inject SelectedValues Sel
+@inject AuralService Aural
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
@@ -55,6 +56,7 @@
         self = DotNetObjectReference.Create(this);
         module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/MPBackend.UI/js/shell.js");
         await module.InvokeVoidAsync("observe", self, root);
+        await Aural.AttachAsync(JS);
     }
 
     [JSInvokable]

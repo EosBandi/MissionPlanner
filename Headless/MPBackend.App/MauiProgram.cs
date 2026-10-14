@@ -27,6 +27,7 @@ public static class MauiProgram
         };
         builder.Services.AddSingleton(options);
         builder.Services.AddSingleton(_ => new Backend(options));
+        builder.Services.AddSingleton<MPBackend.UI.Alerts.IVoice, MauiVoice>();
         builder.Services.AddMpBackendUI();
 
         builder.Logging.AddProvider(new FileLoggerProvider(Path.Combine(options.DataDirectory, "logs", "app.log")));
