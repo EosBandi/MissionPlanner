@@ -285,3 +285,15 @@ to them, REFRESH re-downloads the list, EXPORT saves a Mission Planner .param fi
 and COMPARE loads a .param / .parm / QGC file, lists the differences against the vehicle and APPLY FILE (hold)
 writes them. Copter 4.7's renamed m/s parameters (WP_SPD, LOIT_SPEED_MS, PILOT_SPD_UP, LAND_SPD_MS, ATC_ANGLE_MAX)
 are understood by the vehicle profile alongside the older cm/s names.
+
+### Selected values (bugs)
+
+`Pfd/SelectedValues.cs` implements the knob (spec behaviours.selectedValueEditing, interaction.bezelMapping): modes
+HDG, CRS, ALT, V/S, SPD chosen with keys H C A V P, by tapping the matching instrument, or by clicking its value box;
+turn with ↑/↓ (Shift = ×10), the mouse wheel over the PFD, or a drag on the tape (1 unit per 8 px, horizontal on
+the HSI); push (sync to the current value) with S, the middle mouse button or a second tap. The selection is drawn
+as a hollow cyan bug and in the popup left of the HSI; in GUIDED it is sent automatically 1.5 s after the last turn
+(ENT sends immediately), the bug turns solid on the vehicle's ACK and flashes yellow and reverts on a NACK.
+Outside GUIDED the popup says GUIDED ONLY. HDG uses CONDITION_YAW (copter) / GUIDED_CHANGE_HEADING (plane), ALT a
+guided reposition at the current position (copter) / GUIDED_CHANGE_ALTITUDE (plane), SPD DO_CHANGE_SPEED; CRS and
+V/S are local references. The mode reverts to HDG after 10 s idle and the popup disappears after 10 s.

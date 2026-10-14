@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<GcsSession>();
         services.AddSingleton<ShellState>();
         services.AddSingleton<Pfd.PfdFeed>();
+        services.AddSingleton<Pfd.SelectedValues>();
         services.AddSingleton<Alerts.AlertService>();
         services.AddSingleton<Map.TileCache>();
         services.AddSingleton<Map.MissionStore>();

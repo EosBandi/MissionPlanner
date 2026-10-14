@@ -59,6 +59,13 @@ public interface IGcs
     /// <summary>Guided "fly to here"; altitude in metres above home.</summary>
     Task<CommandResult> GotoAsync(uint sysid, byte compid, double lat, double lng, float alt);
 
+    /// <summary>
+    /// Operator-selected target in GUIDED (spec selectedValueEditing.commands): heading (CONDITION_YAW on
+    /// copters, GUIDED_CHANGE_HEADING on planes), altitude above home (guided reposition / GUIDED_CHANGE_ALTITUDE)
+    /// or speed (DO_CHANGE_SPEED, ground speed on copters, airspeed on planes).
+    /// </summary>
+    Task<CommandResult> SetGuidedTargetAsync(uint sysid, byte compid, Pfd.SelectedKind kind, double value);
+
     /// <summary>Download the mission, fence or rally list from the vehicle.</summary>
     Task<MPBackend.Core.Missions.MissionPlan> GetMissionAsync(uint sysid, byte compid, MAVLink.MAV_MISSION_TYPE type);
 

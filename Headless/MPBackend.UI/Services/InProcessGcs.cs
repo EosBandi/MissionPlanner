@@ -130,6 +130,34 @@ public sealed class InProcessGcs : IGcs, IDisposable
     public Task<CommandResult> GotoAsync(uint sysid, byte compid, double lat, double lng, float alt) =>
         backend.Vehicles.GotoAsync(sysid, compid, lat, lng, alt);
 
+    public async Task<CommandResult> SetGuidedTargetAsync(uint sysid, byte compid, Pfd.SelectedKind kind, double value)
+    {
+        var cs = backend.Vehicles.Resolve(sysid, compid).mav.cs;
+        var plane = cs.firmware == MissionPlanner.ArduPilot.Firmwares.ArduPlane;
+        var v = (float)value;
+        switch (kind)
+        {
+            case Pfd.SelectedKind.Hdg:
+                return plane
+                    // GUIDED_CHANGE_HEADING: p1 heading type (1 = heading), p2 heading, p3 rate °/s
+                    ? await backend.Vehicles.CommandAsync(sysid, compid, MAVLink.MAV_CMD.GUIDED_CHANGE_HEADING, new[] { 1f, v, 20f }, useInt: true)
+                    // CONDITION_YAW: p1 heading, p2 rate °/s, p3 direction (0 = shortest), p4 0 = absolute
+                    : await backend.Vehicles.CommandAsync(sysid, compid, MAVLink.MAV_CMD.CONDITION_YAW, new[] { v, 30f, 0f, 0f });
+            case Pfd.SelectedKind.Alt:
+                if (plane)
+                    // GUIDED_CHANGE_ALTITUDE: p3 altitude in the command frame (relative to home)
+                    return await backend.Vehicles.CommandAsync(sysid, compid, MAVLink.MAV_CMD.GUIDED_CHANGE_ALTITUDE, new[] { 0f, 0f, v }, useInt: true);
+                if (cs.lat == 0 && cs.lng == 0)
+                    return new CommandResult(false, "no position");
+                return await backend.Vehicles.GotoAsync(sysid, compid, cs.lat, cs.lng, v);
+            case Pfd.SelectedKind.Spd:
+                // DO_CHANGE_SPEED: p1 speed type (0 airspeed, 1 ground speed), p2 speed m/s, p3 throttle (-1 = no change)
+                return await backend.Vehicles.CommandAsync(sysid, compid, MAVLink.MAV_CMD.DO_CHANGE_SPEED, new[] { plane ? 0f : 1f, v, -1f });
+            default:
+                return new CommandResult(false, "reference only");
+        }
+    }
+
     public Task<MPBackend.Core.Missions.MissionPlan> GetMissionAsync(uint sysid, byte compid, MAVLink.MAV_MISSION_TYPE type) =>
         backend.Missions.DownloadAsync(sysid, compid, type);
 

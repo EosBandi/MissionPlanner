@@ -2,15 +2,19 @@
 @inject ShellState Shell
 @inject GcsSession Session
 @inject PfdFeed Feed
+@inject SelectedValues Sel
+@inject IJSRuntime JS
 @inject Microsoft.Extensions.Logging.ILogger<PfdDisplay> Logger
 @using Microsoft.Extensions.Logging
-@implements IDisposable
+@implements IAsyncDisposable
 
-<div class="display pfd" @onpointerdown="() => Shell.Touch(DisplayKind.Pfd)">
+<div class="display pfd" @ref="root"
+     @onpointerdown="OnPointerDown" @onpointermove="OnPointerMove" @onpointerup="OnPointerUp" @onpointercancel="OnPointerUp"
+     @onwheel="OnWheel" @onwheel:preventDefault @onmousedown="OnMouseDown" @oncontextmenu:preventDefault>
     @* a rendering fault in one instrument must not take the whole GCS down: show it as a failed display *@
     <ErrorBoundary @ref="boundary">
         <ChildContent>
-            <PfdView S="Feed.State" P="Feed.Profile" />
+            <PfdView S="Feed.State" P="Feed.Profile" Sel="Sel.State" />
         </ChildContent>
         <ErrorContent Context="ex">
             <svg class="pfd-stage pfd" viewBox="0 0 800 640" preserveAspectRatio="xMidYMid meet">
@@ -40,14 +44,117 @@
     private ErrorBoundary? boundary;
     private bool synTerr = true, hrznHdg, signs, wind, brg1, brg2;
     private int pending;
+    private ElementReference root;
+    private DotNetObjectReference<PfdDisplay>? self;
+    private IJSObjectReference? module, observer;
+    private double width = 800, height = 640, left, top;
+    private bool dragging;
+    private double dragX, dragY, dragAccum;
+    private SelectedKind? dragKind;
+    private DateTime lastTap;
 
     protected override void OnInitialized()
     {
         Shell.Changed += OnShellChanged;
         Session.Changed += OnSessionChanged;
         Feed.Updated += OnFrame;
+        Sel.Changed += OnFrame;
         PublishKeys();
     }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+        self = DotNetObjectReference.Create(this);
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/MPBackend.UI/js/shell.js");
+        observer = await module.InvokeAsync<IJSObjectReference>("observeSize", self, root, nameof(OnSize));
+    }
+
+    [JSInvokable]
+    public void OnSize(double w, double h, double l, double t)
+    {
+        width = w;
+        height = h;
+        left = l;
+        top = t;
+    }
+
+    // ---- knob replacement on mouse / touch (spec interaction.bezelMapping, interaction.touch) ------------
+    // screen pixel -> PFD reference units (800 x 640, letterboxed with "meet")
+    private (double X, double Y) ToPfd(double clientX, double clientY)
+    {
+        var scale = Math.Min(width / 800, height / 640);
+        var ox = (width - 800 * scale) / 2;
+        var oy = (height - 640 * scale) / 2;
+        return ((clientX - left - ox) / scale, (clientY - top - oy) / scale);
+    }
+
+    private static SelectedKind? KindAt(double x, double y)
+    {
+        if (x is >= 70 and <= 162 && y is >= 82 and <= 434) return SelectedKind.Spd;      // speed tape + SPD box
+        if (x is >= 598 and <= 690 && y is >= 82 and <= 434) return SelectedKind.Alt;     // altitude tape + ALT box
+        if (x is >= 694 and <= 758 && y is >= 130 and <= 414) return SelectedKind.Vs;     // VSI + V/S box
+        if (Math.Sqrt((x - 400) * (x - 400) + (y - 530) * (y - 530)) <= 118 || x is >= 368 and <= 432 && y is >= 384 and <= 412)
+            return SelectedKind.Hdg;                                                      // HSI card + heading readout
+        return null;
+    }
+
+    private void OnPointerDown(PointerEventArgs e)
+    {
+        Shell.Touch(DisplayKind.Pfd);
+        if (e.Button != 0)
+            return;
+        var (x, y) = ToPfd(e.ClientX, e.ClientY);
+        dragKind = KindAt(x, y);
+        dragging = dragKind != null;
+        dragX = e.ClientX;
+        dragY = e.ClientY;
+        dragAccum = 0;
+    }
+
+    private void OnPointerMove(PointerEventArgs e)
+    {
+        if (!dragging || dragKind is not { } kind)
+            return;
+        // drag on a tape: 1 unit per 8 px (spec interaction.touch); up = increase, HSI uses horizontal drag
+        var delta = kind == SelectedKind.Hdg ? e.ClientX - dragX : dragY - e.ClientY;
+        dragX = e.ClientX;
+        dragY = e.ClientY;
+        dragAccum += delta / 8;
+        var steps = (int)dragAccum;
+        if (steps == 0)
+            return;
+        dragAccum -= steps;
+        if (Sel.Mode != kind)
+            Sel.SetMode(kind);
+        Sel.Adjust(steps);
+    }
+
+    private void OnPointerUp(PointerEventArgs e)
+    {
+        if (!dragging)
+            return;
+        dragging = false;
+        var moved = Math.Abs(e.ClientX - dragX) + Math.Abs(e.ClientY - dragY) > 4 || dragAccum != 0;
+        if (dragKind is not { } kind || moved)
+            return;
+        // tap on an instrument selects its knob mode; a second tap within 400 ms syncs (knob push)
+        var now = DateTime.UtcNow;
+        if (Sel.Mode == kind && (now - lastTap).TotalMilliseconds < 400)
+            Sel.Sync();
+        else
+            Sel.SetMode(kind);
+        lastTap = now;
+    }
+
+    private void OnMouseDown(MouseEventArgs e)
+    {
+        if (e.Button == 1) // middle button = knob push
+            Sel.Sync();
+    }
+
+    private void OnWheel(WheelEventArgs e) => Sel.Adjust((e.DeltaY < 0 ? 1 : -1) * (e.ShiftKey ? 10 : 1));
 
     private void OnShellChanged() => _ = InvokeAsync(StateHasChanged);
     private void OnSessionChanged() => _ = InvokeAsync(() => { PublishKeys(); StateHasChanged(); });
@@ -150,11 +257,23 @@
         PublishKeys();
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
+        try
+        {
+            if (observer != null) await observer.InvokeVoidAsync("dispose");
+            if (observer != null) await observer.DisposeAsync();
+            if (module != null) await module.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+
+        self?.Dispose();
         Shell.Changed -= OnShellChanged;
         Session.Changed -= OnSessionChanged;
         Feed.Updated -= OnFrame;
+        Sel.Changed -= OnFrame;
         revert?.Dispose();
     }
 }

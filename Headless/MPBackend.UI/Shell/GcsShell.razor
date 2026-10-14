@@ -2,6 +2,7 @@
 @inject GcsSession Session
 @inject ShellState Shell
 @inject AlertService Alerts
+@inject SelectedValues Sel
 @inject IJSRuntime JS
 @implements IAsyncDisposable
 
@@ -114,9 +115,32 @@
             case "K":
                 Alerts.Acknowledge();
                 break;
+            // knob modes: H C A V P choose, up/down (shift = x10) turn, S syncs, Enter sends (PFD active)
+            case "h": case "H": Sel.SetMode(SelectedKind.Hdg); Shell.Touch(DisplayKind.Pfd); break;
+            case "c": case "C": Sel.SetMode(SelectedKind.Crs); Shell.Touch(DisplayKind.Pfd); break;
+            case "a": case "A": Sel.SetMode(SelectedKind.Alt); Shell.Touch(DisplayKind.Pfd); break;
+            case "v": case "V": Sel.SetMode(SelectedKind.Vs); Shell.Touch(DisplayKind.Pfd); break;
+            case "p": case "P": Sel.SetMode(SelectedKind.Spd); Shell.Touch(DisplayKind.Pfd); break;
+            case "s": case "S": Sel.Sync(); break;
             case "ArrowUp":
             case "ArrowDown":
+                if (Shell.ActiveDisplay == DisplayKind.Pfd)
+                {
+                    Sel.Adjust((e.Key == "ArrowUp" ? 1 : -1) * (e.ShiftKey ? 10 : 1));
+                    preventKeys = true;
+                }
+                else
+                    preventKeys = Shell.PageKeys?.Invoke(e.Key) == true;
+                break;
             case "Enter":
+                if (Shell.ActiveDisplay == DisplayKind.Pfd)
+                {
+                    _ = Sel.CommitAsync();
+                    preventKeys = true;
+                }
+                else
+                    preventKeys = Shell.PageKeys?.Invoke(e.Key) == true;
+                break;
             case "PageUp":
             case "PageDown":
                 preventKeys = Shell.PageKeys?.Invoke(e.Key) == true;

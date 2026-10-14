@@ -32,10 +32,10 @@
                 <T X="@(X + 20)" Y="@(ty + 6)" V="@F(Math.Round(t))" Size="18" />
             }
         }
-        @if (S.TargetAltValid)
+        @if (HasTarget)
         {
-            var sy = Clamp(Mid - (S.TargetAlt - V) * Ppu, Y + 2, Y + H - 2);
-            <path d="@($"M{F(X)} {F(sy - 8)} h10 l-4 8 l4 8 h-10 Z")" fill="var(--p-cyan)" />
+            var sy = Clamp(Mid - (Target - V) * Ppu, Y + 2, Y + H - 2);
+            <path d="@($"M{F(X)} {F(sy - 8)} h10 l-4 8 l4 8 h-10 Z")" fill="@(BugSolid ? "var(--p-cyan)" : "none")" stroke="var(--p-cyan)" stroke-width="2" />
         }
         @if (P.FloorAlt is { } floor && !Extreme && FloorState != "hidden")
         {
@@ -51,10 +51,10 @@
     <T X="@(X + W - 2)" Y="@(Mid + 10)" V="@F(Math.Round(V))" A="end" Size="30" />
     @if (!Extreme)
     {
-        @if (S.TargetAltValid)
+        @if (HasTarget)
         {
-            <rect x="@F(X)" y="82" width="@F(W)" height="26" fill="@AlerterBg" stroke="var(--p-gray700)" />
-            <T X="@(X + W - 6)" Y="101" V="@F(Math.Round(S.TargetAlt))" A="end" Size="18" Fill="@AlerterFg" Class="@(AlerterFlash ? "flash" : null)" />
+            <rect x="@F(X)" y="82" width="@F(W)" height="26" fill="@AlerterBg" stroke="@(Sel.Mode == SelectedKind.Alt && Sel.Popup != null ? "var(--p-cyan)" : "var(--p-gray700)")" />
+            <T X="@(X + W - 6)" Y="101" V="@F(Math.Round(Target))" A="end" Size="18" Fill="@(Sel.Nack && Sel.Mode == SelectedKind.Alt ? "var(--p-yellow)" : AlerterFg)" Class="@(AlerterFlash || Sel.Nack && Sel.Mode == SelectedKind.Alt ? "flash" : null)" />
             <path d="@($"M{F(X + 6)} 88 h8 l-3 7 l3 7 h-8 Z")" fill="@AlerterFg" />
         }
         @if (S.AglValid)
@@ -72,6 +72,9 @@
     private double Ppu => H / P.AltSpan;
     private double V => S.Alt;
     private double Trend => S.ClimbRate * 6;
+    private bool HasTarget => Sel.Alt != null || S.TargetAltValid;
+    private double Target => Sel.Alt ?? S.TargetAlt;
+    private bool BugSolid => Sel.Alt != null ? Sel.AltSolid : true;
 
     private IEnumerable<double> Ticks
     {
@@ -93,13 +96,13 @@
 
     private void UpdateAlerter()
     {
-        if (S.TargetAlt != lastTarget)
+        if (Target != lastTarget)
         {
-            lastTarget = S.TargetAlt;
+            lastTarget = Target;
             captured = false;
             SetState("idle");
         }
-        var d = Math.Abs(V - S.TargetAlt);
+        var d = Math.Abs(V - Target);
         string next;
         if (captured && d > P.AlertDeviation) next = "deviation";
         else if (d <= P.AlertApproach2) { captured = true; next = "captured"; }
@@ -136,5 +139,5 @@
 
     protected override void OnParametersSet() => UpdateAlerter();
 
-    protected override object Key() => (R1(V), R2(S.ClimbRate), R1(S.TargetAlt), S.TargetAltValid, R1(S.Agl), S.AglValid, alerter, Extreme, P);
+    protected override object Key() => (R1(V), R2(S.ClimbRate), R1(S.TargetAlt), S.TargetAltValid, R1(S.Agl), S.AglValid, alerter, Extreme, P, Sel.Alt, Sel.AltSolid, Sel.Mode, Sel.Popup != null, Sel.Nack);
 }

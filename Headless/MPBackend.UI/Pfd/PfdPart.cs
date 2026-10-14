@@ -13,6 +13,7 @@ public abstract class PfdPart : ComponentBase
     [Parameter] public PfdState S { get; set; } = PfdState.Empty;
     [Parameter] public VehicleProfile P { get; set; } = VehicleProfile.Default("multirotor");
     [Parameter] public bool Extreme { get; set; }
+    [Parameter] public SelectedState Sel { get; set; } = SelectedState.Empty;
 
     private object? last;
 

@@ -30,10 +30,19 @@
         {
             <T X="@CX" Y="@(CY - R + 30)" V="@label" A="middle" Size="@(cardinal ? 18 : 15)" Transform="@($"rotate({a} {F(CX)} {F(CY)})")" />
         }
-        @if (Autopilot)
+        @if (Sel.Hdg != null || Autopilot)
         {
-            <g transform="@($"rotate({F(S.NavBearing)} {F(CX)} {F(CY)})")">
-                <path d="@BugPath" fill="var(--p-cyan)" stroke="var(--p-cyan)" stroke-width="2" />
+            <g transform="@($"rotate({F(Sel.Hdg ?? S.NavBearing)} {F(CX)} {F(CY)})")">
+                <path d="@BugPath" fill="@(Sel.Hdg != null && !Sel.HdgSolid ? "none" : "var(--p-cyan)")" stroke="var(--p-cyan)" stroke-width="2" />
+            </g>
+        }
+        @if (NavSource == null && Sel.Crs is { } crs)
+        {
+            @* CRS reference (no nav source): cyan course pointer, no deviation bar *@
+            <g transform="@($"rotate({F(crs)} {F(CX)} {F(CY)})")">
+                <line x1="@F(CX)" y1="@F(CY - R + 8)" x2="@F(CX)" y2="@F(CY - 44)" stroke="var(--p-cyan)" stroke-width="4" />
+                <path d="@($"M{F(CX)} {F(CY - R + 4)} l-9 16 h18 Z")" fill="var(--p-cyan)" />
+                <line x1="@F(CX)" y1="@F(CY + 44)" x2="@F(CX)" y2="@F(CY + R - 8)" stroke="var(--p-cyan)" stroke-width="4" />
             </g>
         }
         @if (S.PositionValid && S.GroundSpeed > 0.5)
@@ -75,7 +84,21 @@
             <T X="@CX" Y="@(CY + 38)" V="@($"XTK {F(Math.Abs(S.Xtrack), "0")}m")" A="middle" Size="14" Fill="@NavColor" />
         }
     }
-    <rect x="@F(CX - 32)" y="@F(CY - R - 46)" width="64" height="28" fill="#000" stroke="#fff" stroke-width="1.5" />
+    @if (Sel.Popup != null)
+    {
+        @* selected-value popup (spec pfd.hsi.selectedValuePopup): upper-left of the HSI for 10 s *@
+        <rect x="238" y="430" width="96" height="26" fill="#000" stroke="@(Sel.Nack ? "var(--p-yellow)" : "var(--p-cyan)")" />
+        <T X="244" Y="448" V="@Sel.Popup" Size="15" W="700" Fill="@(Sel.Nack ? "var(--p-yellow)" : "var(--p-cyan)")" Class="@(Sel.Nack ? "flash" : null)" />
+        @if (Sel.Message != null)
+        {
+            <T X="238" Y="472" V="@Sel.Message" Size="12" W="700" Fill="var(--p-yellow)" />
+        }
+        else if (Sel.Pending)
+        {
+            <T X="238" Y="472" V="@((Sel.Mode is SelectedKind.Crs or SelectedKind.Vs) ? "REFERENCE" : "ENT TO SEND")" Size="11" Fill="var(--p-gray300)" />
+        }
+    }
+    <rect x="@F(CX - 32)" y="@F(CY - R - 46)" width="64" height="28" fill="#000" stroke="@(Sel.Mode == SelectedKind.Hdg && Sel.Popup != null ? "var(--p-cyan)" : "#fff")" stroke-width="1.5" />
     <T X="@CX" Y="@(CY - R - 24)" V="@(S.AttitudeValid ? D3(S.Heading) + "°" : "---")" A="middle" Size="24" Fill="@(S.AttitudeValid ? "#fff" : "var(--p-yellow)")" />
     <path d="@($"M{F(CX)} {F(CY - R + 1)} l-7 -10 h14 Z")" fill="#fff" />
 </g>
@@ -129,5 +152,6 @@
     private double Deviation => Clamp(-S.Xtrack / P.CdiFullScale, -1.2, 1.2) * 50;
 
     protected override object Key() => (R1(S.Heading), R1(S.Track), R1(S.TurnRate), R1(S.NavBearing), R1(S.TargetBearing), R1(S.Xtrack),
-        R1(S.HomeBearing), S.HomeValid, S.PositionValid, S.AttitudeValid, S.GroundSpeed > 0.5, R1(S.WpDist), S.Mode, Extreme, P);
+        R1(S.HomeBearing), S.HomeValid, S.PositionValid, S.AttitudeValid, S.GroundSpeed > 0.5, R1(S.WpDist), S.Mode, Extreme, P,
+        Sel.Hdg, Sel.HdgSolid, Sel.Crs, Sel.Popup, Sel.Message, Sel.Pending, Sel.Nack, Sel.Mode);
 }

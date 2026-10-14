@@ -26,10 +26,14 @@
     {
         <T X="@(X + 60)" Y="@(Vy + 6)" V="@((Vs > 0 ? "+" : "") + F(Vs, "0.0"))" A="end" Size="17" />
     }
-    @if (!Extreme && Autopilot)
+    @if (!Extreme && (Autopilot || Sel.Vs != null))
     {
-        <rect x="@F(X)" y="@F(Y + H + 4)" width="64" height="20" fill="#000" stroke="var(--p-gray700)" />
-        <T X="@(X + 32)" Y="@(Y + H + 19)" V="AUTO" A="middle" Size="14" Fill="var(--p-cyan)" />
+        <rect x="@F(X)" y="@F(Y + H + 4)" width="64" height="20" fill="#000" stroke="@(Sel.Mode == SelectedKind.Vs && Sel.Popup != null ? "var(--p-cyan)" : "var(--p-gray700)")" />
+        <T X="@(X + 32)" Y="@(Y + H + 19)" V="@(Sel.Vs is { } sv ? (sv >= 0 ? "+" : "") + F(sv, "0.0") : "AUTO")" A="middle" Size="14" Fill="var(--p-cyan)" />
+        @if (Sel.Vs is { } bug)
+        {
+            <path d="@($"M{F(X + 2)} {F(Mid - Clamp(bug, -P.VsRange, P.VsRange) * K)} l-8 -6 v12 Z")" fill="var(--p-cyan)" />
+        }
     }
     <T X="@(X + 32)" Y="450" V="m/s" A="middle" Size="13" Fill="var(--p-gray300)" />
 </g>
@@ -52,5 +56,5 @@
 
     private string PointerPath => $"M{F(X + 2)} {F(Vy)} L{F(X + 12)} {F(Vy - 12)} H{F(X + 64)} V{F(Vy + 12)} H{F(X + 12)} Z";
 
-    protected override object Key() => (R2(Vs), S.Mode, Extreme, P);
+    protected override object Key() => (R2(Vs), S.Mode, Extreme, P, Sel.Vs, Sel.Mode, Sel.Popup != null);
 }

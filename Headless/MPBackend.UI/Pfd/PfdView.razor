@@ -27,14 +27,14 @@
     else
     {
         <g class="@(S.LinkLost ? "pfd-dim" : "")">
-            <PfdAttitude S="S" P="P" Extreme="extreme" />
-            <PfdSpeedTape S="S" P="P" Extreme="extreme" />
-            <PfdAltTape S="S" P="P" Extreme="extreme" />
-            <PfdVsi S="S" P="P" Extreme="extreme" />
-            <PfdAnnunciations S="S" P="P" Extreme="extreme" />
-            <PfdHsi S="S" P="P" Extreme="extreme" />
-            <PfdDataBlocks S="S" P="P" Extreme="extreme" />
-            <PfdNavStatus S="S" P="P" Extreme="extreme" />
+            <PfdAttitude S="S" P="P" Extreme="extreme" Sel="Sel" />
+            <PfdSpeedTape S="S" P="P" Extreme="extreme" Sel="Sel" />
+            <PfdAltTape S="S" P="P" Extreme="extreme" Sel="Sel" />
+            <PfdVsi S="S" P="P" Extreme="extreme" Sel="Sel" />
+            <PfdAnnunciations S="S" P="P" Extreme="extreme" Sel="Sel" />
+            <PfdHsi S="S" P="P" Extreme="extreme" Sel="Sel" />
+            <PfdDataBlocks S="S" P="P" Extreme="extreme" Sel="Sel" />
+            <PfdNavStatus S="S" P="P" Extreme="extreme" Sel="Sel" />
         </g>
         <PfdFma S="S" P="P" Extreme="extreme" />
         @if (S.LinkLost)
@@ -48,6 +48,7 @@
 @code {
     [Parameter] public PfdState S { get; set; } = PfdState.Empty;
     [Parameter] public VehicleProfile P { get; set; } = VehicleProfile.Default("multirotor");
+    [Parameter] public SelectedState Sel { get; set; } = SelectedState.Empty;
 
     // pfd.attitude.states.extremeAttitude: declutter beyond the profile thresholds
     private bool extreme => S.AttitudeValid &&
