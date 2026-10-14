@@ -1,0 +1,94 @@
+@* Vehicle Status Strip (spec component "vss"): master lamps, vehicle, ARM, phase, time, BAT, LINK, GNSS, EKF, clock. *@
+@inject GcsSession Session
+@inject ShellState Shell
+@inject AlertService Alerts
+@implements IDisposable
+
+<div class="vss @(Shell.Layout == LayoutMode.Desktop ? "" : "compact")">
+    @* cas.masterAnnunciators: lit and flashing while an unacknowledged alert of that level exists; click acknowledges *@
+    <span class="lamp warning @(Alerts.HasUnacknowledged(AlertLevel.Warning) ? "on flash-inf" : "")" @onclick="() => Alerts.Acknowledge(AlertLevel.Warning)">WARNING</span>
+    <span class="lamp caution @(Alerts.HasUnacknowledged(AlertLevel.Caution) ? "on flash-inf" : "")" @onclick="() => Alerts.Acknowledge(AlertLevel.Caution)">CAUTION</span>
+
+    @if (v == null)
+    {
+        <span class="vss-item"><span class="vss-value dim">NO VEHICLE</span></span>
+    }
+    else
+    {
+        <span class="vss-item"><span class="vss-label">VEH</span><span class="vss-value">@v.SysId</span><span class="vss-sub">@VehicleType</span></span>
+        <span class="vss-item"><span class="vss-value @(Armed ? "ok" : "")">@(Armed ? "ARMED" : "DISARMED")</span></span>
+        <span class="vss-item"><span class="vss-value ok">@Mode</span></span>
+        <span class="vss-item"><span class="chip">@Alerts.Phase.ToString().ToUpperInvariant()</span></span>
+        @if (Alerts.Simulation)
+        {
+            <span class="vss-item"><span class="chip sim">SIMULATION</span></span>
+        }
+        <span class="vss-item hide-compact"><span class="vss-label">FLT</span><span class="vss-value">@FlightTime</span></span>
+        <span class="vss-item"><span class="vss-label">BAT</span><span class="vss-value @BatClass">@F("battery_voltage", "0.0")V</span><span class="vss-sub hide-compact">@F("current", "0.0")A</span><span class="vss-value @BatClass">@F("battery_remaining", "0")%</span></span>
+        <span class="vss-item"><span class="vss-label">LINK</span><span class="bars @LinkClass">@for (var i = 1; i <= 4; i++) { <i class="@(i <= Bars ? "on" : "")"></i> }</span><span class="vss-value @LinkClass">@LinkText</span></span>
+        <span class="vss-item"><span class="vss-label">GNSS</span><span class="vss-value @GnssClass">@FixText</span><span class="vss-sub">@F("satcount", "0") <span class="hide-compact">HDOP @F("gpshdop", "0.0")</span></span></span>
+        <span class="vss-item hide-compact"><span class="vss-label">EKF</span><span class="vss-value @EkfClass">@EkfText</span></span>
+    }
+
+    <span class="vss-spacer"></span>
+    <span class="vss-item"><span class="vss-value">@clock</span><span class="vss-sub">UTC</span></span>
+</div>
+
+@code {
+    private VehicleInfo? v;
+    private IReadOnlyDictionary<string, object?> s = new Dictionary<string, object?>();
+    private string clock = "";
+    private Timer? tick;
+
+    protected override void OnInitialized()
+    {
+        Session.Changed += OnChanged;
+        Alerts.Changed += OnChanged;
+        tick = new Timer(_ => _ = InvokeAsync(Refresh), null, 0, 1000);
+        Refresh();
+    }
+
+    private void OnChanged() => _ = InvokeAsync(Refresh);
+
+    private void Refresh()
+    {
+        v = Session.ActiveVehicle;
+        s = Session.Status;
+        clock = DateTime.UtcNow.ToString("HH:mm:ss");
+        StateHasChanged();
+    }
+
+    private double D(string field) => s.TryGetValue(field, out var o) && o != null ? Convert.ToDouble(o) : double.NaN;
+    private string F(string field, string format) { var d = D(field); return double.IsNaN(d) ? "---" : d.ToString(format); }
+
+    private bool Armed => s.TryGetValue("armed", out var a) && a is true;
+    private string Mode => s.TryGetValue("mode", out var m) && m is string ms && ms.Length > 0 ? ms.ToUpperInvariant() : (v?.Mode ?? "").ToUpperInvariant();
+    private string VehicleType => (v?.Type ?? "").Replace("_", " ");
+    private string FlightTime { get { var t = D("timeInAir"); return double.IsNaN(t) ? "--:--" : TimeSpan.FromSeconds(t).ToString(@"mm\:ss"); } }
+
+    // field colours follow the CAS state of the matching alert (same thresholds as the alert table)
+    private bool Has(string id) => Alerts.Active.Any(a => a.Id == id);
+    private string BatClass => Has("BATT_CRIT") ? "warning" : Has("BATT_LOW") ? "caution" : double.IsNaN(D("battery_remaining")) ? "" : "ok";
+
+    private double HeartbeatAge => v == null ? double.NaN : (DateTime.UtcNow - v.LastPacket.ToUniversalTime()).TotalSeconds;
+    private double Lq => D("linkqualitygcs");
+    private int Bars => HeartbeatAge > 3 ? 0 : Lq >= 80 ? 4 : Lq >= 60 ? 3 : Lq >= 40 ? 2 : Lq >= 20 ? 1 : 0;
+    // c2link.thresholds: LQ caution < 60 %, warning < 30 %; heartbeat caution > 1.5 s, warning > 3 s
+    private string LinkClass => HeartbeatAge > 3 || Lq < 30 ? "warning" : HeartbeatAge > 1.5 || Lq < 60 ? "caution" : "ok";
+    private string LinkText => HeartbeatAge > 3 ? "LOST" : double.IsNaN(Lq) ? "---" : $"{Lq:0}%";
+
+    private int Fix => (int)(double.IsNaN(D("gpsstatus")) ? 0 : D("gpsstatus"));
+    private string FixText => Fix switch { 0 => "NO GPS", 1 => "NO FIX", 2 => "2D", 3 => "3D", 4 => "DGPS", 5 => "RTK FLT", 6 => "RTK FIX", _ => Fix.ToString() };
+    private string GnssClass => Has("GPS_LOST") || Fix < 2 ? "warning" : Has("GPS_DEGRADED") || Fix == 2 ? "caution" : "ok";
+
+    private double Ekf => D("ekfstatus");
+    private string EkfText => double.IsNaN(Ekf) ? "---" : Has("EKF_FS") ? "FS" : Ekf >= 0.5 ? "VAR" : "OK";
+    private string EkfClass => double.IsNaN(Ekf) ? "" : Has("EKF_FS") ? "warning" : Ekf >= 0.5 ? "caution" : "ok";
+
+    public void Dispose()
+    {
+        Session.Changed -= OnChanged;
+        Alerts.Changed -= OnChanged;
+        tick?.Dispose();
+    }
+}

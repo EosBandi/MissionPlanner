@@ -1,0 +1,63 @@
+@* CAS message window (spec cas.window): MFD top-right, warnings → cautions → advisories → status, newest first. *@
+@inject AlertService Alerts
+@inject ShellState Shell
+@implements IDisposable
+
+@if (visible.Count > 0 || hidden.Count > 0)
+{
+    <div class="cas">
+        @foreach (var a in visible)
+        {
+            <div class="cas-line @Css(a.Level) @(a.Acknowledged ? "" : "unack")">@a.Text</div>
+        }
+        @if (hidden.Count > 0)
+        {
+            <div class="cas-line overflow">&#9660; @Overflow</div>
+        }
+    </div>
+}
+
+@code {
+    private List<ActiveAlert> visible = new();
+    private List<ActiveAlert> hidden = new();
+
+    protected override void OnInitialized()
+    {
+        Alerts.Changed += OnChanged;
+        Shell.Changed += OnChanged;
+        Compute();
+    }
+
+    private void OnChanged() => _ = InvokeAsync(() => { Compute(); StateHasChanged(); });
+
+    // 7 lines on desktop / tablet, 3 on phone; warnings never scroll out of view (G5000 rule)
+    private void Compute()
+    {
+        var lines = Shell.Layout == LayoutMode.Phone ? 3 : 7;
+        var all = Alerts.Active;
+        if (all.Count <= lines)
+        {
+            visible = all.ToList();
+            hidden = new List<ActiveAlert>();
+            return;
+        }
+
+        var warnings = all.Where(a => a.Level == AlertLevel.Warning).ToList();
+        var rest = all.Where(a => a.Level != AlertLevel.Warning).ToList();
+        var room = Math.Max(0, lines - 1 - warnings.Count); // last line is the overflow indicator
+        visible = warnings.Concat(rest.Take(room)).ToList();
+        hidden = rest.Skip(room).ToList();
+    }
+
+    // "▼ 3 CAUT 1 ADV": counts of hidden messages per level
+    private string Overflow => string.Join(" ", hidden.GroupBy(a => a.Level).OrderBy(g => g.Key)
+        .Select(g => $"{g.Count()} {g.Key switch { AlertLevel.Warning => "WARN", AlertLevel.Caution => "CAUT", AlertLevel.Advisory => "ADV", _ => "STAT" }}"));
+
+    private static string Css(AlertLevel l) => l.ToString().ToLowerInvariant();
+
+    public void Dispose()
+    {
+        Alerts.Changed -= OnChanged;
+        Shell.Changed -= OnChanged;
+    }
+}

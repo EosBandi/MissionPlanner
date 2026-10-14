@@ -1,0 +1,160 @@
+@* PFD stage (800 x 640 reference units, letterboxed) fed at 20 Hz, plus the PFD soft-key tree (spec pfd.softkeys). *@
+@inject ShellState Shell
+@inject GcsSession Session
+@inject PfdFeed Feed
+@inject Microsoft.Extensions.Logging.ILogger<PfdDisplay> Logger
+@using Microsoft.Extensions.Logging
+@implements IDisposable
+
+<div class="display pfd" @onpointerdown="() => Shell.Touch(DisplayKind.Pfd)">
+    @* a rendering fault in one instrument must not take the whole GCS down: show it as a failed display *@
+    <ErrorBoundary @ref="boundary">
+        <ChildContent>
+            <PfdView S="Feed.State" P="Feed.Profile" />
+        </ChildContent>
+        <ErrorContent Context="ex">
+            <svg class="pfd-stage pfd" viewBox="0 0 800 640" preserveAspectRatio="xMidYMid meet">
+                <rect width="800" height="640" fill="#000" />
+                <line x1="140" y1="80" x2="660" y2="560" stroke="var(--p-red)" stroke-width="6" />
+                <line x1="660" y1="80" x2="140" y2="560" stroke="var(--p-red)" stroke-width="6" />
+                <T X="400" Y="300" V="PFD FAIL" A="middle" Size="26" W="700" Fill="var(--p-red)" />
+                <T X="400" Y="330" V="@ex.GetType().Name" A="middle" Size="13" Fill="var(--p-red)" />
+            </svg>
+            @{ Logger.LogError(ex, "PFD render failed"); }
+        </ErrorContent>
+    </ErrorBoundary>
+</div>
+
+@code {
+    private const string Root = "root";
+    private static readonly TimeSpan Revert = TimeSpan.FromMilliseconds(45000); // tokens.motion.softkeyRevertTimeout_ms
+
+    // ardupilot.modeQuickKeys; QuadPlane-only Q modes are included only when the vehicle reports them
+    private static readonly string[] PlaneKeys = { "FBWA", "CRUISE", "AUTO", "LOITER", "RTL", "GUIDED", "QLOITER", "QLAND", "QRTL" };
+    private static readonly string[] CopterKeys = { "ALT_HOLD", "LOITER", "POSHOLD", "AUTO", "GUIDED", "BRAKE", "RTL", "SMART_RTL", "LAND" };
+    // entering an autonomous mode needs hold-to-confirm (principle P9); RTL / LAND / BRAKE are single-press safe keys
+    private static readonly HashSet<string> ConfirmModes = new(StringComparer.OrdinalIgnoreCase) { "AUTO", "GUIDED" };
+
+    private string level = Root;
+    private Timer? revert;
+    private ErrorBoundary? boundary;
+    private bool synTerr = true, hrznHdg, signs, wind, brg1, brg2;
+    private int pending;
+
+    protected override void OnInitialized()
+    {
+        Shell.Changed += OnShellChanged;
+        Session.Changed += OnSessionChanged;
+        Feed.Updated += OnFrame;
+        PublishKeys();
+    }
+
+    private void OnShellChanged() => _ = InvokeAsync(StateHasChanged);
+    private void OnSessionChanged() => _ = InvokeAsync(() => { PublishKeys(); StateHasChanged(); });
+
+    // 20 Hz frames: coalesce if the renderer is still busy with the previous one
+    private void OnFrame()
+    {
+        if (Interlocked.Exchange(ref pending, 1) == 1)
+            return;
+        _ = InvokeAsync(() =>
+        {
+            pending = 0;
+            StateHasChanged();
+        });
+    }
+
+    private void Enter(string sub)
+    {
+        level = sub;
+        revert?.Dispose();
+        revert = sub == Root ? null : new Timer(_ => _ = InvokeAsync(() => Enter(Root)), null, Revert, Timeout.InfiniteTimeSpan);
+        PublishKeys();
+    }
+
+    private void PublishKeys() => Shell.SetPfdKeys(BuildKeys());
+
+    private IReadOnlyList<SoftKey> BuildKeys()
+    {
+        var v = Session.ActiveVehicle;
+        var armed = Session.Status.TryGetValue("armed", out var a) && a is true;
+        var back = SoftKey.Simple("BACK", () => Enter(Root));
+
+        switch (level)
+        {
+            case "MODE":
+            {
+                var mode = Session.Status.TryGetValue("mode", out var m) && m is string ms ? ms : v?.Mode ?? "";
+                var keys = new List<SoftKey>();
+                foreach (var name in QuickModes())
+                {
+                    var target = name;
+                    keys.Add(new SoftKey(ModeLabel(target), async () => { await Session.SetModeAsync(target); Enter(Root); },
+                        Selected: string.Equals(mode, target, StringComparison.OrdinalIgnoreCase),
+                        Critical: ConfirmModes.Contains(target)));
+                }
+                while (keys.Count < 10)
+                    keys.Add(SoftKey.Empty);
+                keys.Add(back);
+                return SoftKey.Bar(keys.ToArray());
+            }
+            case "PFD":
+                return SoftKey.Bar(
+                    SoftKey.Simple("SYN VIS", () => Enter("SYN VIS")),
+                    SoftKey.Simple("WIND", () => Toggle(ref wind), wind),
+                    SoftKey.Simple("BRG1", () => Toggle(ref brg1), brg1),
+                    SoftKey.Simple("BRG2", () => Toggle(ref brg2), brg2),
+                    SoftKey.Off("UNITS"),
+                    back);
+            case "SYN VIS":
+                return SoftKey.Bar(
+                    SoftKey.Simple("SYN TERR", () => Toggle(ref synTerr), synTerr),
+                    synTerr ? SoftKey.Simple("HRZN HDG", () => Toggle(ref hrznHdg), hrznHdg) : SoftKey.Off("HRZN HDG"),
+                    synTerr ? SoftKey.Simple("SIGNS", () => Toggle(ref signs), signs) : SoftKey.Off("SIGNS"),
+                    back);
+            case "VIDEO":
+                return SoftKey.Bar(SoftKey.Off("VID ON"), SoftKey.Off("OVERLAY"), SoftKey.Off("GIMBAL"), back);
+            default:
+                return SoftKey.Bar(
+                    new SoftKey(armed ? "DISARM" : "ARM", async () => await Session.ArmAsync(!armed), Critical: true, Disabled: v == null),
+                    v == null ? SoftKey.Off("MODE") : SoftKey.Simple("MODE", () => Enter("MODE")),
+                    SoftKey.Off("CDI"),
+                    SoftKey.Simple("PFD", () => Enter("PFD")),
+                    SoftKey.Off("VIDEO"),
+                    SoftKey.Off("TMR"));
+        }
+    }
+
+    private IEnumerable<string> QuickModes()
+    {
+        var available = Session.ActiveModes.Select(m => m.Name).ToList();
+        if (available.Count == 0)
+            return Array.Empty<string>();
+        var type = (Session.ActiveVehicle?.Type ?? "").ToUpperInvariant();
+        var quick = type.Contains("FIXED_WING") || type.Contains("VTOL") ? PlaneKeys
+            : type.Contains("ROTOR") || type.Contains("COPTER") || type.Contains("HELI") ? CopterKeys
+            : Array.Empty<string>();
+        // MP spells modes "AltHold" / "PosHold" / "SmartRTL"; the spec uses ArduPilot's ALT_HOLD style
+        static string Norm(string s) => s.Replace("_", "").Replace(" ", "").ToUpperInvariant();
+        var picked = quick.Select(q => available.FirstOrDefault(a => Norm(a) == Norm(q))).Where(a => a != null).Select(a => a!).ToList();
+        return picked.Count > 0 ? picked : available.Take(10);
+    }
+
+    /// <summary>"SmartRTL" -> "SMART RTL", "AltHold" -> "ALT HOLD": split camel case, upper case.</summary>
+    private static string ModeLabel(string mode) =>
+        System.Text.RegularExpressions.Regex.Replace(mode, "(?<=[a-z])(?=[A-Z])", " ").Replace("_", " ").ToUpperInvariant();
+
+    private void Toggle(ref bool flag)
+    {
+        flag = !flag;
+        PublishKeys();
+    }
+
+    public void Dispose()
+    {
+        Shell.Changed -= OnShellChanged;
+        Session.Changed -= OnSessionChanged;
+        Feed.Updated -= OnFrame;
+        revert?.Dispose();
+    }
+}

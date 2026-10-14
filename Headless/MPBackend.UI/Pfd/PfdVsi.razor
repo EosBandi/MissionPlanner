@@ -1,0 +1,56 @@
+@* Vertical speed indicator (spec pfd.vsi): fixed scale, pointer with digits, limit bands, selected V/S. *@
+@inherits PfdPart
+
+<g>
+    <rect x="@F(X)" y="@F(Y)" width="40" height="@F(H)" fill="@(InRed ? "rgba(255,43,43,.45)" : "var(--p-tapeFill)")" />
+    <rect x="@F(X)" y="@F(Y)" width="4" height="@F(Math.Max(0, (P.VsRange - P.VsMax) * K))" fill="var(--p-red)" />
+    <rect x="@F(X)" y="@F(Mid - P.VsMin * K)" width="4" height="@F(Math.Max(0, (P.VsRange + P.VsMin) * K))" fill="var(--p-red)" />
+    @foreach (var t in Ticks)
+    {
+        var ty = Mid - t * K;
+        var major = IsMult(t, P.VsMajor);
+        <line x1="@F(X + 4)" y1="@F(ty)" x2="@F(X + (major ? 16 : 10))" y2="@F(ty)" stroke="#fff" stroke-width="@(t == 0 ? "3" : "2")" />
+        @if (major && t != 0)
+        {
+            <T X="@(X + 20)" Y="@(ty + 5)" V="@F(Math.Abs(t))" Size="14" />
+        }
+    }
+    @foreach (var m in P.VsMarks)
+    {
+        var ty = Mid - m.Value * K;
+        <line x1="@F(X + 4)" y1="@F(ty)" x2="@F(X + 36)" y2="@F(ty)" stroke="#fff" stroke-dasharray="3 2" />
+        <T X="@(X + 38)" Y="@(ty + 4)" V="@m.Label" Size="10" />
+    }
+    <path d="@PointerPath" fill="@(InRed ? "var(--p-red)" : "#000")" stroke="#fff" stroke-width="1.5" />
+    @if (Math.Abs(Vs) > (P.FixedWing ? 0.2 : 0.1))
+    {
+        <T X="@(X + 60)" Y="@(Vy + 6)" V="@((Vs > 0 ? "+" : "") + F(Vs, "0.0"))" A="end" Size="17" />
+    }
+    @if (!Extreme && Autopilot)
+    {
+        <rect x="@F(X)" y="@F(Y + H + 4)" width="64" height="20" fill="#000" stroke="var(--p-gray700)" />
+        <T X="@(X + 32)" Y="@(Y + H + 19)" V="AUTO" A="middle" Size="14" Fill="var(--p-cyan)" />
+    }
+    <T X="@(X + 32)" Y="450" V="m/s" A="middle" Size="13" Fill="var(--p-gray300)" />
+</g>
+
+@code {
+    private const double X = 694, Y = 130, H = 260, Mid = Y + H / 2;
+    private double K => H / 2 / P.VsRange;
+    private double Vs => S.ClimbRate;
+    private bool InRed => Vs > P.VsMax || Vs < P.VsMin;
+    private double Vy => Mid - Clamp(Vs, -P.VsRange, P.VsRange) * K;
+
+    private IEnumerable<double> Ticks
+    {
+        get
+        {
+            for (var t = -P.VsRange; t <= P.VsRange + 1e-6; t += P.VsMinor)
+                yield return Math.Round(t, 3);
+        }
+    }
+
+    private string PointerPath => $"M{F(X + 2)} {F(Vy)} L{F(X + 12)} {F(Vy - 12)} H{F(X + 64)} V{F(Vy + 12)} H{F(X + 12)} Z";
+
+    protected override object Key() => (R2(Vs), S.Mode, Extreme, P);
+}

@@ -1,0 +1,267 @@
+@* MSN > ACTIVE MISSION (spec mfd.mission): # · CMD · ALT · DTK · DIS · ETE · params; active leg magenta, cursor cyan. *@
+@inject GcsSession Session
+@inject ShellState Shell
+@inject PfdFeed Feed
+@inject MissionStore Missions
+@implements IDisposable
+@using MPBackend.Core.Missions
+
+<div class="page mission">
+    <div class="mission-head">
+        <span class="src">MSN</span>
+        <span>@(rows.Count) ITEMS</span>
+        @if (remaining > 0)
+        {
+            <span class="dim">REMAINING</span><span>@Dist(remaining)</span>
+            <span class="dim">ETE</span><span>@Ete(remaining)</span>
+        }
+        @if (Missions.Mission?.Home is { } h && h.Lat != 0)
+        {
+            <span class="dim">HOME</span><span>@F(h.Lat, "0.00000")&deg; @F(h.Lng, "0.00000")&deg; @F(h.Alt, "0") AMSL</span>
+        }
+    </div>
+    @if (status != null)
+    {
+        <div class="mission-status @(statusOk ? "ok" : "caution")">@status</div>
+    }
+    <table>
+        <thead><tr><th></th><th>#</th><th>CMD</th><th>ALT</th><th>DTK</th><th>DIS</th><th>ETE</th><th>PARAMS</th></tr></thead>
+        <tbody>
+        @if (rows.Count == 0)
+        {
+            <tr><td colspan="8" class="dim">@(Missions.Error ?? (Session.ActiveVehicle == null ? "no vehicle" : "no mission on the vehicle"))</td></tr>
+        }
+        @foreach (var r in rows)
+        {
+            <tr class="@(r.Active ? "active" : r.Done ? "done" : "") @(r.Seq == selected ? "sel" : "")" @onclick="() => Select(r.Seq)">
+                <td class="mark">@(r.Active ? "→" : "")</td>
+                <td>@r.Seq</td>
+                <td class="cmd">@r.Cmd</td>
+                <td>@r.Alt</td>
+                <td>@r.Dtk</td>
+                <td>@r.Dis</td>
+                <td>@r.Ete</td>
+                <td class="dim params">@r.Params</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [CascadingParameter] public MfdDisplay? Mfd { get; set; }
+    [Parameter] public PageDef? Page { get; set; }
+
+    private sealed record Row(int Seq, string Cmd, string Alt, string Dtk, string Dis, string Ete, string Params, bool Active, bool Done, bool Nav);
+
+    private List<Row> rows = new();
+    private double remaining;
+    private int selected = -1;
+    private string? status;
+    private bool statusOk;
+    private Timer? tick;
+
+    protected override void OnInitialized()
+    {
+        Missions.Changed += OnChanged;
+        Session.Changed += OnChanged;
+        Shell.PageKeys = OnKey;
+        // DIS / ETE follow the vehicle: refresh twice a second from the PFD feed state
+        tick = new Timer(_ => _ = InvokeAsync(Refresh), null, 0, 500);
+        PublishKeys();
+    }
+
+    private void OnChanged() => _ = InvokeAsync(Refresh);
+
+    private void Refresh()
+    {
+        Build();
+        PublishKeys();
+        StateHasChanged();
+    }
+
+    private void Build()
+    {
+        var s = Feed.State;
+        var plan = Missions.Mission;
+        var items = plan?.Items ?? new List<MissionItem>();
+        var current = s.WpNo;
+        var speed = s.GroundSpeed > 0.5 ? s.GroundSpeed : Feed.Profile.DefaultTargetSpeed;
+        var list = new List<Row>();
+        remaining = 0;
+        (double Lat, double Lng)? prev = plan?.Home is { } h && h.Lat != 0 ? (h.Lat, h.Lng) : null;
+
+        for (var i = 0; i < items.Count; i++)
+        {
+            var it = items[i];
+            var seq = i + 1;
+            var nav = it.Lat != 0 && it.Lng != 0;
+            var active = s.HasVehicle && seq == current;
+            var done = seq < current;
+            var dtk = "";
+            var dis = "";
+            var ete = "";
+            if (nav)
+            {
+                double? legFrom = null, legFromLng = null;
+                if (active && s.PositionValid)
+                {
+                    legFrom = s.Lat;
+                    legFromLng = s.Lng;
+                }
+                else if (prev is { } p)
+                {
+                    legFrom = p.Lat;
+                    legFromLng = p.Lng;
+                }
+
+                if (legFrom != null)
+                {
+                    var d = WebMercator.Distance(legFrom.Value, legFromLng!.Value, it.Lat, it.Lng);
+                    dtk = D3(WebMercator.Bearing(legFrom.Value, legFromLng.Value, it.Lat, it.Lng)) + "°";
+                    dis = Dist(d);
+                    ete = Ete(d, speed);
+                    if (!done) remaining += d;
+                }
+
+                prev = (it.Lat, it.Lng);
+            }
+            else if (it.Command == 20 && prev is { } p2 && plan?.Home is { } home && home.Lat != 0)
+            {
+                // RTL: leg back to home
+                var d = WebMercator.Distance(p2.Lat, p2.Lng, home.Lat, home.Lng);
+                dtk = D3(WebMercator.Bearing(p2.Lat, p2.Lng, home.Lat, home.Lng)) + "°";
+                dis = Dist(d);
+                ete = Ete(d, speed);
+                if (!done) remaining += d;
+            }
+
+            list.Add(new Row(seq, Cmd(it), nav || it.Command is 22 or 21 ? Alt(it) : "", dtk, dis, ete, Params(it), active, done, nav));
+        }
+
+        rows = list;
+        if (selected < 0 || rows.All(r => r.Seq != selected))
+            selected = rows.FirstOrDefault(r => r.Active)?.Seq ?? rows.FirstOrDefault()?.Seq ?? -1;
+    }
+
+    private static readonly Dictionary<string, string> CmdNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        ["WAYPOINT"] = "WP", ["SPLINE_WAYPOINT"] = "SPL WP", ["TAKEOFF"] = "TKOF", ["VTOL_TAKEOFF"] = "VTKOF", ["LAND"] = "LAND",
+        ["VTOL_LAND"] = "VLAND", ["RETURN_TO_LAUNCH"] = "RTL", ["LOITER_UNLIM"] = "LOIT", ["LOITER_TIME"] = "LOIT T", ["LOITER_TURNS"] = "LOIT N",
+        ["LOITER_TO_ALT"] = "LOIT ALT", ["DO_LAND_START"] = "LAND START", ["DO_JUMP"] = "JUMP", ["DO_CHANGE_SPEED"] = "SPEED", ["DO_SET_HOME"] = "SET HOME",
+        ["DO_SET_SERVO"] = "SERVO", ["DO_SET_RELAY"] = "RELAY", ["DO_SET_CAM_TRIGG_DIST"] = "CAM DIST", ["DO_DIGICAM_CONTROL"] = "CAM", ["DO_SET_ROI"] = "ROI",
+        ["CONDITION_DELAY"] = "DELAY", ["CONDITION_DISTANCE"] = "COND DIS", ["CONDITION_YAW"] = "YAW", ["DO_VTOL_TRANSITION"] = "TRANS", ["DELAY"] = "DELAY",
+        ["DO_GRIPPER"] = "GRIPPER", ["DO_PARACHUTE"] = "CHUTE", ["DO_MOUNT_CONTROL"] = "MOUNT", ["DO_FENCE_ENABLE"] = "FENCE"
+    };
+
+    private static string Cmd(MissionItem it)
+    {
+        var name = it.CommandName ?? it.Command.ToString();
+        if (CmdNames.TryGetValue(name, out var s)) return s;
+        name = name.Replace("MAV_CMD_", "").Replace("NAV_", "").Replace("_", " ").ToUpperInvariant();
+        return name.Length <= 10 ? name : name.Substring(0, 10);
+    }
+
+    private static string Alt(MissionItem it) => F(it.Alt, "0") + " " + it.Frame switch
+    {
+        MAVLink.MAV_FRAME.GLOBAL or MAVLink.MAV_FRAME.GLOBAL_INT => "AMSL",
+        MAVLink.MAV_FRAME.GLOBAL_TERRAIN_ALT or MAVLink.MAV_FRAME.GLOBAL_TERRAIN_ALT_INT => "TER",
+        _ => "REL"
+    };
+
+    private static string Params(MissionItem it)
+    {
+        var p = new[] { it.Param1, it.Param2, it.Param3, it.Param4 };
+        return p.All(x => x == 0) ? "" : string.Join("  ", p.Select((x, i) => $"p{i + 1} {F(x, "0.##")}"));
+    }
+
+    private static string Dist(double m) => m >= 1000 ? F(m / 1000, "0.00") + " km" : F(m, "0") + " m";
+    private string Ete(double m) => Ete(m, Feed.State.GroundSpeed > 0.5 ? Feed.State.GroundSpeed : Feed.Profile.DefaultTargetSpeed);
+    private static string Ete(double m, double speed) => speed <= 0 ? "--:--" : TimeSpan.FromSeconds(Math.Min(359999, m / speed)).ToString(@"mm\:ss");
+
+    // ---- selection and actions --------------------------------------------------------------------------
+    private void Select(int seq)
+    {
+        selected = seq;
+        PublishKeys();
+    }
+
+    private void Move(int delta)
+    {
+        var navRows = rows.Where(r => r.Nav || r.Cmd == "RTL").Select(r => r.Seq).ToList();
+        if (navRows.Count == 0) return;
+        var i = navRows.IndexOf(selected);
+        selected = navRows[Math.Clamp(i + delta, 0, navRows.Count - 1)];
+        PublishKeys();
+        StateHasChanged();
+    }
+
+    private bool OnKey(string key)
+    {
+        switch (key)
+        {
+            case "ArrowUp": Move(-1); return true;
+            case "ArrowDown": Move(1); return true;
+            default: return false;
+        }
+    }
+
+    private async Task SetCurrentAsync()
+    {
+        var v = Session.ActiveVehicle;
+        if (v == null || selected < 0) return;
+        try
+        {
+            var ok = await Session.Gcs.SetCurrentWaypointAsync(v.SysId, v.CompId, (ushort)selected);
+            SetStatus(ok ? $"WP {selected} SET CURRENT" : "SET CURRENT REJECTED", ok);
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, false);
+        }
+    }
+
+    private async Task PauseContinueAsync(bool resume)
+    {
+        var v = Session.ActiveVehicle;
+        if (v == null) return;
+        try
+        {
+            var r = await Session.Gcs.PauseContinueAsync(v.SysId, v.CompId, resume);
+            SetStatus(r.Accepted ? (resume ? "MISSION CONTINUED" : "MISSION PAUSED") : (r.Message ?? "REJECTED").ToUpperInvariant(), r.Accepted);
+        }
+        catch (Exception ex)
+        {
+            SetStatus(ex.Message, false);
+        }
+    }
+
+    private void SetStatus(string text, bool ok)
+    {
+        status = text;
+        statusOk = ok;
+        StateHasChanged();
+    }
+
+    private void PublishKeys()
+    {
+        var v = Session.ActiveVehicle;
+        var auto = (Feed.State.Mode ?? "").StartsWith("Auto", StringComparison.OrdinalIgnoreCase);
+        Mfd?.SetSoftKeys(SoftKey.Bar(
+            new SoftKey("SET WP", SetCurrentAsync, Critical: true, Disabled: v == null || selected < 0),
+            new SoftKey("PAUSE", () => PauseContinueAsync(false), Disabled: v == null || !auto),
+            new SoftKey("CONTINUE", () => PauseContinueAsync(true), Disabled: v == null || !auto),
+            SoftKey.Simple("▲ UP", () => Move(-1)),
+            SoftKey.Simple("▼ DOWN", () => Move(1)),
+            new SoftKey("RELOAD", () => Missions.ReloadAsync(), Disabled: v == null)));
+    }
+
+    public void Dispose()
+    {
+        Missions.Changed -= OnChanged;
+        Session.Changed -= OnChanged;
+        if (Shell.PageKeys == (Func<string, bool>)OnKey)
+            Shell.PageKeys = null;
+        tick?.Dispose();
+    }
+}

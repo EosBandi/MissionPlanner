@@ -1,0 +1,22 @@
+<Solution>
+  <!-- GCS app (MAUI Blazor Hybrid, Windows + Android) on top of the headless backend. Needs .NET 10 SDK with the
+       android and maui-windows workloads; kept apart from MissionPlanner.Headless.slnx so the backend CI stays on net8. -->
+  <Folder Name="/Libs/">
+    <Project Path="Libs/MPBackend.ArduPilot/MPBackend.ArduPilot.csproj" />
+    <Project Path="Libs/MPBackend.Utilities/MPBackend.Utilities.csproj" />
+  </Folder>
+  <Project Path="../ExtLibs/alglibnet/alglibnet.csproj" />
+  <Project Path="../ExtLibs/Comms/MissionPlanner.Comms.csproj" />
+  <Project Path="../ExtLibs/Core/Core.csproj" />
+  <Project Path="../ExtLibs/GeoUtility/GeoUtility.csproj" />
+  <Project Path="../ExtLibs/GMap.NET.Core/GMap.NET.Core.csproj" />
+  <Project Path="../ExtLibs/ICSharpCode.SharpZipLib/ICSharpCode.SharpZipLib.csproj" />
+  <Project Path="../ExtLibs/Interfaces/Interfaces.csproj" />
+  <Project Path="../ExtLibs/Mavlink/MAVLink.csproj" />
+  <Project Path="../ExtLibs/ProjNet/ProjNET.csproj" />
+  <Project Path="../ExtLibs/Strings/MissionPlanner.Strings.csproj" />
+  <Project Path="../ExtLibs/WinUSBNet/Nefarius.Drivers.WinUSB.csproj" />
+  <Project Path="MPBackend.Core/MPBackend.Core.csproj" />
+  <Project Path="MPBackend.UI/MPBackend.UI.csproj" />
+  <Project Path="MPBackend.App/MPBackend.App.csproj" />
+</Solution>

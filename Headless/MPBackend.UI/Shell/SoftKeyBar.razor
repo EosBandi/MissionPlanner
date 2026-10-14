@@ -1,0 +1,70 @@
+@* Fixed 12-slot soft-key bar. Critical keys: hold >= 1 s with a fill bar, release early cancels. *@
+<div class="skbar">
+    @for (var i = 0; i < SoftKey.Slots; i++)
+    {
+        var index = i;
+        var key = index < Keys.Count ? Keys[index] : SoftKey.Empty;
+        if (key.IsEmpty)
+        {
+            <button class="sk empty" disabled tabindex="-1"></button>
+        }
+        else
+        {
+            <button class="sk @(key.Selected ? "sel" : "") @(key.Disabled ? "dis" : "") @(key.Critical ? "crit" : "") @(key.Alert != null ? "alert-" + key.Alert + " flash" : "") @(holding == index ? "holding" : "")"
+                    disabled="@key.Disabled" tabindex="-1"
+                    @onclick="() => ClickAsync(key)"
+                    @onpointerdown="() => Down(index, key)"
+                    @onpointerup="Up" @onpointerleave="Up" @onpointercancel="Up"
+                    @oncontextmenu:preventDefault>@key.Label</button>
+        }
+    }
+</div>
+
+@code {
+    private static readonly TimeSpan HoldToConfirm = TimeSpan.FromMilliseconds(1000);
+
+    [Parameter] public IReadOnlyList<SoftKey> Keys { get; set; } = Array.Empty<SoftKey>();
+
+    private int holding = -1;
+    private CancellationTokenSource? hold;
+
+    private async Task ClickAsync(SoftKey key)
+    {
+        if (key.Critical || key.Disabled || key.Action == null)
+            return;
+        await key.Action();
+    }
+
+    private void Down(int index, SoftKey key)
+    {
+        if (!key.Critical || key.Disabled)
+            return;
+        hold?.Cancel();
+        hold = new CancellationTokenSource();
+        holding = index;
+        _ = HoldAsync(key, hold.Token);
+    }
+
+    private async Task HoldAsync(SoftKey key, CancellationToken token)
+    {
+        try
+        {
+            await Task.Delay(HoldToConfirm, token);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+
+        holding = -1;
+        StateHasChanged();
+        if (key.Action != null)
+            await key.Action();
+    }
+
+    private void Up()
+    {
+        hold?.Cancel();
+        holding = -1;
+    }
+}

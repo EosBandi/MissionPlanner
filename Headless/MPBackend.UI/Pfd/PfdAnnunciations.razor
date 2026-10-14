@@ -1,0 +1,63 @@
+@* Hazard annunciation column (spec pfd.annunciationColumn) and the vertical deviation indicator (pfd.vsi.verticalDeviation). *@
+@inherits PfdPart
+@inject AlertService Alerts
+@implements IDisposable
+
+@if (!Extreme)
+{
+    <g>
+        @{ var y = 112.0; }
+        @foreach (var (text, warning, flash) in plates)
+        {
+            <rect x="490" y="@F(y)" width="96" height="22" fill="@(warning ? "var(--p-red)" : "var(--p-yellow)")" />
+            <T X="538" Y="@(y + 17)" V="@text" A="middle" W="700" Fill="@(warning ? "#fff" : "#000")" Class="@(flash ? "flash" : null)" />
+            y += 26;
+        }
+    </g>
+    <g>
+        <rect x="572" y="186" width="20" height="148" fill="rgba(0,0,0,.35)" />
+        <T X="582" Y="182" V="V" A="middle" Size="14" Fill="var(--p-magenta)" />
+        @foreach (var d in new[] { -60, -30, 30, 60 })
+        {
+            <circle cx="582" cy="@F(CY + d)" r="4" fill="none" stroke="#fff" stroke-width="1.5" />
+        }
+        <line x1="574" y1="@F(CY)" x2="590" y2="@F(CY)" stroke="#fff" stroke-width="2" />
+        @if (Autopilot)
+        {
+            <path d="@($"M582 {F(Vy - 9)} l7 9 l-7 9 l-7 -9 Z")" fill="var(--p-magenta)" stroke="#000" />
+        }
+        else
+        {
+            <T X="582" Y="@(CY + 80)" V="NO GP" A="middle" Size="10" Fill="var(--p-gray300)" />
+        }
+    </g>
+}
+
+@code {
+    private const double CY = 260;
+
+    // plates: TERRAIN / PULL UP, TRAFFIC / AVOID ADSB, FENCE, EKF — from the CAS (spec pfd.annunciationColumn)
+    private static readonly string[] PlateIds = { "TERRAIN_WARN", "TERRAIN_CAUT", "TRAFFIC_RA", "TRAFFIC_TA", "FENCE_BREACH", "FENCE_NEAR", "EKF_FS" };
+    private List<(string, bool, bool)> plates = new();
+
+    protected override void OnInitialized()
+    {
+        Alerts.Changed += OnAlerts;
+        ComputePlates();
+    }
+
+    private void OnAlerts() => _ = InvokeAsync(() => { ComputePlates(); StateHasChanged(); });
+
+    private void ComputePlates()
+    {
+        plates = Alerts.Active.Where(a => PlateIds.Contains(a.Id))
+            .Select(a => (a.Id == "EKF_FS" ? "EKF" : a.Text, a.Level == AlertLevel.Warning, !a.Acknowledged)).ToList();
+    }
+
+    // VDI: deviation from the target altitude, 1 dot = profile.vdiDot metres, pointer parks at ±2.4 dots
+    private double Vy => CY + Clamp(-S.AltError / P.VdiDot, -2.4, 2.4) * 30;
+
+    protected override object Key() => (R1(S.AltError), string.Join("|", plates), S.Mode, Extreme, P);
+
+    public void Dispose() => Alerts.Changed -= OnAlerts;
+}

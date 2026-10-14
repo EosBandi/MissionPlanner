@@ -1,0 +1,41 @@
+@* Supplemental data windows (spec pfd.dataBlocks): wind, OAT, flight timer left of the HSI; HOME bearing window right. *@
+@inherits PfdPart
+
+@if (!Extreme)
+{
+    <g>
+        <rect x="70" y="470" width="120" height="48" fill="#000" stroke="var(--p-gray700)" />
+        @if (S.WindValid)
+        {
+            <g transform="@($"rotate({F(S.WindDir + 180 - S.Heading)} 92 494)")">
+                <line x1="92" y1="506" x2="92" y2="482" stroke="#fff" stroke-width="3" />
+                <path d="M92 478 l-6 10 h12 Z" fill="#fff" />
+            </g>
+            <T X="112" Y="490" V="@(D3(S.WindDir) + "°")" Size="16" />
+            <T X="112" Y="510" V="@(F(S.WindSpeed, "0.0") + " m/s")" Size="16" />
+        }
+        else
+        {
+            <T X="130" Y="498" V="NO WIND DATA" A="middle" Size="12" Fill="var(--p-gray300)" />
+        }
+        <rect x="70" y="524" width="120" height="24" fill="#000" stroke="var(--p-gray700)" />
+        <T X="76" Y="541" V="OAT" Size="13" Fill="var(--p-gray300)" />
+        <T X="184" Y="541" V="@(S.Oat == 0 ? "---" : F(S.Oat, "0") + "°C")" A="end" Size="16" />
+        <rect x="70" y="552" width="120" height="24" fill="#000" stroke="var(--p-gray700)" />
+        <T X="76" Y="569" V="FLT" Size="13" Fill="var(--p-gray300)" />
+        <T X="184" Y="569" V="@TimeSpan.FromSeconds(Math.Max(0, S.FlightTime)).ToString(@"hh\:mm\:ss")" A="end" Size="16" />
+    </g>
+    <g>
+        <rect x="596" y="520" width="140" height="26" fill="#000" stroke="var(--p-gray700)" />
+        <line x1="602" y1="533" x2="620" y2="533" stroke="var(--p-cyan)" stroke-width="2" />
+        <T X="626" Y="538" V="HOME" Size="13" Fill="var(--p-cyan)" />
+        <T X="730" Y="538" V="@(S.HomeValid ? Dist(S.DistToHome) : "---")" A="end" Size="15" />
+    </g>
+}
+
+@code {
+    private static string Dist(double m) => m >= 1000 ? F(m / 1000, "0.00") + "km" : F(m, "0") + "m";
+
+    protected override object Key() => (S.WindValid, R1(S.WindDir), R1(S.WindSpeed), R1(S.Heading), Math.Round(S.Oat), Math.Floor(S.FlightTime),
+        S.HomeValid, Math.Round(S.DistToHome), Extreme);
+}

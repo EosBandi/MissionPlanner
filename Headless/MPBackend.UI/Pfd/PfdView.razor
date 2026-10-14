@@ -1,0 +1,55 @@
+@* The PFD: 800 x 640 reference units (spec pfd.frame), letterboxed by the host. *@
+<svg class="pfd-stage pfd" viewBox="0 0 800 640" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="sky" gradientUnits="userSpaceOnUse" x1="0" y1="-160" x2="0" y2="260">
+            <stop offset="0" stop-color="var(--p-skyTop)" /><stop offset="1" stop-color="var(--p-skyHorizon)" />
+        </linearGradient>
+        <linearGradient id="gnd" gradientUnits="userSpaceOnUse" x1="0" y1="260" x2="0" y2="680">
+            <stop offset="0" stop-color="var(--p-groundHorizon)" /><stop offset="1" stop-color="var(--p-groundBottom)" />
+        </linearGradient>
+        <pattern id="barber" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="10" height="10" fill="#fff" /><rect width="5" height="10" fill="var(--p-red)" />
+        </pattern>
+        <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+            <rect width="8" height="8" fill="rgba(255,43,43,.18)" /><rect width="2" height="8" fill="var(--p-red)" />
+        </pattern>
+        <clipPath id="frame"><rect x="0" y="34" width="800" height="606" /></clipPath>
+        <clipPath id="ladder"><rect x="215" y="105" width="370" height="300" /></clipPath>
+        <clipPath id="cSpd"><rect x="70" y="110" width="92" height="300" /></clipPath>
+        <clipPath id="cAlt"><rect x="598" y="110" width="92" height="300" /></clipPath>
+    </defs>
+    <rect width="800" height="640" fill="#000" />
+
+    @if (!S.HasVehicle)
+    {
+        <T X="400" Y="300" V="NO VEHICLE" A="middle" Size="26" W="700" Fill="var(--p-gray500)" />
+    }
+    else
+    {
+        <g class="@(S.LinkLost ? "pfd-dim" : "")">
+            <PfdAttitude S="S" P="P" Extreme="extreme" />
+            <PfdSpeedTape S="S" P="P" Extreme="extreme" />
+            <PfdAltTape S="S" P="P" Extreme="extreme" />
+            <PfdVsi S="S" P="P" Extreme="extreme" />
+            <PfdAnnunciations S="S" P="P" Extreme="extreme" />
+            <PfdHsi S="S" P="P" Extreme="extreme" />
+            <PfdDataBlocks S="S" P="P" Extreme="extreme" />
+            <PfdNavStatus S="S" P="P" Extreme="extreme" />
+        </g>
+        <PfdFma S="S" P="P" Extreme="extreme" />
+        @if (S.LinkLost)
+        {
+            <rect x="250" y="300" width="300" height="40" fill="var(--p-red)" />
+            <T X="400" Y="328" V="@($"TELEMETRY LOST {F(S.LinkAge, "0")} s")" A="middle" Size="22" W="700" />
+        }
+    }
+</svg>
+
+@code {
+    [Parameter] public PfdState S { get; set; } = PfdState.Empty;
+    [Parameter] public VehicleProfile P { get; set; } = VehicleProfile.Default("multirotor");
+
+    // pfd.attitude.states.extremeAttitude: declutter beyond the profile thresholds
+    private bool extreme => S.AttitudeValid &&
+        (Math.Abs(S.Roll) > P.ExtremeRoll || S.Pitch > P.ExtremePitchUp || S.Pitch < -P.ExtremePitchDown);
+}

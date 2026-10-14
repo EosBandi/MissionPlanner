@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+  <!--
+    GCS screens as a Razor class library. Hosted in-process by MPBackend.App (MAUI Blazor Hybrid, Windows + Android);
+    all backend access goes through IGcs so the same components can later run against MPBackend.Server.
+    Directory.Build.props (net8.0, nullable off) is overridden here.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>MPBackend.UI</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <StaticWebAssetBasePath>_content/MPBackend.UI</StaticWebAssetBasePath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MPBackend.Core\MPBackend.Core.csproj" />
+  </ItemGroup>
+</Project>

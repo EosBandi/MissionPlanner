@@ -1,0 +1,56 @@
+@* Nav status bar, style 1 (spec pfd.navStatus): [SOURCE] WP n | DIS | DTK | TRK | ETE under the FMA. *@
+@inherits PfdPart
+
+<g>
+    <rect x="0" y="34" width="800" height="26" fill="#000" />
+    @if (Extreme)
+    {
+        <T X="790" Y="53" V="EXTREME ATTITUDE · DECLUTTERED" A="end" Size="13" W="700" Fill="var(--p-red)" />
+    }
+    else if (Source != null)
+    {
+        <T X="10" Y="53" V="@Source" Size="16" W="700" Fill="@Color" />
+        <T X="70" Y="53" V="WP" Size="13" Fill="var(--p-gray300)" />
+        <T X="92" Y="53" V="@S.WpNo.ToString()" Size="17" Fill="@Color" />
+        <T X="150" Y="53" V="DIS" Size="13" Fill="var(--p-gray300)" />
+        <T X="178" Y="53" V="@Dist(S.WpDist)" Size="17" />
+        <T X="270" Y="53" V="DTK" Size="13" Fill="var(--p-gray300)" />
+        <T X="300" Y="53" V="@(D3(S.TargetBearing) + "°")" Size="17" />
+        <T X="370" Y="53" V="TRK" Size="13" Fill="var(--p-gray300)" />
+        <T X="400" Y="53" V="@(S.PositionValid ? D3(S.Track) + "°" : "---")" Size="17" />
+        <T X="470" Y="53" V="ETE" Size="13" Fill="var(--p-gray300)" />
+        <T X="500" Y="53" V="@Ete" Size="17" />
+    }
+    else
+    {
+        <T X="10" Y="53" V="NO NAV SOURCE" Size="13" Fill="var(--p-gray500)" />
+    }
+</g>
+
+@code {
+    private string? Source
+    {
+        get
+        {
+            if (!Autopilot || S.WpDist <= 0) return null;
+            var m = S.Mode.ToUpperInvariant();
+            return m.StartsWith("AUTO") ? "MSN" : m.Contains("RTL") ? "RTL" : m.StartsWith("GUIDED") ? "GUIDED" : m.StartsWith("LOITER") ? "LOIT" : m.StartsWith("LAND") ? "LAND" : "NAV";
+        }
+    }
+
+    private string Color => Source == "MSN" ? "var(--p-magenta)" : "var(--p-green)";
+
+    private string Ete
+    {
+        get
+        {
+            if (S.GroundSpeed < 0.5) return "--:--";
+            var s = S.WpDist / S.GroundSpeed;
+            return s > 5999 ? "99:59" : TimeSpan.FromSeconds(s).ToString(@"mm\:ss");
+        }
+    }
+
+    private static string Dist(double m) => m >= 1000 ? F(m / 1000, "0.00") + "km" : F(m, "0") + "m";
+
+    protected override object Key() => (Source, S.WpNo, R1(S.WpDist), R1(S.TargetBearing), R1(S.Track), R1(S.GroundSpeed), S.PositionValid, Extreme);
+}

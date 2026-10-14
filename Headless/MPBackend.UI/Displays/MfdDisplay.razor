@@ -1,0 +1,90 @@
+@* MFD: current page, bottom bar (page name, page-group locator, map range) per spec mfd.frame.regions. *@
+@inject ShellState Shell
+@inject GcsSession Session
+@inject AlertService Alerts
+@implements IDisposable
+
+<div class="display mfd" @onpointerdown="() => Shell.Touch(DisplayKind.Mfd)">
+    <div class="mfd-page">
+        <CascadingValue Value="this" IsFixed="true">
+            <DynamicComponent @key="Shell.Page.Id" Type="Shell.Page.Component" Parameters="PageParameters" />
+        </CascadingValue>
+        @if (Alerts.WindowOpen)
+        {
+            <AlertsWindow />
+        }
+        <CasWindow />
+    </div>
+    <div class="mfd-bottom">
+        <span class="mfd-pagename">@Shell.Page.Title</span>
+        <span class="mfd-locator">
+            @foreach (var group in PageRegistry.Groups)
+            {
+                var current = group.Id == Shell.GroupId;
+                <span class="loc @(current ? "cur" : "")" @onclick="() => Shell.GoTo(group.Id)">
+                    @group.Id
+                    <span class="dots">
+                        @for (var i = 0; i < group.Pages.Count; i++)
+                        {
+                            <i class="@(current && i == Shell.PageIndex ? "on" : "")"></i>
+                        }
+                    </span>
+                </span>
+            }
+        </span>
+        <span class="mfd-range">@(range ?? "—")</span>
+    </div>
+</div>
+
+@code {
+    private string? keysForPage;
+    private string? range;
+
+    protected override void OnInitialized()
+    {
+        Shell.Changed += OnChanged;
+        Alerts.Changed += OnChanged;
+    }
+
+    protected override void OnParametersSet() => EnsureDefaultKeys();
+
+    private void OnChanged() => _ = InvokeAsync(() =>
+    {
+        EnsureDefaultKeys();
+        StateHasChanged();
+    });
+
+    private Dictionary<string, object> PageParameters => new() { ["Page"] = Shell.Page };
+
+    /// <summary>Map pages publish their range here (bottom-right of the MFD bar).</summary>
+    public void SetRange(string? text)
+    {
+        if (range == text)
+            return;
+        range = text;
+        _ = InvokeAsync(StateHasChanged);
+    }
+
+    /// <summary>Pages call this to publish their soft keys; placeholders get a blank bar.</summary>
+    public void SetSoftKeys(IReadOnlyList<SoftKey> keys)
+    {
+        keysForPage = Shell.Page.Id;
+        Shell.SetMfdKeys(keys);
+    }
+
+    private void EnsureDefaultKeys()
+    {
+        if (keysForPage == Shell.Page.Id)
+            return;
+        keysForPage = Shell.Page.Id;
+        range = null;
+        Shell.PageKeys = null;
+        Shell.SetMfdKeys(SoftKey.Bar());
+    }
+
+    public void Dispose()
+    {
+        Shell.Changed -= OnChanged;
+        Alerts.Changed -= OnChanged;
+    }
+}

@@ -1,0 +1,133 @@
+@* HSI (spec pfd.hsi): heading-up card, turn-rate trend, heading bug, track diamond, bearing pointer, course + CDI. *@
+@inherits PfdPart
+
+<g>
+    <circle cx="@F(CX)" cy="@F(CY)" r="@F(R + 1)" fill="rgba(30,30,30,.55)" />
+
+    @* turn rate arc: ticks at half and standard rate (9° / 18° in 6 s), magenta trend to the heading in 6 s *@
+    <path d="@TurnArc" fill="none" stroke="#fff" stroke-width="1.5" />
+    @foreach (var (x1, y1, x2, y2) in TurnTicks)
+    {
+        <line x1="@F(x1)" y1="@F(y1)" x2="@F(x2)" y2="@F(y2)" stroke="#fff" stroke-width="2" />
+    }
+    @if (S.AttitudeValid && Math.Abs(TurnAngle) > 0.5)
+    {
+        <path d="@Arc(CX, CY, TR, 0, TurnAngle)" fill="none" stroke="var(--p-magenta)" stroke-width="4" />
+        @if (Math.Abs(S.TurnRate) > 4)
+        {
+            <g transform="@($"rotate({F(TurnAngle)} {F(CX)} {F(CY)}) translate({F(CX)} {F(CY - TR)})")">
+                <path d="@($"M{F(6 * TurnDir)} 0 L{F(-8 * TurnDir)} -7 L{F(-8 * TurnDir)} 7 Z")" fill="var(--p-magenta)" />
+            </g>
+        }
+    }
+
+    <g transform="@($"rotate({F(-S.Heading)} {F(CX)} {F(CY)})")">
+        @foreach (var (x1, y1, x2, y2, major) in CardTicks)
+        {
+            <line x1="@F(x1)" y1="@F(y1)" x2="@F(x2)" y2="@F(y2)" stroke="#fff" stroke-width="@(major ? "2" : "1.5")" />
+        }
+        @foreach (var (a, label, cardinal) in CardLabels)
+        {
+            <T X="@CX" Y="@(CY - R + 30)" V="@label" A="middle" Size="@(cardinal ? 18 : 15)" Transform="@($"rotate({a} {F(CX)} {F(CY)})")" />
+        }
+        @if (Autopilot)
+        {
+            <g transform="@($"rotate({F(S.NavBearing)} {F(CX)} {F(CY)})")">
+                <path d="@BugPath" fill="var(--p-cyan)" stroke="var(--p-cyan)" stroke-width="2" />
+            </g>
+        }
+        @if (S.PositionValid && S.GroundSpeed > 0.5)
+        {
+            <g transform="@($"rotate({F(S.Track)} {F(CX)} {F(CY)})")">
+                <path d="@DiamondPath" fill="var(--p-magenta)" />
+            </g>
+        }
+        @if (S.HomeValid)
+        {
+            <g transform="@($"rotate({F(S.HomeBearing)} {F(CX)} {F(CY)})")" stroke="var(--p-cyan)" stroke-width="2" fill="none">
+                <line x1="@F(CX)" y1="@F(CY - R + 14)" x2="@F(CX)" y2="@F(CY - 40)" />
+                <path d="@($"M{F(CX - 7)} {F(CY - R + 26)} L{F(CX)} {F(CY - R + 14)} L{F(CX + 7)} {F(CY - R + 26)}")" />
+                <line x1="@F(CX)" y1="@F(CY + 40)" x2="@F(CX)" y2="@F(CY + R - 14)" />
+            </g>
+        }
+        @if (NavSource != null)
+        {
+            <g transform="@($"rotate({F(S.TargetBearing)} {F(CX)} {F(CY)})")">
+                @foreach (var d in new[] { -50, -25, 25, 50 })
+                {
+                    <circle cx="@F(CX + d)" cy="@F(CY)" r="4" fill="none" stroke="#fff" stroke-width="1.5" />
+                }
+                <line x1="@F(CX)" y1="@F(CY - R + 8)" x2="@F(CX)" y2="@F(CY - 44)" stroke="@NavColor" stroke-width="5" />
+                <path d="@($"M{F(CX)} {F(CY - R + 4)} l-9 16 h18 Z")" fill="@NavColor" />
+                <line x1="@F(CX)" y1="@F(CY + 44)" x2="@F(CX)" y2="@F(CY + R - 8)" stroke="@NavColor" stroke-width="5" />
+                <line x1="@F(CX + Deviation)" y1="@F(CY - 40)" x2="@F(CX + Deviation)" y2="@F(CY + 40)" stroke="@NavColor" stroke-width="5" />
+                <path d="@($"M{F(CX + 16)} {F(CY - 22)} l8 12 h-16 Z")" fill="@NavColor" />
+            </g>
+        }
+    </g>
+
+    <path d="@($"M{F(CX - 18)} {F(CY + 2)} h36 M{F(CX)} {F(CY - 16)} v30 M{F(CX - 8)} {F(CY + 12)} h16")" stroke="#fff" stroke-width="3" fill="none" />
+    @if (NavSource != null)
+    {
+        <T X="@(CX - 48)" Y="@(CY - 22)" V="@NavSource" A="middle" Size="14" W="700" Fill="@NavColor" />
+        @if (!Extreme && Math.Abs(S.Xtrack) > P.CdiFullScale)
+        {
+            <T X="@CX" Y="@(CY + 38)" V="@($"XTK {F(Math.Abs(S.Xtrack), "0")}m")" A="middle" Size="14" Fill="@NavColor" />
+        }
+    }
+    <rect x="@F(CX - 32)" y="@F(CY - R - 46)" width="64" height="28" fill="#000" stroke="#fff" stroke-width="1.5" />
+    <T X="@CX" Y="@(CY - R - 24)" V="@(S.AttitudeValid ? D3(S.Heading) + "°" : "---")" A="middle" Size="24" Fill="@(S.AttitudeValid ? "#fff" : "var(--p-yellow)")" />
+    <path d="@($"M{F(CX)} {F(CY - R + 1)} l-7 -10 h14 Z")" fill="#fff" />
+</g>
+
+@code {
+    private const double CX = 400, CY = 530, R = 100, TR = R + 10;
+
+    private static readonly string TurnArc = Arc(CX, CY, TR, -24, 24);
+    private static readonly IReadOnlyList<(double, double, double, double)> TurnTicks = new[] { -18, -9, 9, 18 }.Select(a =>
+    {
+        var (x1, y1) = Polar(CX, CY, TR, a);
+        var (x2, y2) = Polar(CX, CY, TR + 7, a);
+        return (x1, y1, x2, y2);
+    }).ToList();
+
+    private static readonly IReadOnlyList<(double, double, double, double, bool)> CardTicks = Enumerable.Range(0, 72).Select(i =>
+    {
+        var a = i * 5;
+        var major = a % 10 == 0;
+        var (x1, y1) = Polar(CX, CY, R, a);
+        var (x2, y2) = Polar(CX, CY, R - (major ? 12 : 7), a);
+        return (x1, y1, x2, y2, major);
+    }).ToList();
+
+    private static readonly IReadOnlyList<(int, string, bool)> CardLabels = Enumerable.Range(0, 12).Select(i =>
+    {
+        var a = i * 30;
+        var cardinal = a % 90 == 0;
+        var label = a switch { 0 => "N", 90 => "E", 180 => "S", 270 => "W", _ => (a / 10).ToString() };
+        return (a, label, cardinal);
+    }).ToList();
+
+    private static readonly string BugPath = $"M{F(CX - 9)} {F(CY - R - 2)} v-8 h6 l3 6 l3 -6 h6 v8 Z";
+    private static readonly string DiamondPath = $"M{F(CX)} {F(CY - R - 1)} l6 9 l-6 9 l-6 -9 Z";
+
+    private double TurnAngle => Clamp(S.TurnRate * 6, -24, 24);
+    private double TurnDir => S.TurnRate > 0 ? 1 : -1;
+
+    // nav source: mission (magenta) in AUTO, guided-type target (green) in the other autopilot modes
+    private string? NavSource
+    {
+        get
+        {
+            if (!Autopilot || S.WpDist <= 0) return null;
+            var m = S.Mode.ToUpperInvariant();
+            return m.StartsWith("AUTO") ? "MSN" : m.Contains("RTL") ? "RTL" : m.StartsWith("GUIDED") ? "GUIDED" : m.StartsWith("LOITER") ? "LOIT" : m.StartsWith("LAND") ? "LAND" : "NAV";
+        }
+    }
+
+    private string NavColor => NavSource == "MSN" ? "var(--p-magenta)" : "var(--p-green)";
+    private double Deviation => Clamp(-S.Xtrack / P.CdiFullScale, -1.2, 1.2) * 50;
+
+    protected override object Key() => (R1(S.Heading), R1(S.Track), R1(S.TurnRate), R1(S.NavBearing), R1(S.TargetBearing), R1(S.Xtrack),
+        R1(S.HomeBearing), S.HomeValid, S.PositionValid, S.AttitudeValid, S.GroundSpeed > 0.5, R1(S.WpDist), S.Mode, Extreme, P);
+}

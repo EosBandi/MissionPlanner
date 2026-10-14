@@ -1,0 +1,523 @@
+@* MAP > NAV MAP 1 (spec mfd.navMap): backend tiles, ownship, home, mission / fence / rally overlays, range steps. *@
+@inject GcsSession Session
+@inject ShellState Shell
+@inject PfdFeed Feed
+@inject TileCache Tiles
+@inject MissionStore Missions
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+@using MPBackend.Core.Missions
+
+<div class="navmap" @ref="root"
+     @onpointerdown="OnPointerDown" @onpointermove="OnPointerMove" @onpointerup="OnPointerUp" @onpointercancel="OnPointerUp"
+     @onwheel="OnWheel" @onwheel:preventDefault>
+    <div class="map-rotor" style="transform: rotate(@F(Rotation)deg)">
+        @foreach (var t in tiles)
+        {
+            if (t.DataUri != null)
+            {
+                <img @key="t.Key" class="tile" src="@t.DataUri" alt="" draggable="false"
+                     style="left:@(F(t.X))px;top:@(F(t.Y))px;width:@(F(t.Size + 0.5))px;height:@(F(t.Size + 0.5))px" />
+            }
+            else
+            {
+                <div @key="t.Key" class="tile missing" style="left:@(F(t.X))px;top:@(F(t.Y))px;width:@(F(t.Size))px;height:@(F(t.Size))px"></div>
+            }
+        }
+        <svg class="map-overlay" width="@F(view.Width)" height="@F(view.Height)" xmlns="http://www.w3.org/2000/svg">
+            @* geofence: inclusion red dashed, exclusion hatched (spec mfd.navMap.geofence) *@
+            @foreach (var (points, exclusion) in FencePolygons)
+            {
+                <polygon points="@points" fill="@(exclusion ? "rgba(255,43,43,.18)" : "none")" stroke="var(--p-red)" stroke-width="2" stroke-dasharray="6 4" />
+            }
+            @foreach (var (x, y, r, exclusion) in FenceCircles)
+            {
+                <circle cx="@F(x)" cy="@F(y)" r="@F(r)" fill="@(exclusion ? "rgba(255,43,43,.18)" : "none")" stroke="var(--p-red)" stroke-width="2" stroke-dasharray="6 4" />
+            }
+
+            @* mission legs: completed gray, active magenta, others white *@
+            @foreach (var leg in Legs)
+            {
+                <line x1="@F(leg.X1)" y1="@F(leg.Y1)" x2="@F(leg.X2)" y2="@F(leg.Y2)" stroke="@leg.Color" stroke-width="@(leg.Active ? "3" : "2")" stroke-dasharray="@(leg.Dashed ? "6 4" : null)" />
+            }
+            @foreach (var wp in Waypoints)
+            {
+                <g transform="@($"translate({F(wp.X)} {F(wp.Y)}) rotate({F(-Rotation)})")">
+                    <circle r="7" fill="#000" stroke="@wp.Color" stroke-width="2" />
+                    @if (wp.ShowLabel)
+                    {
+                        <T X="11" Y="5" V="@wp.Label" Size="13" W="700" Fill="@wp.Color" Class="halo" />
+                    }
+                </g>
+            }
+            @foreach (var (x, y) in RallyPoints)
+            {
+                <g transform="@($"translate({F(x)} {F(y)}) rotate({F(-Rotation)})")">
+                    <circle r="8" fill="#000" stroke="var(--p-cyan)" stroke-width="2" />
+                    <T X="0" Y="4" V="R" A="middle" Size="11" W="700" Fill="var(--p-cyan)" />
+                </g>
+            }
+            @if (HomePoint is { } h)
+            {
+                <g transform="@($"translate({F(h.X)} {F(h.Y)}) rotate({F(-Rotation)})")">
+                    <circle r="9" fill="#000" stroke="#fff" stroke-width="2" />
+                    <T X="0" Y="5" V="H" A="middle" Size="13" W="700" />
+                </g>
+            }
+
+            @* range ring (optional) *@
+            @if (ring && Ownship is { } o1)
+            {
+                <circle cx="@F(o1.X)" cy="@F(o1.Y)" r="@F(RingRadius)" fill="none" stroke="#fff" stroke-width="1" stroke-dasharray="4 4" />
+                <T X="@(o1.X + 4)" Y="@(o1.Y - RingRadius - 4)" V="@Dist(view.RangeMetres / 4)" Size="12" Fill="#fff" Class="halo" Transform="@($"rotate({F(-Rotation)} {F(o1.X)} {F(o1.Y - RingRadius)})")" />
+            }
+
+            @* measure / cursor line *@
+            @if (cursorOn && measure && Ownship is { } o2)
+            {
+                <line x1="@F(o2.X)" y1="@F(o2.Y)" x2="@F(view.Width / 2)" y2="@F(view.Height / 2)" stroke="var(--p-cyan)" stroke-width="2" stroke-dasharray="6 4" />
+            }
+
+            @* ownship with track vector (magenta dashed, 30 s / 60 s ahead) *@
+            @if (Ownship is { } o)
+            {
+                @if (S.PositionValid && S.GroundSpeed > 0.5)
+                {
+                    <line x1="@F(o.X)" y1="@F(o.Y)" x2="@F(o.X + TrackVector.X)" y2="@F(o.Y + TrackVector.Y)" stroke="var(--p-magenta)" stroke-width="2" stroke-dasharray="6 4" />
+                }
+                <g transform="@($"translate({F(o.X)} {F(o.Y)}) rotate({F(S.Heading)})")" opacity="@(S.PositionValid ? "1" : ".5")">
+                    @if (P.FixedWing)
+                    {
+                        <path d="M0 -14 L4 -6 L16 2 L16 6 L4 3 L3 10 L8 13 L8 15 L0 13 L-8 15 L-8 13 L-3 10 L-4 3 L-16 6 L-16 2 L-4 -6 Z" fill="var(--p-yellow)" stroke="#000" stroke-width="1.2" />
+                    }
+                    else
+                    {
+                        <g fill="var(--p-yellow)" stroke="#000" stroke-width="1.2">
+                            <line x1="-9" y1="-9" x2="9" y2="9" stroke="var(--p-yellow)" stroke-width="3" />
+                            <line x1="-9" y1="9" x2="9" y2="-9" stroke="var(--p-yellow)" stroke-width="3" />
+                            <circle cx="-9" cy="-9" r="4" /><circle cx="9" cy="-9" r="4" /><circle cx="-9" cy="9" r="4" /><circle cx="9" cy="9" r="4" />
+                            <path d="M0 -18 L5 -8 L-5 -8 Z" />
+                        </g>
+                    }
+                </g>
+            }
+
+            @* pan cursor *@
+            @if (cursorOn)
+            {
+                <g stroke="var(--p-cyan)" stroke-width="2" fill="none">
+                    <circle cx="@F(view.Width / 2)" cy="@F(view.Height / 2)" r="9" />
+                    <line x1="@F(view.Width / 2 - 16)" y1="@F(view.Height / 2)" x2="@F(view.Width / 2 - 5)" y2="@F(view.Height / 2)" />
+                    <line x1="@F(view.Width / 2 + 5)" y1="@F(view.Height / 2)" x2="@F(view.Width / 2 + 16)" y2="@F(view.Height / 2)" />
+                    <line x1="@F(view.Width / 2)" y1="@F(view.Height / 2 - 16)" x2="@F(view.Width / 2)" y2="@F(view.Height / 2 - 5)" />
+                    <line x1="@F(view.Width / 2)" y1="@F(view.Height / 2 + 5)" x2="@F(view.Width / 2)" y2="@F(view.Height / 2 + 16)" />
+                </g>
+            }
+        </svg>
+    </div>
+
+    <div class="map-plates-left">
+        <div class="plate">@orientation</div>
+        @if (S.WindValid)
+        {
+            <div class="plate wind"><span style="display:inline-block;transform:rotate(@F(S.WindDir + 180 - (orientation == "NORTH UP" ? 0 : S.Heading))deg)">&#8593;</span> @D3(S.WindDir)&deg; @F(S.WindSpeed, "0.0") m/s</div>
+        }
+        @if (declutter > 0)
+        {
+            <div class="plate dim">DCLTR-@declutter</div>
+        }
+    </div>
+    @if (cursorOn)
+    {
+        <div class="map-plate-top">
+            <span>@F(view.CentreLat, "0.00000")&deg; @F(view.CentreLng, "0.00000")&deg;</span>
+            @if (S.PositionValid)
+            {
+                <span>BRG <b>@D3(WebMercator.Bearing(S.Lat, S.Lng, view.CentreLat, view.CentreLng))&deg;</b></span>
+                <span>DIS <b>@Dist(WebMercator.Distance(S.Lat, S.Lng, view.CentreLat, view.CentreLng))</b></span>
+                @if (S.GroundSpeed > 0.5)
+                {
+                    <span>ETE <b>@TimeSpan.FromSeconds(Math.Min(359999, WebMercator.Distance(S.Lat, S.Lng, view.CentreLat, view.CentreLng) / S.GroundSpeed)).ToString(@"mm\:ss")</b></span>
+                }
+            }
+        </div>
+    }
+    @if (!S.HasVehicle && HomePoint == null)
+    {
+        <div class="map-center-note">NO POSITION</div>
+    }
+    @if (Missions.Error != null)
+    {
+        <div class="map-error">MISSION: @Missions.Error</div>
+    }
+</div>
+
+@code {
+    [CascadingParameter] public MfdDisplay? Mfd { get; set; }
+    [Parameter] public PageDef? Page { get; set; }
+
+    private static readonly string[] Orientations = { "NORTH UP", "TRK UP", "HDG UP" };
+    private const string DefaultProvider = "BingSatelliteMap";
+
+    private ElementReference root;
+    private DotNetObjectReference<NavMapPage>? self;
+    private IJSObjectReference? module, observer;
+    private readonly MapView view = new();
+    private List<TileRect> tiles = new();
+    private Timer? ticker;
+    private int dirty;
+
+    private double width = 800, height = 600, left, top;
+    private int rangeIndex = -1;
+    private string orientation = "NORTH UP";
+    private int declutter;
+    private string provider = DefaultProvider;
+    private IReadOnlyList<MPBackend.Core.Maps.MapProviderInfo> providers = Array.Empty<MPBackend.Core.Maps.MapProviderInfo>();
+    private bool ring, cursorOn, measure;
+    private double cursorLat, cursorLng;
+    private string level = "root";
+    private bool dragging, moved;
+    private double dragX, dragY;
+    private (double Lat, double Lng)? lastFix;
+
+    private PfdState S => Feed.State;
+    private VehicleProfile P => Feed.Profile;
+
+    protected override async Task OnInitializedAsync()
+    {
+        orientation = P.DefaultOrientation;
+        Feed.Updated += MarkDirty;
+        Tiles.Changed += MarkDirty;
+        Missions.Changed += MarkDirty;
+        Session.Changed += MarkDirty;
+        ticker = new Timer(_ => Tick(), null, 100, 100);
+        PublishKeys();
+        try
+        {
+            providers = await Session.Gcs.GetMapProvidersAsync();
+            if (providers.All(p => p.Name != provider) && providers.Count > 0)
+                provider = providers[0].Name;
+        }
+        catch
+        {
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+        self = DotNetObjectReference.Create(this);
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/MPBackend.UI/js/shell.js");
+        observer = await module.InvokeAsync<IJSObjectReference>("observeSize", self, root, nameof(OnSize));
+    }
+
+    [JSInvokable]
+    public void OnSize(double w, double h, double l, double t)
+    {
+        width = w;
+        height = h;
+        left = l;
+        top = t;
+        MarkDirty();
+    }
+
+    private void MarkDirty() => Interlocked.Exchange(ref dirty, 1);
+
+    // 10 Hz redraw while anything changed (telemetry at 20 Hz, tiles arriving, mission updates)
+    private void Tick()
+    {
+        if (Interlocked.Exchange(ref dirty, 0) == 0)
+            return;
+        _ = InvokeAsync(() =>
+        {
+            Layout();
+            StateHasChanged();
+        });
+    }
+
+    private double Range => P.MapRangeSteps.Count == 0 ? 500 : P.MapRangeSteps[Math.Clamp(RangeIndex, 0, P.MapRangeSteps.Count - 1)];
+
+    private int RangeIndex
+    {
+        get
+        {
+            if (rangeIndex < 0)
+            {
+                var steps = P.MapRangeSteps;
+                rangeIndex = steps.Count == 0 ? 0 : steps.ToList().FindIndex(s => s >= P.DefaultMapRange);
+                if (rangeIndex < 0) rangeIndex = 0;
+            }
+            return rangeIndex;
+        }
+    }
+
+    private void Layout()
+    {
+        if (S.PositionValid && S.Lat != 0)
+            lastFix = (S.Lat, S.Lng);
+        var centre = cursorOn ? (cursorLat, cursorLng)
+            : lastFix ?? (Missions.Mission?.Home is { } h ? (h.Lat, h.Lng) : (0, 0));
+        var info = providers.FirstOrDefault(p => p.Name == provider);
+        view.Set(width, height, centre.Item1, centre.Item2, Range, info?.MinZoom ?? 1, Math.Min(info?.MaxZoom ?? 19, 19));
+        tiles = view.Tiles(provider, Tiles).ToList();
+        Mfd?.SetRange(Dist(view.RangeMetres));
+    }
+
+    // ---- orientation -------------------------------------------------------------------------------------
+    private double Rotation => orientation switch
+    {
+        "HDG UP" => -S.Heading,
+        "TRK UP" => -(S.GroundSpeed > 1 ? S.Track : S.Heading),
+        _ => 0
+    };
+
+    // ---- overlays ----------------------------------------------------------------------------------------
+    private (double X, double Y)? Ownship => S.HasVehicle && S.Lat != 0 ? view.Project(S.Lat, S.Lng) : null;
+
+    private (double X, double Y) TrackVector
+    {
+        get
+        {
+            var len = S.GroundSpeed * P.TrackVectorSeconds * view.PixelsPerMetre;
+            var a = S.Track * Math.PI / 180;
+            return (len * Math.Sin(a), -len * Math.Cos(a));
+        }
+    }
+
+    private double RingRadius => view.Height / 4;
+
+    private GeoPoint? Home => Missions.Mission?.Home;
+    private (double X, double Y)? HomePoint => Home is { } h && h.Lat != 0 ? view.Project(h.Lat, h.Lng) : null;
+
+    private sealed record Leg(double X1, double Y1, double X2, double Y2, string Color, bool Active, bool Dashed);
+    private sealed record Wp(double X, double Y, string Label, string Color, bool ShowLabel);
+
+    private static bool IsNav(MissionItem i) => i.Lat != 0 && i.Lng != 0 && i.Command is 16 or 17 or 18 or 19 or 21 or 22 or 31 or 82 or 84 or 85;
+
+    private List<(int Seq, MissionItem Item)> NavItems =>
+        (Missions.Mission?.Items ?? new List<MissionItem>()).Select((item, i) => (i + 1, item)).Where(x => IsNav(x.item)).ToList();
+
+    private IEnumerable<Leg> Legs
+    {
+        get
+        {
+            var nav = NavItems;
+            if (nav.Count == 0)
+                yield break;
+            var current = S.WpNo;
+            (double, double)? prev = HomePoint;
+            var prevSeq = 0;
+            foreach (var (seq, item) in nav)
+            {
+                var p = view.Project(item.Lat, item.Lng);
+                if (prev is { } a)
+                {
+                    var active = S.HasVehicle && seq == current;
+                    var done = current > seq;
+                    if (!(declutter >= 3 && !active))
+                        yield return new Leg(a.Item1, a.Item2, p.X, p.Y, active ? "var(--p-magenta)" : done ? "var(--p-gray500)" : "#fff", active, item.Command == 22);
+                }
+                prev = p;
+                prevSeq = seq;
+            }
+            // RTL at the end: dashed white back to home
+            var last = Missions.Mission!.Items.LastOrDefault();
+            if (last?.Command == 20 && prev is { } b && HomePoint is { } hp)
+                yield return new Leg(b.Item1, b.Item2, hp.X, hp.Y, "#fff", false, true);
+        }
+    }
+
+    private IEnumerable<Wp> Waypoints
+    {
+        get
+        {
+            var current = S.WpNo;
+            foreach (var (seq, item) in NavItems)
+            {
+                var active = S.HasVehicle && seq == current;
+                if (declutter >= 3 && !active) continue;
+                var p = view.Project(item.Lat, item.Lng);
+                var label = item.Command switch { 22 => "T" + seq, 21 => "L" + seq, 17 or 18 or 19 or 31 => "LTR" + seq, _ => seq.ToString() };
+                var next = seq == current + 1;
+                yield return new Wp(p.X, p.Y, label, active ? "var(--p-magenta)" : "#fff", declutter < 2 || active || next);
+            }
+        }
+    }
+
+    private IEnumerable<(double X, double Y)> RallyPoints =>
+        declutter >= 2 ? Array.Empty<(double, double)>()
+            : (Missions.Rally?.Items ?? new List<MissionItem>()).Where(i => i.Command == 5100).Select(i => view.Project(i.Lat, i.Lng));
+
+    private IEnumerable<(string Points, bool Exclusion)> FencePolygons
+    {
+        get
+        {
+            var items = Missions.Fence?.Items ?? new List<MissionItem>();
+            var i = 0;
+            while (i < items.Count)
+            {
+                var it = items[i];
+                if (it.Command is 5001 or 5002)
+                {
+                    var count = Math.Max(1, (int)it.Param1);
+                    var verts = items.Skip(i).Take(count).Where(v => v.Command == it.Command).Select(v => view.Project(v.Lat, v.Lng));
+                    yield return (string.Join(" ", verts.Select(v => $"{F(v.X)},{F(v.Y)}")), it.Command == 5002);
+                    i += count;
+                }
+                else
+                    i++;
+            }
+        }
+    }
+
+    private IEnumerable<(double X, double Y, double R, bool Exclusion)> FenceCircles =>
+        (Missions.Fence?.Items ?? new List<MissionItem>()).Where(i => i.Command is 5003 or 5004)
+        .Select(i => { var p = view.Project(i.Lat, i.Lng); return (p.X, p.Y, i.Param1 * view.PixelsPerMetre, i.Command == 5004); });
+
+    private static string Dist(double m) => m >= 1000 ? F(m / 1000, "0.#") + " km" : F(m, "0") + " m";
+
+    // ---- input -------------------------------------------------------------------------------------------
+    private void OnPointerDown(PointerEventArgs e)
+    {
+        Shell.Touch(DisplayKind.Mfd);
+        dragging = true;
+        moved = false;
+        dragX = e.ClientX;
+        dragY = e.ClientY;
+    }
+
+    private void OnPointerMove(PointerEventArgs e)
+    {
+        if (!dragging)
+            return;
+        var dx = e.ClientX - dragX;
+        var dy = e.ClientY - dragY;
+        if (!moved && Math.Abs(dx) + Math.Abs(dy) < 4)
+            return;
+        moved = true;
+        dragX = e.ClientX;
+        dragY = e.ClientY;
+        // screen delta → map frame (undo the rotation), then move the centre the other way
+        var r = Rotation * Math.PI / 180;
+        var mx = dx * Math.Cos(r) + dy * Math.Sin(r);
+        var my = -dx * Math.Sin(r) + dy * Math.Cos(r);
+        if (!cursorOn)
+        {
+            cursorOn = true;
+            (cursorLat, cursorLng) = (view.CentreLat, view.CentreLng);
+            Layout();
+        }
+        (cursorLat, cursorLng) = view.Unproject(view.Width / 2 - mx, view.Height / 2 - my);
+        PublishKeys();
+        MarkDirty();
+    }
+
+    private void OnPointerUp(PointerEventArgs e)
+    {
+        if (!dragging)
+            return;
+        dragging = false;
+        if (moved)
+            return;
+        // tap: put the cursor there (spec: click on map = cursor on)
+        var sx = e.ClientX - left - view.Width / 2;
+        var sy = e.ClientY - top - view.Height / 2;
+        var r = Rotation * Math.PI / 180;
+        var mx = sx * Math.Cos(r) + sy * Math.Sin(r);
+        var my = -sx * Math.Sin(r) + sy * Math.Cos(r);
+        (cursorLat, cursorLng) = view.Unproject(view.Width / 2 + mx, view.Height / 2 + my);
+        cursorOn = true;
+        PublishKeys();
+        MarkDirty();
+    }
+
+    private void OnWheel(WheelEventArgs e) => StepRange(e.DeltaY > 0 ? 1 : -1);
+
+    private void StepRange(int delta)
+    {
+        rangeIndex = Math.Clamp(RangeIndex + delta, 0, Math.Max(0, P.MapRangeSteps.Count - 1));
+        MarkDirty();
+    }
+
+    private void Center()
+    {
+        cursorOn = false;
+        measure = false;
+        PublishKeys();
+        MarkDirty();
+    }
+
+    // ---- soft keys (spec mfd.frame: DCLTR, MAP, TRAFFIC, TERRAIN, ORIENT, FLY HERE*, MEASURE, …, ALERTS) ----
+    private void PublishKeys()
+    {
+        var back = SoftKey.Simple("BACK", () => { level = "root"; PublishKeys(); });
+        if (level == "MAP")
+        {
+            // curated providers in a fixed order (GMap.NET knows ~60); only those the backend reports
+            var keys = ProviderMenu.Where(m => providers.Any(p => p.Name == m.Name))
+                .Select(m => SoftKey.Simple(m.Label, () => { provider = m.Name; MarkDirty(); PublishKeys(); }, provider == m.Name)).Take(9).ToList();
+            while (keys.Count < 9) keys.Add(SoftKey.Empty);
+            keys.Add(SoftKey.Simple("RING", () => { ring = !ring; MarkDirty(); PublishKeys(); }, ring));
+            keys.Add(back);
+            Mfd?.SetSoftKeys(SoftKey.Bar(keys.ToArray()));
+            return;
+        }
+
+        var v = Session.ActiveVehicle;
+        Mfd?.SetSoftKeys(SoftKey.Bar(
+            SoftKey.Simple(declutter == 0 ? "DCLTR" : "DCLTR-" + declutter, () => { declutter = (declutter + 1) % 4; MarkDirty(); PublishKeys(); }, declutter > 0),
+            SoftKey.Simple("MAP", () => { level = "MAP"; PublishKeys(); }),
+            SoftKey.Off("TRAFFIC"),
+            SoftKey.Off("TERRAIN"),
+            SoftKey.Simple("ORIENT", () => { orientation = Orientations[(Array.IndexOf(Orientations, orientation) + 1) % Orientations.Length]; MarkDirty(); PublishKeys(); }),
+            new SoftKey("FLY HERE", FlyHereAsync, Critical: true, Disabled: !cursorOn || v == null),
+            SoftKey.Simple("MEASURE", () => { measure = !measure; if (measure && !cursorOn) { cursorOn = true; (cursorLat, cursorLng) = (view.CentreLat, view.CentreLng); } MarkDirty(); PublishKeys(); }, measure),
+            SoftKey.Simple("RNG ▲", () => StepRange(1)),
+            SoftKey.Simple("RNG ▼", () => StepRange(-1)),
+            cursorOn ? SoftKey.Simple("CENTER", Center) : null));
+    }
+
+    private static readonly (string Name, string Label)[] ProviderMenu =
+    {
+        ("BingSatelliteMap", "BING SAT"), ("BingHybridMap", "BING HYB"), ("BingMap", "BING RD"),
+        ("GoogleSatelliteMap", "GOOG SAT"), ("GoogleHybridMap", "GOOG HYB"), ("GoogleMap", "GOOG RD"),
+        ("ArcGIS_World_Imagery", "ESRI SAT"), ("OpenStreetMap", "OSM"), ("OpenTopoMap", "TOPO")
+    };
+
+    private async Task FlyHereAsync()
+    {
+        var v = Session.ActiveVehicle;
+        if (v == null || !cursorOn)
+            return;
+        var alt = (float)Math.Max(S.Alt, 5);
+        try
+        {
+            await Session.Gcs.GotoAsync(v.SysId, v.CompId, cursorLat, cursorLng, alt);
+        }
+        catch (Exception ex)
+        {
+            Missions.Error = ex.Message;
+            MarkDirty();
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Feed.Updated -= MarkDirty;
+        Tiles.Changed -= MarkDirty;
+        Missions.Changed -= MarkDirty;
+        Session.Changed -= MarkDirty;
+        ticker?.Dispose();
+        self?.Dispose();
+        try
+        {
+            if (observer != null) await observer.InvokeVoidAsync("dispose");
+            if (observer != null) await observer.DisposeAsync();
+            if (module != null) await module.DisposeAsync();
+        }
+        catch (JSDisconnectedException)
+        {
+        }
+    }
+}

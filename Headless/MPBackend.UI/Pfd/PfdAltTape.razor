@@ -1,0 +1,140 @@
+@* Altimeter tape (spec pfd.altitudeTape): REL altitude, fence band, ground band, selected altitude with alerter. *@
+@inherits PfdPart
+
+<g>
+    <rect x="@F(X)" y="@F(Y)" width="@F(W)" height="@F(H)" fill="var(--p-tapeFill)" />
+    <g clip-path="url(#cAlt)">
+        @if (P.FenceAltMax is { } fence)
+        {
+            var yf = Mid - (fence - V) * Ppu;
+            if (yf > Y)
+            {
+                <rect x="@F(X)" y="@F(Y)" width="@F(W)" height="@F(yf - Y)" fill="url(#hatch)" />
+                <line x1="@F(X)" y1="@F(yf)" x2="@F(X + W)" y2="@F(yf)" stroke="var(--p-red)" stroke-width="2" />
+            }
+        }
+        @if (S.AglValid)
+        {
+            var yg = Mid + S.Agl * Ppu;
+            if (yg < Y + H)
+            {
+                <rect x="@F(X)" y="@F(yg)" width="@F(W)" height="@F(Y + H - yg + 2)" fill="var(--p-groundHorizon)" />
+                <line x1="@F(X)" y1="@F(yg)" x2="@F(X + W)" y2="@F(yg)" stroke="#fff" stroke-width="2" />
+            }
+        }
+        @foreach (var t in Ticks)
+        {
+            var ty = Mid - (t - V) * Ppu;
+            var major = IsMult(t, P.AltLabel);
+            <line x1="@F(X)" y1="@F(ty)" x2="@F(X + (major ? 14 : 7))" y2="@F(ty)" stroke="#fff" stroke-width="2" />
+            @if (major)
+            {
+                <T X="@(X + 20)" Y="@(ty + 6)" V="@F(Math.Round(t))" Size="18" />
+            }
+        }
+        @if (S.TargetAltValid)
+        {
+            var sy = Clamp(Mid - (S.TargetAlt - V) * Ppu, Y + 2, Y + H - 2);
+            <path d="@($"M{F(X)} {F(sy - 8)} h10 l-4 8 l4 8 h-10 Z")" fill="var(--p-cyan)" />
+        }
+        @if (P.FloorAlt is { } floor && !Extreme && FloorState != "hidden")
+        {
+            var fy = Clamp(Mid - (floor - V) * Ppu, Y + 4, Y + H - 4);
+            <path d="@($"M{F(X)} {F(fy)} l12 -7 v14 Z")" fill="@FloorColor" />
+        }
+    </g>
+    @if (Math.Abs(Trend) >= 0.5)
+    {
+        <line x1="@F(X + 3)" y1="@F(Mid)" x2="@F(X + 3)" y2="@F(Mid - Clamp(Trend, -H / 2, H / 2) * Ppu)" stroke="var(--p-magenta)" stroke-width="3" />
+    }
+    <path d="@PointerPath" fill="#000" stroke="#fff" stroke-width="1.5" />
+    <T X="@(X + W - 2)" Y="@(Mid + 10)" V="@F(Math.Round(V))" A="end" Size="30" />
+    @if (!Extreme)
+    {
+        @if (S.TargetAltValid)
+        {
+            <rect x="@F(X)" y="82" width="@F(W)" height="26" fill="@AlerterBg" stroke="var(--p-gray700)" />
+            <T X="@(X + W - 6)" Y="101" V="@F(Math.Round(S.TargetAlt))" A="end" Size="18" Fill="@AlerterFg" Class="@(AlerterFlash ? "flash" : null)" />
+            <path d="@($"M{F(X + 6)} 88 h8 l-3 7 l3 7 h-8 Z")" fill="@AlerterFg" />
+        }
+        @if (S.AglValid)
+        {
+            <rect x="@F(X)" y="412" width="@F(W)" height="22" fill="#000" />
+            <T X="@(X + 6)" Y="428" V="RNG" Size="13" Fill="var(--p-gray300)" />
+            <T X="@(X + W - 6)" Y="429" V="@F(S.Agl, "0.0")" A="end" Size="16" Fill="@(P.FloorAlt is { } fl && S.Agl < fl - (V - S.Agl) ? "var(--p-yellow)" : "#fff")" />
+        }
+    }
+    <T X="@(X + W / 2)" Y="450" V="REL m" A="middle" Size="13" Fill="var(--p-gray300)" />
+</g>
+
+@code {
+    private const double X = 598, Y = 110, W = 92, H = 300, Mid = Y + H / 2;
+    private double Ppu => H / P.AltSpan;
+    private double V => S.Alt;
+    private double Trend => S.ClimbRate * 6;
+
+    private IEnumerable<double> Ticks
+    {
+        get
+        {
+            var start = Math.Floor((V - P.AltSpan / 2 - 5) / P.AltMinor) * P.AltMinor;
+            for (var t = start; t <= V + P.AltSpan / 2 + 5; t += P.AltMinor)
+                yield return t;
+        }
+    }
+
+    private static readonly string PointerPath = $"M{F(X + 4)} {F(Mid)} L{F(X + 16)} {F(Mid - 18)} H{F(X + W + 2)} V{F(Mid + 18)} H{F(X + 16)} Z";
+
+    // behaviours.altitudeAlerter: idle → approach1 (black on cyan) → captured → deviation (yellow)
+    private double lastTarget = double.NaN;
+    private bool captured;
+    private DateTime stateSince;
+    private string alerter = "idle";
+
+    private void UpdateAlerter()
+    {
+        if (S.TargetAlt != lastTarget)
+        {
+            lastTarget = S.TargetAlt;
+            captured = false;
+            SetState("idle");
+        }
+        var d = Math.Abs(V - S.TargetAlt);
+        string next;
+        if (captured && d > P.AlertDeviation) next = "deviation";
+        else if (d <= P.AlertApproach2) { captured = true; next = "captured"; }
+        else if (d <= P.AlertApproach1 && !captured) next = "approach1";
+        else next = captured ? "captured" : "idle";
+        if (next != alerter) SetState(next);
+    }
+
+    private void SetState(string s)
+    {
+        alerter = s;
+        stateSince = DateTime.UtcNow;
+    }
+
+    private string AlerterFg => alerter switch { "approach1" => "#000", "deviation" => "var(--p-yellow)", _ => "var(--p-cyan)" };
+    private string AlerterBg => alerter == "approach1" ? "var(--p-cyan)" : "#000";
+    private bool AlerterFlash => alerter is "approach1" or "deviation" && (DateTime.UtcNow - stateSince).TotalSeconds < 5;
+
+    // behaviours.floorAlerter
+    private string FloorState
+    {
+        get
+        {
+            if (P.FloorAlt is not { } floor) return "hidden";
+            var above = V - floor;
+            if (above > P.FloorShowWithin) return "hidden";
+            if (V <= floor) return "reached";
+            if (above <= P.FloorWhiteWithin) return "near";
+            return "approaching";
+        }
+    }
+
+    private string FloorColor => FloorState switch { "reached" => "var(--p-yellow)", "near" => "#fff", _ => "var(--p-cyan)" };
+
+    protected override void OnParametersSet() => UpdateAlerter();
+
+    protected override object Key() => (R1(V), R2(S.ClimbRate), R1(S.TargetAlt), S.TargetAltValid, R1(S.Agl), S.AglValid, alerter, Extreme, P);
+}

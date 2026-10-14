@@ -1,0 +1,169 @@
+@* Root component: status strip, PFD, MFD and soft-key bars laid out per the spec's layout variants. *@
+@inject GcsSession Session
+@inject ShellState Shell
+@inject AlertService Alerts
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<div class="gcs layout-@Shell.Layout.ToString().ToLowerInvariant()" tabindex="0" @ref="root"
+     @onkeydown="OnKeyDown" @onkeyup="OnKeyUp" @onkeydown:preventDefault="preventKeys">
+    <div class="area-status"><StatusStrip /></div>
+
+    @if (Shell.TwoDisplays || Shell.ActiveDisplay == DisplayKind.Pfd)
+    {
+        <div class="area-pfd @(Shell.ActiveDisplay == DisplayKind.Pfd ? "active" : "")"><PfdDisplay /></div>
+    }
+    @if (Shell.TwoDisplays || Shell.ActiveDisplay == DisplayKind.Mfd)
+    {
+        <div class="area-mfd @(Shell.ActiveDisplay == DisplayKind.Mfd ? "active" : "")"><MfdDisplay /></div>
+    }
+
+    @if (Shell.TwoKeyBars)
+    {
+        <div class="area-pfdkeys"><SoftKeyBar Keys="WithAlerts(Shell.PfdKeys)" /></div>
+        <div class="area-mfdkeys"><SoftKeyBar Keys="WithAlerts(MfdKeys)" /></div>
+    }
+    else
+    {
+        <div class="area-keys"><SoftKeyBar Keys="WithAlerts(SingleBarKeys)" /></div>
+    }
+</div>
+
+@code {
+    private ElementReference root;
+    private DotNetObjectReference<GcsShell>? self;
+    private IJSObjectReference? module;
+    private CancellationTokenSource? escHold;
+    private bool preventKeys;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Shell.Changed += OnChanged;
+        Session.Changed += OnChanged;
+        Alerts.Changed += OnChanged;
+        await Session.InitialiseAsync();
+        // nothing to fly yet: open the Link page instead of the (empty) home map
+        if (Session.Links.Count == 0)
+            Shell.GoToPage("link");
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+            return;
+        self = DotNetObjectReference.Create(this);
+        module = await JS.InvokeAsync<IJSObjectReference>("import", "./_content/MPBackend.UI/js/shell.js");
+        await module.InvokeVoidAsync("observe", self, root);
+    }
+
+    [JSInvokable]
+    public void OnViewport(double width, double height) => Shell.SetViewport(width, height);
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    /// <summary>MFD keys, replaced by the alerts window's own keys while it is open.</summary>
+    private IReadOnlyList<SoftKey> MfdKeys => Alerts.WindowOpen
+        ? SoftKey.Bar(
+            new SoftKey("ACK", () => { Alerts.Acknowledge(); return Task.CompletedTask; }, Disabled: Alerts.Unacknowledged == null),
+            SoftKey.Simple("RCL", Alerts.ToggleHistory, Alerts.ShowHistory),
+            null, null, null, null, null, null, null, null,
+            SoftKey.Simple("CLOSE", () => Alerts.OpenWindow(false)))
+        : Shell.MfdKeys;
+
+    /// <summary>Phone / portrait: one bar for the active display; on phone slot 7 toggles PFD / MAP.</summary>
+    private IReadOnlyList<SoftKey> SingleBarKeys
+    {
+        get
+        {
+            var keys = (Shell.ActiveDisplay == DisplayKind.Pfd ? Shell.PfdKeys : MfdKeys).ToArray();
+            if (Shell.Layout == LayoutMode.Phone)
+                keys[6] = SoftKey.Simple(Shell.ActiveDisplay == DisplayKind.Pfd ? "MAP" : "PFD", Shell.ToggleDisplay);
+            return keys;
+        }
+    }
+
+    /// <summary>
+    /// alerts.window: the right-most key is always ALERTS; with an unacknowledged alert it shows the highest level
+    /// in that level's colours and flashes until the alerts window is opened.
+    /// </summary>
+    private IReadOnlyList<SoftKey> WithAlerts(IReadOnlyList<SoftKey> keys)
+    {
+        var bar = keys.ToArray();
+        var level = Alerts.Unacknowledged;
+        var label = level switch { AlertLevel.Warning => "WARNING", AlertLevel.Caution => "CAUTION", AlertLevel.Advisory => "ADVISORY", _ => "ALERTS" };
+        var style = level switch { AlertLevel.Warning => "w", AlertLevel.Caution => "c", AlertLevel.Advisory => "a", _ => null };
+        bar[SoftKey.Slots - 1] = new SoftKey(label, () => { Alerts.OpenWindow(!Alerts.WindowOpen); Shell.Touch(DisplayKind.Mfd); return Task.CompletedTask; },
+            Selected: Alerts.WindowOpen && level == null, Alert: Alerts.WindowOpen ? null : style);
+        return bar;
+    }
+
+    // interaction.bezelMapping: arrows = MFD small knob, ctrl+arrows = large knob, hold ESC >= 1 s = home, K = acknowledge
+    private void OnKeyDown(KeyboardEventArgs e)
+    {
+        preventKeys = false;
+        switch (e.Key)
+        {
+            case "ArrowLeft":
+            case "ArrowRight":
+                if (e.CtrlKey) Shell.NavigateGroup(e.Key == "ArrowLeft" ? -1 : 1);
+                else Shell.NavigatePage(e.Key == "ArrowLeft" ? -1 : 1);
+                Shell.Touch(DisplayKind.Mfd);
+                preventKeys = true;
+                break;
+            case "k":
+            case "K":
+                Alerts.Acknowledge();
+                break;
+            case "ArrowUp":
+            case "ArrowDown":
+            case "Enter":
+            case "PageUp":
+            case "PageDown":
+                preventKeys = Shell.PageKeys?.Invoke(e.Key) == true;
+                break;
+            case "Escape":
+                if (Alerts.WindowOpen)
+                {
+                    Alerts.OpenWindow(false);
+                    return;
+                }
+                if (e.Repeat || escHold != null)
+                    return;
+                escHold = new CancellationTokenSource();
+                var token = escHold.Token;
+                _ = Task.Delay(1000, token).ContinueWith(t =>
+                {
+                    if (!t.IsCanceled)
+                        InvokeAsync(Shell.Home);
+                }, TaskScheduler.Default);
+                break;
+        }
+    }
+
+    private void OnKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key != "Escape")
+            return;
+        escHold?.Cancel();
+        escHold = null;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Shell.Changed -= OnChanged;
+        Session.Changed -= OnChanged;
+        Alerts.Changed -= OnChanged;
+        escHold?.Cancel();
+        self?.Dispose();
+        if (module != null)
+        {
+            try
+            {
+                await module.DisposeAsync();
+            }
+            catch (JSDisconnectedException)
+            {
+            }
+        }
+    }
+}

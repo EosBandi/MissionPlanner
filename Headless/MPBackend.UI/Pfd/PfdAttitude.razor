@@ -1,0 +1,194 @@
+@* Attitude indicator (spec pfd.attitude): sky/ground, pitch ladder, roll scale, FD, FPM, aircraft symbol. *@
+@inherits PfdPart
+
+@if (!S.AttitudeValid)
+{
+    <g>
+        <line x1="140" y1="80" x2="660" y2="430" stroke="var(--p-red)" stroke-width="6" />
+        <line x1="660" y1="80" x2="140" y2="430" stroke="var(--p-red)" stroke-width="6" />
+        <rect x="290" y="232" width="220" height="40" fill="#000" stroke="var(--p-red)" stroke-width="2" />
+        <T X="400" Y="260" V="ATTITUDE FAIL" A="middle" Size="22" W="700" Fill="var(--p-red)" />
+    </g>
+}
+else
+{
+    <g clip-path="url(#frame)">
+        <g transform="@AttitudeTransform">
+            <rect x="-1200" y="@F(CY - 3000)" width="3200" height="3000" fill="url(#sky)" />
+            <rect x="-1200" y="@F(CY)" width="3200" height="3000" fill="url(#gnd)" />
+            <line x1="-1200" y1="@F(CY)" x2="2000" y2="@F(CY)" stroke="#fff" stroke-width="2" />
+        </g>
+        @* unusual attitude band: keep a strip of sky / ground at the edge when the horizon leaves the frame *@
+        @if (HorizonOffTop)
+        {
+            <rect x="0" y="60" width="800" height="12" fill="var(--p-skyHorizon)" />
+        }
+        else if (HorizonOffBottom)
+        {
+            <rect x="0" y="628" width="800" height="12" fill="var(--p-groundHorizon)" />
+        }
+        <g clip-path="url(#ladder)">
+            <g transform="@AttitudeTransform">
+                @foreach (var (p, w) in LadderMarks)
+                {
+                    var y = CY - p * PPD;
+                    <line x1="@F(CX - w / 2)" y1="@F(y)" x2="@F(CX + w / 2)" y2="@F(y)" stroke="#fff" stroke-width="2" />
+                    @if (w == 110)
+                    {
+                        <T X="@(CX - 72)" Y="@(y + 6)" V="@F(Math.Abs(p))" A="end" Size="17" />
+                        <T X="@(CX + 72)" Y="@(y + 6)" V="@F(Math.Abs(p))" Size="17" />
+                    }
+                }
+                @foreach (var d in Chevrons)
+                {
+                    <path d="@d" fill="var(--p-red)" stroke="#fff" stroke-width="1" />
+                }
+                @if (ShowFpm)
+                {
+                    <g stroke="var(--p-green)" stroke-width="2.5" fill="none">
+                        <circle cx="@F(FpmX)" cy="@F(FpmY)" r="8" />
+                        <line x1="@F(FpmX - 22)" y1="@F(FpmY)" x2="@F(FpmX - 8)" y2="@F(FpmY)" />
+                        <line x1="@F(FpmX + 8)" y1="@F(FpmY)" x2="@F(FpmX + 22)" y2="@F(FpmY)" />
+                        <line x1="@F(FpmX)" y1="@F(FpmY - 8)" x2="@F(FpmX)" y2="@F(FpmY - 16)" />
+                    </g>
+                }
+            </g>
+        </g>
+    </g>
+
+    @* roll scale (fixed) and sky pointer (rotates with the sky) *@
+    <g>
+        @foreach (var (x1, y1, x2, y2) in RollTicks)
+        {
+            <line x1="@F(x1)" y1="@F(y1)" x2="@F(x2)" y2="@F(y2)" stroke="#fff" stroke-width="2.5" />
+        }
+        <path d="@RollArc" fill="none" stroke="#fff" stroke-width="2" />
+        <path d="@ZeroTriangle" fill="#fff" />
+        <g transform="@RollTransform">
+            <path d="@PointerTriangle" fill="#fff" stroke="#000" stroke-width="1" />
+            @if (P.SlipSkid)
+            {
+                <rect x="@F(CX - 12 + Slip)" y="@F(CY - R + 23)" width="24" height="6" fill="#fff" stroke="#000" />
+            }
+        </g>
+    </g>
+
+    @if (ShowFd)
+    {
+        <g transform="@FdTransform">
+            <path d="@FdCue" fill="var(--p-magenta)" stroke="#000" stroke-width="1" />
+        </g>
+    }
+
+    <path d="@AircraftSymbol" fill="var(--p-yellow)" stroke="#000" stroke-width="1.5" />
+
+    @if (P.FixedWing && !Extreme)
+    {
+        <g>
+            <line x1="206" y1="@F(CY - 40)" x2="206" y2="@F(CY + 40)" stroke="#fff" stroke-width="2" />
+            @foreach (var d in new[] { -40, -20, 0, 20, 40 })
+            {
+                <line x1="200" y1="@F(CY + d)" x2="212" y2="@F(CY + d)" stroke="#fff" stroke-width="@(d == 0 ? "3" : "1.5")" />
+            }
+            <T X="206" Y="@(CY - 48)" V="F" A="middle" Size="13" />
+            <T X="206" Y="@(CY + 58)" V="S" A="middle" Size="13" />
+            <path d="@FastSlowPointer" fill="var(--p-magenta)" />
+        </g>
+    }
+}
+
+@code {
+    private const double PPD = 7, CX = 400, CY = 260, R = 165;
+
+    private static readonly IReadOnlyList<(double P, double W)> LadderMarks = BuildLadder();
+
+    private static IReadOnlyList<(double, double)> BuildLadder()
+    {
+        var list = new List<(double, double)>();
+        for (var p = -80.0; p <= 80; p += 2.5)
+        {
+            if (p == 0) continue;
+            double w;
+            if (IsMult(p, 10)) w = 110;
+            else if (IsMult(p, 5)) w = p >= -25 && p <= 45 ? 50 : 0;
+            else w = Math.Abs(p) <= 20 ? 26 : 0;
+            if (w > 0) list.Add((p, w));
+        }
+        return list;
+    }
+
+    private static readonly IReadOnlyList<(double, double, double, double)> RollTicks = new[] { -60, -45, -30, -20, -10, 10, 20, 30, 45, 60 }
+        .Select(a =>
+        {
+            var len = Math.Abs(a) == 30 || Math.Abs(a) == 60 ? 18 : 10;
+            var (x1, y1) = Polar(CX, CY, R, a);
+            var (x2, y2) = Polar(CX, CY, R + len, a);
+            return (x1, y1, x2, y2);
+        }).ToList();
+
+    private static readonly string RollArc = Arc(CX, CY, R, -60, 60);
+    private static readonly string ZeroTriangle = $"M{F(CX)} {F(CY - R)} l-10 -16 h20 Z";
+    private static readonly string PointerTriangle = $"M{F(CX)} {F(CY - R + 2)} l-11 18 h22 Z";
+    private static readonly string AircraftSymbol = $"M{F(CX)} {F(CY)} L{F(CX - 80)} {F(CY + 32)} L{F(CX - 58)} {F(CY + 32)} L{F(CX)} {F(CY + 12)} L{F(CX + 58)} {F(CY + 32)} L{F(CX + 80)} {F(CY + 32)} Z";
+    private static readonly string FdCue = $"M{F(CX)} {F(CY - 2)} L{F(CX - 92)} {F(CY + 32)} L{F(CX - 92)} {F(CY + 24)} L{F(CX)} {F(CY - 10)} L{F(CX + 92)} {F(CY + 24)} L{F(CX + 92)} {F(CY + 32)} Z";
+
+    private string AttitudeTransform => $"rotate({F(-S.Roll)} {F(CX)} {F(CY)}) translate(0 {F(S.Pitch * PPD)})";
+    private string RollTransform => $"rotate({F(-S.Roll)} {F(CX)} {F(CY)})";
+
+    private IEnumerable<string> Chevrons
+    {
+        get
+        {
+            foreach (var p in new[] { P.ChevronUp, P.ChevronUp + 10, P.ChevronUp + 20 })
+                if (p < 90) yield return Chevron(p, true);
+            foreach (var p in new[] { P.ChevronDown, P.ChevronDown + 10, P.ChevronDown + 20 })
+                if (p < 90) yield return Chevron(-p, false);
+        }
+    }
+
+    private static string Chevron(double p, bool up)
+    {
+        var y = CY - p * PPD;
+        var d = up ? 1 : -1;
+        return $"M{F(CX - 46)} {F(y - 22 * d)} L{F(CX)} {F(y)} L{F(CX + 46)} {F(y - 22 * d)} L{F(CX + 46)} {F(y - 8 * d)} L{F(CX)} {F(y + 14 * d)} L{F(CX - 46)} {F(y - 8 * d)} Z";
+    }
+
+    // horizon position on the vertical centre line after the pitch translation; the roll rotation keeps it
+    // through the centre of the frame, so this is a good enough "off-screen" test for the band rule
+    private double HorizonY => CY + S.Pitch * PPD * Math.Cos(S.Roll * Deg);
+    private bool HorizonOffTop => HorizonY < 34 || Math.Abs(S.Roll) > 90 && HorizonY > 640;
+    private bool HorizonOffBottom => !HorizonOffTop && (HorizonY > 640 || Math.Abs(S.Roll) > 90 && HorizonY < 34);
+
+    private double Speed => P.FixedWing ? S.Airspeed : S.GroundSpeed;
+    private bool ShowFpm => S.PositionValid && S.GroundSpeed >= P.FpmMinSpeed;
+    private double FpmX => CX + Clamp(Wrap180(S.Track - S.Heading), -20, 20) * PPD;
+    private double FpmY => CY - Math.Atan2(S.ClimbRate, Math.Max(S.GroundSpeed, 0.1)) / Deg * PPD;
+
+    // slip/skid: one bar width (24 units) per ~0.1 g of lateral acceleration (SCALED_IMU yacc, mG)
+    private double Slip => Clamp(-S.LateralAccel / 100 * 24, -18, 18);
+
+    // flight director: commanded roll/pitch relative to the current attitude, pitch clamped to ±10°
+    private bool ShowFd => Autopilot && !Extreme && (S.NavRoll != 0 || S.NavPitch != 0);
+    private string FdTransform
+    {
+        get
+        {
+            var dp = Clamp(S.NavPitch - S.Pitch, -10, 10);
+            var dr = Clamp(Wrap180(S.NavRoll - S.Roll), -30, 30);
+            return $"translate(0 {F(-dp * PPD)}) rotate({F(-dr)} {F(CX)} {F(CY)})";
+        }
+    }
+
+    // fast/slow: positive = faster than target → pointer moves up toward F
+    private string FastSlowPointer
+    {
+        get
+        {
+            var e = Clamp(-S.AspdError, -5, 5) * 7;
+            return $"M214 {F(CY - e)} l10 -7 v14 Z";
+        }
+    }
+
+    protected override object Key() => (S.AttitudeValid, R1(S.Roll), R1(S.Pitch), R1(S.Heading), R1(S.Track), R1(S.ClimbRate),
+        R1(S.GroundSpeed), R1(S.NavRoll), R1(S.NavPitch), R1(S.AspdError), R1(S.LateralAccel), S.PositionValid, S.Mode, Extreme, P);
+}

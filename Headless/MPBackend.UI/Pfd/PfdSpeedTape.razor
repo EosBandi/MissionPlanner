@@ -1,0 +1,91 @@
+@* Airspeed (FW) / ground-speed (MR) tape (spec pfd.speedTape). *@
+@inherits PfdPart
+
+<g>
+    <rect x="@F(X)" y="@F(Y)" width="@F(W)" height="@F(H)" fill="var(--p-tapeFill)" />
+    <g clip-path="url(#cSpd)">
+        @foreach (var b in P.Bands)
+        {
+            var y1 = Mid - (Math.Min(b.To, V + 40) - V) * Ppu;
+            var y2 = Mid - (b.From - V) * Ppu;
+            if (y2 > y1)
+            {
+                <rect x="@F(X + W - 8)" y="@F(y1)" width="8" height="@F(y2 - y1)" fill="@b.Fill" />
+            }
+        }
+        @foreach (var t in Ticks)
+        {
+            var ty = Mid - (t - V) * Ppu;
+            var major = IsMult(t, P.SpeedMajor);
+            <line x1="@F(X + W - 8 - (major ? 14 : 7))" y1="@F(ty)" x2="@F(X + W - 8)" y2="@F(ty)" stroke="#fff" stroke-width="2" />
+            @if (major)
+            {
+                <T X="@(X + W - 26)" Y="@(ty + 6)" V="@F(Math.Round(t))" A="end" Size="18" />
+            }
+        }
+        <path d="@BugPath" fill="@(Autopilot ? "var(--p-cyan)" : "none")" stroke="var(--p-cyan)" stroke-width="2" />
+    </g>
+    @if (!Extreme)
+    {
+        @foreach (var r in P.SpeedRefs)
+        {
+            var ty = Mid - (r.Value - V) * Ppu;
+            if (ty >= Y + 4 && ty <= Y + H - 4)
+            {
+                <line x1="@F(X + W - 8)" y1="@F(ty)" x2="@F(X + W + 4)" y2="@F(ty)" stroke="#fff" stroke-width="2" />
+                <T X="@(X + W + 7)" Y="@(ty + 4)" V="@r.Label" Size="12" />
+            }
+        }
+    }
+    @if (Math.Abs(Trend) >= 0.5)
+    {
+        <line x1="@F(X + W - 11)" y1="@F(Mid)" x2="@F(X + W - 11)" y2="@F(Mid - Clamp(Trend, -H / 2, H / 2) * Ppu)" stroke="var(--p-magenta)" stroke-width="3" />
+    }
+    <path d="@PointerPath" fill="@(Over ? "var(--p-red)" : "#000")" stroke="#fff" stroke-width="1.5" />
+    <T X="@(X + W - 20)" Y="@(Mid + 10)" V="@F(V, "0")" A="end" Size="30" Fill="@(Caution && !Over ? "var(--p-yellow)" : "#fff")" />
+    @if (!Extreme)
+    {
+        <rect x="@F(X)" y="82" width="@F(W)" height="26" fill="#000" stroke="var(--p-gray700)" />
+        <T X="@(X + 6)" Y="100" V="SPD" Size="13" Fill="var(--p-cyan)" />
+        <T X="@(X + W - 6)" Y="101" V="@F(S.TargetSpeed, "0")" A="end" Size="18" Fill="var(--p-cyan)" />
+        @if (P.FixedWing)
+        {
+            <rect x="@F(X)" y="412" width="@F(W)" height="22" fill="#000" />
+            <T X="@(X + 6)" Y="428" V="GS" Size="13" Fill="var(--p-gray300)" />
+            <T X="@(X + W - 6)" Y="429" V="@F(S.GroundSpeed, "0")" A="end" Size="16" />
+        }
+    }
+    <T X="@(X + W / 2)" Y="450" V="@(P.SpeedLabel + " m/s")" A="middle" Size="13" Fill="var(--p-gray300)" />
+</g>
+
+@code {
+    private const double X = 70, Y = 110, W = 92, H = 300, Mid = Y + H / 2;
+    private double Ppu => H / P.SpeedSpan;
+    private double V => P.FixedWing ? S.Airspeed : S.GroundSpeed;
+    private double Trend => S.SpeedTrend * 6;
+    private bool Over => V >= P.Overspeed;
+    private bool Caution => V + Trend >= P.Caution;
+
+    private IEnumerable<double> Ticks
+    {
+        get
+        {
+            var start = Math.Floor((V - P.SpeedSpan / 2 - 2) / P.SpeedMinor) * P.SpeedMinor;
+            for (var t = start; t <= V + P.SpeedSpan / 2 + 2; t += P.SpeedMinor)
+                if (t >= 0) yield return t;
+        }
+    }
+
+    private string BugPath
+    {
+        get
+        {
+            var by = Mid - (S.TargetSpeed - V) * Ppu;
+            return $"M{F(X + W - 10)} {F(by - 8)} h10 v16 h-10 l4 -8 Z";
+        }
+    }
+
+    private static readonly string PointerPath = $"M{F(X + 2)} {F(Mid - 18)} H{F(X + W - 18)} L{F(X + W - 6)} {F(Mid)} L{F(X + W - 18)} {F(Mid + 18)} H{F(X + 2)} Z";
+
+    protected override object Key() => (R1(V), R2(S.SpeedTrend), R1(S.TargetSpeed), R1(S.GroundSpeed), S.Mode, Extreme, P);
+}

@@ -1,0 +1,165 @@
+@* VEH > LINK: open/close MAVLink links, pick the active vehicle. *@
+@inject GcsSession Session
+@implements IDisposable
+
+<div class="page form">
+    <div class="row">
+        <label for="conn">CONNECTION</label>
+        <input id="conn" @bind="connection" @bind:event="oninput" placeholder="tcp:host:port  udp:14550  udpcl:host:port  COM3:57600" />
+        <button @onclick="ConnectAsync" disabled="@busy">CONNECT</button>
+    </div>
+    <div class="row">
+        <label for="port">SERIAL</label>
+        <select id="port" @bind="port">
+            <option value="">(select port)</option>
+            @foreach (var p in ports)
+            {
+                <option value="@p.Name">@p.Name @(string.IsNullOrEmpty(p.Description) ? "" : "- " + p.Description)</option>
+            }
+        </select>
+        <select @bind="baud" aria-label="baud rate">
+            @foreach (var b in new[] { 57600, 115200, 230400, 460800, 921600 })
+            {
+                <option value="@b">@b</option>
+            }
+        </select>
+        <button @onclick="RefreshPortsAsync" disabled="@busy">REFRESH</button>
+        <button @onclick="ConnectSerialAsync" disabled="@(busy || string.IsNullOrEmpty(port))">CONNECT SERIAL</button>
+    </div>
+    @if (error != null)
+    {
+        <div class="row error">@error</div>
+    }
+
+    <h3>LINKS</h3>
+    <table>
+        <thead><tr><th>ID</th><th>CONNECTION</th><th>STATE</th><th>VEHICLES</th><th>TLOG</th><th></th></tr></thead>
+        <tbody>
+        @if (Session.Links.Count == 0)
+        {
+            <tr><td colspan="6" class="dim">no links</td></tr>
+        }
+        @foreach (var l in Session.Links)
+        {
+            <tr class="@(l.Id == selectedLink ? "sel" : "")" @onclick="() => selectedLink = l.Id">
+                <td>@l.Id</td>
+                <td>@l.Connection</td>
+                <td class="@StateClass(l.State)">@l.State.ToString().ToUpperInvariant() @l.Error</td>
+                <td>@string.Join(", ", l.Vehicles.Select(v => $"{v.SysId}/{v.CompId}"))</td>
+                <td class="dim">@System.IO.Path.GetFileName(l.TlogPath)</td>
+                <td><button @onclick="() => DisconnectAsync(l.Id)" @onclick:stopPropagation>DISCONN</button></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <h3>VEHICLES</h3>
+    <table>
+        <thead><tr><th>SYS/COMP</th><th>TYPE</th><th>FIRMWARE</th><th>MODE</th><th>ARMED</th><th>LQ</th><th>PARAMS</th><th></th></tr></thead>
+        <tbody>
+        @if (Session.Vehicles.Count == 0)
+        {
+            <tr><td colspan="8" class="dim">no vehicles</td></tr>
+        }
+        @foreach (var v in Session.Vehicles)
+        {
+            var active = Session.ActiveVehicle?.SysId == v.SysId && Session.ActiveVehicle?.CompId == v.CompId;
+            <tr class="@(active ? "sel" : "")">
+                <td>@v.SysId/@v.CompId</td>
+                <td>@v.Type</td>
+                <td>@v.Firmware @v.Version</td>
+                <td>@v.Mode</td>
+                <td class="@(v.Armed ? "ok" : "")">@(v.Armed ? "ARMED" : "DISARMED")</td>
+                <td>@v.LinkQuality%</td>
+                <td>@v.ParamsReceived/@v.ParamsTotal</td>
+                <td>@if (active) { <span class="sel-tag">ACTIVE</span> } else { <button @onclick="() => Session.SetActiveVehicleAsync(v)">SELECT</button> }</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [CascadingParameter] public MfdDisplay? Mfd { get; set; }
+    [Parameter] public PageDef? Page { get; set; }
+
+    private string connection = "tcp:127.0.0.1:5760";
+    private string port = "";
+    private int baud = 57600;
+    private IReadOnlyList<SerialPortInfo> ports = Array.Empty<SerialPortInfo>();
+    private int? selectedLink;
+    private string? error;
+    private bool busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Session.Changed += OnChanged;
+        Mfd?.SetSoftKeys(SoftKey.Bar(
+            new SoftKey("CONNECT", ConnectAsync),
+            new SoftKey("DISCONN", () => DisconnectAsync(selectedLink ?? Session.Links.LastOrDefault()?.Id)),
+            new SoftKey("REFRESH", RefreshPortsAsync)));
+        await RefreshPortsAsync();
+    }
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    private async Task RefreshPortsAsync()
+    {
+        try
+        {
+            ports = await Session.Gcs.GetSerialPortsAsync();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    private Task ConnectSerialAsync() => Open($"{port}:{baud}");
+    private Task ConnectAsync() => Open(connection);
+
+    private async Task Open(string conn)
+    {
+        busy = true;
+        error = null;
+        try
+        {
+            var link = await Session.Gcs.ConnectAsync(conn);
+            selectedLink = link.Id;
+            await Session.RefreshAsync();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private async Task DisconnectAsync(int? id)
+    {
+        if (id == null)
+            return;
+        try
+        {
+            await Session.Gcs.DisconnectAsync(id.Value);
+            await Session.RefreshAsync();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+        }
+    }
+
+    private static string StateClass(LinkState s) => s switch
+    {
+        LinkState.Connected => "ok",
+        LinkState.Connecting => "caution",
+        LinkState.Failed => "warning",
+        _ => "dim"
+    };
+
+    public void Dispose() => Session.Changed -= OnChanged;
+}

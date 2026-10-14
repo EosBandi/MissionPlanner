@@ -1,0 +1,60 @@
+@* AUX > SYSTEM STATUS: backend jobs and the STATUSTEXT log. *@
+@inject GcsSession Session
+@implements IDisposable
+
+<div class="page form">
+    <h3>JOBS</h3>
+    <table>
+        <thead><tr><th>JOB</th><th>STATE</th><th>PROGRESS</th><th>MESSAGE</th></tr></thead>
+        <tbody>
+        @if (Session.Jobs.Count == 0)
+        {
+            <tr><td colspan="4" class="dim">none</td></tr>
+        }
+        @foreach (var j in Session.Jobs.Take(12))
+        {
+            <tr>
+                <td>@j.Title</td>
+                <td class="@(j.State == JobState.Failed ? "warning" : j.State == JobState.Succeeded ? "ok" : "caution")">@j.State.ToString().ToUpperInvariant()</td>
+                <td>@(j.Progress >= 0 ? j.Progress + "%" : "")</td>
+                <td>@j.Message @j.Error</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+
+    <h3>STATUS TEXT</h3>
+    <div class="log">
+        @foreach (var m in Session.Messages.AsEnumerable().Reverse().Take(100))
+        {
+            <div class="@Severity(m.Severity)">
+                <span class="dim">@m.Time.ToLocalTime().ToString("HH:mm:ss")</span>
+                <span class="dim">@m.SysId/@m.CompId</span>
+                <span>@m.Text</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] public MfdDisplay? Mfd { get; set; }
+    [Parameter] public PageDef? Page { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Session.Changed += OnChanged;
+        Mfd?.SetSoftKeys(SoftKey.Bar());
+    }
+
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+
+    // ardupilot.statusTextSeverity: EMERGENCY..ERROR = warning, WARNING = caution, NOTICE/INFO = advisory
+    private static string Severity(MAVLink.MAV_SEVERITY s) => s switch
+    {
+        <= MAVLink.MAV_SEVERITY.ERROR => "warning",
+        MAVLink.MAV_SEVERITY.WARNING => "caution",
+        _ => ""
+    };
+
+    public void Dispose() => Session.Changed -= OnChanged;
+}

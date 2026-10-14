@@ -1,0 +1,36 @@
+@* Alerts window (spec alerts.window / cas): time · message · description · action, grouped by level; RCL shows history. *@
+@inject AlertService Alerts
+@implements IDisposable
+
+<div class="alerts-window">
+    <div class="alerts-title">
+        <span>@(Alerts.ShowHistory ? "ALERTS · HISTORY" : "ALERTS")</span>
+        <span class="dim">@(Alerts.ShowHistory ? "cleared and inhibited messages (RCL)" : "ACK acknowledges · RCL history · CLOSE")</span>
+    </div>
+    <table>
+        <thead><tr><th>TIME UTC</th><th>LEVEL</th><th>MESSAGE</th><th>DESCRIPTION</th><th>ACTION</th></tr></thead>
+        <tbody>
+        @{ var rows = Alerts.ShowHistory ? Alerts.History : Alerts.Active; }
+        @if (rows.Count == 0)
+        {
+            <tr><td colspan="5" class="dim">@(Alerts.ShowHistory ? "no history" : "no active alerts")</td></tr>
+        }
+        @foreach (var a in rows)
+        {
+            <tr class="@(Alerts.ShowHistory ? "history" : "")">
+                <td class="dim">@((Alerts.ShowHistory ? a.ClearedAt ?? a.Since : a.Since).ToString("HH:mm:ss"))</td>
+                <td><span class="lvl @a.Level.ToString().ToLowerInvariant() @(a.Acknowledged || Alerts.ShowHistory ? "" : "unack")">@a.Level.ToString().ToUpperInvariant()</span></td>
+                <td class="msg">@a.Text</td>
+                <td>@a.Description</td>
+                <td class="dim">@a.Action</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    protected override void OnInitialized() => Alerts.Changed += OnChanged;
+    private void OnChanged() => _ = InvokeAsync(StateHasChanged);
+    public void Dispose() => Alerts.Changed -= OnChanged;
+}

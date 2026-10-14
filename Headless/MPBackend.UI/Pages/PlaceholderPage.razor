@@ -1,0 +1,11 @@
+@* Stand-in for MFD pages that are not implemented yet; keeps the page-group structure navigable. *@
+<div class="page placeholder">
+    <div class="plate">
+        <div class="title">@Page?.Title</div>
+        <div class="note">NOT IMPLEMENTED</div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public PageDef? Page { get; set; }
+}
