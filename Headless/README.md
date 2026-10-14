@@ -209,6 +209,8 @@ comments name the Mission Planner method each part was ported from.
 
 ## GCS app (MAUI Blazor Hybrid, Windows + Android)
 
+Continuation guide, dev environment variables and backlog: **`GCS-HANDOVER.md`**.
+
 `MissionPlanner.GCS.slnx` adds two projects on top of the backend (they need the .NET 10 SDK with the `android` and
 `maui-windows` workloads, so they are kept out of the net8 `MissionPlanner.Headless.slnx` that CI builds):
 
