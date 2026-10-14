@@ -1,0 +1,26 @@
+{
+  "name": "@mpbackend/client",
+  "version": "0.1.0",
+  "description": "TypeScript client for the Mission Planner headless backend (REST + WebSocket)",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "src",
+    "openapi.json"
+  ],
+  "scripts": {
+    "fetch-spec": "node scripts/fetch-spec.mjs",
+    "generate": "openapi-typescript openapi.json -o src/schema.d.ts",
+    "build": "tsc -p tsconfig.json && node -e \"require('fs').copyFileSync('src/schema.d.ts','dist/schema.d.ts')\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "openapi-fetch": "0.13.4"
+  },
+  "devDependencies": {
+    "openapi-typescript": "7.4.4",
+    "typescript": "5.6.3"
+  }
+}

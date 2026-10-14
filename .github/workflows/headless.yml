@@ -1,0 +1,45 @@
+name: Headless Backend
+on:
+  push:
+  workflow_dispatch:
+  pull_request:
+
+# Builds the headless backend (Headless/) and runs its unit tests. The slim projects compile ExtLibs sources by
+# link, so this also catches upstream changes in ExtLibs that the backend needs to follow.
+jobs:
+  build:
+    name: Build and test
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 10
+
+      # .slnx needs SDK 9.0.200+; the projects target net8.0
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+
+      - name: Build
+        shell: pwsh
+        run: dotnet build Headless/MissionPlanner.Headless.slnx --configuration Release
+
+      - name: Unit tests (SITL tests are skipped)
+        shell: pwsh
+        run: dotnet test Headless/MPBackend.Tests --configuration Release --no-build --filter "TestCategory!=SITL" --logger "trx;LogFileName=headless.trx"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: TypeScript client
+        shell: pwsh
+        working-directory: Headless/client-ts
+        run: |
+          npm ci
+          npm run generate
+          git diff --exit-code -- src/schema.d.ts
+          npm run build

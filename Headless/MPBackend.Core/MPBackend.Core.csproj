@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Headless orchestration layer (no web dependencies). Replaces the MainV2 connection/reader logic. -->
+  <PropertyGroup>
+    <RootNamespace>MPBackend.Core</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Libs\MPBackend.ArduPilot\MPBackend.ArduPilot.csproj" />
+    <ProjectReference Include="$(ExtLibs)GeoidHeightsDotNet\GeoidHeights\GeoidHeights.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="MPBackend.Tests" />
+  </ItemGroup>
+</Project>

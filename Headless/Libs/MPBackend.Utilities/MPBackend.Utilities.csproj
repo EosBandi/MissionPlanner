@@ -1,0 +1,65 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Slim build of ExtLibs/Utilities for the headless backend.
+    Compiles the original sources by link, minus everything that needs SkiaSharp, ImageSharp,
+    LibVLC, Roslyn, MissionPlanner.Drawing (mono/Skia System.Drawing shim), or other GUI/imaging libs.
+  -->
+  <PropertyGroup>
+    <AssemblyName>MissionPlanner.Utilities</AssemblyName>
+    <RootNamespace>MissionPlanner.Utilities</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <UtilSrc>$(ExtLibs)Utilities\</UtilSrc>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(UtilSrc)**\*.cs" Link="Utilities\%(RecursiveDir)%(Filename)%(Extension)" />
+    <!-- excluded: imaging / video / scripting / GUI-oriented -->
+    <Compile Remove="$(UtilSrc)UAVCAN\**" />
+    <Compile Remove="$(UtilSrc)Properties\**" />
+    <Compile Include="$(UtilSrc)Properties\Resources.Designer.cs" Link="Utilities\Properties\Resources.Designer.cs" />
+    <Compile Remove="$(UtilSrc)obj\**;$(UtilSrc)bin\**" />
+    <Compile Remove="$(UtilSrc)MPEG1\**" />
+    <Compile Remove="$(UtilSrc)Warnings\**" />
+    <Compile Remove="$(UtilSrc)Capture.cs;$(UtilSrc)CodeGen.cs;$(UtilSrc)vlcrender.cs;$(UtilSrc)GStreamer.cs;$(UtilSrc)CaptureMJPEG.cs;$(UtilSrc)AviWriter.cs" />
+    <Compile Remove="$(UtilSrc)LogMap.cs;$(UtilSrc)Spectrogram.cs;$(UtilSrc)ImageProjection.cs;$(UtilSrc)GeoRefImageBase.cs;$(UtilSrc)SightGen.cs" />
+    <Compile Remove="$(UtilSrc)SignedFW.cs" />
+    <Compile Remove="$(UtilSrc)dxf.cs;$(UtilSrc)ZeroConf.cs;$(UtilSrc)LogOutput.cs;$(UtilSrc)fitCurve.cs;$(UtilSrc)XTermRBGColors.cs" />
+    <!-- excluded: dataflash log analysis (out of scope) -->
+    <Compile Remove="$(UtilSrc)DFLog.cs;$(UtilSrc)DFLogBuffer.cs;$(UtilSrc)DFLogScript.cs;$(UtilSrc)BinaryLog.cs;$(UtilSrc)MatLab.cs;$(UtilSrc)mavgraph.cs;$(UtilSrc)dfgpslag.cs;$(UtilSrc)DashWare.cs;$(UtilSrc)ULog.cs;$(UtilSrc)LogSort.cs;$(UtilSrc)Privacy.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="$(UtilSrc)Properties\Resources.resx" LogicalName="MissionPlanner.Utilities.Properties.Resources.resources" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="log4net" Version="2.0.13" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Flurl" Version="3.0.2" />
+    <PackageReference Include="Flurl.Http" Version="3.2.0" />
+    <PackageReference Include="SharpCompress" Version="0.29.0" />
+    <PackageReference Include="DotNetZip.NetStandard" Version="1.12.0" />
+    <PackageReference Include="BitMiracle.LibTiff.NET" Version="2.4.584.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="3.1.13" />
+    <PackageReference Include="GeoJSON.Net" Version="1.1.64" />
+    <PackageReference Include="LibUsbDfu" Version="1.1.0" />
+    <PackageReference Include="MP.DotSpatial.Projections" Version="4.0.0" />
+    <PackageReference Include="MathParser.org-mXparser" Version="4.3.3" />
+    <PackageReference Include="ExifLibNet" Version="2.1.3" />
+    <PackageReference Include="csmatio" Version="1.0.20" />
+    <PackageReference Include="WebSocket4Net" Version="0.15.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(ExtLibs)alglibnet\alglibnet.csproj" />
+    <ProjectReference Include="$(ExtLibs)Comms\MissionPlanner.Comms.csproj" />
+    <ProjectReference Include="$(ExtLibs)Core\Core.csproj" />
+    <ProjectReference Include="$(ExtLibs)GeoUtility\GeoUtility.csproj" />
+    <ProjectReference Include="$(ExtLibs)GMap.NET.Core\GMap.NET.Core.csproj" />
+    <ProjectReference Include="$(ExtLibs)ICSharpCode.SharpZipLib\ICSharpCode.SharpZipLib.csproj" />
+    <ProjectReference Include="$(ExtLibs)Interfaces\Interfaces.csproj" />
+    <ProjectReference Include="$(ExtLibs)Mavlink\MAVLink.csproj" />
+    <ProjectReference Include="$(ExtLibs)ProjNet\ProjNET.csproj" />
+  </ItemGroup>
+</Project>

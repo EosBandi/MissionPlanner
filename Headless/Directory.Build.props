@@ -1,0 +1,14 @@
+<Project>
+  <!-- Shared settings for the headless backend. Sources under ExtLibs are compiled by link; do not edit them here. -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);CS0168;CS0169;CS0219;CS0414;CS0612;CS0618;CS0649;CS0067;CS0105;CS0108;CS0162;CS1998;CS4014;CS8618;CS8632;CA1416;SYSLIB0001;SYSLIB0006;SYSLIB0011;SYSLIB0014;SYSLIB0021;SYSLIB0023;SYSLIB0039;NU1701;NU1603</NoWarn>
+    <ExtLibs>$(MSBuildThisFileDirectory)..\ExtLibs\</ExtLibs>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+  </PropertyGroup>
+</Project>

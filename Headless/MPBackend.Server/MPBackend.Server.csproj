@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!-- REST + WebSocket host for the headless backend. -->
+  <PropertyGroup>
+    <RootNamespace>MPBackend.Server</RootNamespace>
+    <AssemblyName>MPBackend.Server</AssemblyName>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MPBackend.Core\MPBackend.Core.csproj" />
+  </ItemGroup>
+</Project>

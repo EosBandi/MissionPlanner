@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Slim build of ExtLibs/ArduPilot for the headless backend (sources compiled by link).
+    Excluded: DirectInput joystick (SharpDX), Dokan FTP mount, Roslyn REPL, LibVLC alerts, Skia optical flow.
+  -->
+  <PropertyGroup>
+    <AssemblyName>MissionPlanner.ArduPilot</AssemblyName>
+    <RootNamespace>MissionPlanner.ArduPilot</RootNamespace>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
+    <ApSrc>$(ExtLibs)ArduPilot\</ApSrc>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="$(ApSrc)**\*.cs" Link="ArduPilot\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Compile Remove="$(ApSrc)obj\**;$(ApSrc)bin\**;$(ApSrc)Properties\**" />
+    <Compile Remove="$(ApSrc)Joystick\**" />
+    <Compile Remove="$(ApSrc)MavFtpDokan.cs;$(ApSrc)AP_REPL.cs;$(ApSrc)UserAlert.cs;$(ApSrc)OpticalFlow.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(ApSrc)HW\*.json" Link="HW\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="SharpCompress" Version="0.29.0" />
+    <PackageReference Include="log4net" Version="2.0.13" />
+    <PackageReference Include="System.Reactive" Version="4.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(ExtLibs)Comms\MissionPlanner.Comms.csproj" />
+    <ProjectReference Include="$(ExtLibs)GMap.NET.Core\GMap.NET.Core.csproj" />
+    <ProjectReference Include="$(ExtLibs)Mavlink\MAVLink.csproj" />
+    <ProjectReference Include="$(ExtLibs)Strings\MissionPlanner.Strings.csproj" />
+    <ProjectReference Include="..\MPBackend.Utilities\MPBackend.Utilities.csproj" />
+  </ItemGroup>
+</Project>

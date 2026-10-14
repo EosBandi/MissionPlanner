@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MP Backend Dev Console</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root { --bg:#fafafa; --fg:#1d1d1f; --muted:#6e6e73; --line:#d8d8dc; --accent:#0a66c2; --bad:#c62828; --ok:#2e7d32; --card:#fff; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#161618; --fg:#ececf0; --muted:#9a9aa2; --line:#33333a; --accent:#5aa0ff; --bad:#ff6b6b; --ok:#6fcf73; --card:#1f1f23; } }
+  * { box-sizing: border-box; }
+  body { font: 13px system-ui, sans-serif; margin: 0; padding: 16px; background: var(--bg); color: var(--fg); }
+  h1 { font-size: 18px; margin: 0 0 12px; }
+  h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); margin: 0 0 8px; }
+  .grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 12px; min-width: 0; }
+  input, select, button { font: inherit; padding: 4px 8px; border: 1px solid var(--line); border-radius: 4px; background: var(--card); color: var(--fg); }
+  button { cursor: pointer; } button:hover { border-color: var(--accent); }
+  .row { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+  table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  td { padding: 2px 4px; border-bottom: 1px solid var(--line); overflow-wrap: anywhere; }
+  td:first-child { color: var(--muted); width: 45%; }
+  #log, #status { height: 220px; overflow: auto; font-family: ui-monospace, monospace; font-size: 12px; white-space: pre-wrap; }
+  #map { height: 360px; border-radius: 6px; }
+  .wide { grid-column: 1 / -1; }
+  .bad { color: var(--bad); } .ok { color: var(--ok); } .muted { color: var(--muted); }
+</style>
+</head>
+<body>
+<h1>MP Backend dev console <span id="ws" class="muted">(ws: connecting)</span></h1>
+<div class="grid">
+  <section>
+    <h2>Links</h2>
+    <div class="row">
+      <input id="conn" value="tcp:127.0.0.1:5760" size="26" aria-label="connection string">
+      <button onclick="connect()">Connect</button>
+    </div>
+    <div id="links" class="muted">none</div>
+    <h2 style="margin-top:12px">Jobs</h2>
+    <div id="jobs" class="muted">none</div>
+  </section>
+  <section>
+    <h2>Vehicle</h2>
+    <div class="row">
+      <select id="veh" onchange="watch()" aria-label="vehicle"></select>
+      <select id="mode" aria-label="mode"></select><button onclick="setMode()">Set mode</button>
+    </div>
+    <div class="row">
+      <button onclick="post('arm',{arm:true})">Arm</button>
+      <button onclick="post('arm',{arm:false})">Disarm</button>
+      <input id="alt" value="10" size="4" aria-label="takeoff altitude"><button onclick="post('takeoff',{altitude:+alt.value})">Takeoff</button>
+    </div>
+    <table id="tele"></table>
+  </section>
+  <section class="wide">
+    <h2>Map</h2>
+    <div class="row">
+      <select id="provider" onchange="setProvider()" aria-label="map provider"></select>
+      <button onclick="loadMission()">Download mission + fence + rally</button>
+      <span id="mapinfo" class="muted"></span>
+    </div>
+    <div id="map"></div>
+  </section>
+  <section>
+    <h2>Gamepad (manual control)</h2>
+    <div class="row">
+      <label><input type="checkbox" id="padOn" onchange="padToggle()"> Send gamepad as RC override (Mode 2)</label>
+    </div>
+    <div id="pad" class="muted">connect a gamepad and press a button</div>
+  </section>
+  <section><h2>Status text</h2><div id="status"></div></section>
+  <section><h2>Events</h2><div id="log"></div></section>
+</div>
+<script>
+const FIELDS = ['mode','armed','alt','groundspeed','roll','pitch','yaw','lat','lng','satcount','gpsstatus','battery_voltage','battery_remaining','linkqualitygcs','messageHigh'];
+const api = (p, o) => fetch('/api/v1' + p, o).then(async r => { const t = await r.text(); const j = t ? JSON.parse(t) : null; if (!r.ok) throw new Error(j?.detail || r.statusText); return j; });
+const $ = id => document.getElementById(id);
+const tele = {};
+let sock, current = null;
+
+function log(el, text, cls) {
+  const d = document.createElement('div'); d.textContent = new Date().toLocaleTimeString() + ' ' + text; if (cls) d.className = cls;
+  el.prepend(d); while (el.childNodes.length > 300) el.lastChild.remove();
+}
+
+function openWs() {
+  sock = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws');
+  sock.onopen = () => {
+    $('ws').textContent = '(ws: open)';
+    for (const t of ['links', 'vehicles', 'status', 'jobs']) sock.send(JSON.stringify({ op: 'subscribe', topic: t }));
+    if (current) watch();
+  };
+  sock.onclose = () => { $('ws').textContent = '(ws: closed, retrying)'; setTimeout(openWs, 2000); };
+  sock.onmessage = e => {
+    const m = JSON.parse(e.data);
+    switch (m.topic) {
+      case 'telemetry': Object.assign(tele, m.data); renderTele(); moveVehicle(); break;
+      case 'status': log($('status'), `[${m.data.sysId}/${m.data.compId}] ${m.data.severity}: ${m.data.text}`, ['EMERGENCY','ALERT','CRITICAL','ERROR'].includes(m.data.severity) ? 'bad' : ''); break;
+      case 'jobs': renderJob(m.data); break;
+      case 'links': log($('log'), `link ${m.data.event}: ${m.data.link.connection} ${m.data.link.state} ${m.data.link.error || ''}`); refreshLinks(); break;
+      case 'vehicles': log($('log'), `vehicle ${m.data.event} ${m.data.sysId}/${m.data.compId} on link ${m.data.linkId}`); refreshVehicles(); break;
+      case 'error': log($('log'), 'ws error: ' + m.data, 'bad'); break;
+    }
+  };
+}
+
+const jobs = {};
+function renderJob(j) {
+  jobs[j.id] = j;
+  $('jobs').innerHTML = Object.values(jobs).slice(-8).reverse().map(j =>
+    `<div class="${j.state === 'Failed' ? 'bad' : j.state === 'Succeeded' ? 'ok' : ''}">${j.title}: ${j.state} ${j.progress >= 0 ? j.progress + '%' : ''} ${j.message || ''} ${j.error || ''}</div>`).join('');
+}
+
+function renderTele() {
+  $('tele').innerHTML = FIELDS.map(f => `<tr><td>${f}</td><td>${fmt(tele[f])}</td></tr>`).join('');
+}
+const fmt = v => typeof v === 'number' ? (Number.isInteger(v) ? v : v.toFixed(6).replace(/0+$/, '')) : v ?? '';
+
+async function refreshLinks() {
+  const links = await api('/links');
+  $('links').innerHTML = links.length ? links.map(l =>
+    `<div class="row"><span class="${l.state === 'Connected' ? 'ok' : l.state === 'Failed' ? 'bad' : ''}">#${l.id} ${l.connection} ${l.state}</span>
+     <button onclick="api('/links/${l.id}',{method:'DELETE'}).then(refreshLinks)">Disconnect</button></div>`).join('') : 'none';
+  refreshVehicles();
+}
+
+async function refreshVehicles() {
+  const vs = await api('/vehicles');
+  const sel = $('veh'), prev = sel.value;
+  sel.innerHTML = vs.map(v => `<option value="${v.sysId}/${v.compId}">${v.sysId}/${v.compId} ${v.type} ${v.firmware}</option>`).join('');
+  if (vs.some(v => `${v.sysId}/${v.compId}` === prev)) sel.value = prev;
+  if (sel.value && sel.value !== current) watch();
+}
+
+async function watch() {
+  const v = $('veh').value; if (!v) return;
+  const [sysid, compid] = v.split('/').map(Number);
+  if (current && current !== v) { const [s, c] = current.split('/').map(Number); sock.send(JSON.stringify({ op: 'unsubscribe', topic: 'telemetry', sysid: s, compid: c })); }
+  current = v; for (const k in tele) delete tele[k];
+  sock.send(JSON.stringify({ op: 'subscribe', topic: 'telemetry', sysid, compid, fields: FIELDS, rate: 10 }));
+  const modes = await api(`/vehicles/${v}/modes`);
+  $('mode').innerHTML = modes.map(m => `<option>${m.name}</option>`).join('');
+}
+
+async function connect() {
+  try { const r = await api('/links', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ connection: $('conn').value }) }); renderJob(r.job); }
+  catch (e) { log($('log'), e.message, 'bad'); }
+}
+
+async function post(path, body) {
+  if (!current) return;
+  try { const r = await api(`/vehicles/${current}/${path}`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+        log($('log'), `${path}: ${r.accepted ? 'accepted' : 'rejected'} ${r.message || ''}`, r.accepted ? 'ok' : 'bad'); }
+  catch (e) { log($('log'), `${path}: ${e.message}`, 'bad'); }
+}
+const setMode = () => post('mode', { mode: $('mode').value });
+
+// ---- map: tiles come from the backend's GMap.NET proxy/cache ----
+const map = L.map('map').setView([-35.3632, 149.1652], 15);
+let tileLayer, vehicleMarker, overlays = L.layerGroup().addTo(map);
+async function loadProviders() {
+  const ps = await api('/maps/providers');
+  $('provider').innerHTML = ps.map(p => `<option>${p.name}</option>`).join('');
+  $('provider').value = ps.some(p => p.name === 'BingSatelliteMap') ? 'BingSatelliteMap' : 'OpenStreetMap';
+  setProvider();
+}
+function setProvider() {
+  if (tileLayer) map.removeLayer(tileLayer);
+  tileLayer = L.tileLayer(`/api/v1/maps/tiles/${$('provider').value}/{z}/{x}/{y}`, { maxZoom: 20 }).addTo(map);
+}
+function moveVehicle() {
+  if (!(tele.lat || tele.lng)) return;
+  const ll = [tele.lat, tele.lng];
+  if (!vehicleMarker) { vehicleMarker = L.circleMarker(ll, { radius: 7, color: '#d32f2f', fillOpacity: 1 }).addTo(map); map.setView(ll); }
+  else vehicleMarker.setLatLng(ll);
+}
+async function loadMission() {
+  if (!current) return;
+  overlays.clearLayers();
+  try {
+    const [mission, fence, rally] = await Promise.all(['mission', 'fence', 'rally'].map(t => api(`/vehicles/${current}/missions/${t}`)));
+    const located = i => i.lat || i.lng;
+    const wps = mission.items.filter(located).map(i => [i.lat, i.lng]);
+    if (mission.home) wps.unshift([mission.home.lat, mission.home.lng]);
+    L.polyline(wps, { color: '#ffb300' }).addTo(overlays);
+    mission.items.filter(located).forEach((i, n) => L.marker([i.lat, i.lng], { title: `${n + 1} ${i.commandName} ${i.alt}m` }).addTo(overlays));
+    const poly = fence.items.filter(i => i.commandName === 'FENCE_POLYGON_VERTEX_INCLUSION').map(i => [i.lat, i.lng]);
+    if (poly.length) L.polygon(poly, { color: '#43a047', fill: false }).addTo(overlays);
+    fence.items.filter(i => i.commandName.startsWith('FENCE_CIRCLE')).forEach(i =>
+      L.circle([i.lat, i.lng], { radius: i.param1, color: i.commandName.endsWith('INCLUSION') ? '#43a047' : '#e53935' }).addTo(overlays));
+    rally.items.forEach(i => L.circleMarker([i.lat, i.lng], { radius: 5, color: '#8e24aa' }).addTo(overlays));
+    $('mapinfo').textContent = `${mission.items.length} mission, ${fence.items.length} fence, ${rally.items.length} rally items`;
+  } catch (e) { log($('log'), 'mission: ' + e.message, 'bad'); }
+}
+
+// ---- gamepad: browser reads the pad, backend sends RC_CHANNELS_OVERRIDE at 20 Hz ----
+// Mode 2: left stick = throttle/yaw, right stick = pitch/roll. Values are -1..1; the backend maps them with
+// RCx_MIN/TRIM/MAX (throttle linear min..max). Stop sending and the backend releases the sticks after 500 ms.
+let padTimer = null;
+function padToggle() {
+  if (padTimer) { clearInterval(padTimer); padTimer = null; sendPadStop(); return; }
+  padTimer = setInterval(() => {
+    const gp = [...navigator.getGamepads()].find(g => g);
+    if (!gp || !current) { $('pad').textContent = 'no gamepad / vehicle'; return; }
+    const dz = v => Math.abs(v) < 0.05 ? 0 : v;
+    const [sysid, compid] = current.split('/').map(Number);
+    const normalized = { 1: dz(gp.axes[2] ?? 0), 2: dz(gp.axes[3] ?? 0), 3: -dz(gp.axes[1] ?? 0), 4: dz(gp.axes[0] ?? 0) };
+    sock.send(JSON.stringify({ op: 'manual_control', sysid, compid, normalized }));
+    $('pad').textContent = `${gp.id.slice(0, 40)}  roll ${normalized[1].toFixed(2)} pitch ${normalized[2].toFixed(2)} thr ${normalized[3].toFixed(2)} yaw ${normalized[4].toFixed(2)}`;
+  }, 50);
+}
+function sendPadStop() {
+  if (!current) return;
+  const [sysid, compid] = current.split('/').map(Number);
+  sock.send(JSON.stringify({ op: 'manual_control_stop', sysid, compid }));
+}
+
+openWs(); refreshLinks(); renderTele(); loadProviders();
+</script>
+</body>
+</html>
