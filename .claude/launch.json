@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "mpbackend",
+      "runtimeExecutable": "dotnet",
+      "runtimeArgs": ["run", "--project", "Headless/MPBackend.Server", "--", "--MPBackend:DataDirectory=../.devdata"],
+      "port": 5880
+    }
+  ]
+}
