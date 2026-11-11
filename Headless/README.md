@@ -45,6 +45,9 @@ Configuration (`appsettings.json` or command line):
 
 ## API overview
 
+**Full developer reference (every endpoint, the WebSocket protocol, data models and UI-building guidance):
+[`API.md`](API.md).** This section is the short version.
+
 All REST paths are under `/api/v1`; vehicles are addressed as `vehicles/{sysid}/{compid}` whatever link they are
 on. Long operations return or run as **jobs** (`GET/DELETE jobs/{id}`, progress on the `jobs` topic).
 Errors are RFC 7807 problem documents (404 unknown vehicle/file, 409 conflicting state, 502 vehicle/IO failure).
