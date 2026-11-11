@@ -17,4 +17,5 @@
   <Project Path="MPBackend.Core/MPBackend.Core.csproj" />
   <Project Path="MPBackend.Server/MPBackend.Server.csproj" />
   <Project Path="MPBackend.Tests/MPBackend.Tests.csproj" />
+  <Project Path="MPBackend.Tray/MPBackend.Tray.csproj" />
 </Solution>

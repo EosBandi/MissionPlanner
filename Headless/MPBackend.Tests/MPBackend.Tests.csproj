@@ -9,6 +9,11 @@
     <PackageReference Include="MSTest.TestFramework" Version="3.6.1" />
   </ItemGroup>
   <ItemGroup>
+    <!-- the web host test builds the server in-process -->
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\MPBackend.Core\MPBackend.Core.csproj" />
+    <ProjectReference Include="..\MPBackend.Server\MPBackend.Server.csproj" />
   </ItemGroup>
 </Project>

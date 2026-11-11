@@ -36,7 +36,9 @@ Configuration (`appsettings.json` or command line):
 | `MPBackend.Server` | ASP.NET Core host: REST under `/api/v1`, WebSocket at `/ws`, Swagger, dev console. |
 | `MPBackend.Tests` | Unit tests plus a SITL end-to-end test (category `SITL`, inconclusive without SITL). |
 | `client-ts` | `@mpbackend/client`: generated TypeScript types + typed REST client + WebSocket client. |
+| `MPBackend.Tray` | Standalone Windows tray app: hosts the same API in-process with a status window (see below). |
 | `tools/Start-Sitl.ps1` | SITL launcher for development. |
+| `tools/Publish-Tray.ps1` | Self-contained publish + zip of the tray app. |
 
 `MPBackend.Core` services (`Backend.*`): `Links`, `Vehicles`, `Params`, `Missions`, `Ftp`, `Logs`, `Terrain`,
 `Tiles`, `Calibration`, `ManualControl`, `Rtk`, `Adsb`, `Jobs`, `Events`.
@@ -196,6 +198,8 @@ comments name the Mission Planner method each part was ported from.
   sequence number with its cached reply, which MP then ignores.
 - `CustomMessageBox` prompts inside the libraries are answered with the safe default (No/Cancel/OK) and logged.
 - The libraries use static state (Settings, hooks, srtm, GMap), so it is one backend per process.
+- `BackendWebApp.Create` builds the web host around an existing `Backend` (JSON, Swagger, error mapping, `/ws`,
+  `/api/v1`); `MPBackend.Server/Program.cs` and the tray app both use it, so there is one place to add middleware.
 
 ## Known limitations
 
@@ -206,6 +210,34 @@ comments name the Mission Planner method each part was ported from.
   "terrain data expired" even though all terrain blocks were loaded; check on hardware.
 - MP's own MAVFTP param download creates a fresh FTP session (sequence numbers restart); it runs first after
   connecting and has not collided in testing.
+
+## Standalone tray app (Windows)
+
+`MPBackend.Tray` is the backend plus the REST / WebSocket API packaged as a normal Windows application for people who
+do not run `dotnet`: it starts the API in-process (the same endpoints, Swagger and dev console as
+`MPBackend.Server`, built through `MPBackend.Server/Hosting/BackendWebApp.cs`), sits in the notification area and
+shows a status window with the host state and URLs, the links and vehicles, and the last log lines. Links are not
+created from the window: clients open them through the API (`POST /api/v1/links`), exactly as with the console
+server.
+
+```bash
+dotnet build Headless/MPBackend.Tray -c Release        # Headless/MPBackend.Tray/bin/Release/net8.0-windows/MPBackend.Tray.exe
+Headless/tools/Publish-Tray.ps1                        # self-contained single-file exe + zip under Headless/publish/
+```
+
+- Defaults: `http://0.0.0.0:5880` (all interfaces, **no authentication** - trusted networks only), data in
+  `%LOCALAPPDATA%\MPBackend` (shared with the console server), tlog recording on, API started with the app.
+  *Settings…* in the window or tray menu changes the listen address / port (applied immediately, the host is
+  restarted), the data directory, tlog recording and log level (applied at the next start). The app's own settings
+  are in `%LOCALAPPDATA%\MPBackend\tray.json`.
+- Tray menu: show the window, open the dev console / Swagger in the browser, copy the API URL (a LAN address when
+  bound to all interfaces), start / stop the API, *Add Windows Firewall rule…* (runs `netsh` elevated for the exe
+  and port; otherwise Windows asks on the first listen), exit. The icon is grey while the API is stopped, blue when
+  it runs, green with a vehicle connected and red after a host or link error.
+- One instance per session (the MP libraries are static state); a second start only raises the window. Closing or
+  minimising the window hides it; *Exit* closes the links and saves the settings.
+- Logs: the backend's `logs\mpbackend.log` as before; the window shows the same lines plus the ASP.NET Core host
+  output and STATUSTEXT.
 
 ## GCS app (MAUI Blazor Hybrid, Windows + Android)
 

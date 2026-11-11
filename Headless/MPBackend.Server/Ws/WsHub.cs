@@ -39,7 +39,7 @@ public sealed class WsRequest
 /// telemetry adds sysid/compid/full (data holds only changed fields unless full=true),
 /// mavlink adds linkId/sysid/compid/msg.
 /// </summary>
-public sealed class WsHub
+public sealed class WsHub : IDisposable
 {
     public const string Telemetry = "telemetry";
     public const string Mavlink = "mavlink";
@@ -73,6 +73,19 @@ public sealed class WsHub
             clients.TryRemove(client.Id, out _);
             client.Dispose();
         }
+    }
+
+    /// <summary>
+    /// Detach from the backend (the host may be stopped and recreated while the backend lives on) and drop
+    /// the remaining clients.
+    /// </summary>
+    public void Dispose()
+    {
+        backend.Events.Published -= OnEvent;
+        backend.Links.PacketReceived -= OnPacket;
+        foreach (var client in clients.Values)
+            client.Dispose();
+        clients.Clear();
     }
 
     private void OnEvent(string topic, object data)

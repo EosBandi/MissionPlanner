@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Standalone Windows tray app: runs the headless backend and serves the REST + WebSocket API in-process
+    (same endpoints as MPBackend.Server, hosted through BackendWebApp). Links are created through the API.
+  -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>MPBackend.Tray</RootNamespace>
+    <AssemblyName>MPBackend.Tray</AssemblyName>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- publish defaults (tools/Publish-Tray.ps1 passes the runtime) -->
+    <PublishSingleFile Condition="'$(RuntimeIdentifier)' != ''">true</PublishSingleFile>
+    <IncludeNativeLibrariesForSelfExtract>true</IncludeNativeLibrariesForSelfExtract>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="log4net" Version="2.0.13" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MPBackend.Server\MPBackend.Server.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- the server's static pages (dev console, index) so / and /dev.html work from this host too -->
+    <Content Include="..\MPBackend.Server\wwwroot\**" Link="wwwroot\%(RecursiveDir)%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
