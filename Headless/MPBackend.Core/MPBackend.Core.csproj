@@ -8,6 +8,10 @@
     <ProjectReference Include="$(ExtLibs)GeoidHeightsDotNet\GeoidHeights\GeoidHeights.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <!-- obstacle inflation in the spray-grid planner -->
+    <PackageReference Include="Clipper2" Version="1.3.0" />
+  </ItemGroup>
+  <ItemGroup>
     <InternalsVisibleTo Include="MPBackend.Tests" />
   </ItemGroup>
 </Project>

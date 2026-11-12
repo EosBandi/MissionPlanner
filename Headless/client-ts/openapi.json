@@ -2256,6 +2256,84 @@
         }
       }
     },
+    "/api/v1/planning/spraygrid/preview": {
+      "post": {
+        "tags": [
+          "Planning"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Core.Planning.SprayGridRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Core.Planning.SprayGridPreview"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Core.Planning.SprayGridPreview"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/planning/spraygrid/mission": {
+      "post": {
+        "tags": [
+          "Planning"
+        ],
+        "parameters": [
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Core.Planning.SprayGridRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Core.Planning.SprayMissionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request"
+          }
+        }
+      }
+    },
     "/api/v1/rtk": {
       "get": {
         "tags": [
@@ -4086,6 +4164,350 @@
           }
         },
         "additionalProperties": false
+      },
+      "Core.Planning.ElevationRaster": {
+        "type": "object",
+        "properties": {
+          "north": {
+            "type": "number",
+            "format": "double"
+          },
+          "south": {
+            "type": "number",
+            "format": "double"
+          },
+          "west": {
+            "type": "number",
+            "format": "double"
+          },
+          "east": {
+            "type": "number",
+            "format": "double"
+          },
+          "cols": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rows": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "heights": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Core.Planning.SprayAltitudeReference": {
+        "enum": [
+          "Relative",
+          "Absolute",
+          "Terrain"
+        ],
+        "type": "string"
+      },
+      "Core.Planning.SprayElevationSource": {
+        "enum": [
+          "None",
+          "Backend",
+          "Raster"
+        ],
+        "type": "string"
+      },
+      "Core.Planning.SprayGridPoint": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "format": "double"
+          },
+          "lng": {
+            "type": "number",
+            "format": "double"
+          },
+          "alt": {
+            "type": "number",
+            "format": "double"
+          },
+          "tag": {
+            "type": "string",
+            "nullable": true
+          },
+          "split": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Core.Planning.SprayGridPreview": {
+        "type": "object",
+        "properties": {
+          "points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Core.Planning.SprayGridPoint"
+            },
+            "nullable": true
+          },
+          "stats": {
+            "$ref": "#/components/schemas/Core.Planning.SprayGridStats"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Core.Planning.SprayGridRequest": {
+        "type": "object",
+        "properties": {
+          "polygon": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Core.Terrain.LatLng"
+            },
+            "nullable": true
+          },
+          "obstacles": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Core.Terrain.LatLng"
+              }
+            },
+            "nullable": true
+          },
+          "home": {
+            "$ref": "#/components/schemas/Core.Planning.SprayHome"
+          },
+          "lineDistance": {
+            "type": "number",
+            "format": "double"
+          },
+          "angle": {
+            "type": "number",
+            "format": "double"
+          },
+          "shift": {
+            "type": "number",
+            "format": "double"
+          },
+          "laneSeparation": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "startFrom": {
+            "$ref": "#/components/schemas/Core.Planning.SprayStartPosition"
+          },
+          "startPoint": {
+            "$ref": "#/components/schemas/Core.Terrain.LatLng"
+          },
+          "extendedEndpoint": {
+            "type": "boolean"
+          },
+          "litersPerHa": {
+            "type": "number",
+            "format": "double"
+          },
+          "sprayBarWidth": {
+            "type": "number",
+            "format": "double"
+          },
+          "flySpeed": {
+            "type": "number",
+            "format": "double"
+          },
+          "expandObstacles": {
+            "type": "boolean"
+          },
+          "ignoreObstacles": {
+            "type": "boolean"
+          },
+          "altitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "gpsOffset": {
+            "type": "number",
+            "format": "double"
+          },
+          "altitudeReference": {
+            "$ref": "#/components/schemas/Core.Planning.SprayAltitudeReference"
+          },
+          "altitudeTracking": {
+            "type": "boolean"
+          },
+          "trackingAltitudeError": {
+            "type": "number",
+            "format": "double"
+          },
+          "takeoffAltitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "addTakeoffAndRtl": {
+            "type": "boolean"
+          },
+          "headLock": {
+            "type": "boolean"
+          },
+          "delayAtWaypoint": {
+            "type": "number",
+            "format": "double"
+          },
+          "splitBy": {
+            "$ref": "#/components/schemas/Core.Planning.SpraySplitMode"
+          },
+          "splitValue": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "wpnavSpeed": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "elevationSource": {
+            "$ref": "#/components/schemas/Core.Planning.SprayElevationSource"
+          },
+          "elevation": {
+            "$ref": "#/components/schemas/Core.Planning.ElevationRaster"
+          },
+          "terrainWait": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Core.Planning.SprayGridStats": {
+        "type": "object",
+        "properties": {
+          "areaM2": {
+            "type": "number",
+            "format": "double"
+          },
+          "areaHa": {
+            "type": "number",
+            "format": "double",
+            "readOnly": true
+          },
+          "strips": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sprayDistanceM": {
+            "type": "number",
+            "format": "double"
+          },
+          "sprayTimeS": {
+            "type": "number",
+            "format": "double"
+          },
+          "totalDistanceM": {
+            "type": "number",
+            "format": "double"
+          },
+          "flightTimeS": {
+            "type": "number",
+            "format": "double"
+          },
+          "splitTimesS": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            },
+            "nullable": true
+          },
+          "litersTotal": {
+            "type": "number",
+            "format": "double"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Core.Planning.SprayHome": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "format": "double"
+          },
+          "lng": {
+            "type": "number",
+            "format": "double"
+          },
+          "alt": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Core.Planning.SprayMissionResult": {
+        "type": "object",
+        "properties": {
+          "mission": {
+            "$ref": "#/components/schemas/Core.Missions.MissionPlan"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Core.Planning.SprayGridPoint"
+            },
+            "nullable": true
+          },
+          "stats": {
+            "$ref": "#/components/schemas/Core.Planning.SprayGridStats"
+          },
+          "segmentStartSeq": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Core.Planning.SpraySplitMode": {
+        "enum": [
+          "None",
+          "Time",
+          "Segments"
+        ],
+        "type": "string"
+      },
+      "Core.Planning.SprayStartPosition": {
+        "enum": [
+          "Home",
+          "BottomLeft",
+          "TopLeft",
+          "BottomRight",
+          "TopRight",
+          "Point"
+        ],
+        "type": "string"
       },
       "Core.Telemetry.TelemetryField": {
         "type": "object",

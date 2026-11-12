@@ -25,6 +25,12 @@ export type ManualControlInput = S["Core.Control.ManualControlInput"];
 export type RtkStatus = S["Core.Gps.RtkStatus"];
 export type Aircraft = S["Core.Gps.Aircraft"];
 export type TelemetryField = S["Core.Telemetry.TelemetryField"];
+export type SprayGridRequest = S["Core.Planning.SprayGridRequest"];
+export type SprayGridPreview = S["Core.Planning.SprayGridPreview"];
+export type SprayGridPoint = S["Core.Planning.SprayGridPoint"];
+export type SprayGridStats = S["Core.Planning.SprayGridStats"];
+export type SprayMissionResult = S["Core.Planning.SprayMissionResult"];
+export type ElevationRaster = S["Core.Planning.ElevationRaster"];
 
 export type BackendClient = Client<paths>;
 

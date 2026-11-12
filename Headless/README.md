@@ -41,7 +41,7 @@ Configuration (`appsettings.json` or command line):
 | `tools/Publish-Tray.ps1` | Self-contained publish + zip of the tray app. |
 
 `MPBackend.Core` services (`Backend.*`): `Links`, `Vehicles`, `Params`, `Missions`, `Ftp`, `Logs`, `Terrain`,
-`Tiles`, `Calibration`, `ManualControl`, `Rtk`, `Adsb`, `Jobs`, `Events`.
+`Tiles`, `Planning`, `Calibration`, `ManualControl`, `Rtk`, `Adsb`, `Jobs`, `Events`.
 
 ## API overview
 
@@ -88,6 +88,7 @@ Global: `POST params/metadata/update`, `POST params/parse`, `GET logs/local`, `G
 | Mission files | `POST missions/parse`, `POST missions/export?format=` |
 | Terrain | `GET terrain/elevation?lat&lng&wait`, `POST terrain/profile`, `GET terrain/geoid?lat&lng` |
 | Maps | `GET maps/providers`, `GET maps/tiles/{provider}/{z}/{x}/{y}`, `POST maps/prefetch` (job), `GET/PUT maps/mode` |
+| Spray-grid planning | `POST planning/spraygrid/preview`, `POST planning/spraygrid/mission[?format=waypoints\|plan\|kml]` |
 
 - A plan is `{type, home, items[]}`; items use raw MAVLink units with `command` or `commandName`, `frame`,
   `param1-4`, `lat`, `lng`, `alt`. ArduPilot's mission item 0 (home) is returned as `home` and inserted on
@@ -97,6 +98,11 @@ Global: `POST params/metadata/update`, `POST params/parse`, `GET logs/local`, `G
 - Terrain: MP's `srtm` (GeoTIFF/DTED first, SRTM tiles downloaded on demand). Vehicle TERRAIN_REQUESTs are
   answered automatically.
 - Tiles: GMap.NET's providers, e.g. Leaflet `L.tileLayer('/api/v1/maps/tiles/BingSatelliteMap/{z}/{x}/{y}')`.
+- Spray-grid planning (`MPBackend.Core/Planning`): the SprayGrid-Soleon plugin's grid generator and mission
+  builder as pure code. A field polygon, obstacles, home and the plugin's parameters go in; parallel strips
+  (preview) or a full mission with the sprayer's `DO_SEND_SCRIPT_MESSAGE` commands, takeoff/RTL, time or
+  segment splits with DO_JUMP and footprint-based altitude tracking come out. Terrain comes from the srtm
+  store, from a height raster in the request, or not at all. No vehicle is needed; see `API.md` 3.16.
 
 ### Calibration and manual control
 
@@ -207,7 +213,8 @@ comments name the Mission Planner method each part was ported from.
 ## Known limitations
 
 - Not ported: firmware flashing/board detection, dataflash log analysis/graphs, tlog playback, video, speech,
-  DirectInput joystick (use the browser Gamepad API), DroneCAN, follow-me, survey/grid generation.
+  DirectInput joystick (use the browser Gamepad API), DroneCAN, follow-me, Mission Planner's survey grid
+  (the spray-grid planner under `planning/spraygrid` is the only mission generator).
 - Accel and compass calibration need a physical vehicle (verified only for the message flow in SITL).
 - A terrain-following (GLOBAL_TERRAIN_ALT) mission item made ArduPilot 4.7 SITL refuse to arm with
   "terrain data expired" even though all terrain blocks were loaded; check on hardware.

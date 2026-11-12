@@ -8,6 +8,7 @@ using MPBackend.Core.Links;
 using MPBackend.Core.Maps;
 using MPBackend.Core.Missions;
 using MPBackend.Core.Params;
+using MPBackend.Core.Planning;
 using MPBackend.Core.Terrain;
 using MPBackend.Core.Vehicles;
 
@@ -33,6 +34,7 @@ namespace MPBackend.Core
             Logs = new LogService(Vehicles, Jobs);
             Missions = new MissionService(Vehicles, Jobs, Events);
             Terrain = new TerrainService();
+            Planning = new SprayGridService();
             Tiles = new TileService(Jobs, options);
             Calibration = new CalibrationService(Vehicles, Params, Events);
             ManualControl = new ManualControlService(Vehicles);
@@ -66,6 +68,7 @@ namespace MPBackend.Core
         public LogService Logs { get; }
         public MissionService Missions { get; }
         public TerrainService Terrain { get; }
+        public SprayGridService Planning { get; }
         public TileService Tiles { get; }
         public CalibrationService Calibration { get; }
         public ManualControlService ManualControl { get; }

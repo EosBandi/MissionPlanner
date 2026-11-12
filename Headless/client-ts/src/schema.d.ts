@@ -2107,6 +2107,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/planning/spraygrid/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["Core.Planning.SprayGridRequest"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Core.Planning.SprayGridPreview"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Core.Planning.SprayGridPreview"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/planning/spraygrid/mission": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: {
+            parameters: {
+                query?: {
+                    format?: string;
+                };
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: {
+                content: {
+                    "application/json": components["schemas"]["Core.Planning.SprayGridRequest"];
+                };
+            };
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/json": components["schemas"]["Core.Planning.SprayMissionResult"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/rtk": {
         parameters: {
             query?: never;
@@ -3413,6 +3509,125 @@ export interface components {
             /** Format: double */
             default?: number | null;
         };
+        "Core.Planning.ElevationRaster": {
+            /** Format: double */
+            north?: number;
+            /** Format: double */
+            south?: number;
+            /** Format: double */
+            west?: number;
+            /** Format: double */
+            east?: number;
+            /** Format: int32 */
+            cols?: number;
+            /** Format: int32 */
+            rows?: number;
+            heights?: number[] | null;
+        };
+        /** @enum {string} */
+        "Core.Planning.SprayAltitudeReference": "Relative" | "Absolute" | "Terrain";
+        /** @enum {string} */
+        "Core.Planning.SprayElevationSource": "None" | "Backend" | "Raster";
+        "Core.Planning.SprayGridPoint": {
+            /** Format: double */
+            lat?: number;
+            /** Format: double */
+            lng?: number;
+            /** Format: double */
+            alt?: number;
+            tag?: string | null;
+            split?: boolean;
+        };
+        "Core.Planning.SprayGridPreview": {
+            points?: components["schemas"]["Core.Planning.SprayGridPoint"][] | null;
+            stats?: components["schemas"]["Core.Planning.SprayGridStats"];
+            warnings?: string[] | null;
+        };
+        "Core.Planning.SprayGridRequest": {
+            polygon?: components["schemas"]["Core.Terrain.LatLng"][] | null;
+            obstacles?: components["schemas"]["Core.Terrain.LatLng"][][] | null;
+            home?: components["schemas"]["Core.Planning.SprayHome"];
+            /** Format: double */
+            lineDistance?: number;
+            /** Format: double */
+            angle?: number;
+            /** Format: double */
+            shift?: number;
+            /** Format: int32 */
+            laneSeparation?: number;
+            startFrom?: components["schemas"]["Core.Planning.SprayStartPosition"];
+            startPoint?: components["schemas"]["Core.Terrain.LatLng"];
+            extendedEndpoint?: boolean;
+            /** Format: double */
+            litersPerHa?: number;
+            /** Format: double */
+            sprayBarWidth?: number;
+            /** Format: double */
+            flySpeed?: number;
+            expandObstacles?: boolean;
+            ignoreObstacles?: boolean;
+            /** Format: double */
+            altitude?: number;
+            /** Format: double */
+            gpsOffset?: number;
+            altitudeReference?: components["schemas"]["Core.Planning.SprayAltitudeReference"];
+            altitudeTracking?: boolean;
+            /** Format: double */
+            trackingAltitudeError?: number;
+            /** Format: double */
+            takeoffAltitude?: number;
+            addTakeoffAndRtl?: boolean;
+            headLock?: boolean;
+            /** Format: double */
+            delayAtWaypoint?: number;
+            splitBy?: components["schemas"]["Core.Planning.SpraySplitMode"];
+            /** Format: int32 */
+            splitValue?: number;
+            /** Format: double */
+            wpnavSpeed?: number | null;
+            elevationSource?: components["schemas"]["Core.Planning.SprayElevationSource"];
+            elevation?: components["schemas"]["Core.Planning.ElevationRaster"];
+            /** Format: double */
+            terrainWait?: number;
+        };
+        "Core.Planning.SprayGridStats": {
+            /** Format: double */
+            areaM2?: number;
+            /** Format: double */
+            readonly areaHa?: number;
+            /** Format: int32 */
+            strips?: number;
+            /** Format: double */
+            sprayDistanceM?: number;
+            /** Format: double */
+            sprayTimeS?: number;
+            /** Format: double */
+            totalDistanceM?: number;
+            /** Format: double */
+            flightTimeS?: number;
+            splitTimesS?: number[] | null;
+            /** Format: double */
+            litersTotal?: number;
+        };
+        "Core.Planning.SprayHome": {
+            /** Format: double */
+            lat?: number;
+            /** Format: double */
+            lng?: number;
+            /** Format: double */
+            alt?: number | null;
+        };
+        "Core.Planning.SprayMissionResult": {
+            mission?: components["schemas"]["Core.Missions.MissionPlan"];
+            points?: components["schemas"]["Core.Planning.SprayGridPoint"][] | null;
+            stats?: components["schemas"]["Core.Planning.SprayGridStats"];
+            segmentStartSeq?: number[] | null;
+            warnings?: string[] | null;
+        };
+        /** @enum {string} */
+        "Core.Planning.SpraySplitMode": "None" | "Time" | "Segments";
+        /** @enum {string} */
+        "Core.Planning.SprayStartPosition": "Home" | "BottomLeft" | "TopLeft" | "BottomRight" | "TopRight" | "Point";
         "Core.Telemetry.TelemetryField": {
             name?: string | null;
             type?: string | null;

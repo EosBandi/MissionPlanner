@@ -20,6 +20,7 @@ public static class Endpoints
         api.MapFileApi();
         api.MapMissionApi();
         api.MapControlApi();
+        api.MapPlanningApi();
         api.MapSystemApi();
     }
 

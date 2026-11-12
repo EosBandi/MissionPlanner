@@ -20,6 +20,7 @@ Contents
    - 3.8 [Missions, fences, rally points](#38-missions-fences-rally-points) · 3.9 [Terrain](#39-terrain) · 3.10 [Map tiles](#310-map-tiles)
    - 3.11 [Calibration](#311-calibration) · 3.12 [Manual control](#312-manual-control)
    - 3.13 [RTK / GPS injection](#313-rtk--gps-injection) · 3.14 [ADS-B](#314-ads-b) · 3.15 [Settings](#315-settings)
+   - 3.16 [Spray-grid planning](#316-spray-grid-planning)
 4. [WebSocket protocol](#4-websocket-protocol)
 5. [Data model reference](#5-data-model-reference)
 6. [Building a GCS UI on this API](#6-building-a-gcs-ui-on-this-api)
@@ -543,6 +544,76 @@ here under its own key prefix so they travel with the backend's data directory.
 | `PUT /settings/{key}` | `{ "value": "..." }` | 204 (saved to disk immediately) |
 | `DELETE /settings/{key}` | | 204, 404 |
 
+### 3.16 Spray-grid planning
+
+The SprayGrid-Soleon Mission Planner plugin as an endpoint: parallel spray strips across a field polygon, cut
+around obstacles, turned into an ArduPilot mission with the sprayer's Lua script messages. No vehicle is
+needed; the result is a `MissionPlan` for `PUT .../missions/mission` or a file.
+
+| Method & path | Body / query | Returns |
+|---|---|---|
+| `POST /planning/spraygrid/preview` | `SprayGridRequest` | `{ points, stats, warnings }`: the strips as S/E points with the requested altitude, plus area / strips / distances / times. Fast; call it on every parameter change. |
+| `POST /planning/spraygrid/mission` | `SprayGridRequest`, optional `?format=waypoints\|plan\|kml` | `{ mission, points, stats, segmentStartSeq, warnings }` with the full `MissionPlan` (home + items), or the mission file as an attachment when `format` is given. Waits for terrain (see below). |
+
+Request errors (polygon with fewer than 3 vertices, no home, non-positive `lineDistance` / `flySpeed`, a
+field too small for any strip on `/mission`) are 400 with the reason in the body.
+
+`SprayGridRequest` (metres, m/s, degrees; everything but `polygon` and `home` has a default):
+
+```json
+{ "polygon": [ { "lat": -35.3632, "lng": 149.1652 }, ... ],
+  "obstacles": [ [ { "lat": ..., "lng": ... }, ... ] ],
+  "home": { "lat": -35.3634, "lng": 149.1650, "alt": null },
+  "lineDistance": 5, "angle": 0, "shift": 0, "laneSeparation": 0,
+  "startFrom": "Home", "startPoint": null, "extendedEndpoint": true,
+  "litersPerHa": 20, "sprayBarWidth": 4, "flySpeed": 5, "expandObstacles": true, "ignoreObstacles": false,
+  "altitude": 3, "gpsOffset": 0.5, "altitudeReference": "Relative",
+  "altitudeTracking": false, "trackingAltitudeError": 0.5, "takeoffAltitude": 5,
+  "addTakeoffAndRtl": true, "headLock": false, "delayAtWaypoint": 0,
+  "splitBy": "None", "splitValue": 0, "wpnavSpeed": null,
+  "elevationSource": "Backend", "elevation": null, "terrainWait": 10 }
+```
+
+- **Grid**: `lineDistance` between strips, `angle` is the strip bearing in the UTM grid (0 = grid north),
+  `shift` moves the whole grid sideways, `laneSeparation` is the minimum number of strips skipped between
+  consecutive strips (0 = adjacent), `startFrom` is `Home`, `BottomLeft`, `TopLeft`, `BottomRight`,
+  `TopRight` or `Point` (then `startPoint` must be one of a previous preview's S/E points),
+  `extendedEndpoint` picks the next strip from the end of the current one.
+- **Spray**: `litersPerHa`, `sprayBarWidth` (also the vehicle footprint for terrain sampling), `flySpeed` on
+  the strips, `expandObstacles` grows each obstacle by half the bar width, `ignoreObstacles` plans the whole
+  field. Obstacle polygons must lie inside the field; circles are sent as polygons.
+- **Altitude**: waypoints fly at `altitude + gpsOffset` in the `altitudeReference` frame (`Relative`,
+  `Absolute`, `Terrain`). With an elevation source the Relative/Absolute altitudes are terrain-corrected per
+  waypoint (terrain under the point + target − terrain under home, as Mission Planner's "verify height" did
+  for the plugin). `altitudeTracking` additionally samples the highest terrain under the spray-bar footprint
+  (0.2 m steps) and inserts extra waypoints along each strip wherever the straight leg would be more than
+  `trackingAltitudeError` off the target height; inserted points have an empty `tag`.
+- **Mission**: `addTakeoffAndRtl` wraps each segment in TAKEOFF (`takeoffAltitude`, relative) and
+  RETURN_TO_LAUNCH; `headLock` adds CONDITION_YAW with the strip angle; `delayAtWaypoint` is WAYPOINT
+  param1; `wpnavSpeed` (the vehicle's WPNAV_SPEED in m/s, read it from `GET .../params/WPNAV_SPEED` ÷ 100
+  when a vehicle is connected) adds a DO_CHANGE_SPEED back to it after the last strip.
+- **Splits**: `splitBy` `Time` (`splitValue` minutes per segment including the flight home, estimated at
+  `flySpeed`) or `Segments` (`splitValue` segments cut at strip starts). Every segment is a full block
+  (sprayer setup, takeoff, speed, strips, RTL) and the mission starts with one DO_JUMP per segment so the
+  vehicle can be started at any segment with `POST .../missions/current` and `seq` from `segmentStartSeq`.
+  `stats.splitTimesS` holds the estimated duration of each time segment; a warning says when the time is too
+  short for the flight to the field and back.
+- **Terrain**: `elevationSource` `Backend` uses the srtm store (waits up to `terrainWait` seconds for tiles
+  to download; a warning is added when they were still missing, then retry), `Raster` uses `elevation`
+  (`{ north, south, west, east, cols, rows, heights[] }`, row-major from the north-west corner, metres AMSL,
+  null where unknown; the UI samples it from its own terrain provider), `None` applies no terrain correction.
+  `home.alt` is sampled from the elevation source when null.
+
+Sprayer protocol in the generated mission (unchanged from the plugin, consumed by the vehicle's Lua script):
+`DO_SEND_SCRIPT_MESSAGE` (217) with `param1 = 1` and `param2..4 = litersPerHa, lineDistance, flySpeed` once
+per segment, `param1 = 2, param2 = 3, param3 = distance to the strip end` after every strip-start waypoint and
+`param1 = 2, param2 = 0` after every strip-end waypoint. Strip starts and ends carry `param4 = 1` / `2` on
+the WAYPOINT; Relative waypoints carry the height above the terrain under the point in `param3`.
+
+Differences from the plugin: altitudes are not truncated to whole metres; altitude-tracking points are kept in
+split missions; the last segment of a `Segments` split always reaches the end of the grid; the plugin's
+disabled obstacle-routing code (`I` points) is not ported; display-unit conversion is the UI's job.
+
 ---
 
 ## 4. WebSocket protocol
@@ -793,9 +864,10 @@ time are serialised per link by the backend but will overwrite each other logica
 ### What the backend does not do
 
 Firmware flashing and board detection, dataflash log analysis, tlog playback, video, speech, DirectInput
-joysticks (use the browser Gamepad API), DroneCAN, follow-me and survey grid generation are not available
-through this API (see "Known limitations" in `README.md`). The raw `mavlink` stream and `POST .../command` cover
-many ad-hoc needs that the typed endpoints do not.
+joysticks (use the browser Gamepad API), DroneCAN, follow-me and Mission Planner's survey grid are not
+available through this API (see "Known limitations" in `README.md`); the spray-grid planner (3.16) is the one
+mission generator. The raw `mavlink` stream and `POST .../command` cover many ad-hoc needs that the typed
+endpoints do not.
 
 ---
 
