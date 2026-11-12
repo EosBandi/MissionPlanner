@@ -119,7 +119,15 @@ Golden `.grid`/`.waypoints` comparison dropped on the user's decision.
 5. Cesium elevation mode: sample the field bbox with `sampleTerrainMostDetailed` at about 1 m spacing into the
    raster the backend accepts (progress indicator; cancellable).
 
-## Phase 3: packaging
+## Phase 3: packaging - done 2026-11-12
+
+Tauri 2 shell in `src-tauri/` of the SprayGrid repo: picks a free port, spawns the published backend
+(`tools/Publish-Backend.ps1` -> `src-tauri/binaries/mpbackend-x86_64-pc-windows-msvc.exe`, 122 MB
+self-contained single file) with its data under the app's local-data folder, exposes the URL to the UI
+(`backend_info` command), native open/save dialogs, kills the sidecar on exit. NSIS installer
+(46 MB) built with `npm run tauri build`; GitHub Actions workflow included. Rust 1.99 installed via winget.
+Open: the sidecar is orphaned if the shell crashes (a Windows job object would fix that); code signing.
+
 
 - `tools/Publish-Backend.ps1` in the new repo: `dotnet publish` MPBackend.Server self-contained win-x64
   single-file into `src-tauri/binaries/` (Tauri sidecar naming), copying `appsettings.json` with the SprayGrid
