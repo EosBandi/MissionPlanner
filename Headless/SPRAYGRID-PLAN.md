@@ -158,3 +158,27 @@ vendors `@soleon/client`; the mpheadless copy of the planner stays as the upstre
 - `.grid` files store `fences` as `Locationwp` lists; the new app writes an empty list and reads obstacles from
   `obstaclesmarks`.
 - Cesium-mode elevation accuracy depends on the sampled raster spacing (1 m default; configurable).
+
+## State at the end of 2026-11-12 and how to continue
+
+Repositories:
+
+| Repo | Where | GitHub | Head |
+|---|---|---|---|
+| mpheadless (`headless-gcs`) | `D:/00Git/mpheadless` | `EosBandi/MissionPlanner` (public; the user pushes this branch) | planner upstream, API.md 3.16, tile fix |
+| SoleonBackend | `D:/00Git/SoleonBackend` | `EosBandi/SoleonBackend` (private) | 658c765 |
+| SprayGrid | `D:/00Git/SprayGrid` | `EosBandi/SprayGrid` (private) | d34a9f6 |
+
+Verified by the user on a real field in Hungary: strips, obstacles, parameter changes (after the overlay fix),
+export. Build chain on this machine: SoleonBackend `dotnet build SoleonBackend.slnx`; SprayGrid
+`npm run publish:backend` then `npm run tauri build` (cargo in `C:/Users/bandi/.cargo/bin`).
+
+Open items:
+
+- SprayGrid CI: add the `SOLEONBACKEND_TOKEN` secret so Actions can check out the private SoleonBackend.
+- Tauri shell: the sidecar stays running if the shell crashes (use a Windows job object); the installer is
+  unsigned and the bundle identifier is a placeholder.
+- A real-field `.grid` fixture for the planner tests (the tests use a traced CMAC rectangle).
+- SoleonBackend `docs/pdf` not regenerated; ACCBackend could take the same tile-proxy fix.
+- Ideas not started: vehicle upload from the app (the backend already supports `PUT .../missions/mission`),
+  per-strip editing, KML export of the field itself, units other than metric.
