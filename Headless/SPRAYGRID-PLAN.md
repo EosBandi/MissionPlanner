@@ -139,10 +139,14 @@ Open: the sidecar is orphaned if the shell crashes (a Windows job object would f
 - The app currently depends on `../mpheadless/Headless/client-ts` as a `file:` package; vendor the built
   client (or publish it) before the installer build so the SprayGrid repo stands alone.
 
-## Phase 4: ACCBackend port (later)
+## Phase 4: SoleonBackend - done 2026-11-12
 
-Copy `Planning/` + `PlanningEndpoints.cs` + DTOs + tests into `D:\00Git\ACCBackend\src`, add Clipper2, update
-its API reference and client.
+On the user's decision the planner was not added to ACCBackend itself: `D:/00Git/SoleonBackend` is a fresh
+copy of ACCBackend (single initial commit) renamed to SoleonBackend.* / config section `Soleon:` / data dir
+`%LOCALAPPDATA%/SoleonBackend` / `soleon.log` / npm `@soleon/client`, with the ACC turbine features (CanBridge
+relays, named values, TurbineStatus) removed and `Planning/` + the endpoints, tests and API-Reference 4.16 added.
+Default port stays 5880. SprayGrid publishes its sidecar from SoleonBackend (`tools/Publish-Backend.ps1`) and
+vendors `@soleon/client`; the mpheadless copy of the planner stays as the upstream source.
 
 ## Open items and risks
 
