@@ -92,7 +92,28 @@ namespace MPBackend.Core.Maps
             }
 
             var bytes = image.Data.ToArray();
-            return new MapTile(bytes, Sniff(bytes));
+            // some providers answer "no tile here" with a gzip-compressed stub that GMap stores as-is
+            if (bytes.Length > 2 && bytes[0] == 0x1F && bytes[1] == 0x8B)
+                bytes = Gunzip(bytes);
+            var contentType = Sniff(bytes);
+            // anything that is not an image is a provider error page or stub: report it as a missing tile
+            return contentType == "application/octet-stream" ? null : new MapTile(bytes, contentType);
+        }
+
+        private static byte[] Gunzip(byte[] data)
+        {
+            try
+            {
+                using var input = new System.IO.Compression.GZipStream(new MemoryStream(data),
+                    System.IO.Compression.CompressionMode.Decompress);
+                using var output = new MemoryStream();
+                input.CopyTo(output);
+                return output.ToArray();
+            }
+            catch (Exception)
+            {
+                return data;
+            }
         }
 
         /// <summary>

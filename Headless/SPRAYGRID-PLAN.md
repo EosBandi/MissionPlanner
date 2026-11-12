@@ -91,7 +91,15 @@ API.md section 3.16, client-ts regenerated. Still open: golden comparison agains
    old plugin produced for them (to be supplied or generated with the old build); unit tests for split by
    time/segments, obstacle inflation, alt-tracking interim points on synthetic terrain, and `.grid` round trip.
 
-## Phase 2: UI (new repo `D:\00Git\SprayGrid`)
+## Phase 2: UI (new repo `D:\00Git\SprayGrid`) — done 2026-11-12
+
+Vite + React + TypeScript + CesiumJS app in `D:\00Git\SprayGrid` (own git repo): field/obstacle/home drawing
+with vertex drag, debounced preview, parameter panel, statistics, `.grid` read/write compatible with the old
+plugin, KML/KMZ/GeoJSON/.poly import, `.waypoints`/`.plan`/`.kml` export through the backend, settings with
+Mapbox / Cesium ion tokens, backend tile proxy fallback, Cesium-terrain raster sampling for the altitude
+pass. Verified in the browser against the backend with the CMAC test field. Not yet a desktop exe (Phase 3).
+Golden `.grid`/`.waypoints` comparison dropped on the user's decision.
+
 
 1. Scaffold: `create-tauri-app` (React + TS + Vite), `cesium` + `vite-plugin-cesium`, `@mpbackend/client`
    (file dependency on `mpheadless/Headless/client-ts` or a vendored build), `zustand` state, Tailwind with
@@ -120,6 +128,8 @@ API.md section 3.16, client-ts regenerated. Still open: golden comparison agains
   installer; app icon; version from one place.
 - GitHub Actions (windows-latest): build backend publish + `tauri build`, upload the installer artifact.
 - Prerequisite on this machine: the Rust toolchain (`rustup`, MSVC target) is not installed yet.
+- The app currently depends on `../mpheadless/Headless/client-ts` as a `file:` package; vendor the built
+  client (or publish it) before the installer build so the SprayGrid repo stands alone.
 
 ## Phase 4: ACCBackend port (later)
 
