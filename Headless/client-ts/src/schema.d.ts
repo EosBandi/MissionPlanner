@@ -2734,6 +2734,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/terrain/heightmap/{level}/{x}/{y}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: {
+            parameters: {
+                query?: {
+                    size?: number;
+                    wait?: number;
+                };
+                header?: never;
+                path: {
+                    level: number;
+                    x: number;
+                    y: number;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description Success */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "application/problem+json": components["schemas"]["Microsoft.AspNetCore.Mvc.ProblemDetails"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/vehicles": {
         parameters: {
             query?: never;
@@ -3706,6 +3755,16 @@ export interface components {
         "MAVLink.MAV_FRAME": "GLOBAL" | "LOCAL_NED" | "MISSION" | "GLOBAL_RELATIVE_ALT" | "LOCAL_ENU" | "GLOBAL_INT" | "GLOBAL_RELATIVE_ALT_INT" | "LOCAL_OFFSET_NED" | "BODY_NED" | "BODY_OFFSET_NED" | "GLOBAL_TERRAIN_ALT" | "GLOBAL_TERRAIN_ALT_INT" | "BODY_FRD" | "RESERVED_13" | "RESERVED_14" | "RESERVED_15" | "RESERVED_16" | "RESERVED_17" | "RESERVED_18" | "RESERVED_19" | "LOCAL_FRD" | "LOCAL_FLU";
         /** @enum {string} */
         "MAVLink.MAV_MISSION_TYPE": "MISSION" | "FENCE" | "RALLY" | "ALL";
+        "Microsoft.AspNetCore.Mvc.ProblemDetails": {
+            type?: string | null;
+            title?: string | null;
+            /** Format: int32 */
+            status?: number | null;
+            detail?: string | null;
+            instance?: string | null;
+        } & {
+            [key: string]: unknown;
+        };
         "Server.Api.AcceptedResult": {
             accepted?: boolean;
         };

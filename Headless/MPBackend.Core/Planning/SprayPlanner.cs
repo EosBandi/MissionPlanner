@@ -223,7 +223,8 @@ namespace MPBackend.Core.Planning
                 return result;
             }
 
-            // homealt stays 0 unless altitude tracking (relative/absolute) sets it; it feeds WAYPOINT param3
+            // terrain under home; feeds WAYPOINT param3 so a Relative waypoint carries its height above the terrain
+            // under the point (the target) whether or not altitude tracking inserted points
             double homealt = 0;
 
             if (r.AltitudeTracking && sampler.Available)
@@ -256,6 +257,8 @@ namespace MPBackend.Core.Planning
                 // The plugin forced the Flight Planner's "verify height" on, which rewrites every waypoint's
                 // altitude from srtm when it is added: terrain under the point + target - terrain under home.
                 double homeTerrain = Sample(home.Lat, home.Lng) ?? (r.Home.Alt ?? 0);
+                if (r.AltitudeReference == SprayAltitudeReference.Relative)
+                    homealt = homeTerrain;
                 foreach (var p in grid)
                 {
                     switch (r.AltitudeReference)

@@ -148,6 +148,36 @@ relays, named values, TurbineStatus) removed and `Planning/` + the endpoints, te
 Default port stays 5880. SprayGrid publishes its sidecar from SoleonBackend (`tools/Publish-Backend.ps1`) and
 vendors `@soleon/client`; the mpheadless copy of the planner stays as the upstream source.
 
+## Phase 5: 3D view - done 2026-11-15
+
+Decisions (with the user): target is the SprayGrid app; terrain relief from Cesium World Terrain **or** the
+backend's SRTM store, user selectable; the 3D route is the full mission from `POST /planning/spraygrid/mission`
+(debounced on every edit, same request builder as Export); style is the route line plus vertical drop lines.
+
+- Backend (mpheadless first, copied to SoleonBackend): `GET /terrain/heightmap/{level}/{x}/{y}?size=65&wait=30`
+  in `TerrainService.GetHeightmapAsync` / `MapEndpoints`: float32 heights above the ellipsoid (SRTM + EGM96, the
+  geoid evaluated at the tile corners and interpolated, since one EGM96 evaluation costs ~4 ms) on Cesium's
+  geographic tiling scheme; tiles coarser than level 9 are flat so a globe view does not queue SRTM downloads.
+  Tests in `TerrainHeightmapTests`, API.md 3.9 / API-Reference 4.9.
+- App: `Settings.terrainSource` (`none | ion | backend`) replaces the terrain checkbox; `terrain/backendTerrain.ts`
+  wraps the endpoint in a `CustomHeightmapTerrainProvider`; `terrain/sample.ts` samples any provider (ion by
+  availability, backend at level 13, ellipsoid = 0). `store.view` (`2D | 3D`, persisted) drives the toolbar
+  toggle; 3D = `morphTo3D` + depth test + 40 degree tilted framing, 2D = `morphTo2D` top-down. `map/route.ts`
+  turns the mission items into nav points (217/2 state machine for spray legs, param4 for S/E markers) and
+  resolves heights against the rendered ground (relative: ground under home; terrain frame: ground under the
+  point; AMSL: relative to the planner's home AMSL). `api/missionRequest.ts` is shared by Export and the live
+  3D route (raster sampling cached by area). Verified on a hillside near Mount Majura: 41 strips, waypoints
+  5.0-5.4 m above the rendered ground, takeoff climb and dashed RTL drawn, 2D picking/measure still works.
+- Making altitude tracking visible (user feedback the same day): intermediate (tracking) waypoints are cyan
+  markers and counted in the stats card; in the Relative/Absolute frames each straight leg is sampled every
+  10 m against the rendered terrain and drawn orange where it gets closer to the ground than
+  `altitude - max tracking error` (the stats card says how many and suggests tracking); in the Terrain frame
+  the legs are drawn as terrain-following curves through those samples (the FC follows the ground between
+  waypoints) and the clearance warning is skipped. Checked with the user's `field.grid` (Gellert Hill,
+  13.4 ha, 9 strips, 50 m terrain frame): waypoints 50.0-50.7 m above ground.
+- Also on the user's decision: Relative missions without tracking write WAYPOINT param3 = target height above
+  the terrain under the point (was target minus home terrain; the old plugin had the same quirk).
+
 ## Open items and risks
 
 - Golden reference data: a `.grid` and matching `.waypoints` from the old plugin are needed to prove fidelity.

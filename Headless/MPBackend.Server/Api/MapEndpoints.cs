@@ -111,6 +111,31 @@ public static class MapEndpoints
         t.MapGet("/geoid", (double lat, double lng) =>
                 new GeoidResult(lat, lng, TerrainService.GeoidUndulation(lat, lng)))
             .WithSummary("EGM96 geoid height above the WGS84 ellipsoid (metres)");
+
+        t.MapGet("/heightmap/{level}/{x}/{y}", async (Backend b, int level, int x, int y, int? size, double? wait,
+                HttpResponse response, CancellationToken ct) =>
+            {
+                var n = size ?? 65;
+                if (level < 0 || level > TerrainService.MaxHeightmapLevel || x < 0 || x >= (2 << level) ||
+                    y < 0 || y >= (1 << level))
+                    return Results.Problem("level/x/y outside the geographic tiling scheme", statusCode: 400);
+                if (n < TerrainService.MinHeightmapSize || n > TerrainService.MaxHeightmapSize)
+                    return Results.Problem(
+                        $"size must be {TerrainService.MinHeightmapSize}..{TerrainService.MaxHeightmapSize}",
+                        statusCode: 400);
+                var heights = await b.Terrain.GetHeightmapAsync(level, x, y, n, TimeSpan.FromSeconds(wait ?? 30), ct);
+                var bytes = new byte[heights.Length * sizeof(float)];
+                Buffer.BlockCopy(heights, 0, bytes, 0, bytes.Length);
+                response.Headers.CacheControl = "no-store";
+                return Results.Bytes(bytes, "application/octet-stream");
+            })
+            .Produces(200, contentType: "application/octet-stream")
+            .ProducesProblem(400)
+            .WithSummary("Heightmap tile for a 3D map: size*size little-endian float32 heights in metres above the " +
+                         "WGS84 ellipsoid (SRTM + EGM96 undulation), row 0 north, column 0 west, edges inclusive. " +
+                         "Tile grid = Cesium GeographicTilingScheme (2x1 at level 0). Waits up to 'wait' seconds " +
+                         "(default 30) for SRTM downloads; unknown and ocean heights are 0, and tiles coarser than level " +
+                         $"{TerrainService.MinSampledLevel} are flat.");
     }
 
     private static void MapTiles(RouteGroupBuilder maps)

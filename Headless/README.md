@@ -86,7 +86,7 @@ Global: `POST params/metadata/update`, `POST params/parse`, `GET logs/local`, `G
 |---|---|
 | Missions (`{type}` = mission, fence, rally) | `GET vehicles/{s}/{c}/missions/{type}[?format=waypoints\|plan\|kml]`, `PUT .../missions/{type}`, `POST .../missions/{type}/file`, `DELETE .../missions/{type}`, `POST .../missions/current` |
 | Mission files | `POST missions/parse`, `POST missions/export?format=` |
-| Terrain | `GET terrain/elevation?lat&lng&wait`, `POST terrain/profile`, `GET terrain/geoid?lat&lng` |
+| Terrain | `GET terrain/elevation?lat&lng&wait`, `POST terrain/profile`, `GET terrain/geoid?lat&lng`, `GET terrain/heightmap/{level}/{x}/{y}` (Cesium heightmap tiles) |
 | Maps | `GET maps/providers`, `GET maps/tiles/{provider}/{z}/{x}/{y}`, `POST maps/prefetch` (job), `GET/PUT maps/mode` |
 | Spray-grid planning | `POST planning/spraygrid/preview`, `POST planning/spraygrid/mission[?format=waypoints\|plan\|kml]` |
 

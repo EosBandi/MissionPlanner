@@ -267,6 +267,8 @@ namespace MPBackend.Tests.Planning
             Assert.IsTrue(rel.Mission.Items.Where(i => i.CommandName == "WAYPOINT").All(i => Math.Abs(i.Alt - 5.5f) < 1e-4),
                 "relative = terrain + target - home terrain");
             Assert.AreEqual(98, rel.Mission.Home.Alt, "home altitude sampled");
+            Assert.IsTrue(rel.Mission.Items.Where(i => i.CommandName == "WAYPOINT").All(i => Math.Abs(i.Param3 - 3.5f) < 1e-4),
+                "param3 = height above the terrain under the point, also without tracking");
 
             r.AltitudeReference = SprayAltitudeReference.Absolute;
             var abs = SprayPlanner.BuildMission(r, flat);

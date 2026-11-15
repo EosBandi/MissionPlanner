@@ -101,6 +101,97 @@ namespace MPBackend.Core.Terrain
 
         public static double GeoidUndulation(double lat, double lng) => GeoidHeightsDotNet.GeoidHeights.undulation(lat, lng);
 
+        public const int MinHeightmapSize = 2;
+        public const int MaxHeightmapSize = 257;
+        public const int MaxHeightmapLevel = 20;
+        /// <summary>Tiles coarser than this come back flat (0) without touching the SRTM store: a whole-globe
+        /// view would otherwise queue downloads of every 1x1 degree SRTM tile on earth.</summary>
+        public const int MinSampledLevel = 9;
+
+        /// <summary>
+        /// The geographic (WGS84 degrees) tile rectangle of Cesium's GeographicTilingScheme: two tiles across and one
+        /// down at level 0, each level splits a tile in four, x grows eastward from -180 and y grows southward from +90.
+        /// Returns (West, South, East, North) in degrees.
+        /// </summary>
+        public static (double West, double South, double East, double North) TileRectangle(int level, int x, int y)
+        {
+            if (level < 0 || level > MaxHeightmapLevel)
+                throw new ArgumentOutOfRangeException(nameof(level));
+            var tilesX = 2 << level; // 2 * 2^level
+            var tilesY = 1 << level;
+            if (x < 0 || x >= tilesX)
+                throw new ArgumentOutOfRangeException(nameof(x));
+            if (y < 0 || y >= tilesY)
+                throw new ArgumentOutOfRangeException(nameof(y));
+            var width = 180.0 / tilesY; // 180 / 2^level
+            var west = -180.0 + x * width;
+            var north = 90.0 - y * width;
+            return (west, north - width, west + width, north);
+        }
+
+        /// <summary>
+        /// Sample positions of a <paramref name="size"/> x <paramref name="size"/> heightmap over a tile: row 0 is the
+        /// north edge, column 0 the west edge, both edges inclusive (Cesium's heightmap layout).
+        /// </summary>
+        public static IEnumerable<LatLng> HeightmapPositions(int level, int x, int y, int size)
+        {
+            if (size < MinHeightmapSize || size > MaxHeightmapSize)
+                throw new ArgumentOutOfRangeException(nameof(size));
+            var (west, south, east, north) = TileRectangle(level, x, y);
+            for (var r = 0; r < size; r++)
+            {
+                var lat = north - (north - south) * r / (size - 1);
+                for (var c = 0; c < size; c++)
+                    yield return new LatLng(lat, west + (east - west) * c / (size - 1));
+            }
+        }
+
+        /// <summary>
+        /// A heightmap tile for a 3D map client (Cesium's CustomHeightmapTerrainProvider): <paramref name="size"/>²
+        /// heights in metres above the WGS84 ellipsoid (SRTM AMSL plus the EGM96 undulation), row 0 north, column 0
+        /// west. Waits up to <paramref name="wait"/> for SRTM tiles still downloading; heights still unknown after
+        /// that, and ocean, are 0, as is every tile coarser than <see cref="MinSampledLevel"/>.
+        /// </summary>
+        public async Task<float[]> GetHeightmapAsync(int level, int x, int y, int size, TimeSpan wait,
+            CancellationToken ct = default)
+        {
+            var positions = HeightmapPositions(level, x, y, size).ToList();
+            if (level < MinSampledLevel)
+                return new float[positions.Count];
+            // The EGM96 evaluation costs milliseconds per point; the geoid changes by centimetres across a tile of
+            // level 9 or finer, so evaluate the four corners and interpolate.
+            var (west, south, east, north) = TileRectangle(level, x, y);
+            double uNW = GeoidUndulation(north, west), uNE = GeoidUndulation(north, east);
+            double uSW = GeoidUndulation(south, west), uSE = GeoidUndulation(south, east);
+            double Undulation(int index)
+            {
+                var fr = (double)(index / size) / (size - 1); // 0 at the north edge
+                var fc = (double)(index % size) / (size - 1); // 0 at the west edge
+                var n = uNW + (uNE - uNW) * fc;
+                var s = uSW + (uSE - uSW) * fc;
+                return n + (s - n) * fr;
+            }
+
+            var deadline = DateTime.UtcNow + wait;
+            while (true)
+            {
+                var results = positions.Select(p => srtm.getAltitude(p.Lat, p.Lng)).ToList();
+                if (results.All(r => r.currenttype != srtm.tiletype.invalid) || DateTime.UtcNow >= deadline)
+                {
+                    var heights = new float[positions.Count];
+                    for (var i = 0; i < heights.Length; i++)
+                    {
+                        var r = results[i];
+                        heights[i] = r.currenttype == srtm.tiletype.valid ? (float)(r.alt + Undulation(i)) : 0f;
+                    }
+
+                    return heights;
+                }
+
+                await Task.Delay(250, ct).ConfigureAwait(false);
+            }
+        }
+
         private static Elevation ToElevation(double lat, double lng, srtm.altresponce r) => new Elevation(
             lat, lng,
             r.currenttype == srtm.tiletype.invalid ? null : r.alt,
