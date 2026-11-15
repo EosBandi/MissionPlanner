@@ -103,6 +103,9 @@ Global: `POST params/metadata/update`, `POST params/parse`, `GET logs/local`, `G
   (preview) or a full mission with the sprayer's `DO_SEND_SCRIPT_MESSAGE` commands, takeoff/RTL, time or
   segment splits with DO_JUMP and footprint-based altitude tracking come out. Terrain comes from the srtm
   store, from a height raster in the request, or not at all. No vehicle is needed; see `API.md` 3.16.
+  The planner and the heightmap tiles are maintained in the SoleonBackend repository (the backend of the
+  SprayGrid app and the Soleon Pilot screen) since 2026-11-15; the copies here stay as generic features and
+  are not updated from there.
 
 ### Calibration and manual control
 
